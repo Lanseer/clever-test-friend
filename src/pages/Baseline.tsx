@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { CreateDocumentDialog } from "@/components/baseline/CreateDocumentDialog";
 
 interface Document {
   id: string;
@@ -31,14 +32,15 @@ interface Document {
   updatedAt: string;
   author: string;
   category: string;
+  createdBy: string;
 }
 
 const mockDocuments: Document[] = [
-  { id: "1", name: "API接口规范文档", version: "v2.3.0", status: "published", updatedAt: "2024-01-15", author: "张三", category: "接口规范" },
-  { id: "2", name: "测试用例模板", version: "v1.5.0", status: "published", updatedAt: "2024-01-14", author: "李四", category: "测试模板" },
-  { id: "3", name: "自动化测试框架指南", version: "v3.0.0", status: "draft", updatedAt: "2024-01-13", author: "王五", category: "框架指南" },
-  { id: "4", name: "性能测试标准", version: "v1.2.0", status: "published", updatedAt: "2024-01-12", author: "赵六", category: "性能标准" },
-  { id: "5", name: "安全测试规范", version: "v2.0.0", status: "archived", updatedAt: "2024-01-10", author: "钱七", category: "安全规范" },
+  { id: "1", name: "API接口规范文档", version: "v2.3.0", status: "published", updatedAt: "2024-01-15", author: "张三", category: "接口规范", createdBy: "Lanseer" },
+  { id: "2", name: "测试用例模板", version: "v1.5.0", status: "published", updatedAt: "2024-01-14", author: "李四", category: "测试模板", createdBy: "Lanseer" },
+  { id: "3", name: "自动化测试框架指南", version: "v3.0.0", status: "draft", updatedAt: "2024-01-13", author: "王五", category: "框架指南", createdBy: "Admin" },
+  { id: "4", name: "性能测试标准", version: "v1.2.0", status: "published", updatedAt: "2024-01-12", author: "赵六", category: "性能标准", createdBy: "Lanseer" },
+  { id: "5", name: "安全测试规范", version: "v2.0.0", status: "archived", updatedAt: "2024-01-10", author: "钱七", category: "安全规范", createdBy: "Admin" },
 ];
 
 const categories = ["全部", "接口规范", "测试模板", "框架指南", "性能标准", "安全规范"];
@@ -46,6 +48,7 @@ const categories = ["全部", "接口规范", "测试模板", "框架指南", "�
 export default function Baseline() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("全部");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const filteredDocuments = mockDocuments.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -72,13 +75,18 @@ export default function Baseline() {
               <h1 className="text-2xl font-bold text-foreground">基线数据</h1>
               <p className="text-sm text-muted-foreground mt-1">文档管理中心 · 版本化文档管理</p>
             </div>
-            <Button className="gradient-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity">
+            <Button 
+              className="gradient-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
+              onClick={() => setIsCreateDialogOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               新建文档
             </Button>
           </div>
         </div>
       </header>
+
+      <CreateDocumentDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
 
       <div className="p-6">
         {/* Search and Filter */}
@@ -113,9 +121,10 @@ export default function Baseline() {
         {/* Documents List */}
         <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
           <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-            <div className="col-span-5">文档名称</div>
+            <div className="col-span-4">文档名称</div>
             <div className="col-span-2">版本</div>
-            <div className="col-span-2">状态</div>
+            <div className="col-span-2">创建人</div>
+            <div className="col-span-1">状态</div>
             <div className="col-span-2">更新时间</div>
             <div className="col-span-1">操作</div>
           </div>
@@ -129,7 +138,7 @@ export default function Baseline() {
                   className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="col-span-5 flex items-center gap-3">
+                  <div className="col-span-4 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <FileText className="w-5 h-5 text-primary" />
                     </div>
@@ -146,7 +155,13 @@ export default function Baseline() {
                       {doc.version}
                     </Badge>
                   </div>
-                  <div className="col-span-2 flex items-center">
+                  <div className="col-span-2 flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="w-3 h-3 text-primary" />
+                    </div>
+                    <span className="text-sm text-foreground">{doc.createdBy}</span>
+                  </div>
+                  <div className="col-span-1 flex items-center">
                     <Badge variant="outline" className={statusConfig.className}>
                       {statusConfig.label}
                     </Badge>
