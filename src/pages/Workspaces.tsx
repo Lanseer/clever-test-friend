@@ -34,12 +34,10 @@ interface Workspace {
 }
 
 const mockWorkspaces: Workspace[] = [
-  { id: "1", name: "移动端测试", description: "iOS和Android应用测试项目", members: 8, documents: 45, lastActive: "2小时前", color: "217 91% 60%" },
-  { id: "2", name: "Web前端测试", description: "React/Vue项目自动化测试", members: 12, documents: 78, lastActive: "30分钟前", color: "262 83% 58%" },
-  { id: "3", name: "API接口测试", description: "后端API自动化测试套件", members: 6, documents: 32, lastActive: "1天前", color: "142 76% 36%" },
-  { id: "4", name: "性能测试", description: "压力测试与性能优化", members: 4, documents: 18, lastActive: "3小时前", color: "38 92% 50%" },
-  { id: "5", name: "安全测试", description: "渗透测试与安全审计", members: 5, documents: 25, lastActive: "5小时前", color: "0 84% 60%" },
-  { id: "6", name: "回归测试", description: "版本发布回归测试用例", members: 10, documents: 120, lastActive: "刚刚", color: "280 68% 55%" },
+  { id: "1", name: "SCB", description: "渣打银行测试项目空间", members: 12, documents: 156, lastActive: "30分钟前", color: "142 76% 36%" },
+  { id: "2", name: "DBS", description: "星展银行测试项目空间", members: 8, documents: 89, lastActive: "2小时前", color: "217 91% 60%" },
+  { id: "3", name: "CBS", description: "招商银行测试项目空间", members: 15, documents: 234, lastActive: "刚刚", color: "0 84% 60%" },
+  { id: "4", name: "研发中心", description: "内部研发测试项目空间", members: 20, documents: 312, lastActive: "1小时前", color: "262 83% 58%" },
 ];
 
 export default function Workspaces() {
