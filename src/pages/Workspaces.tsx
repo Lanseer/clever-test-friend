@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Plus, 
   Search, 
@@ -13,7 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 
 interface Workspace {
   id: string;
@@ -34,19 +33,24 @@ interface Workspace {
 }
 
 const mockWorkspaces: Workspace[] = [
-  { id: "1", name: "SCB", description: "渣打银行测试项目空间", members: 12, documents: 156, lastActive: "30分钟前", color: "142 76% 36%" },
-  { id: "2", name: "DBS", description: "星展银行测试项目空间", members: 8, documents: 89, lastActive: "2小时前", color: "217 91% 60%" },
-  { id: "3", name: "CBS", description: "招商银行测试项目空间", members: 15, documents: 234, lastActive: "刚刚", color: "0 84% 60%" },
-  { id: "4", name: "研发中心", description: "内部研发测试项目空间", members: 20, documents: 312, lastActive: "1小时前", color: "262 83% 58%" },
+  { id: "scb", name: "SCB", description: "渣打银行测试项目空间", members: 12, documents: 156, lastActive: "30分钟前", color: "142 76% 36%" },
+  { id: "dbs", name: "DBS", description: "星展银行测试项目空间", members: 8, documents: 89, lastActive: "2小时前", color: "217 91% 60%" },
+  { id: "cbs", name: "CBS", description: "招商银行测试项目空间", members: 15, documents: 234, lastActive: "刚刚", color: "0 84% 60%" },
+  { id: "rnd", name: "研发中心", description: "内部研发测试项目空间", members: 20, documents: 312, lastActive: "1小时前", color: "262 83% 58%" },
 ];
 
 export default function Workspaces() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const filteredWorkspaces = mockWorkspaces.filter(ws =>
     ws.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ws.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleWorkspaceClick = (workspaceId: string) => {
+    navigate(`/workspace/${workspaceId}`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -85,6 +89,7 @@ export default function Workspaces() {
               key={workspace.id}
               className="group bg-card rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden animate-scale-in cursor-pointer"
               style={{ animationDelay: `${index * 50}ms` }}
+              onClick={() => handleWorkspaceClick(workspace.id)}
             >
               {/* Color Bar */}
               <div 

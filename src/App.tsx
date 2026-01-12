@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Baseline from "./pages/Baseline";
 import Workspaces from "./pages/Workspaces";
+import WorkspaceDetail from "./pages/WorkspaceDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               </MainLayout>
             }
           />
+          <Route path="/workspace/:workspaceId/*" element={<WorkspaceDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
