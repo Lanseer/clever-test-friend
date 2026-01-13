@@ -6,6 +6,7 @@ import TestCases from "./workspace/TestCases";
 import TestCaseDetail from "./workspace/TestCaseDetail";
 import AIGeneratedCases from "./workspace/AIGeneratedCases";
 import CaseReview from "./workspace/CaseReview";
+import Dashboard from "./Index";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -63,7 +64,7 @@ export default function WorkspaceDetail() {
         <main className="flex-1 p-6 overflow-auto">
           <Routes>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<WorkspaceDashboard workspace={workspace} />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="knowledge" element={<Knowledge />} />
             <Route path="management/cases" element={<TestCases />} />
             <Route path="management/cases/:caseId" element={<TestCaseDetail />} />
