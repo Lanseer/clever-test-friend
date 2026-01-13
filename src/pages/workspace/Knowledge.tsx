@@ -180,10 +180,9 @@ export default function Knowledge() {
         {/* Documents List */}
         <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
           <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-            <div className="col-span-4">文档名称</div>
+            <div className="col-span-5">文档名称</div>
             <div className="col-span-1">类型</div>
             <div className="col-span-2">版本</div>
-            <div className="col-span-1">状态</div>
             <div className="col-span-2">更新时间</div>
             <div className="col-span-1">作者</div>
             <div className="col-span-1">操作</div>
@@ -191,7 +190,6 @@ export default function Knowledge() {
 
           <div className="divide-y divide-border">
             {filteredDocs.map((doc, index) => {
-              const statusConfig = getStatusBadge(doc.status);
               const typeInfo = typeConfig[doc.type];
               const TypeIcon = typeInfo.icon;
               
@@ -201,7 +199,7 @@ export default function Knowledge() {
                   className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in cursor-pointer"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="col-span-4 flex items-center gap-3">
+                  <div className="col-span-5 flex items-center gap-3">
                     <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", typeInfo.color.split(" ")[0])}>
                       <TypeIcon className={cn("w-5 h-5", typeInfo.color.split(" ")[1])} />
                     </div>
@@ -218,11 +216,6 @@ export default function Knowledge() {
                   <div className="col-span-2 flex items-center">
                     <Badge variant="outline" className="font-mono text-xs">
                       {doc.version}
-                    </Badge>
-                  </div>
-                  <div className="col-span-1 flex items-center">
-                    <Badge variant="outline" className={statusConfig.className}>
-                      {statusConfig.label}
                     </Badge>
                   </div>
                   <div className="col-span-2 flex items-center gap-2 text-sm text-muted-foreground">
