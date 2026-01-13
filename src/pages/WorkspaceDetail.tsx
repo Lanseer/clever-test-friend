@@ -4,6 +4,7 @@ import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
 import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
 import AIGeneratedCases from "./workspace/AIGeneratedCases";
+import CaseReview from "./workspace/CaseReview";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -65,6 +66,7 @@ export default function WorkspaceDetail() {
             <Route path="knowledge" element={<Knowledge />} />
             <Route path="management/cases" element={<TestCases />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
+            <Route path="management/ai-cases/:recordId/review" element={<CaseReview />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
         </main>
