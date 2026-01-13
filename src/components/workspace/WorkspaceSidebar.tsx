@@ -43,7 +43,7 @@ interface MenuItem {
 }
 
 const workspaceMenuItems: MenuItem[] = [
-  { title: "数据大屏", url: "dashboard", icon: LayoutDashboard },
+  { title: "数据看板", url: "dashboard", icon: LayoutDashboard },
   { 
     title: "测试管理", 
     url: "management", 
