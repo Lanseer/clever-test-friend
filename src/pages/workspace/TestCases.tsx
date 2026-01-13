@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Copy, Clock, User, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -61,12 +62,17 @@ const mockTestCases = [
 
 export default function TestCases() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const filteredCases = mockTestCases.filter(
     (tc) =>
       tc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tc.code.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleCaseClick = (caseId: string) => {
+    navigate(`${caseId}`);
+  };
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -117,7 +123,12 @@ export default function TestCases() {
                 </Badge>
               </div>
               <div className="col-span-3 flex items-center">
-                <span className="font-medium text-foreground truncate">{tc.name}</span>
+                <button 
+                  onClick={() => handleCaseClick(tc.id)}
+                  className="font-medium text-primary hover:text-primary/80 hover:underline truncate text-left transition-colors"
+                >
+                  {tc.name}
+                </button>
               </div>
               <div className="col-span-1 flex items-center gap-1">
                 <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
