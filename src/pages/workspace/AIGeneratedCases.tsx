@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { ReportSidebar } from "@/components/workspace/ReportSidebar";
 
 type GenerationStatus = "generating" | "completed" | "failed";
 
@@ -14,6 +16,7 @@ interface GenerationRecord {
   status: GenerationStatus;
   reviewer: string;
   reviewReport: string | null;
+  failureReason?: string;
   createdAt: string;
 }
 
@@ -52,6 +55,7 @@ const mockRecords: GenerationRecord[] = [
     status: "failed",
     reviewer: "赵六",
     reviewReport: null,
+    failureReason: "源文档解析失败：文档格式不正确，缺少必要的功能描述章节。请检查文档结构是否符合 FSD 规范。",
     createdAt: "2024-01-14 09:15",
   },
   {
@@ -84,13 +88,34 @@ const statusConfig: Record<GenerationStatus, { label: string; icon: typeof Loade
 };
 
 export default function AIGeneratedCases() {
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarType, setSidebarType] = useState<"report" | "failure">("report");
+  const [selectedRecord, setSelectedRecord] = useState<GenerationRecord | null>(null);
 
   const filteredRecords = mockRecords.filter(
     (record) =>
       record.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       record.code.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleOpenReport = (record: GenerationRecord) => {
+    setSelectedRecord(record);
+    setSidebarType("report");
+    setSidebarOpen(true);
+  };
+
+  const handleOpenFailure = (record: GenerationRecord) => {
+    setSelectedRecord(record);
+    setSidebarType("failure");
+    setSidebarOpen(true);
+  };
+
+  const handleOpenReview = (record: GenerationRecord) => {
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/review`);
+  };
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -116,12 +141,11 @@ export default function AIGeneratedCases() {
       <div className="rounded-xl border bg-card overflow-hidden">
         <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div className="col-span-1">编号</div>
-          <div className="col-span-3">名称</div>
+          <div className="col-span-4">名称</div>
           <div className="col-span-1">状态</div>
           <div className="col-span-1">评审人</div>
-          <div className="col-span-3">评审报告</div>
           <div className="col-span-2">创建时间</div>
-          <div className="col-span-1">操作</div>
+          <div className="col-span-3">操作</div>
         </div>
 
         <div className="divide-y">
@@ -129,6 +153,7 @@ export default function AIGeneratedCases() {
             const status = statusConfig[record.status];
             const StatusIcon = status.icon;
             const isCompleted = record.status === "completed";
+            const isFailed = record.status === "failed";
 
             return (
               <div
@@ -141,7 +166,7 @@ export default function AIGeneratedCases() {
                     {record.code}
                   </Badge>
                 </div>
-                <div className="col-span-3 flex items-center">
+                <div className="col-span-4 flex items-center">
                   <span className="font-medium text-foreground truncate">{record.name}</span>
                 </div>
                 <div className="col-span-1 flex items-center">
@@ -156,39 +181,65 @@ export default function AIGeneratedCases() {
                   </div>
                   <span className="text-sm text-foreground truncate">{record.reviewer}</span>
                 </div>
-                <div className="col-span-3 flex items-center">
-                  {record.reviewReport ? (
-                    <span className="text-sm text-muted-foreground truncate flex items-center gap-1">
-                      <FileText className="w-3.5 h-3.5" />
-                      {record.reviewReport}
-                    </span>
-                  ) : (
-                    <span className="text-sm text-muted-foreground/50">-</span>
-                  )}
-                </div>
                 <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
                   <Clock className="w-3.5 h-3.5" />
                   {record.createdAt}
                 </div>
-                <div className="col-span-1 flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1"
-                    disabled={!isCompleted}
-                  >
-                    <FileCheck className="w-3.5 h-3.5" />
-                    评审
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1"
-                    disabled={!isCompleted}
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    再次生成
-                  </Button>
+                <div className="col-span-3 flex items-center gap-1 flex-wrap">
+                  {isCompleted && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenReview(record)}
+                      >
+                        <FileCheck className="w-3.5 h-3.5" />
+                        评审
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenReport(record)}
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        评审报告
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        再次生成
+                      </Button>
+                    </>
+                  )}
+                  {isFailed && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive"
+                        onClick={() => handleOpenFailure(record)}
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        查看失败信息
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        重新生成
+                      </Button>
+                    </>
+                  )}
+                  {record.status === "generating" && (
+                    <span className="text-xs text-muted-foreground">生成中，请稍候...</span>
+                  )}
                 </div>
               </div>
             );
@@ -202,6 +253,24 @@ export default function AIGeneratedCases() {
           </div>
         )}
       </div>
+
+      <ReportSidebar
+        open={sidebarOpen}
+        onOpenChange={setSidebarOpen}
+        type={sidebarType}
+        data={
+          selectedRecord
+            ? {
+                code: selectedRecord.code,
+                name: selectedRecord.name,
+                reviewer: selectedRecord.reviewer,
+                createdAt: selectedRecord.createdAt,
+                report: selectedRecord.reviewReport,
+                failureReason: selectedRecord.failureReason,
+              }
+            : null
+        }
+      />
     </div>
   );
 }
