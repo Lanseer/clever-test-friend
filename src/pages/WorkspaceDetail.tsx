@@ -2,6 +2,8 @@ import { useParams, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
 import Knowledge from "./workspace/Knowledge";
+import TestCases from "./workspace/TestCases";
+import AIGeneratedCases from "./workspace/AIGeneratedCases";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -61,6 +63,8 @@ export default function WorkspaceDetail() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<WorkspaceDashboard workspace={workspace} />} />
             <Route path="knowledge" element={<Knowledge />} />
+            <Route path="management/cases" element={<TestCases />} />
+            <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
         </main>

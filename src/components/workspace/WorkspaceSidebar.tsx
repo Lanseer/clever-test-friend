@@ -8,9 +8,13 @@ import {
   Server, 
   Tags,
   ChevronLeft,
-  ArrowLeft
+  ArrowLeft,
+  ChevronDown,
+  FlaskConical,
+  Sparkles
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,10 +29,30 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
-const workspaceMenuItems = [
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children?: { title: string; url: string; icon: React.ComponentType<{ className?: string }> }[];
+}
+
+const workspaceMenuItems: MenuItem[] = [
   { title: "数据大屏", url: "dashboard", icon: LayoutDashboard },
-  { title: "测试管理", url: "management", icon: ClipboardList },
+  { 
+    title: "测试管理", 
+    url: "management", 
+    icon: ClipboardList,
+    children: [
+      { title: "测试用例", url: "management/cases", icon: FlaskConical },
+      { title: "AI生成用例", url: "management/ai-cases", icon: Sparkles },
+    ]
+  },
   { title: "测试数据", url: "data", icon: Database },
   { title: "测试计划", url: "plan", icon: Calendar },
   { title: "测试报告", url: "report", icon: FileText },
@@ -45,6 +69,19 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openMenus, setOpenMenus] = useState<string[]>(["测试管理"]);
+
+  const toggleMenu = (title: string) => {
+    setOpenMenus((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const isChildActive = (item: MenuItem) => {
+    if (!item.children) return false;
+    return item.children.some((child) => location.pathname.includes(child.url));
+  };
 
   return (
     <Sidebar
@@ -77,26 +114,86 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {workspaceMenuItems.map((item, index) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="h-9">
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive }) =>
-                        cn(
-                          "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
-                          "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
-                          isActive && "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md",
-                          index === 0 && "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                        )
-                      }
+              {workspaceMenuItems.map((item) => {
+                if (item.children) {
+                  const isOpen = openMenus.includes(item.title);
+                  const hasActiveChild = isChildActive(item);
+
+                  return (
+                    <Collapsible
+                      key={item.title}
+                      open={isOpen}
+                      onOpenChange={() => toggleMenu(item.title)}
                     >
-                      <item.icon className="w-4 h-4 flex-shrink-0" />
-                      {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton className="h-9 w-full">
+                            <div
+                              className={cn(
+                                "flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg transition-all duration-200",
+                                "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                                hasActiveChild && "text-sidebar-foreground"
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                <item.icon className="w-4 h-4 flex-shrink-0" />
+                                {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                              </div>
+                              {!isCollapsed && (
+                                <ChevronDown
+                                  className={cn(
+                                    "w-3.5 h-3.5 transition-transform duration-200",
+                                    isOpen && "rotate-180"
+                                  )}
+                                />
+                              )}
+                            </div>
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-4 mt-1 space-y-1">
+                          {item.children.map((child) => (
+                            <SidebarMenuButton key={child.title} asChild className="h-8">
+                              <NavLink
+                                to={child.url}
+                                className={({ isActive }) =>
+                                  cn(
+                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
+                                    "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                                    isActive && "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md"
+                                  )
+                                }
+                              >
+                                <child.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                                {!isCollapsed && <span className="text-xs font-medium">{child.title}</span>}
+                              </NavLink>
+                            </SidebarMenuButton>
+                          ))}
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  );
+                }
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="h-9">
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
+                            "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                            isActive && "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md"
+                          )
+                        }
+                      >
+                        <item.icon className="w-4 h-4 flex-shrink-0" />
+                        {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
