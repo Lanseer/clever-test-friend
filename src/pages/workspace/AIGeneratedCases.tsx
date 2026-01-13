@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ReportSidebar } from "@/components/workspace/ReportSidebar";
+import { AIGenerateDialog } from "@/components/workspace/AIGenerateDialog";
 
 type GenerationStatus = "generating" | "completed" | "failed";
+
+interface SelectedDocument {
+  docId: string;
+  docName: string;
+  versionId: string;
+  versionName: string;
+}
 
 interface GenerationRecord {
   id: string;
@@ -18,6 +26,8 @@ interface GenerationRecord {
   reviewReport: string | null;
   failureReason?: string;
   createdAt: string;
+  documents?: SelectedDocument[];
+  tags?: string[];
 }
 
 const mockRecords: GenerationRecord[] = [
@@ -29,6 +39,10 @@ const mockRecords: GenerationRecord[] = [
     reviewer: "张三",
     reviewReport: "已通过，共生成 24 个用例",
     createdAt: "2024-01-15 10:30",
+    documents: [
+      { docId: "doc-1", docName: "用户管理功能规格说明书", versionId: "v1-2", versionName: "v1.1" },
+    ],
+    tags: ["功能测试", "回归测试"],
   },
   {
     id: "2",
@@ -38,6 +52,10 @@ const mockRecords: GenerationRecord[] = [
     reviewer: "李四",
     reviewReport: null,
     createdAt: "2024-01-15 14:20",
+    documents: [
+      { docId: "doc-2", docName: "支付模块接口文档", versionId: "v2-2", versionName: "v2.0" },
+    ],
+    tags: ["接口测试"],
   },
   {
     id: "3",
@@ -47,6 +65,10 @@ const mockRecords: GenerationRecord[] = [
     reviewer: "王五",
     reviewReport: "部分通过，需调整 3 个用例",
     createdAt: "2024-01-14 16:45",
+    documents: [
+      { docId: "doc-3", docName: "订单流程设计文档", versionId: "v3-3", versionName: "v2.0" },
+    ],
+    tags: ["功能测试"],
   },
   {
     id: "4",
@@ -57,6 +79,10 @@ const mockRecords: GenerationRecord[] = [
     reviewReport: null,
     failureReason: "源文档解析失败：文档格式不正确，缺少必要的功能描述章节。请检查文档结构是否符合 FSD 规范。",
     createdAt: "2024-01-14 09:15",
+    documents: [
+      { docId: "doc-4", docName: "商品管理PRD", versionId: "v4-1", versionName: "v1.0" },
+    ],
+    tags: ["冒烟测试"],
   },
   {
     id: "5",
@@ -66,6 +92,10 @@ const mockRecords: GenerationRecord[] = [
     reviewer: "张三",
     reviewReport: "已通过，生成 18 个用例",
     createdAt: "2024-01-13 11:00",
+    documents: [
+      { docId: "doc-5", docName: "权限控制设计方案", versionId: "v5-2", versionName: "v1.1" },
+    ],
+    tags: ["安全测试", "功能测试"],
   },
 ];
 
@@ -94,6 +124,9 @@ export default function AIGeneratedCases() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarType, setSidebarType] = useState<"report" | "failure">("report");
   const [selectedRecord, setSelectedRecord] = useState<GenerationRecord | null>(null);
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [generateMode, setGenerateMode] = useState<"create" | "regenerate">("create");
+  const [regenerateRecord, setRegenerateRecord] = useState<GenerationRecord | null>(null);
 
   const filteredRecords = mockRecords.filter(
     (record) =>
@@ -117,6 +150,23 @@ export default function AIGeneratedCases() {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/review`);
   };
 
+  const handleOpenGenerateDialog = () => {
+    setGenerateMode("create");
+    setRegenerateRecord(null);
+    setGenerateDialogOpen(true);
+  };
+
+  const handleOpenRegenerateDialog = (record: GenerationRecord) => {
+    setGenerateMode("regenerate");
+    setRegenerateRecord(record);
+    setGenerateDialogOpen(true);
+  };
+
+  const handleConfirmGenerate = (data: { name: string; documents: SelectedDocument[]; tags: string[] }) => {
+    console.log("生成用例:", data);
+    // 这里可以添加实际的生成逻辑
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -124,6 +174,10 @@ export default function AIGeneratedCases() {
           <h1 className="text-2xl font-bold text-foreground">AI生成用例</h1>
           <p className="text-muted-foreground mt-1">查看和管理AI自动生成的测试用例记录</p>
         </div>
+        <Button onClick={handleOpenGenerateDialog} className="gap-2">
+          <Sparkles className="w-4 h-4" />
+          AI生成
+        </Button>
       </div>
 
       <div className="mb-6">
@@ -210,6 +264,7 @@ export default function AIGeneratedCases() {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenRegenerateDialog(record)}
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         再次生成
@@ -231,6 +286,7 @@ export default function AIGeneratedCases() {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenRegenerateDialog(record)}
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         重新生成
@@ -270,6 +326,22 @@ export default function AIGeneratedCases() {
               }
             : null
         }
+      />
+
+      <AIGenerateDialog
+        open={generateDialogOpen}
+        onOpenChange={setGenerateDialogOpen}
+        mode={generateMode}
+        initialData={
+          regenerateRecord
+            ? {
+                name: regenerateRecord.name,
+                documents: regenerateRecord.documents || [],
+                tags: regenerateRecord.tags || [],
+              }
+            : undefined
+        }
+        onConfirm={handleConfirmGenerate}
       />
     </div>
   );
