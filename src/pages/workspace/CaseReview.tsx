@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle } from "lucide-react";
+import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ interface GeneratedCase {
   status: CaseStatus;
   bddContent: string;
   sourceDocument: string;
+  createdAt: string;
 }
 
 const mockCases: GeneratedCase[] = [
@@ -24,6 +25,7 @@ const mockCases: GeneratedCase[] = [
     code: "TC-001",
     name: "用户登录成功场景",
     status: "pending",
+    createdAt: "2024-01-15 10:30",
     bddContent: `Feature: 用户登录
   Scenario: 使用有效凭证登录
     Given 用户在登录页面
@@ -46,6 +48,7 @@ const mockCases: GeneratedCase[] = [
     code: "TC-002",
     name: "用户登录失败-密码错误",
     status: "pending",
+    createdAt: "2024-01-15 10:32",
     bddContent: `Feature: 用户登录
   Scenario: 使用错误密码登录
     Given 用户在登录页面
@@ -67,6 +70,7 @@ const mockCases: GeneratedCase[] = [
     code: "TC-003",
     name: "用户注册成功场景",
     status: "accepted",
+    createdAt: "2024-01-15 10:35",
     bddContent: `Feature: 用户注册
   Scenario: 使用有效信息注册新用户
     Given 用户在注册页面
@@ -85,6 +89,7 @@ const mockCases: GeneratedCase[] = [
     code: "TC-004",
     name: "密码重置流程",
     status: "pending",
+    createdAt: "2024-01-15 10:38",
     bddContent: `Feature: 密码重置
   Scenario: 通过邮箱重置密码
     Given 用户在忘记密码页面
@@ -100,6 +105,7 @@ const mockCases: GeneratedCase[] = [
     code: "TC-005",
     name: "用户资料更新",
     status: "rejected",
+    createdAt: "2024-01-15 10:40",
     bddContent: `Feature: 用户资料管理
   Scenario: 更新用户头像
     Given 用户已登录
@@ -221,9 +227,10 @@ export default function CaseReview() {
       <div className="rounded-xl border bg-card overflow-hidden">
         <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div className="col-span-1">编号</div>
-          <div className="col-span-6">用例名称</div>
+          <div className="col-span-5">用例名称</div>
+          <div className="col-span-2">创建时间</div>
           <div className="col-span-2">状态</div>
-          <div className="col-span-3">操作</div>
+          <div className="col-span-2">操作</div>
         </div>
 
         <div className="divide-y">
@@ -242,8 +249,12 @@ export default function CaseReview() {
                     {testCase.code}
                   </Badge>
                 </div>
-                <div className="col-span-6 flex items-center">
+                <div className="col-span-5 flex items-center">
                   <span className="font-medium text-foreground">{testCase.name}</span>
+                </div>
+                <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {testCase.createdAt}
                 </div>
                 <div className="col-span-2 flex items-center">
                   <Badge variant="outline" className={cn("text-xs gap-1", status.className)}>
@@ -251,7 +262,7 @@ export default function CaseReview() {
                     {status.label}
                   </Badge>
                 </div>
-                <div className="col-span-3 flex items-center gap-2">
+                <div className="col-span-2 flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
