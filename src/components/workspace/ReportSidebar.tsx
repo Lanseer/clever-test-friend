@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, AlertTriangle, FileText, Clock, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle, XCircle, AlertTriangle, FileText, Clock, User, Pencil, Save, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 interface ReportSidebarProps {
@@ -13,12 +16,37 @@ interface ReportSidebarProps {
     reviewer?: string;
     createdAt: string;
     report?: string | null;
+    reportSummary?: string;
     failureReason?: string;
   } | null;
 }
 
+const defaultSummary = `本次生成用例覆盖了用户登录、注册、密码重置等核心功能场景。
+
+**完整性评估**: 覆盖率约85%，主要覆盖了正向流程和常见异常场景。
+
+**质量评估**: 用例描述清晰，BDD格式规范，步骤可执行性强。
+
+**缺失用例建议**: 
+- 缺少并发登录限制场景
+- 缺少密码强度验证边界测试
+- 建议补充会话超时处理用例`;
+
 export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [summary, setSummary] = useState(data?.reportSummary || defaultSummary);
+
   if (!data) return null;
+
+  const handleSave = () => {
+    // In a real app, this would save to the backend
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setSummary(data?.reportSummary || defaultSummary);
+    setIsEditing(false);
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -123,6 +151,67 @@ export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarP
               )}
             </div>
           </div>
+
+          {/* Report Summary - Only for report type */}
+          {type === "report" && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    报告总结
+                  </h4>
+                  {!isEditing && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs gap-1"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      编辑报告
+                    </Button>
+                  )}
+                </div>
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      value={summary}
+                      onChange={(e) => setSummary(e.target.value)}
+                      className="min-h-[200px] text-sm"
+                      placeholder="输入报告总结..."
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-3 text-xs gap-1"
+                        onClick={handleCancel}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        取消
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 px-3 text-xs gap-1"
+                        onClick={handleSave}
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        保存
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-lg border bg-muted/30">
+                    <div className="text-sm whitespace-pre-wrap prose prose-sm max-w-none">
+                      {summary}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>
