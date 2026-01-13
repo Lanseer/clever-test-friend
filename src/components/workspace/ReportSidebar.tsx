@@ -121,16 +121,12 @@ export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarP
                   <p className="text-sm">{data.report || "暂无报告内容"}</p>
                   <div className="pt-3 border-t space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">生成用例数</span>
-                      <span className="font-medium">24 个</span>
+                      <span className="text-muted-foreground">用例采纳</span>
+                      <span className="font-medium text-green-600">22 / 24 个</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">通过用例数</span>
-                      <span className="font-medium text-green-600">22 个</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">待调整用例</span>
-                      <span className="font-medium text-amber-600">2 个</span>
+                      <span className="text-muted-foreground">用例总结</span>
+                      <span className="font-medium">覆盖登录、注册等核心场景</span>
                     </div>
                   </div>
                 </div>
