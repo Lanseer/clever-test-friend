@@ -12,7 +12,8 @@ import {
   Download,
   FileCode,
   FileType,
-  Link2
+  Link2,
+  GitCompare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import VersionDiffDialog from "@/components/workspace/VersionDiffDialog";
 
 interface KnowledgeDocument {
   id: string;
@@ -109,9 +111,31 @@ const typeConfig = {
   Other: { label: "其他", icon: FileText, color: "bg-muted text-muted-foreground border-border" },
 };
 
+// Mock version history for documents
+const mockVersionHistory: Record<string, { version: string; date: string; author: string; changes: string[] }[]> = {
+  "1": [
+    { version: "v2.1.0", date: "2024-01-15", author: "张三", changes: ["新增权限控制模块", "优化用户列表查询"] },
+    { version: "v2.0.0", date: "2024-01-10", author: "张三", changes: ["重构用户管理架构", "新增批量操作功能"] },
+    { version: "v1.5.0", date: "2024-01-05", author: "李四", changes: ["添加用户导入导出", "修复搜索问题"] },
+    { version: "v1.0.0", date: "2023-12-20", author: "张三", changes: ["初始版本发布"] },
+  ],
+  "2": [
+    { version: "v3.0.0", date: "2024-01-14", author: "李四", changes: ["全新订单流程设计", "支持多币种"] },
+    { version: "v2.5.0", date: "2024-01-08", author: "李四", changes: ["优化订单状态机", "新增退款流程"] },
+    { version: "v2.0.0", date: "2023-12-25", author: "王五", changes: ["订单拆分功能", "物流对接"] },
+  ],
+  "3": [
+    { version: "v1.8.0", date: "2024-01-13", author: "王五", changes: ["新增微信支付", "优化接口响应"] },
+    { version: "v1.5.0", date: "2024-01-01", author: "王五", changes: ["支付宝接口升级", "安全加固"] },
+    { version: "v1.0.0", date: "2023-12-01", author: "赵六", changes: ["初始接口发布"] },
+  ],
+};
+
 export default function Knowledge() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("全部");
+  const [diffDialogOpen, setDiffDialogOpen] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<KnowledgeDocument | null>(null);
 
   const filteredDocs = mockKnowledgeDocs.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -119,6 +143,11 @@ export default function Knowledge() {
     const matchesType = selectedType === "全部" || doc.type === selectedType;
     return matchesSearch && matchesType;
   });
+
+  const handleOpenDiffDialog = (doc: KnowledgeDocument) => {
+    setSelectedDoc(doc);
+    setDiffDialogOpen(true);
+  };
 
   const getStatusBadge = (status: KnowledgeDocument["status"]) => {
     const config = {
@@ -244,6 +273,10 @@ export default function Knowledge() {
                           <History className="w-4 h-4 mr-2" />
                           版本历史
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenDiffDialog(doc)}>
+                          <GitCompare className="w-4 h-4 mr-2" />
+                          查看版本差异
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Download className="w-4 h-4 mr-2" />
                           下载文档
@@ -264,6 +297,17 @@ export default function Knowledge() {
           </div>
         )}
       </div>
+
+      {/* Version Diff Dialog */}
+      {selectedDoc && (
+        <VersionDiffDialog
+          open={diffDialogOpen}
+          onOpenChange={setDiffDialogOpen}
+          documentName={selectedDoc.name}
+          currentVersion={selectedDoc.version}
+          versionHistory={mockVersionHistory[selectedDoc.id] || []}
+        />
+      )}
     </div>
   );
 }
