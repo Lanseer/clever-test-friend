@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
 import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
+import TestCaseDetail from "./workspace/TestCaseDetail";
 import AIGeneratedCases from "./workspace/AIGeneratedCases";
 import CaseReview from "./workspace/CaseReview";
 
@@ -65,6 +66,7 @@ export default function WorkspaceDetail() {
             <Route path="dashboard" element={<WorkspaceDashboard workspace={workspace} />} />
             <Route path="knowledge" element={<Knowledge />} />
             <Route path="management/cases" element={<TestCases />} />
+            <Route path="management/cases/:caseId" element={<TestCaseDetail />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId/review" element={<CaseReview />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
