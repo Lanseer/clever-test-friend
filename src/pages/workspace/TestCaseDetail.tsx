@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Tag, Settings, TestTube } from "lucide-react";
+import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -172,14 +173,20 @@ export default function TestCaseDetail() {
     );
   };
 
-  const handleSave = () => {
-    console.log("Saving test case:", {
-      ...testCase,
-      tags: selectedTags,
-      environment,
-      testData,
-    });
-    // Here you would typically save to backend
+  const handleCopy = () => {
+    toast.success("用例已复制");
+    // Here you would typically copy the test case
+  };
+
+  const handleDelete = () => {
+    toast.success("用例已删除");
+    navigate(-1);
+    // Here you would typically delete the test case
+  };
+
+  const handleTest = () => {
+    toast.success("开始执行测试");
+    // Here you would typically trigger test execution
   };
 
   return (
@@ -200,10 +207,20 @@ export default function TestCaseDetail() {
             <p className="text-muted-foreground text-sm mt-1">测试用例详情</p>
           </div>
         </div>
-        <Button onClick={handleSave} className="gap-2">
-          <Save className="w-4 h-4" />
-          保存
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleCopy} className="gap-2">
+            <Copy className="w-4 h-4" />
+            复制
+          </Button>
+          <Button variant="outline" onClick={handleDelete} className="gap-2 text-destructive hover:text-destructive">
+            <Trash2 className="w-4 h-4" />
+            删除
+          </Button>
+          <Button onClick={handleTest} className="gap-2">
+            <Play className="w-4 h-4" />
+            测试
+          </Button>
+        </div>
       </div>
 
       {/* Content */}
