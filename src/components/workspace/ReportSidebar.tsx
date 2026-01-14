@@ -3,8 +3,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, AlertTriangle, FileText, Clock, User, Pencil, Save, X } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, FileText, Clock, User, Pencil, Save, X, Sparkles } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ReportSidebarProps {
   open: boolean;
@@ -34,9 +36,34 @@ const defaultSummary = `本次生成用例覆盖了用户登录、注册、密�
 
 export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [summary, setSummary] = useState(data?.reportSummary || defaultSummary);
 
   if (!data) return null;
+
+  const handleAIGenerate = () => {
+    setIsGenerating(true);
+    // Simulate AI generation
+    setTimeout(() => {
+      setSummary(`**AI智能生成报告总结**
+
+本次用例评审共涉及24个AI生成用例，最终采纳22个，采纳率91.7%。
+
+**质量分析**: 
+- 用例场景覆盖完整，涵盖正向流程和异常边界
+- BDD格式规范，可读性强
+- 测试步骤清晰明确，可执行性高
+
+**问题用例分析**: 
+- 2个不采纳用例主要问题：场景描述与实际需求不符
+
+**优化建议**: 
+- 建议补充并发场景测试用例
+- 增加性能边界值测试覆盖`);
+      setIsGenerating(false);
+      toast.success("AI报告总结生成成功");
+    }, 1500);
+  };
 
   const handleSave = () => {
     // In a real app, this would save to the backend
@@ -159,15 +186,27 @@ export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarP
                     报告总结
                   </h4>
                   {!isEditing && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                      编辑报告
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={handleAIGenerate}
+                        disabled={isGenerating}
+                      >
+                        <Sparkles className={cn("w-3.5 h-3.5", isGenerating && "animate-pulse")} />
+                        {isGenerating ? "生成中..." : "AI智能生成"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => setIsEditing(true)}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        编辑报告
+                      </Button>
+                    </div>
                   )}
                 </div>
                 {isEditing ? (
