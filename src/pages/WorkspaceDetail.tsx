@@ -5,6 +5,7 @@ import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
 import TestCaseDetail from "./workspace/TestCaseDetail";
 import AIGeneratedCases from "./workspace/AIGeneratedCases";
+import AIGeneratedCaseDetail from "./workspace/AIGeneratedCaseDetail";
 import CaseReview from "./workspace/CaseReview";
 import Dashboard from "./Index";
 
@@ -69,7 +70,8 @@ export default function WorkspaceDetail() {
             <Route path="management/cases" element={<TestCases />} />
             <Route path="management/cases/:caseId" element={<TestCaseDetail />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
-            <Route path="management/ai-cases/:recordId/review" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId" element={<AIGeneratedCaseDetail />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
         </main>

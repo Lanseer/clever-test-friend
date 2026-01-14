@@ -221,7 +221,12 @@ export default function AIGeneratedCases() {
                   </Badge>
                 </div>
                 <div className="col-span-4 flex items-center">
-                  <span className="font-medium text-foreground truncate">{record.name}</span>
+                  <button
+                    className="font-medium text-primary hover:underline truncate text-left"
+                    onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}`)}
+                  >
+                    {record.name}
+                  </button>
                 </div>
                 <div className="col-span-1 flex items-center">
                   <Badge variant="outline" className={cn("text-xs gap-1", status.className)}>
@@ -242,15 +247,6 @@ export default function AIGeneratedCases() {
                 <div className="col-span-3 flex items-center gap-1 flex-wrap">
                   {isCompleted && (
                     <>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs gap-1"
-                        onClick={() => handleOpenReview(record)}
-                      >
-                        <FileCheck className="w-3.5 h-3.5" />
-                        评审
-                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
