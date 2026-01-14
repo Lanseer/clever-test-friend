@@ -102,8 +102,6 @@ const weekIssueData = [
   { category: "格式不规范", count: 45, color: "#f59e0b", description: "用例格式不符合标准模板" },
   { category: "步骤不完整", count: 38, color: "#3b82f6", description: "测试步骤缺失或不完整" },
   { category: "预期结果错误", count: 32, color: "#8b5cf6", description: "预期结果与实际预期不符" },
-  { category: "重复用例", count: 24, color: "#06b6d4", description: "与已有用例重复或相似" },
-  { category: "优先级不当", count: 18, color: "#ec4899", description: "用例优先级设置不合理" },
 ];
 
 const monthIssueData = [
@@ -111,8 +109,6 @@ const monthIssueData = [
   { category: "格式不规范", count: 156, color: "#f59e0b", description: "用例格式不符合标准模板" },
   { category: "步骤不完整", count: 128, color: "#3b82f6", description: "测试步骤缺失或不完整" },
   { category: "预期结果错误", count: 98, color: "#8b5cf6", description: "预期结果与实际预期不符" },
-  { category: "重复用例", count: 66, color: "#06b6d4", description: "与已有用例重复或相似" },
-  { category: "优先级不当", count: 42, color: "#ec4899", description: "用例优先级设置不合理" },
 ];
 
 const lineChartConfig = {
