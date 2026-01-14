@@ -150,14 +150,14 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
                             </div>
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
-                        <CollapsibleContent className="pl-4 mt-1 space-y-1">
+                        <CollapsibleContent className="mt-1 space-y-1">
                           {item.children.map((child) => (
                             <SidebarMenuButton key={child.title} asChild className="h-8">
                               <NavLink
                                 to={child.url}
                                 className={({ isActive }) =>
                                   cn(
-                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
+                                    "flex items-center gap-2 pl-9 pr-2.5 py-1.5 rounded-lg transition-all duration-200",
                                     "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
                                     isActive && "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md"
                                   )
