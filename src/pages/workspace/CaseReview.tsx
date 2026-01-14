@@ -140,7 +140,7 @@ const statusConfig: Record<CaseStatus, { label: string; icon: typeof CheckCircle
 
 export default function CaseReview() {
   const navigate = useNavigate();
-  const { workspaceId, recordId } = useParams();
+  const { workspaceId, recordId, batchId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [cases, setCases] = useState(mockCases);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -216,7 +216,11 @@ export default function CaseReview() {
             <Sparkles className="w-4 h-4" />
             AI评审
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/ai-assistant`)}
+          >
             <Bot className="w-4 h-4" />
             AI助手
           </Button>
