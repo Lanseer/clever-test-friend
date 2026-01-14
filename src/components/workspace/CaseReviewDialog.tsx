@@ -65,6 +65,7 @@ export function CaseReviewDialog({
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const [selectedRejectionTag, setSelectedRejectionTag] = useState<string>("");
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const currentCase = cases[currentIndex];
   const hasPrevious = currentIndex > 0;
@@ -101,9 +102,13 @@ export function CaseReviewDialog({
 
   const handleRejectConfirm = () => {
     if (selectedRejectionTag && onReject) {
-      onReject(currentCase.id, selectedRejectionTag);
+      const fullReason = rejectionReason 
+        ? `${selectedRejectionTag}: ${rejectionReason}` 
+        : selectedRejectionTag;
+      onReject(currentCase.id, fullReason);
       setShowRejectDialog(false);
       setSelectedRejectionTag("");
+      setRejectionReason("");
       if (hasNext) {
         setCurrentIndex(currentIndex + 1);
       }
@@ -254,25 +259,42 @@ export function CaseReviewDialog({
               请选择一个标签来说明不采纳此用例的原因
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex flex-wrap gap-2 py-4">
-            {rejectionTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className={cn(
-                  "cursor-pointer px-3 py-1.5 text-sm transition-colors",
-                  selectedRejectionTag === tag
-                    ? "bg-orange-500/10 text-orange-600 border-orange-300"
-                    : "hover:bg-muted"
-                )}
-                onClick={() => setSelectedRejectionTag(tag)}
-              >
-                {tag}
-              </Badge>
-            ))}
+          <div className="space-y-4 py-4">
+            <div>
+              <p className="text-sm font-medium mb-2">选择标签</p>
+              <div className="flex flex-wrap gap-2">
+                {rejectionTags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="outline"
+                    className={cn(
+                      "cursor-pointer px-3 py-1.5 text-sm transition-colors",
+                      selectedRejectionTag === tag
+                        ? "bg-orange-500/10 text-orange-600 border-orange-300"
+                        : "hover:bg-muted"
+                    )}
+                    onClick={() => setSelectedRejectionTag(tag)}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-2">详细原因（选填）</p>
+              <Textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="请输入不采纳的详细原因..."
+                className="min-h-[80px] resize-none"
+              />
+            </div>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setSelectedRejectionTag("")}>
+            <AlertDialogCancel onClick={() => {
+              setSelectedRejectionTag("");
+              setRejectionReason("");
+            }}>
               取消
             </AlertDialogCancel>
             <AlertDialogAction
