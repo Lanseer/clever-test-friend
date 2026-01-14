@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar } from "lucide-react";
+import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, Sparkles, Bot } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -173,6 +173,16 @@ export default function CaseReview() {
     );
   };
 
+  const handleRejectCase = (caseId: string, reason: string) => {
+    setCases((prev) =>
+      prev.map((c) => (c.id === caseId ? { ...c, status: "rejected" as CaseStatus, rejectionReason: reason } : c))
+    );
+  };
+
+  const handleDiscardCase = (caseId: string) => {
+    setCases((prev) => prev.filter((c) => c.id !== caseId));
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
@@ -201,10 +211,20 @@ export default function CaseReview() {
             className="pl-10"
           />
         </div>
-        <Button onClick={handleBatchReview} disabled={pendingCount === 0} className="gap-2">
-          <FileCheck className="w-4 h-4" />
-          批量评审 ({pendingCount})
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="gap-2">
+            <Sparkles className="w-4 h-4" />
+            AI评审
+          </Button>
+          <Button variant="outline" className="gap-2">
+            <Bot className="w-4 h-4" />
+            AI助手
+          </Button>
+          <Button onClick={handleBatchReview} disabled={pendingCount === 0} className="gap-2">
+            <FileCheck className="w-4 h-4" />
+            批量评审 ({pendingCount})
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -292,6 +312,8 @@ export default function CaseReview() {
         cases={filteredCases}
         initialIndex={selectedCaseIndex}
         onAccept={handleAcceptCase}
+        onReject={handleRejectCase}
+        onDiscard={handleDiscardCase}
       />
     </div>
   );
