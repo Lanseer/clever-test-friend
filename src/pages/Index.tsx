@@ -82,6 +82,19 @@ const monthResultData = [
   { name: "错误", value: 35, color: "#f59e0b" },
 ];
 
+// AI生成用例质量分布数据
+const weekQualityData = [
+  { name: "采纳", value: 68, color: "#22c55e" },
+  { name: "不采纳", value: 24, color: "#f59e0b" },
+  { name: "丢弃", value: 8, color: "#ef4444" },
+];
+
+const monthQualityData = [
+  { name: "采纳", value: 256, color: "#22c55e" },
+  { name: "不采纳", value: 89, color: "#f59e0b" },
+  { name: "丢弃", value: 32, color: "#ef4444" },
+];
+
 const lineChartConfig = {
   count: {
     label: "用例数",
@@ -92,10 +105,13 @@ const lineChartConfig = {
 const Index = () => {
   const [trendPeriod, setTrendPeriod] = useState<"week" | "month">("week");
   const [resultPeriod, setResultPeriod] = useState<"week" | "month">("week");
+  const [qualityPeriod, setQualityPeriod] = useState<"week" | "month">("week");
 
   const trendData = trendPeriod === "week" ? weekTrendData : monthTrendData;
   const resultData = resultPeriod === "week" ? weekResultData : monthResultData;
+  const qualityData = qualityPeriod === "week" ? weekQualityData : monthQualityData;
   const totalResults = resultData.reduce((sum, item) => sum + item.value, 0);
+  const totalQuality = qualityData.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <div className="space-y-6">
@@ -124,7 +140,7 @@ const Index = () => {
         ))}
       </div>
 
-      {/* 图表区域 */}
+      {/* 图表区域 - 第一行 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 用例增加趋势 - 折线图 */}
         <Card className="border shadow-sm">
@@ -241,6 +257,85 @@ const Index = () => {
                       <span className="font-medium ml-2">{item.value}</span>
                       <span className="text-muted-foreground ml-1">
                         ({((item.value / totalResults) * 100).toFixed(1)}%)
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 图表区域 - 第二行 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* AI生成用例质量分布 - 环形图 */}
+        <Card className="border shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-semibold">AI生成用例质量分布</CardTitle>
+              <Select
+                value={qualityPeriod}
+                onValueChange={(value: "week" | "month") => setQualityPeriod(value)}
+              >
+                <SelectTrigger className="w-32 h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">过去一周</SelectItem>
+                  <SelectItem value="month">过去一个月</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px] w-full flex items-center">
+              <div className="flex-1">
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={qualityData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {qualityData.map((entry, index) => (
+                        <Cell key={`quality-cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-popover border rounded-lg shadow-md p-2 text-sm">
+                              <p className="font-medium">{data.name}</p>
+                              <p className="text-muted-foreground">{data.value} 个</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              {/* 图例 */}
+              <div className="space-y-3 pr-4">
+                {qualityData.map((item) => (
+                  <div key={item.name} className="flex items-center gap-3">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">{item.name}</span>
+                      <span className="font-medium ml-2">{item.value}</span>
+                      <span className="text-muted-foreground ml-1">
+                        ({((item.value / totalQuality) * 100).toFixed(1)}%)
                       </span>
                     </div>
                   </div>
