@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ClipboardList, Play, XCircle, CheckCircle } from "lucide-react";
+import { ClipboardList, Play, XCircle, CheckCircle, AlertTriangle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import {
   ChartContainer,
   ChartTooltip,
@@ -95,6 +96,25 @@ const monthQualityData = [
   { name: "丢弃", value: 32, color: "#ef4444" },
 ];
 
+// AI用例生成问题分类统计数据
+const weekIssueData = [
+  { category: "场景描述错误", count: 86, color: "#ef4444", description: "用例场景与实际业务不符" },
+  { category: "格式不规范", count: 45, color: "#f59e0b", description: "用例格式不符合标准模板" },
+  { category: "步骤不完整", count: 38, color: "#3b82f6", description: "测试步骤缺失或不完整" },
+  { category: "预期结果错误", count: 32, color: "#8b5cf6", description: "预期结果与实际预期不符" },
+  { category: "重复用例", count: 24, color: "#06b6d4", description: "与已有用例重复或相似" },
+  { category: "优先级不当", count: 18, color: "#ec4899", description: "用例优先级设置不合理" },
+];
+
+const monthIssueData = [
+  { category: "场景描述错误", count: 300, color: "#ef4444", description: "用例场景与实际业务不符" },
+  { category: "格式不规范", count: 156, color: "#f59e0b", description: "用例格式不符合标准模板" },
+  { category: "步骤不完整", count: 128, color: "#3b82f6", description: "测试步骤缺失或不完整" },
+  { category: "预期结果错误", count: 98, color: "#8b5cf6", description: "预期结果与实际预期不符" },
+  { category: "重复用例", count: 66, color: "#06b6d4", description: "与已有用例重复或相似" },
+  { category: "优先级不当", count: 42, color: "#ec4899", description: "用例优先级设置不合理" },
+];
+
 const lineChartConfig = {
   count: {
     label: "用例数",
@@ -106,12 +126,15 @@ const Index = () => {
   const [trendPeriod, setTrendPeriod] = useState<"week" | "month">("week");
   const [resultPeriod, setResultPeriod] = useState<"week" | "month">("week");
   const [qualityPeriod, setQualityPeriod] = useState<"week" | "month">("week");
+  const [issuePeriod, setIssuePeriod] = useState<"week" | "month">("week");
 
   const trendData = trendPeriod === "week" ? weekTrendData : monthTrendData;
   const resultData = resultPeriod === "week" ? weekResultData : monthResultData;
   const qualityData = qualityPeriod === "week" ? weekQualityData : monthQualityData;
+  const issueData = issuePeriod === "week" ? weekIssueData : monthIssueData;
   const totalResults = resultData.reduce((sum, item) => sum + item.value, 0);
   const totalQuality = qualityData.reduce((sum, item) => sum + item.value, 0);
+  const totalIssues = issueData.reduce((sum, item) => sum + item.count, 0);
 
   return (
     <div className="space-y-6">
@@ -341,6 +364,67 @@ const Index = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI用例生成问题分类统计 */}
+        <Card className="border shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                <CardTitle className="text-base font-semibold">AI用例生成问题分类</CardTitle>
+              </div>
+              <Select
+                value={issuePeriod}
+                onValueChange={(value: "week" | "month") => setIssuePeriod(value)}
+              >
+                <SelectTrigger className="w-32 h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">过去一周</SelectItem>
+                  <SelectItem value="month">过去一个月</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              基于用户不采纳反馈的问题归类统计，共 {totalIssues} 条问题
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {issueData.map((item) => {
+                const percentage = (item.count / totalIssues) * 100;
+                return (
+                  <div key={item.category} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-sm font-medium">{item.category}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold">{item.count} 条</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({percentage.toFixed(1)}%)
+                        </span>
+                      </div>
+                    </div>
+                    <Progress 
+                      value={percentage} 
+                      className="h-2"
+                      style={{ 
+                        '--progress-color': item.color 
+                      } as React.CSSProperties}
+                    />
+                    <p className="text-xs text-muted-foreground pl-5">{item.description}</p>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
