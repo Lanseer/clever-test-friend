@@ -212,7 +212,11 @@ export default function CaseReview() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/ai-review`)}
+          >
             <Sparkles className="w-4 h-4" />
             AI评审
           </Button>
