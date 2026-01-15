@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Sparkles, Users, ClipboardCheck } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Sparkles, ClipboardCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { ReportSidebar } from "@/components/workspace/ReportSidebar";
 import { AIGenerateDialog } from "@/components/workspace/AIGenerateDialog";
-import { ExpertReviewDialog } from "@/components/workspace/ExpertReviewDialog";
-import { RejectionDetailDialog } from "@/components/workspace/RejectionDetailDialog";
 
 type GenerationStatus = "generating" | "completed" | "failed";
 
@@ -31,12 +28,10 @@ interface GenerationRecord {
   createdAt: string;
   documents?: SelectedDocument[];
   tags?: string[];
-  // New fields for review stats
   selfReviewTotal: number;
   selfReviewPassed: number;
   expertReviewTotal: number;
   expertReviewPassed: number;
-  expertReviewRejected: number;
 }
 
 const mockRecords: GenerationRecord[] = [
@@ -56,7 +51,6 @@ const mockRecords: GenerationRecord[] = [
     selfReviewPassed: 480,
     expertReviewTotal: 480,
     expertReviewPassed: 450,
-    expertReviewRejected: 15,
   },
   {
     id: "2",
@@ -74,7 +68,6 @@ const mockRecords: GenerationRecord[] = [
     selfReviewPassed: 0,
     expertReviewTotal: 0,
     expertReviewPassed: 0,
-    expertReviewRejected: 0,
   },
   {
     id: "3",
@@ -92,7 +85,6 @@ const mockRecords: GenerationRecord[] = [
     selfReviewPassed: 300,
     expertReviewTotal: 300,
     expertReviewPassed: 280,
-    expertReviewRejected: 8,
   },
   {
     id: "4",
@@ -111,7 +103,6 @@ const mockRecords: GenerationRecord[] = [
     selfReviewPassed: 0,
     expertReviewTotal: 0,
     expertReviewPassed: 0,
-    expertReviewRejected: 0,
   },
   {
     id: "5",
@@ -129,14 +120,7 @@ const mockRecords: GenerationRecord[] = [
     selfReviewPassed: 175,
     expertReviewTotal: 175,
     expertReviewPassed: 170,
-    expertReviewRejected: 3,
   },
-];
-
-const mockRejectedCases = [
-  { id: "1", code: "TC-001", name: "用户登录功能验证", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", reviewer: "李专家", reviewTime: "2024-01-15 14:30" },
-  { id: "2", code: "TC-002", name: "密码重置流程", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊，无法作为测试验收标准", reviewer: "王专家", reviewTime: "2024-01-15 15:00" },
-  { id: "3", code: "TC-003", name: "多设备登录限制", rejectTag: "与现有用例重复", rejectReason: "该用例与TC-089重复，建议合并", reviewer: "李专家", reviewTime: "2024-01-15 15:30" },
 ];
 
 const statusConfig: Record<GenerationStatus, { label: string; icon: typeof Loader2; className: string }> = {
@@ -167,11 +151,6 @@ export default function AIGeneratedCases() {
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [generateMode, setGenerateMode] = useState<"create" | "regenerate">("create");
   const [regenerateRecord, setRegenerateRecord] = useState<GenerationRecord | null>(null);
-  const [activeTab, setActiveTab] = useState<"self" | "expert">("self");
-  const [expertReviewDialogOpen, setExpertReviewDialogOpen] = useState(false);
-  const [expertReviewRecord, setExpertReviewRecord] = useState<GenerationRecord | null>(null);
-  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
-  const [rejectionRecord, setRejectionRecord] = useState<GenerationRecord | null>(null);
 
   const filteredRecords = mockRecords.filter(
     (record) =>
@@ -211,229 +190,6 @@ export default function AIGeneratedCases() {
     console.log("生成用例:", data);
   };
 
-  const handleOpenExpertReview = (record: GenerationRecord) => {
-    setExpertReviewRecord(record);
-    setExpertReviewDialogOpen(true);
-  };
-
-  const handleConfirmExpertReview = (data: { experts: { id: string; name: string; email: string }[]; selectedCases: string[] }) => {
-    console.log("发起专家评审:", data);
-  };
-
-  const handleOpenRejectionDetail = (record: GenerationRecord) => {
-    setRejectionRecord(record);
-    setRejectionDialogOpen(true);
-  };
-
-  const handleOpenExpertReviewDetail = (record: GenerationRecord) => {
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/expert-review`);
-  };
-
-  const renderTable = (isExpertView: boolean) => (
-    <div className="rounded-xl border bg-card overflow-hidden">
-      <div className={cn(
-        "grid gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b",
-        isExpertView ? "grid-cols-14" : "grid-cols-14"
-      )}>
-        <div className="col-span-1">编号</div>
-        <div className="col-span-3">名称</div>
-        <div className="col-span-1">状态</div>
-        <div className="col-span-1">评审人</div>
-        <div className="col-span-1">用例自评</div>
-        <div className="col-span-1">专家评审</div>
-        <div className="col-span-2">创建时间</div>
-        <div className="col-span-4">操作</div>
-      </div>
-
-      <div className="divide-y">
-        {filteredRecords.map((record, index) => {
-          const status = statusConfig[record.status];
-          const StatusIcon = status.icon;
-          const isCompleted = record.status === "completed";
-          const isFailed = record.status === "failed";
-
-          return (
-            <div
-              key={record.id}
-              className="grid grid-cols-14 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="col-span-1 flex items-center">
-                <Badge variant="outline" className="font-mono text-xs">
-                  {record.code}
-                </Badge>
-              </div>
-              <div className="col-span-3 flex items-center">
-                <button
-                  className="font-medium text-primary hover:underline truncate text-left"
-                  onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}`)}
-                >
-                  {record.name}
-                </button>
-              </div>
-              <div className="col-span-1 flex items-center">
-                <Badge variant="outline" className={cn("text-xs gap-1", status.className)}>
-                  <StatusIcon className={cn("w-3 h-3", record.status === "generating" && "animate-spin")} />
-                  {status.label}
-                </Badge>
-              </div>
-              <div className="col-span-1 flex items-center gap-1">
-                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-3 h-3 text-primary" />
-                </div>
-                <span className="text-sm text-foreground truncate">{record.reviewer}</span>
-              </div>
-              <div className="col-span-1 flex items-center">
-                {isCompleted ? (
-                  <span className="text-sm font-medium">
-                    <span className="text-green-600">{record.selfReviewPassed}</span>
-                    <span className="text-muted-foreground">/{record.selfReviewTotal}</span>
-                  </span>
-                ) : (
-                  <span className="text-sm text-muted-foreground">-</span>
-                )}
-              </div>
-              <div className="col-span-1 flex items-center">
-                {isCompleted ? (
-                  isExpertView ? (
-                    <span className="text-sm font-medium">
-                      <span className="text-green-600">{record.expertReviewPassed}</span>
-                      <span className="text-muted-foreground">/{record.expertReviewTotal}</span>
-                      {record.expertReviewRejected > 0 && (
-                        <button
-                          className="ml-1 text-red-600 hover:underline cursor-pointer"
-                          onClick={() => handleOpenRejectionDetail(record)}
-                        >
-                          ({record.expertReviewRejected})
-                        </button>
-                      )}
-                    </span>
-                  ) : (
-                    <span className="text-sm font-medium">
-                      <span className="text-green-600">{record.expertReviewPassed}</span>
-                      <span className="text-muted-foreground">/{record.expertReviewTotal}</span>
-                    </span>
-                  )
-                ) : (
-                  <span className="text-sm text-muted-foreground">-</span>
-                )}
-              </div>
-              <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" />
-                {record.createdAt}
-              </div>
-              <div className="col-span-4 flex items-center gap-1 flex-wrap">
-                {isCompleted && !isExpertView && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenReport(record)}
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      评审报告
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenReview(record)}
-                    >
-                      <ClipboardCheck className="w-3.5 h-3.5" />
-                      评审
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenRegenerateDialog(record)}
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      再次生成
-                    </Button>
-                  </>
-                )}
-                {isCompleted && isExpertView && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenReport(record)}
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      评审报告
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenExpertReview(record)}
-                    >
-                      <Users className="w-3.5 h-3.5" />
-                      发起专家评审
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenExpertReviewDetail(record)}
-                    >
-                      <ClipboardCheck className="w-3.5 h-3.5" />
-                      专家评审详情
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenRegenerateDialog(record)}
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      再次生成
-                    </Button>
-                  </>
-                )}
-                {isFailed && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive"
-                      onClick={() => handleOpenFailure(record)}
-                    >
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      查看失败信息
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleOpenRegenerateDialog(record)}
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      重新生成
-                    </Button>
-                  </>
-                )}
-                {record.status === "generating" && (
-                  <span className="text-xs text-muted-foreground">生成中，请稍候...</span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {filteredRecords.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-          <Search className="w-12 h-12 mb-4 opacity-50" />
-          <p>未找到匹配的生成记录</p>
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -459,26 +215,150 @@ export default function AIGeneratedCases() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "self" | "expert")} className="mb-6">
-        <TabsList>
-          <TabsTrigger value="self" className="gap-2">
-            <ClipboardCheck className="w-4 h-4" />
-            用例自评
-          </TabsTrigger>
-          <TabsTrigger value="expert" className="gap-2">
-            <Users className="w-4 h-4" />
-            专家评审
-          </TabsTrigger>
-        </TabsList>
+      <div className="rounded-xl border bg-card overflow-hidden">
+        <div className="grid grid-cols-14 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+          <div className="col-span-1">编号</div>
+          <div className="col-span-3">名称</div>
+          <div className="col-span-1">状态</div>
+          <div className="col-span-1">评审人</div>
+          <div className="col-span-1">用例自评</div>
+          <div className="col-span-1">专家评审</div>
+          <div className="col-span-2">创建时间</div>
+          <div className="col-span-4">操作</div>
+        </div>
 
-        <TabsContent value="self" className="mt-4">
-          {renderTable(false)}
-        </TabsContent>
+        <div className="divide-y">
+          {filteredRecords.map((record, index) => {
+            const status = statusConfig[record.status];
+            const StatusIcon = status.icon;
+            const isCompleted = record.status === "completed";
+            const isFailed = record.status === "failed";
 
-        <TabsContent value="expert" className="mt-4">
-          {renderTable(true)}
-        </TabsContent>
-      </Tabs>
+            return (
+              <div
+                key={record.id}
+                className="grid grid-cols-14 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="col-span-1 flex items-center">
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {record.code}
+                  </Badge>
+                </div>
+                <div className="col-span-3 flex items-center">
+                  <button
+                    className="font-medium text-primary hover:underline truncate text-left"
+                    onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}`)}
+                  >
+                    {record.name}
+                  </button>
+                </div>
+                <div className="col-span-1 flex items-center">
+                  <Badge variant="outline" className={cn("text-xs gap-1", status.className)}>
+                    <StatusIcon className={cn("w-3 h-3", record.status === "generating" && "animate-spin")} />
+                    {status.label}
+                  </Badge>
+                </div>
+                <div className="col-span-1 flex items-center gap-1">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="w-3 h-3 text-primary" />
+                  </div>
+                  <span className="text-sm text-foreground truncate">{record.reviewer}</span>
+                </div>
+                <div className="col-span-1 flex items-center">
+                  {isCompleted ? (
+                    <span className="text-sm font-medium">
+                      <span className="text-green-600">{record.selfReviewPassed}</span>
+                      <span className="text-muted-foreground">/{record.selfReviewTotal}</span>
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">-</span>
+                  )}
+                </div>
+                <div className="col-span-1 flex items-center">
+                  {isCompleted ? (
+                    <span className="text-sm font-medium">
+                      <span className="text-green-600">{record.expertReviewPassed}</span>
+                      <span className="text-muted-foreground">/{record.expertReviewTotal}</span>
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">-</span>
+                  )}
+                </div>
+                <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" />
+                  {record.createdAt}
+                </div>
+                <div className="col-span-4 flex items-center gap-1 flex-wrap">
+                  {isCompleted && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenReport(record)}
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        评审报告
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenReview(record)}
+                      >
+                        <ClipboardCheck className="w-3.5 h-3.5" />
+                        评审
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenRegenerateDialog(record)}
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        再次生成
+                      </Button>
+                    </>
+                  )}
+                  {isFailed && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive"
+                        onClick={() => handleOpenFailure(record)}
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        查看失败信息
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1"
+                        onClick={() => handleOpenRegenerateDialog(record)}
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        重新生成
+                      </Button>
+                    </>
+                  )}
+                  {record.status === "generating" && (
+                    <span className="text-xs text-muted-foreground">生成中，请稍候...</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {filteredRecords.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Search className="w-12 h-12 mb-4 opacity-50" />
+            <p>未找到匹配的生成记录</p>
+          </div>
+        )}
+      </div>
 
       <ReportSidebar
         open={sidebarOpen}
@@ -512,20 +392,6 @@ export default function AIGeneratedCases() {
             : undefined
         }
         onConfirm={handleConfirmGenerate}
-      />
-
-      <ExpertReviewDialog
-        open={expertReviewDialogOpen}
-        onOpenChange={setExpertReviewDialogOpen}
-        recordName={expertReviewRecord?.name || ""}
-        onConfirm={handleConfirmExpertReview}
-      />
-
-      <RejectionDetailDialog
-        open={rejectionDialogOpen}
-        onOpenChange={setRejectionDialogOpen}
-        recordName={rejectionRecord?.name || ""}
-        rejectedCases={mockRejectedCases}
       />
     </div>
   );
