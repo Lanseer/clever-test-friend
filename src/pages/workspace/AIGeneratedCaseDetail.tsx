@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, FileCheck, Clock, CheckCircle, XCircle, Calendar, Users, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Search, FileCheck, Clock, CheckCircle, XCircle, Calendar, Users, ClipboardCheck, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { ExpertReviewDialog } from "@/components/workspace/ExpertReviewDialog";
 import { RejectionDetailDialog } from "@/components/workspace/RejectionDetailDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface BatchRecord {
   id: string;
@@ -207,38 +212,34 @@ export default function AIGeneratedCaseDetail() {
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-1">
-              {!isExpertView ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
-                  onClick={() => handleReview(batch.id)}
-                >
-                  <FileCheck className="w-3.5 h-3.5" />
-                  评审
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1 whitespace-nowrap"
-                    onClick={() => handleOpenExpertReview(batch)}
-                  >
-                    <Users className="w-3.5 h-3.5" />
-                    发起专家评审
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1 whitespace-nowrap"
-                    onClick={() => handleOpenExpertReviewDetail(batch.id)}
-                  >
-                    <ClipboardCheck className="w-3.5 h-3.5" />
-                    详情
-                  </Button>
-                </>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="default"
+                size="sm"
+                className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
+                onClick={() => isExpertView ? handleOpenExpertReviewDetail(batch.id) : handleReview(batch.id)}
+              >
+                <FileCheck className="w-3.5 h-3.5" />
+                评审
+              </Button>
+              {isExpertView && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleOpenExpertReview(batch)}>
+                      <Users className="w-4 h-4 mr-2" />
+                      发起专家评审
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleOpenExpertReviewDetail(batch.id)}>
+                      <ClipboardCheck className="w-4 h-4 mr-2" />
+                      查看评审详情
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
@@ -273,14 +274,14 @@ export default function AIGeneratedCaseDetail() {
       </div>
 
       {/* Tab Card Switcher */}
-      <div className="flex mb-6 bg-muted rounded-xl p-1.5">
+      <div className="flex mb-6 bg-slate-200 dark:bg-slate-800 rounded-xl p-1.5">
         <button
           onClick={() => setActiveTab("self")}
           className={cn(
             "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
             activeTab === "self"
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           )}
         >
           <ClipboardCheck className="w-5 h-5" />
@@ -291,8 +292,8 @@ export default function AIGeneratedCaseDetail() {
           className={cn(
             "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
             activeTab === "expert"
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           )}
         >
           <Users className="w-5 h-5" />
