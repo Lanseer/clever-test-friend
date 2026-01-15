@@ -273,15 +273,15 @@ export default function AIGeneratedCaseDetail() {
         </div>
       </div>
 
-      {/* Tab Card Switcher */}
-      <div className="flex mb-6 bg-slate-200 dark:bg-slate-800 rounded-xl p-1.5">
+      {/* Tab Switcher */}
+      <div className="flex mb-6 gap-2">
         <button
           onClick={() => setActiveTab("self")}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
+            "flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all",
             activeTab === "self"
-              ? "bg-primary text-primary-foreground shadow-md"
-              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              ? "bg-primary/80 text-white shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
           )}
         >
           <ClipboardCheck className="w-5 h-5" />
@@ -290,10 +290,10 @@ export default function AIGeneratedCaseDetail() {
         <button
           onClick={() => setActiveTab("expert")}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
+            "flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all",
             activeTab === "expert"
-              ? "bg-primary text-primary-foreground shadow-md"
-              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              ? "bg-primary/80 text-white shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
           )}
         >
           <Users className="w-5 h-5" />
