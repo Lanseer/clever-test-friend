@@ -62,6 +62,37 @@ const mockRejectedCases = [
   { id: "3", code: "TC-003", name: "多设备登录限制", rejectTag: "与现有用例重复", rejectReason: "该用例与TC-089重复，建议合并", reviewer: "李专家", reviewTime: "2024-01-15 15:30" },
 ];
 
+// Mock data for expert review (different stats)
+const mockExpertBatchRecords: BatchRecord[] = [
+  {
+    id: "batch-1",
+    batchCode: "BATCH-001",
+    generatedAt: "2024-01-15 10:30",
+    totalCases: 24,
+    pendingCount: 8,
+    acceptedCount: 14,
+    rejectedCount: 2,
+  },
+  {
+    id: "batch-2",
+    batchCode: "BATCH-002",
+    generatedAt: "2024-01-14 15:20",
+    totalCases: 18,
+    pendingCount: 3,
+    acceptedCount: 12,
+    rejectedCount: 3,
+  },
+  {
+    id: "batch-3",
+    batchCode: "BATCH-003",
+    generatedAt: "2024-01-13 09:45",
+    totalCases: 12,
+    pendingCount: 2,
+    acceptedCount: 8,
+    rejectedCount: 2,
+  },
+];
+
 export default function AIGeneratedCaseDetail() {
   const navigate = useNavigate();
   const { workspaceId, recordId } = useParams();
@@ -71,7 +102,9 @@ export default function AIGeneratedCaseDetail() {
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<BatchRecord | null>(null);
 
-  const filteredBatches = mockBatchRecords.filter((batch) =>
+  const currentBatches = activeTab === "self" ? mockBatchRecords : mockExpertBatchRecords;
+  
+  const filteredBatches = currentBatches.filter((batch) =>
     batch.batchCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -97,10 +130,21 @@ export default function AIGeneratedCaseDetail() {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/expert-review`);
   };
 
-  const totalCases = mockBatchRecords.reduce((sum, b) => sum + b.totalCases, 0);
-  const totalPending = mockBatchRecords.reduce((sum, b) => sum + b.pendingCount, 0);
-  const totalAccepted = mockBatchRecords.reduce((sum, b) => sum + b.acceptedCount, 0);
-  const totalRejected = mockBatchRecords.reduce((sum, b) => sum + b.rejectedCount, 0);
+  // Self review stats
+  const selfTotalCases = mockBatchRecords.reduce((sum, b) => sum + b.totalCases, 0);
+  const selfTotalPending = mockBatchRecords.reduce((sum, b) => sum + b.pendingCount, 0);
+  const selfTotalAccepted = mockBatchRecords.reduce((sum, b) => sum + b.acceptedCount, 0);
+  const selfTotalRejected = mockBatchRecords.reduce((sum, b) => sum + b.rejectedCount, 0);
+
+  // Expert review stats
+  const expertTotalCases = mockExpertBatchRecords.reduce((sum, b) => sum + b.totalCases, 0);
+  const expertTotalPending = mockExpertBatchRecords.reduce((sum, b) => sum + b.pendingCount, 0);
+  const expertTotalAccepted = mockExpertBatchRecords.reduce((sum, b) => sum + b.acceptedCount, 0);
+  const expertTotalRejected = mockExpertBatchRecords.reduce((sum, b) => sum + b.rejectedCount, 0);
+
+  const currentStats = activeTab === "self" 
+    ? { total: selfTotalCases, pending: selfTotalPending, accepted: selfTotalAccepted, rejected: selfTotalRejected }
+    : { total: expertTotalCases, pending: expertTotalPending, accepted: expertTotalAccepted, rejected: expertTotalRejected };
 
   const renderBatchTable = (isExpertView: boolean) => (
     <div className="rounded-xl border bg-card overflow-hidden">
@@ -231,22 +275,50 @@ export default function AIGeneratedCaseDetail() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Tab Switcher - More Prominent */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setActiveTab("self")}
+          className={cn(
+            "flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
+            activeTab === "self"
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "bg-muted hover:bg-muted/80 text-muted-foreground"
+          )}
+        >
+          <ClipboardCheck className="w-5 h-5" />
+          用例自评
+        </button>
+        <button
+          onClick={() => setActiveTab("expert")}
+          className={cn(
+            "flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
+            activeTab === "expert"
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "bg-muted hover:bg-muted/80 text-muted-foreground"
+          )}
+        >
+          <Users className="w-5 h-5" />
+          专家评审
+        </button>
+      </div>
+
+      {/* Stats - Different for each tab */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold">{totalCases}</div>
+          <div className="text-2xl font-bold">{currentStats.total}</div>
           <div className="text-sm text-muted-foreground">总用例数</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-amber-600">{totalPending}</div>
+          <div className="text-2xl font-bold text-amber-600">{currentStats.pending}</div>
           <div className="text-sm text-muted-foreground">未评审</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-green-600">{totalAccepted}</div>
+          <div className="text-2xl font-bold text-green-600">{currentStats.accepted}</div>
           <div className="text-sm text-muted-foreground">已采纳</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-red-600">{totalRejected}</div>
+          <div className="text-2xl font-bold text-red-600">{currentStats.rejected}</div>
           <div className="text-sm text-muted-foreground">不采纳</div>
         </div>
       </div>
@@ -263,27 +335,8 @@ export default function AIGeneratedCaseDetail() {
         </div>
       </div>
 
-      {/* Tabs for Self Review and Expert Review */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "self" | "expert")} className="mb-6">
-        <TabsList>
-          <TabsTrigger value="self" className="gap-2">
-            <ClipboardCheck className="w-4 h-4" />
-            用例自评
-          </TabsTrigger>
-          <TabsTrigger value="expert" className="gap-2">
-            <Users className="w-4 h-4" />
-            专家评审
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="self" className="mt-4">
-          {renderBatchTable(false)}
-        </TabsContent>
-
-        <TabsContent value="expert" className="mt-4">
-          {renderBatchTable(true)}
-        </TabsContent>
-      </Tabs>
+      {/* Content based on active tab */}
+      {activeTab === "self" ? renderBatchTable(false) : renderBatchTable(true)}
 
       <ExpertReviewDialog
         open={expertReviewDialogOpen}
