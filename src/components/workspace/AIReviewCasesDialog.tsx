@@ -62,9 +62,10 @@ export function AIReviewCasesDialog({
 }: AIReviewCasesDialogProps) {
   const config = typeConfig[type];
   const TypeIcon = config.icon;
+  const [selectedCase, setSelectedCase] = useState<ReviewCase | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   
   const adoptedCount = cases.filter((c) => c.adopted).length;
-  const notAdoptedCount = cases.filter((c) => c.adopted === false && cases.some(cc => cc.id === c.id && cc.adopted !== undefined)).length;
 
   const handleAdopt = (caseId: string) => {
     const updatedCases = cases.map((c) =>
@@ -88,18 +89,21 @@ export function AIReviewCasesDialog({
     toast.success(`已批量采纳 ${cases.length} 个用例`);
   };
 
+  const handleCaseClick = (caseItem: ReviewCase) => {
+    setSelectedCase(caseItem);
+    setDetailOpen(true);
+  };
+
   const getAdoptionStatus = (caseItem: ReviewCase) => {
     if (caseItem.adopted === true) {
       return (
-        <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 gap-1">
-          <Check className="w-3 h-3" />
+        <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
           已采纳
         </Badge>
       );
     } else if (caseItem.adopted === false) {
       return (
-        <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200 gap-1">
-          <X className="w-3 h-3" />
+        <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200">
           不采纳
         </Badge>
       );
@@ -162,7 +166,12 @@ export function AIReviewCasesDialog({
                   </div>
                   <div className="col-span-5 flex items-center">
                     <div>
-                      <span className="font-medium text-foreground text-sm">{caseItem.name}</span>
+                      <button
+                        className="font-medium text-foreground text-sm hover:text-primary hover:underline text-left"
+                        onClick={() => handleCaseClick(caseItem)}
+                      >
+                        {caseItem.name}
+                      </button>
                       {caseItem.reason && (
                         <p className="text-xs text-muted-foreground mt-0.5">{caseItem.reason}</p>
                       )}
@@ -198,6 +207,86 @@ export function AIReviewCasesDialog({
             </div>
           </div>
         </div>
+
+        {/* Case Detail Dialog */}
+        <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                用例详情
+                {selectedCase && (
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {selectedCase.code}
+                  </Badge>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            {selectedCase && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">用例名称</label>
+                    <p className="mt-1 text-sm">{selectedCase.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">评审状态</label>
+                    <div className="mt-1">
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          selectedCase.status === "excellent" && "bg-green-50 text-green-600 border-green-200",
+                          selectedCase.status === "passed" && "bg-blue-50 text-blue-600 border-blue-200",
+                          selectedCase.status === "failed" && "bg-red-50 text-red-600 border-red-200"
+                        )}
+                      >
+                        {selectedCase.statusLabel}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">采纳状态</label>
+                    <div className="mt-1">
+                      {getAdoptionStatus(selectedCase)}
+                    </div>
+                  </div>
+                </div>
+                {selectedCase.reason && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">评审意见</label>
+                    <p className="mt-1 text-sm bg-muted/50 p-3 rounded-lg">{selectedCase.reason}</p>
+                  </div>
+                )}
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                    onClick={() => {
+                      handleReject(selectedCase.id);
+                      setDetailOpen(false);
+                    }}
+                    disabled={selectedCase.adopted === false}
+                  >
+                    <X className="w-4 h-4" />
+                    不采纳
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => {
+                      handleAdopt(selectedCase.id);
+                      setDetailOpen(false);
+                    }}
+                    disabled={selectedCase.adopted === true}
+                  >
+                    <Check className="w-4 h-4" />
+                    采纳
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   );
