@@ -77,7 +77,7 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
-            <Route path="management/ai-cases/:recordId/expert-review" element={<ExpertReviewDetail />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review" element={<ExpertReviewDetail />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
         </main>
