@@ -177,7 +177,7 @@ export default function AIGeneratedCases() {
   };
 
   const handleOpenReview = (record: GenerationRecord) => {
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/review`);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}`);
   };
 
   const handleOpenGenerateDialog = () => {
