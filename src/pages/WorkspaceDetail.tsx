@@ -9,6 +9,7 @@ import AIGeneratedCaseDetail from "./workspace/AIGeneratedCaseDetail";
 import CaseReview from "./workspace/CaseReview";
 import AIReview from "./workspace/AIReview";
 import AIAssistant from "./workspace/AIAssistant";
+import ExpertReviewDetail from "./workspace/ExpertReviewDetail";
 import Dashboard from "./Index";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
@@ -76,6 +77,7 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
+            <Route path="management/ai-cases/:recordId/expert-review" element={<ExpertReviewDetail />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
         </main>
