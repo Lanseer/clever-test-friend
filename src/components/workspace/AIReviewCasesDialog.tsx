@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, AlertCircle, XCircle, Check, X, FileText, Code, Trash2 } from "lucide-react";
+import { CheckCircle, AlertCircle, XCircle, Check, X, FileText, Code, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -87,6 +87,7 @@ export function AIReviewCasesDialog({
   const config = typeConfig[type];
   const TypeIcon = config.icon;
   const [selectedCase, setSelectedCase] = useState<ReviewCase | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [detailOpen, setDetailOpen] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
@@ -94,6 +95,24 @@ export function AIReviewCasesDialog({
   const [rejectionReason, setRejectionReason] = useState("");
   
   const adoptedCount = cases.filter((c) => c.adopted).length;
+  const hasPrevious = currentIndex > 0;
+  const hasNext = currentIndex < cases.length - 1;
+
+  const handlePrevious = () => {
+    if (hasPrevious) {
+      const newIndex = currentIndex - 1;
+      setCurrentIndex(newIndex);
+      setSelectedCase(cases[newIndex]);
+    }
+  };
+
+  const handleNext = () => {
+    if (hasNext) {
+      const newIndex = currentIndex + 1;
+      setCurrentIndex(newIndex);
+      setSelectedCase(cases[newIndex]);
+    }
+  };
 
   const handleAdopt = (caseId: string) => {
     const updatedCases = cases.map((c) =>
@@ -136,8 +155,9 @@ export function AIReviewCasesDialog({
     toast.success(`已批量采纳 ${cases.length} 个用例`);
   };
 
-  const handleCaseClick = (caseItem: ReviewCase) => {
+  const handleCaseClick = (caseItem: ReviewCase, index: number) => {
     setSelectedCase(caseItem);
+    setCurrentIndex(index);
     setDetailOpen(true);
   };
 
@@ -247,7 +267,7 @@ export function AIReviewCasesDialog({
                       <div>
                         <button
                           className="font-medium text-sm text-primary hover:underline text-left"
-                          onClick={() => handleCaseClick(caseItem)}
+                          onClick={() => handleCaseClick(caseItem, index)}
                         >
                           {caseItem.name}
                         </button>
@@ -382,32 +402,58 @@ export function AIReviewCasesDialog({
               </div>
 
               {/* Bottom Actions */}
-              <div className="flex-shrink-0 flex items-center justify-end pt-4 border-t mt-4 gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDiscardDialog(true)}
-                  className="gap-2 text-muted-foreground hover:text-destructive hover:border-destructive"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  丢弃
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowRejectDialog(true)}
-                  className="gap-2 text-orange-600 border-orange-200 hover:bg-orange-50 hover:text-orange-700"
-                  disabled={selectedCase.adopted === false}
-                >
-                  <X className="w-4 h-4" />
-                  不采纳
-                </Button>
-                <Button 
-                  onClick={() => handleAdopt(selectedCase.id)} 
-                  className="gap-2 px-8"
-                  disabled={selectedCase.adopted === true}
-                >
-                  <Check className="w-4 h-4" />
-                  采纳
-                </Button>
+              <div className="flex-shrink-0 flex items-center justify-between pt-4 border-t mt-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handlePrevious}
+                    disabled={!hasPrevious}
+                    className="gap-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    上一个
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleNext}
+                    disabled={!hasNext}
+                    className="gap-2"
+                  >
+                    下一个
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                  <span className="text-sm text-muted-foreground ml-2">
+                    {currentIndex + 1} / {cases.length}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDiscardDialog(true)}
+                    className="gap-2 text-muted-foreground hover:text-destructive hover:border-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    丢弃
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowRejectDialog(true)}
+                    className="gap-2 text-orange-600 border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                    disabled={selectedCase.adopted === false}
+                  >
+                    <X className="w-4 h-4" />
+                    不采纳
+                  </Button>
+                  <Button 
+                    onClick={() => handleAdopt(selectedCase.id)} 
+                    className="gap-2 px-8"
+                    disabled={selectedCase.adopted === true}
+                  >
+                    <Check className="w-4 h-4" />
+                    采纳
+                  </Button>
+                </div>
               </div>
             </>
           )}
