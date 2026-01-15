@@ -213,33 +213,37 @@ export default function AIGeneratedCaseDetail() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="default"
-                size="sm"
-                className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
-                onClick={() => isExpertView ? handleOpenExpertReviewDetail(batch.id) : handleReview(batch.id)}
-              >
-                <FileCheck className="w-3.5 h-3.5" />
-                评审
-              </Button>
-              {isExpertView && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleOpenExpertReview(batch)}>
-                      <Users className="w-4 h-4 mr-2" />
-                      发起专家评审
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleOpenExpertReviewDetail(batch.id)}>
-                      <ClipboardCheck className="w-4 h-4 mr-2" />
-                      查看评审详情
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              {!isExpertView ? (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
+                  onClick={() => handleReview(batch.id)}
+                >
+                  <FileCheck className="w-3.5 h-3.5" />
+                  评审
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
+                    onClick={() => handleOpenExpertReview(batch)}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    发起评审
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
+                    onClick={() => handleOpenExpertReviewDetail(batch.id)}
+                  >
+                    <ClipboardCheck className="w-3.5 h-3.5" />
+                    评审详情
+                  </Button>
+                </>
               )}
             </div>
           </div>
