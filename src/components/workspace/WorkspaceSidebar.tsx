@@ -11,7 +11,8 @@ import {
   ArrowLeft,
   ChevronDown,
   FlaskConical,
-  Sparkles
+  Sparkles,
+  Network
 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -57,6 +58,7 @@ const workspaceMenuItems: MenuItem[] = [
   { title: "测试计划", url: "plan", icon: Calendar },
   { title: "测试报告", url: "report", icon: FileText },
   { title: "知识库", url: "knowledge", icon: BookOpen },
+  { title: "测试本体", url: "ontology", icon: Network },
   { title: "环境", url: "environment", icon: Server },
   { title: "标签", url: "tags", icon: Tags },
 ];
@@ -127,7 +129,7 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
                     >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuButton className="h-9 w-full">
+                          <SidebarMenuButton className="h-9 w-full px-0">
                             <div
                               className={cn(
                                 "flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg transition-all duration-200",
