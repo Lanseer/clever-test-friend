@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 type ReviewStatus = "adopted" | "rejected" | "pending";
 type AIQuality = "excellent" | "passed";
@@ -20,23 +21,25 @@ type AIQuality = "excellent" | "passed";
 interface ExpertCase {
   id: string;
   batchCode: string;
+  caseCode: string;
   name: string;
   createdAt: string;
   aiQuality: AIQuality;
   status: ReviewStatus;
   rejectTag?: string;
   rejectReason?: string;
+  expertName?: string;
 }
 
 const mockExpertCases: ExpertCase[] = [
-  { id: "1", batchCode: "BATCH-001", name: "用户登录功能验证", createdAt: "2024-01-15 10:30", aiQuality: "excellent", status: "adopted" },
-  { id: "2", batchCode: "BATCH-001", name: "用户注册表单验证", createdAt: "2024-01-15 10:35", aiQuality: "passed", status: "rejected", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证" },
-  { id: "3", batchCode: "BATCH-001", name: "密码重置流程", createdAt: "2024-01-15 10:40", aiQuality: "excellent", status: "pending" },
-  { id: "4", batchCode: "BATCH-001", name: "用户权限校验", createdAt: "2024-01-15 10:45", aiQuality: "passed", status: "pending" },
-  { id: "5", batchCode: "BATCH-002", name: "会话超时处理", createdAt: "2024-01-15 11:00", aiQuality: "excellent", status: "adopted" },
-  { id: "6", batchCode: "BATCH-002", name: "多设备登录限制", createdAt: "2024-01-15 11:05", aiQuality: "passed", status: "rejected", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊，无法作为测试验收标准" },
-  { id: "7", batchCode: "BATCH-002", name: "用户信息修改", createdAt: "2024-01-15 11:10", aiQuality: "excellent", status: "pending" },
-  { id: "8", batchCode: "BATCH-002", name: "账户注销流程", createdAt: "2024-01-15 11:15", aiQuality: "passed", status: "adopted" },
+  { id: "1", batchCode: "BATCH-001", caseCode: "TC-001", name: "用户登录功能验证", createdAt: "2024-01-15 10:30", aiQuality: "excellent", status: "adopted" },
+  { id: "2", batchCode: "BATCH-001", caseCode: "TC-002", name: "用户注册表单验证", createdAt: "2024-01-15 10:35", aiQuality: "passed", status: "rejected", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", expertName: "李专家" },
+  { id: "3", batchCode: "BATCH-001", caseCode: "TC-003", name: "密码重置流程", createdAt: "2024-01-15 10:40", aiQuality: "excellent", status: "pending" },
+  { id: "4", batchCode: "BATCH-001", caseCode: "TC-004", name: "用户权限校验", createdAt: "2024-01-15 10:45", aiQuality: "passed", status: "pending" },
+  { id: "5", batchCode: "BATCH-002", caseCode: "TC-005", name: "会话超时处理", createdAt: "2024-01-15 11:00", aiQuality: "excellent", status: "adopted" },
+  { id: "6", batchCode: "BATCH-002", caseCode: "TC-006", name: "多设备登录限制", createdAt: "2024-01-15 11:05", aiQuality: "passed", status: "rejected", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊，无法作为测试验收标准", expertName: "王专家" },
+  { id: "7", batchCode: "BATCH-002", caseCode: "TC-007", name: "用户信息修改", createdAt: "2024-01-15 11:10", aiQuality: "excellent", status: "pending" },
+  { id: "8", batchCode: "BATCH-002", caseCode: "TC-008", name: "账户注销流程", createdAt: "2024-01-15 11:15", aiQuality: "passed", status: "adopted" },
 ];
 
 const rejectTags = [
@@ -86,6 +89,7 @@ export default function ExpertReviewDetail() {
   const [rejectingCase, setRejectingCase] = useState<ExpertCase | null>(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [rejectReason, setRejectReason] = useState("");
+  const [expertName, setExpertName] = useState("");
   const [viewRejectDialogOpen, setViewRejectDialogOpen] = useState(false);
   const [viewingCase, setViewingCase] = useState<ExpertCase | null>(null);
 
@@ -99,6 +103,7 @@ export default function ExpertReviewDetail() {
     setRejectingCase(caseItem);
     setSelectedTag("");
     setRejectReason("");
+    setExpertName("");
     setRejectDialogOpen(true);
   };
 
@@ -106,7 +111,7 @@ export default function ExpertReviewDetail() {
     if (rejectingCase && selectedTag) {
       setCases(cases.map(c =>
         c.id === rejectingCase.id
-          ? { ...c, status: "rejected" as ReviewStatus, rejectTag: selectedTag, rejectReason }
+          ? { ...c, status: "rejected" as ReviewStatus, rejectTag: selectedTag, rejectReason, expertName: expertName || undefined }
           : c
       ));
       setRejectDialogOpen(false);
@@ -164,7 +169,8 @@ export default function ExpertReviewDetail() {
       {/* Cases Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
         <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          <div className="col-span-2">批次编号</div>
+          <div className="col-span-1">批次编号</div>
+          <div className="col-span-1">用例编号</div>
           <div className="col-span-3">用例名称</div>
           <div className="col-span-2">创建时间</div>
           <div className="col-span-1">AI评审</div>
@@ -184,9 +190,14 @@ export default function ExpertReviewDetail() {
                 className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="col-span-2 flex items-center">
+                <div className="col-span-1 flex items-center">
                   <Badge variant="outline" className="font-mono text-xs">
                     {caseItem.batchCode}
+                  </Badge>
+                </div>
+                <div className="col-span-1 flex items-center">
+                  <Badge variant="outline" className="font-mono text-xs bg-blue-500/10 text-blue-600 border-blue-200">
+                    {caseItem.caseCode}
                   </Badge>
                 </div>
                 <div className="col-span-3 flex items-center">
@@ -253,7 +264,15 @@ export default function ExpertReviewDetail() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>选择标签</Label>
+              <Label>专家名称 <span className="text-muted-foreground text-xs">(选填)</span></Label>
+              <Input
+                placeholder="请输入专家名称..."
+                value={expertName}
+                onChange={(e) => setExpertName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>选择标签 <span className="text-red-500">*</span></Label>
               <div className="flex flex-wrap gap-2">
                 {rejectTags.map((tag) => (
                   <Badge
@@ -309,6 +328,12 @@ export default function ExpertReviewDetail() {
                 <Label className="text-muted-foreground">用例名称</Label>
                 <p className="mt-1 font-medium">{viewingCase.name}</p>
               </div>
+              {viewingCase.expertName && (
+                <div>
+                  <Label className="text-muted-foreground">评审专家</Label>
+                  <p className="mt-1 font-medium">{viewingCase.expertName}</p>
+                </div>
+              )}
               <div>
                 <Label className="text-muted-foreground">不采纳标签</Label>
                 <div className="mt-1">
