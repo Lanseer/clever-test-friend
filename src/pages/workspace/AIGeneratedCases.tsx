@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Sparkles, ClipboardCheck } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Sparkles, ClipboardCheck, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ReportSidebar } from "@/components/workspace/ReportSidebar";
 import { AIGenerateDialog } from "@/components/workspace/AIGenerateDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type GenerationStatus = "generating" | "completed" | "failed";
 
@@ -216,15 +222,15 @@ export default function AIGeneratedCases() {
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-14 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          <div className="col-span-1">编号</div>
-          <div className="col-span-3">名称</div>
-          <div className="col-span-1">状态</div>
-          <div className="col-span-1">评审人</div>
-          <div className="col-span-1">用例自评</div>
-          <div className="col-span-1">专家评审</div>
-          <div className="col-span-2">创建时间</div>
-          <div className="col-span-4">操作</div>
+        <div className="grid grid-cols-[80px_minmax(150px,2fr)_90px_80px_90px_90px_130px_100px] gap-3 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+          <div className="whitespace-nowrap">编号</div>
+          <div className="whitespace-nowrap">名称</div>
+          <div className="whitespace-nowrap">状态</div>
+          <div className="whitespace-nowrap">评审人</div>
+          <div className="whitespace-nowrap">用例自评</div>
+          <div className="whitespace-nowrap">专家评审</div>
+          <div className="whitespace-nowrap">创建时间</div>
+          <div className="whitespace-nowrap">操作</div>
         </div>
 
         <div className="divide-y">
@@ -237,15 +243,15 @@ export default function AIGeneratedCases() {
             return (
               <div
                 key={record.id}
-                className="grid grid-cols-14 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[80px_minmax(150px,2fr)_90px_80px_90px_90px_130px_100px] gap-3 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="col-span-1 flex items-center">
-                  <Badge variant="outline" className="font-mono text-xs">
+                <div className="flex items-center">
+                  <Badge variant="outline" className="font-mono text-xs whitespace-nowrap">
                     {record.code}
                   </Badge>
                 </div>
-                <div className="col-span-3 flex items-center">
+                <div className="flex items-center min-w-0">
                   <button
                     className="font-medium text-primary hover:underline truncate text-left"
                     onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}`)}
@@ -253,21 +259,21 @@ export default function AIGeneratedCases() {
                     {record.name}
                   </button>
                 </div>
-                <div className="col-span-1 flex items-center">
-                  <Badge variant="outline" className={cn("text-xs gap-1", status.className)}>
+                <div className="flex items-center">
+                  <Badge variant="outline" className={cn("text-xs gap-1 whitespace-nowrap", status.className)}>
                     <StatusIcon className={cn("w-3 h-3", record.status === "generating" && "animate-spin")} />
                     {status.label}
                   </Badge>
                 </div>
-                <div className="col-span-1 flex items-center gap-1">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="flex items-center gap-1">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <User className="w-3 h-3 text-primary" />
                   </div>
                   <span className="text-sm text-foreground truncate">{record.reviewer}</span>
                 </div>
-                <div className="col-span-1 flex items-center">
+                <div className="flex items-center">
                   {isCompleted ? (
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium whitespace-nowrap">
                       <span className="text-green-600">{record.selfReviewPassed}</span>
                       <span className="text-muted-foreground">/{record.selfReviewTotal}</span>
                     </span>
@@ -275,9 +281,9 @@ export default function AIGeneratedCases() {
                     <span className="text-sm text-muted-foreground">-</span>
                   )}
                 </div>
-                <div className="col-span-1 flex items-center">
+                <div className="flex items-center">
                   {isCompleted ? (
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium whitespace-nowrap">
                       <span className="text-green-600">{record.expertReviewPassed}</span>
                       <span className="text-muted-foreground">/{record.expertReviewTotal}</span>
                     </span>
@@ -285,66 +291,69 @@ export default function AIGeneratedCases() {
                     <span className="text-sm text-muted-foreground">-</span>
                   )}
                 </div>
-                <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1 text-sm text-muted-foreground whitespace-nowrap">
+                  <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                   {record.createdAt}
                 </div>
-                <div className="col-span-4 flex items-center gap-1 flex-wrap">
+                <div className="flex items-center gap-2">
                   {isCompleted && (
                     <>
                       <Button
-                        variant="ghost"
+                        variant="default"
                         size="sm"
-                        className="h-7 px-2 text-xs gap-1"
-                        onClick={() => handleOpenReport(record)}
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        评审报告
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs gap-1"
+                        className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
                         onClick={() => handleOpenReview(record)}
                       >
                         <ClipboardCheck className="w-3.5 h-3.5" />
                         评审
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs gap-1"
-                        onClick={() => handleOpenRegenerateDialog(record)}
-                      >
-                        <RefreshCw className="w-3.5 h-3.5" />
-                        再次生成
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleOpenReport(record)}>
+                            <FileText className="w-4 h-4 mr-2" />
+                            评审报告
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleOpenRegenerateDialog(record)}>
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            再次生成
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </>
                   )}
                   {isFailed && (
                     <>
                       <Button
-                        variant="ghost"
+                        variant="default"
                         size="sm"
-                        className="h-7 px-2 text-xs gap-1 text-destructive hover:text-destructive"
-                        onClick={() => handleOpenFailure(record)}
-                      >
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        查看失败信息
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs gap-1"
+                        className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
                         onClick={() => handleOpenRegenerateDialog(record)}
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         重新生成
                       </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleOpenFailure(record)} className="text-destructive">
+                            <AlertTriangle className="w-4 h-4 mr-2" />
+                            查看失败信息
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </>
                   )}
                   {record.status === "generating" && (
-                    <span className="text-xs text-muted-foreground">生成中，请稍候...</span>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">生成中...</span>
                   )}
                 </div>
               </div>
