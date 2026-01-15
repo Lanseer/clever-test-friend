@@ -148,51 +148,48 @@ export default function AIGeneratedCaseDetail() {
 
   const renderBatchTable = (isExpertView: boolean) => (
     <div className="rounded-xl border bg-card overflow-hidden">
-      <div className={cn(
-        "grid gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b",
-        isExpertView ? "grid-cols-12" : "grid-cols-12"
-      )}>
-        <div className="col-span-2">批次编号</div>
-        <div className="col-span-2">生成时间</div>
-        <div className="col-span-1">总用例数</div>
-        <div className="col-span-2">未评审</div>
-        <div className="col-span-2">已采纳</div>
-        <div className="col-span-1">不采纳</div>
-        <div className="col-span-2">操作</div>
+      <div className="grid grid-cols-[120px_160px_80px_100px_100px_80px_1fr] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="whitespace-nowrap">批次编号</div>
+        <div className="whitespace-nowrap">生成时间</div>
+        <div className="whitespace-nowrap">总用例数</div>
+        <div className="whitespace-nowrap">未评审</div>
+        <div className="whitespace-nowrap">已采纳</div>
+        <div className="whitespace-nowrap">不采纳</div>
+        <div className="whitespace-nowrap">操作</div>
       </div>
 
       <div className="divide-y">
         {filteredBatches.map((batch, index) => (
           <div
             key={batch.id}
-            className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+            className="grid grid-cols-[120px_160px_80px_100px_100px_80px_1fr] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
             style={{ animationDelay: `${index * 50}ms` }}
           >
-            <div className="col-span-2 flex items-center">
+            <div className="flex items-center">
               <Badge variant="outline" className="font-mono text-xs">
                 {batch.batchCode}
               </Badge>
             </div>
-            <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
-              <Calendar className="w-3.5 h-3.5" />
-              {batch.generatedAt}
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="whitespace-nowrap">{batch.generatedAt}</span>
             </div>
-            <div className="col-span-1 flex items-center">
+            <div className="flex items-center">
               <span className="font-medium">{batch.totalCases}</span>
             </div>
-            <div className="col-span-2 flex items-center">
+            <div className="flex items-center">
               <Badge variant="outline" className={cn("text-xs gap-1", batch.pendingCount > 0 ? "bg-amber-500/10 text-amber-600 border-amber-200" : "")}>
                 <Clock className="w-3 h-3" />
                 {batch.pendingCount}
               </Badge>
             </div>
-            <div className="col-span-2 flex items-center">
+            <div className="flex items-center">
               <Badge variant="outline" className="text-xs gap-1 bg-green-500/10 text-green-600 border-green-200">
                 <CheckCircle className="w-3 h-3" />
                 {batch.acceptedCount}
               </Badge>
             </div>
-            <div className="col-span-1 flex items-center">
+            <div className="flex items-center">
               {isExpertView && batch.rejectedCount > 0 ? (
                 <button
                   className="cursor-pointer"
@@ -210,12 +207,12 @@ export default function AIGeneratedCaseDetail() {
                 </Badge>
               )}
             </div>
-            <div className="col-span-2 flex items-center gap-1">
+            <div className="flex items-center gap-1">
               {!isExpertView ? (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 px-3 text-xs gap-1"
+                  className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
                   onClick={() => handleReview(batch.id)}
                 >
                   <FileCheck className="w-3.5 h-3.5" />
@@ -226,7 +223,7 @@ export default function AIGeneratedCaseDetail() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 px-2 text-xs gap-1"
+                    className="h-7 px-2 text-xs gap-1 whitespace-nowrap"
                     onClick={() => handleOpenExpertReview(batch)}
                   >
                     <Users className="w-3.5 h-3.5" />
@@ -235,7 +232,7 @@ export default function AIGeneratedCaseDetail() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 px-2 text-xs gap-1"
+                    className="h-7 px-2 text-xs gap-1 whitespace-nowrap"
                     onClick={() => handleOpenExpertReviewDetail(batch.id)}
                   >
                     <ClipboardCheck className="w-3.5 h-3.5" />
@@ -275,15 +272,15 @@ export default function AIGeneratedCaseDetail() {
         </div>
       </div>
 
-      {/* Tab Switcher - More Prominent */}
-      <div className="flex gap-2 mb-6">
+      {/* Tab Card Switcher */}
+      <div className="flex mb-6 bg-muted rounded-xl p-1.5">
         <button
           onClick={() => setActiveTab("self")}
           className={cn(
-            "flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
+            "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
             activeTab === "self"
-              ? "bg-primary text-primary-foreground shadow-md"
-              : "bg-muted hover:bg-muted/80 text-muted-foreground"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           <ClipboardCheck className="w-5 h-5" />
@@ -292,10 +289,10 @@ export default function AIGeneratedCaseDetail() {
         <button
           onClick={() => setActiveTab("expert")}
           className={cn(
-            "flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
+            "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all",
             activeTab === "expert"
-              ? "bg-primary text-primary-foreground shadow-md"
-              : "bg-muted hover:bg-muted/80 text-muted-foreground"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           <Users className="w-5 h-5" />
