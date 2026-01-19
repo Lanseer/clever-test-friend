@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 type ReviewStatus = "adopted" | "rejected" | "pending";
 type AIQuality = "excellent" | "passed";
+type CaseNature = "positive" | "negative";
 
 interface ExpertCase {
   id: string;
@@ -25,19 +26,20 @@ interface ExpertCase {
   createdAt: string;
   aiQuality: AIQuality;
   status: ReviewStatus;
+  nature: CaseNature;
   rejectTag?: string;
   rejectReason?: string;
 }
 
 const mockExpertCases: ExpertCase[] = [
-  { id: "1", batchCode: "BATCH-001", caseCode: "TC-001", name: "用户登录功能验证", createdAt: "2024-01-15 10:30", aiQuality: "excellent", status: "adopted" },
-  { id: "2", batchCode: "BATCH-001", caseCode: "TC-002", name: "用户注册表单验证", createdAt: "2024-01-15 10:35", aiQuality: "passed", status: "rejected", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤" },
-  { id: "3", batchCode: "BATCH-001", caseCode: "TC-003", name: "密码重置流程", createdAt: "2024-01-15 10:40", aiQuality: "excellent", status: "pending" },
-  { id: "4", batchCode: "BATCH-001", caseCode: "TC-004", name: "用户权限校验", createdAt: "2024-01-15 10:45", aiQuality: "passed", status: "pending" },
-  { id: "5", batchCode: "BATCH-002", caseCode: "TC-005", name: "会话超时处理", createdAt: "2024-01-15 11:00", aiQuality: "excellent", status: "adopted" },
-  { id: "6", batchCode: "BATCH-002", caseCode: "TC-006", name: "多设备登录限制", createdAt: "2024-01-15 11:05", aiQuality: "passed", status: "rejected", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊" },
-  { id: "7", batchCode: "BATCH-002", caseCode: "TC-007", name: "用户信息修改", createdAt: "2024-01-15 11:10", aiQuality: "excellent", status: "pending" },
-  { id: "8", batchCode: "BATCH-002", caseCode: "TC-008", name: "账户注销流程", createdAt: "2024-01-15 11:15", aiQuality: "passed", status: "adopted" },
+  { id: "1", batchCode: "BATCH-001", caseCode: "TC-001", name: "用户登录功能验证", createdAt: "2024-01-15 10:30", aiQuality: "excellent", status: "adopted", nature: "positive" },
+  { id: "2", batchCode: "BATCH-001", caseCode: "TC-002", name: "用户注册表单验证", createdAt: "2024-01-15 10:35", aiQuality: "passed", status: "rejected", nature: "positive", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤" },
+  { id: "3", batchCode: "BATCH-001", caseCode: "TC-003", name: "密码重置流程", createdAt: "2024-01-15 10:40", aiQuality: "excellent", status: "pending", nature: "positive" },
+  { id: "4", batchCode: "BATCH-001", caseCode: "TC-004", name: "用户权限校验", createdAt: "2024-01-15 10:45", aiQuality: "passed", status: "pending", nature: "negative" },
+  { id: "5", batchCode: "BATCH-002", caseCode: "TC-005", name: "会话超时处理", createdAt: "2024-01-15 11:00", aiQuality: "excellent", status: "adopted", nature: "negative" },
+  { id: "6", batchCode: "BATCH-002", caseCode: "TC-006", name: "多设备登录限制", createdAt: "2024-01-15 11:05", aiQuality: "passed", status: "rejected", nature: "negative", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊" },
+  { id: "7", batchCode: "BATCH-002", caseCode: "TC-007", name: "用户信息修改", createdAt: "2024-01-15 11:10", aiQuality: "excellent", status: "pending", nature: "positive" },
+  { id: "8", batchCode: "BATCH-002", caseCode: "TC-008", name: "账户注销流程", createdAt: "2024-01-15 11:15", aiQuality: "passed", status: "adopted", nature: "positive" },
 ];
 
 const rejectTags = [
@@ -76,6 +78,19 @@ const qualityConfig: Record<AIQuality, { label: string; className: string }> = {
   passed: {
     label: "合格",
     className: "bg-blue-500/10 text-blue-600 border-blue-200",
+  },
+};
+
+const natureConfig: Record<CaseNature, { label: string; icon: typeof CheckCircle; className: string }> = {
+  positive: {
+    label: "正例",
+    icon: CheckCircle,
+    className: "bg-green-500/10 text-green-600 border-green-200",
+  },
+  negative: {
+    label: "反例",
+    icon: XCircle,
+    className: "bg-orange-500/10 text-orange-600 border-orange-200",
   },
 };
 
@@ -164,10 +179,11 @@ export default function ExpertReviewDetail() {
 
       {/* Cases Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[100px_100px_1fr_140px_80px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[100px_100px_1fr_80px_140px_80px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>批次编号</div>
           <div>用例编号</div>
           <div>用例名称</div>
+          <div>性质</div>
           <div>创建时间</div>
           <div>AI评审</div>
           <div>评审状态</div>
@@ -178,12 +194,14 @@ export default function ExpertReviewDetail() {
           {cases.map((caseItem, index) => {
             const status = statusConfig[caseItem.status];
             const quality = qualityConfig[caseItem.aiQuality];
+            const nature = natureConfig[caseItem.nature];
             const StatusIcon = status.icon;
+            const NatureIcon = nature.icon;
 
             return (
               <div
                 key={caseItem.id}
-                className="grid grid-cols-[100px_100px_1fr_140px_80px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[100px_100px_1fr_80px_140px_80px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">
@@ -198,6 +216,15 @@ export default function ExpertReviewDetail() {
                 </div>
                 <div className="flex items-center">
                   <span className="font-medium truncate">{caseItem.name}</span>
+                </div>
+                <div className="flex items-center">
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs gap-1", nature.className)}
+                  >
+                    <NatureIcon className="w-3 h-3" />
+                    {nature.label}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Clock className="w-3.5 h-3.5" />
