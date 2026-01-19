@@ -13,18 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 
 type ReviewStatus = "adopted" | "rejected" | "pending";
 type AIQuality = "excellent" | "passed";
-type ExpertOpinion = "adopted" | "rejected" | "pending";
-
-interface ExpertRejection {
-  expertName?: string;
-  rejectTag: string;
-  rejectReason: string;
-  reviewTime: string;
-}
 
 interface ExpertCase {
   id: string;
@@ -34,25 +25,19 @@ interface ExpertCase {
   createdAt: string;
   aiQuality: AIQuality;
   status: ReviewStatus;
-  expertOpinion: ExpertOpinion;
-  rejections?: ExpertRejection[];
+  rejectTag?: string;
+  rejectReason?: string;
 }
 
 const mockExpertCases: ExpertCase[] = [
-  { id: "1", batchCode: "BATCH-001", caseCode: "TC-001", name: "用户登录功能验证", createdAt: "2024-01-15 10:30", aiQuality: "excellent", status: "adopted", expertOpinion: "adopted" },
-  { id: "2", batchCode: "BATCH-001", caseCode: "TC-002", name: "用户注册表单验证", createdAt: "2024-01-15 10:35", aiQuality: "passed", status: "rejected", expertOpinion: "rejected", rejections: [
-    { expertName: "李专家", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", reviewTime: "2024-01-15 14:30" },
-    { rejectTag: "测试数据不合理", rejectReason: "测试数据覆盖不全面", reviewTime: "2024-01-15 16:00" },
-  ]},
-  { id: "3", batchCode: "BATCH-001", caseCode: "TC-003", name: "密码重置流程", createdAt: "2024-01-15 10:40", aiQuality: "excellent", status: "pending", expertOpinion: "pending" },
-  { id: "4", batchCode: "BATCH-001", caseCode: "TC-004", name: "用户权限校验", createdAt: "2024-01-15 10:45", aiQuality: "passed", status: "pending", expertOpinion: "pending" },
-  { id: "5", batchCode: "BATCH-002", caseCode: "TC-005", name: "会话超时处理", createdAt: "2024-01-15 11:00", aiQuality: "excellent", status: "adopted", expertOpinion: "adopted" },
-  { id: "6", batchCode: "BATCH-002", caseCode: "TC-006", name: "多设备登录限制", createdAt: "2024-01-15 11:05", aiQuality: "passed", status: "rejected", expertOpinion: "rejected", rejections: [
-    { expertName: "王专家", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊，无法作为测试验收标准", reviewTime: "2024-01-15 15:00" },
-    { expertName: "张专家", rejectTag: "与现有用例重复", rejectReason: "该用例与TC-089重复，建议合并", reviewTime: "2024-01-15 15:30" },
-  ]},
-  { id: "7", batchCode: "BATCH-002", caseCode: "TC-007", name: "用户信息修改", createdAt: "2024-01-15 11:10", aiQuality: "excellent", status: "pending", expertOpinion: "pending" },
-  { id: "8", batchCode: "BATCH-002", caseCode: "TC-008", name: "账户注销流程", createdAt: "2024-01-15 11:15", aiQuality: "passed", status: "adopted", expertOpinion: "adopted" },
+  { id: "1", batchCode: "BATCH-001", caseCode: "TC-001", name: "用户登录功能验证", createdAt: "2024-01-15 10:30", aiQuality: "excellent", status: "adopted" },
+  { id: "2", batchCode: "BATCH-001", caseCode: "TC-002", name: "用户注册表单验证", createdAt: "2024-01-15 10:35", aiQuality: "passed", status: "rejected", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤" },
+  { id: "3", batchCode: "BATCH-001", caseCode: "TC-003", name: "密码重置流程", createdAt: "2024-01-15 10:40", aiQuality: "excellent", status: "pending" },
+  { id: "4", batchCode: "BATCH-001", caseCode: "TC-004", name: "用户权限校验", createdAt: "2024-01-15 10:45", aiQuality: "passed", status: "pending" },
+  { id: "5", batchCode: "BATCH-002", caseCode: "TC-005", name: "会话超时处理", createdAt: "2024-01-15 11:00", aiQuality: "excellent", status: "adopted" },
+  { id: "6", batchCode: "BATCH-002", caseCode: "TC-006", name: "多设备登录限制", createdAt: "2024-01-15 11:05", aiQuality: "passed", status: "rejected", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊" },
+  { id: "7", batchCode: "BATCH-002", caseCode: "TC-007", name: "用户信息修改", createdAt: "2024-01-15 11:10", aiQuality: "excellent", status: "pending" },
+  { id: "8", batchCode: "BATCH-002", caseCode: "TC-008", name: "账户注销流程", createdAt: "2024-01-15 11:15", aiQuality: "passed", status: "adopted" },
 ];
 
 const rejectTags = [
@@ -83,27 +68,6 @@ const statusConfig: Record<ReviewStatus, { label: string; icon: typeof CheckCirc
   },
 };
 
-const expertOpinionConfig: Record<ExpertOpinion, { label: string; icon: typeof CheckCircle; className: string; clickable: boolean }> = {
-  adopted: {
-    label: "采纳",
-    icon: CheckCircle,
-    className: "bg-green-500/10 text-green-600 border-green-200",
-    clickable: false,
-  },
-  rejected: {
-    label: "不采纳",
-    icon: XCircle,
-    className: "bg-red-500/10 text-red-600 border-red-200 cursor-pointer hover:bg-red-500/20",
-    clickable: true,
-  },
-  pending: {
-    label: "待评审",
-    icon: HelpCircle,
-    className: "bg-gray-500/10 text-gray-600 border-gray-200",
-    clickable: false,
-  },
-};
-
 const qualityConfig: Record<AIQuality, { label: string; className: string }> = {
   excellent: {
     label: "优秀",
@@ -117,19 +81,18 @@ const qualityConfig: Record<AIQuality, { label: string; className: string }> = {
 
 export default function ExpertReviewDetail() {
   const navigate = useNavigate();
-  const { workspaceId, id } = useParams();
+  const { workspaceId } = useParams();
   const [cases, setCases] = useState<ExpertCase[]>(mockExpertCases);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectingCase, setRejectingCase] = useState<ExpertCase | null>(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [rejectReason, setRejectReason] = useState("");
-  const [expertName, setExpertName] = useState("");
   const [viewRejectDialogOpen, setViewRejectDialogOpen] = useState(false);
   const [viewingCase, setViewingCase] = useState<ExpertCase | null>(null);
 
   const handleAdopt = (caseItem: ExpertCase) => {
     setCases(cases.map(c => 
-      c.id === caseItem.id ? { ...c, status: "adopted" as ReviewStatus, expertOpinion: "adopted" as ExpertOpinion } : c
+      c.id === caseItem.id ? { ...c, status: "adopted" as ReviewStatus } : c
     ));
   };
 
@@ -137,26 +100,14 @@ export default function ExpertReviewDetail() {
     setRejectingCase(caseItem);
     setSelectedTag("");
     setRejectReason("");
-    setExpertName("");
     setRejectDialogOpen(true);
   };
 
   const handleConfirmReject = () => {
     if (rejectingCase && selectedTag) {
-      const newRejection: ExpertRejection = {
-        expertName: expertName || undefined,
-        rejectTag: selectedTag,
-        rejectReason: rejectReason,
-        reviewTime: new Date().toISOString().slice(0, 16).replace('T', ' '),
-      };
       setCases(cases.map(c =>
         c.id === rejectingCase.id
-          ? { 
-              ...c, 
-              status: "rejected" as ReviewStatus, 
-              expertOpinion: "rejected" as ExpertOpinion,
-              rejections: [...(c.rejections || []), newRejection]
-            }
+          ? { ...c, status: "rejected" as ReviewStatus, rejectTag: selectedTag, rejectReason }
           : c
       ));
       setRejectDialogOpen(false);
@@ -213,14 +164,13 @@ export default function ExpertReviewDetail() {
 
       {/* Cases Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[100px_100px_1fr_140px_80px_100px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[100px_100px_1fr_140px_80px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>批次编号</div>
           <div>用例编号</div>
           <div>用例名称</div>
           <div>创建时间</div>
           <div>AI评审</div>
           <div>评审状态</div>
-          <div>专家意见</div>
           <div>操作</div>
         </div>
 
@@ -228,14 +178,12 @@ export default function ExpertReviewDetail() {
           {cases.map((caseItem, index) => {
             const status = statusConfig[caseItem.status];
             const quality = qualityConfig[caseItem.aiQuality];
-            const expertOpinion = expertOpinionConfig[caseItem.expertOpinion];
             const StatusIcon = status.icon;
-            const ExpertOpinionIcon = expertOpinion.icon;
 
             return (
               <div
                 key={caseItem.id}
-                className="grid grid-cols-[100px_100px_1fr_140px_80px_100px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[100px_100px_1fr_140px_80px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">
@@ -264,20 +212,15 @@ export default function ExpertReviewDetail() {
                 <div className="flex items-center">
                   <Badge
                     variant="outline"
-                    className={cn("text-xs gap-1", status.className)}
+                    className={cn(
+                      "text-xs gap-1",
+                      status.className,
+                      caseItem.status === "rejected" && "cursor-pointer hover:bg-red-500/20"
+                    )}
+                    onClick={() => caseItem.status === "rejected" && handleViewReject(caseItem)}
                   >
                     <StatusIcon className="w-3 h-3" />
                     {status.label}
-                  </Badge>
-                </div>
-                <div className="flex items-center">
-                  <Badge
-                    variant="outline"
-                    className={cn("text-xs gap-1", expertOpinion.className)}
-                    onClick={() => caseItem.expertOpinion === "rejected" && handleViewReject(caseItem)}
-                  >
-                    <ExpertOpinionIcon className="w-3 h-3" />
-                    {expertOpinion.label}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
@@ -320,14 +263,6 @@ export default function ExpertReviewDetail() {
             <DialogTitle>不采纳用例</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>专家名称 <span className="text-muted-foreground text-xs">(选填)</span></Label>
-              <Input
-                placeholder="请输入专家名称..."
-                value={expertName}
-                onChange={(e) => setExpertName(e.target.value)}
-              />
-            </div>
             <div className="space-y-2">
               <Label>选择标签 <span className="text-red-500">*</span></Label>
               <div className="flex flex-wrap gap-2">
@@ -373,14 +308,14 @@ export default function ExpertReviewDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* View Reject Reason Dialog - Multiple Experts */}
+      {/* View Reject Reason Dialog */}
       <Dialog open={viewRejectDialogOpen} onOpenChange={setViewRejectDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>不采纳详情</DialogTitle>
           </DialogHeader>
           {viewingCase && (
-            <div className="space-y-4 flex-1 overflow-auto">
+            <div className="space-y-4">
               <div>
                 <Label className="text-muted-foreground">用例名称</Label>
                 <p className="mt-1 font-medium">{viewingCase.name}</p>
@@ -389,33 +324,15 @@ export default function ExpertReviewDetail() {
                 <Label className="text-muted-foreground">用例编号</Label>
                 <p className="mt-1 font-mono text-sm">{viewingCase.caseCode}</p>
               </div>
-              
-              {/* Multiple expert rejections */}
-              <div className="space-y-3">
-                <Label className="text-muted-foreground">
-                  专家意见 ({viewingCase.rejections?.length || 0} 位专家不采纳)
-                </Label>
-                {viewingCase.rejections?.map((rejection, idx) => (
-                  <div key={idx} className="bg-muted/50 rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                          {rejection.expertName || "匿名"}
-                        </span>
-                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-200">
-                          {rejection.rejectTag}
-                        </Badge>
-                      </div>
-                      <span className="text-xs text-muted-foreground">{rejection.reviewTime}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {rejection.rejectReason || "未填写原因"}
-                    </p>
-                  </div>
-                ))}
-                {(!viewingCase.rejections || viewingCase.rejections.length === 0) && (
-                  <p className="text-sm text-muted-foreground">暂无专家评审意见</p>
-                )}
+              <div>
+                <Label className="text-muted-foreground">不采纳标签</Label>
+                <Badge variant="outline" className="mt-1 bg-red-500/10 text-red-600 border-red-200">
+                  {viewingCase.rejectTag}
+                </Badge>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">不采纳原因</Label>
+                <p className="mt-1 text-sm">{viewingCase.rejectReason || "未填写原因"}</p>
               </div>
             </div>
           )}
