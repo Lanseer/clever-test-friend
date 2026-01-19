@@ -1,13 +1,29 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, Sparkles, Bot } from "lucide-react";
+import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, Sparkles, Bot, HelpCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CaseReviewDialog } from "@/components/workspace/CaseReviewDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 type CaseStatus = "pending" | "accepted" | "rejected";
+type ExpertOpinion = "adopted" | "rejected" | "pending";
+
+interface ExpertRejection {
+  expertName?: string;
+  rejectTag: string;
+  rejectReason: string;
+  reviewTime: string;
+}
 
 interface GeneratedCase {
   id: string;
@@ -17,6 +33,9 @@ interface GeneratedCase {
   bddContent: string;
   sourceDocument: string;
   createdAt: string;
+  rejectionReason?: string;
+  expertOpinion: ExpertOpinion;
+  expertRejections?: ExpertRejection[];
 }
 
 const mockCases: GeneratedCase[] = [
@@ -26,6 +45,7 @@ const mockCases: GeneratedCase[] = [
     name: "用户登录成功场景",
     status: "pending",
     createdAt: "2024-01-15 10:30",
+    expertOpinion: "pending",
     bddContent: `Feature: 用户登录
   Scenario: 使用有效凭证登录
     Given 用户在登录页面
@@ -49,6 +69,7 @@ const mockCases: GeneratedCase[] = [
     name: "用户登录失败-密码错误",
     status: "pending",
     createdAt: "2024-01-15 10:32",
+    expertOpinion: "pending",
     bddContent: `Feature: 用户登录
   Scenario: 使用错误密码登录
     Given 用户在登录页面
@@ -71,6 +92,7 @@ const mockCases: GeneratedCase[] = [
     name: "用户注册成功场景",
     status: "accepted",
     createdAt: "2024-01-15 10:35",
+    expertOpinion: "adopted",
     bddContent: `Feature: 用户注册
   Scenario: 使用有效信息注册新用户
     Given 用户在注册页面
@@ -90,6 +112,7 @@ const mockCases: GeneratedCase[] = [
     name: "密码重置流程",
     status: "pending",
     createdAt: "2024-01-15 10:38",
+    expertOpinion: "pending",
     bddContent: `Feature: 密码重置
   Scenario: 通过邮箱重置密码
     Given 用户在忘记密码页面
@@ -106,6 +129,11 @@ const mockCases: GeneratedCase[] = [
     name: "用户资料更新",
     status: "rejected",
     createdAt: "2024-01-15 10:40",
+    expertOpinion: "rejected",
+    expertRejections: [
+      { expertName: "李专家", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", reviewTime: "2024-01-15 14:30" },
+      { rejectTag: "测试数据不合理", rejectReason: "测试数据覆盖不全面", reviewTime: "2024-01-15 16:00" },
+    ],
     bddContent: `Feature: 用户资料管理
   Scenario: 更新用户头像
     Given 用户已登录
@@ -132,9 +160,30 @@ const statusConfig: Record<CaseStatus, { label: string; icon: typeof CheckCircle
     className: "bg-green-500/10 text-green-600 border-green-200",
   },
   rejected: {
-    label: "已拒绝",
+    label: "不采纳",
     icon: XCircle,
     className: "bg-red-500/10 text-red-600 border-red-200",
+  },
+};
+
+const expertOpinionConfig: Record<ExpertOpinion, { label: string; icon: typeof CheckCircle; className: string; clickable: boolean }> = {
+  adopted: {
+    label: "采纳",
+    icon: CheckCircle,
+    className: "bg-green-500/10 text-green-600 border-green-200",
+    clickable: false,
+  },
+  rejected: {
+    label: "不采纳",
+    icon: XCircle,
+    className: "bg-red-500/10 text-red-600 border-red-200 cursor-pointer hover:bg-red-500/20",
+    clickable: true,
+  },
+  pending: {
+    label: "待评审",
+    icon: HelpCircle,
+    className: "bg-gray-500/10 text-gray-600 border-gray-200",
+    clickable: false,
   },
 };
 
@@ -145,6 +194,10 @@ export default function CaseReview() {
   const [cases, setCases] = useState(mockCases);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [selectedCaseIndex, setSelectedCaseIndex] = useState(0);
+  const [viewRejectDialogOpen, setViewRejectDialogOpen] = useState(false);
+  const [viewingCase, setViewingCase] = useState<GeneratedCase | null>(null);
+  const [caseDetailDialogOpen, setCaseDetailDialogOpen] = useState(false);
+  const [detailCase, setDetailCase] = useState<GeneratedCase | null>(null);
 
   const filteredCases = cases.filter(
     (c) =>
@@ -154,6 +207,7 @@ export default function CaseReview() {
 
   const pendingCount = cases.filter((c) => c.status === "pending").length;
   const acceptedCount = cases.filter((c) => c.status === "accepted").length;
+  const rejectedCount = cases.filter((c) => c.status === "rejected").length;
 
   const handleOpenReview = (index: number) => {
     setSelectedCaseIndex(index);
@@ -169,18 +223,28 @@ export default function CaseReview() {
 
   const handleAcceptCase = (caseId: string) => {
     setCases((prev) =>
-      prev.map((c) => (c.id === caseId ? { ...c, status: "accepted" as CaseStatus } : c))
+      prev.map((c) => (c.id === caseId ? { ...c, status: "accepted" as CaseStatus, expertOpinion: "adopted" as ExpertOpinion } : c))
     );
   };
 
   const handleRejectCase = (caseId: string, reason: string) => {
     setCases((prev) =>
-      prev.map((c) => (c.id === caseId ? { ...c, status: "rejected" as CaseStatus, rejectionReason: reason } : c))
+      prev.map((c) => (c.id === caseId ? { ...c, status: "rejected" as CaseStatus, rejectionReason: reason, expertOpinion: "rejected" as ExpertOpinion } : c))
     );
   };
 
   const handleDiscardCase = (caseId: string) => {
     setCases((prev) => prev.filter((c) => c.id !== caseId));
+  };
+
+  const handleViewReject = (testCase: GeneratedCase) => {
+    setViewingCase(testCase);
+    setViewRejectDialogOpen(true);
+  };
+
+  const handleViewCaseDetail = (testCase: GeneratedCase) => {
+    setDetailCase(testCase);
+    setCaseDetailDialogOpen(true);
   };
 
   return (
@@ -236,7 +300,7 @@ export default function CaseReview() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold">{cases.length}</div>
           <div className="text-sm text-muted-foreground">总用例数</div>
@@ -249,48 +313,73 @@ export default function CaseReview() {
           <div className="text-2xl font-bold text-green-600">{acceptedCount}</div>
           <div className="text-sm text-muted-foreground">已采纳</div>
         </div>
+        <div className="bg-card border rounded-lg p-4">
+          <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
+          <div className="text-sm text-muted-foreground">不采纳</div>
+        </div>
       </div>
 
       {/* Case List */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          <div className="col-span-1">编号</div>
-          <div className="col-span-5">用例名称</div>
-          <div className="col-span-2">创建时间</div>
-          <div className="col-span-2">状态</div>
-          <div className="col-span-2">操作</div>
+        <div className="grid grid-cols-[80px_1fr_120px_100px_100px_100px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+          <div>编号</div>
+          <div>用例名称</div>
+          <div>创建时间</div>
+          <div>状态</div>
+          <div>专家意见</div>
+          <div>操作</div>
         </div>
 
         <div className="divide-y">
           {filteredCases.map((testCase, index) => {
             const status = statusConfig[testCase.status];
             const StatusIcon = status.icon;
+            const expertOpinion = expertOpinionConfig[testCase.expertOpinion];
+            const ExpertOpinionIcon = expertOpinion.icon;
 
             return (
               <div
                 key={testCase.id}
-                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[80px_1fr_120px_100px_100px_100px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="col-span-1 flex items-center">
+                <div className="flex items-center">
                   <Badge variant="outline" className="font-mono text-xs">
                     {testCase.code}
                   </Badge>
                 </div>
-                <div className="col-span-5 flex items-center">
+                <div className="flex items-center">
                   <span className="font-medium text-foreground">{testCase.name}</span>
                 </div>
-                <div className="col-span-2 flex items-center gap-1 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5" />
                   {testCase.createdAt}
                 </div>
-                <div className="col-span-2 flex items-center">
-                  <Badge variant="outline" className={cn("text-xs gap-1", status.className)}>
+                <div className="flex items-center">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-xs gap-1",
+                      status.className,
+                      testCase.status === "rejected" && "cursor-pointer hover:bg-red-500/20"
+                    )}
+                    onClick={() => testCase.status === "rejected" && handleViewReject(testCase)}
+                  >
                     <StatusIcon className="w-3 h-3" />
                     {status.label}
                   </Badge>
                 </div>
-                <div className="col-span-2 flex items-center gap-2">
+                <div className="flex items-center">
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs gap-1", expertOpinion.className)}
+                    onClick={() => testCase.expertOpinion === "rejected" && handleViewReject(testCase)}
+                  >
+                    <ExpertOpinionIcon className="w-3 h-3" />
+                    {expertOpinion.label}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -323,6 +412,115 @@ export default function CaseReview() {
         onReject={handleRejectCase}
         onDiscard={handleDiscardCase}
       />
+
+      {/* View Reject Reason Dialog - Multiple Experts */}
+      <Dialog open={viewRejectDialogOpen} onOpenChange={setViewRejectDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>不采纳详情</DialogTitle>
+          </DialogHeader>
+          {viewingCase && (
+            <div className="space-y-4 flex-1 overflow-auto">
+              <div>
+                <Label className="text-muted-foreground">用例名称</Label>
+                <p 
+                  className="mt-1 font-medium text-primary cursor-pointer hover:underline"
+                  onClick={() => handleViewCaseDetail(viewingCase)}
+                >
+                  {viewingCase.name}
+                </p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">用例编号</Label>
+                <p className="mt-1 font-mono text-sm">{viewingCase.code}</p>
+              </div>
+              
+              {/* Multiple expert rejections */}
+              <div className="space-y-3">
+                <Label className="text-muted-foreground">
+                  专家意见 ({viewingCase.expertRejections?.length || 0} 位专家不采纳)
+                </Label>
+                {viewingCase.expertRejections?.map((rejection, idx) => (
+                  <div key={idx} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {rejection.expertName || "匿名"}
+                        </span>
+                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-200">
+                          {rejection.rejectTag}
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{rejection.reviewTime}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {rejection.rejectReason || "未填写原因"}
+                    </p>
+                  </div>
+                ))}
+                {(!viewingCase.expertRejections || viewingCase.expertRejections.length === 0) && viewingCase.rejectionReason && (
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <p className="text-sm text-muted-foreground">{viewingCase.rejectionReason}</p>
+                  </div>
+                )}
+                {(!viewingCase.expertRejections || viewingCase.expertRejections.length === 0) && !viewingCase.rejectionReason && (
+                  <p className="text-sm text-muted-foreground">暂无不采纳原因</p>
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewRejectDialogOpen(false)}>
+              关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Case Detail Dialog */}
+      <Dialog open={caseDetailDialogOpen} onOpenChange={setCaseDetailDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>用例详情</DialogTitle>
+          </DialogHeader>
+          {detailCase && (
+            <div className="space-y-4 flex-1 overflow-auto">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">用例编号</Label>
+                  <p className="mt-1 font-mono text-sm">{detailCase.code}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">创建时间</Label>
+                  <p className="mt-1 text-sm">{detailCase.createdAt}</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">用例名称</Label>
+                <p className="mt-1 font-medium">{detailCase.name}</p>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">BDD内容</Label>
+                <pre className="mt-1 p-3 bg-muted/50 rounded-lg text-sm font-mono whitespace-pre-wrap overflow-auto max-h-48">
+                  {detailCase.bddContent}
+                </pre>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">来源文档</Label>
+                <div 
+                  className="mt-1 p-3 bg-muted/50 rounded-lg text-sm prose prose-sm max-w-none overflow-auto max-h-48"
+                  dangerouslySetInnerHTML={{ __html: detailCase.sourceDocument }}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCaseDetailDialogOpen(false)}>
+              关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
