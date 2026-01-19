@@ -62,9 +62,33 @@ const mockRecordInfo = {
 };
 
 const mockRejectedCases = [
-  { id: "1", code: "TC-001", name: "用户登录功能验证", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", reviewer: "李专家", reviewTime: "2024-01-15 14:30" },
-  { id: "2", code: "TC-002", name: "密码重置流程", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊，无法作为测试验收标准", reviewer: "王专家", reviewTime: "2024-01-15 15:00" },
-  { id: "3", code: "TC-003", name: "多设备登录限制", rejectTag: "与现有用例重复", rejectReason: "该用例与TC-089重复，建议合并", reviewer: "李专家", reviewTime: "2024-01-15 15:30" },
+  { 
+    id: "1", 
+    code: "TC-001", 
+    name: "用户登录功能验证", 
+    rejections: [
+      { expertName: "李专家", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", reviewTime: "2024-01-15 14:30" },
+      { expertName: "", rejectTag: "测试数据不合理", rejectReason: "测试数据覆盖不全面", reviewTime: "2024-01-15 16:00" },
+    ]
+  },
+  { 
+    id: "2", 
+    code: "TC-002", 
+    name: "密码重置流程", 
+    rejections: [
+      { expertName: "王专家", rejectTag: "预期结果不明确", rejectReason: "预期结果描述过于模糊，无法作为测试验收标准", reviewTime: "2024-01-15 15:00" }
+    ]
+  },
+  { 
+    id: "3", 
+    code: "TC-003", 
+    name: "多设备登录限制", 
+    rejections: [
+      { expertName: "李专家", rejectTag: "与现有用例重复", rejectReason: "该用例与TC-089重复，建议合并", reviewTime: "2024-01-15 15:30" },
+      { rejectTag: "不符合业务场景", rejectReason: "该场景已不在当前版本范围内", reviewTime: "2024-01-15 17:00" },
+      { expertName: "张专家", rejectTag: "前置条件缺失", rejectReason: "需要明确多设备的定义", reviewTime: "2024-01-15 17:30" },
+    ]
+  },
 ];
 
 // Mock data for expert review (different stats)
