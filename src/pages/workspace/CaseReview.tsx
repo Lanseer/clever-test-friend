@@ -25,6 +25,8 @@ interface ExpertRejection {
   reviewTime: string;
 }
 
+type CaseNature = "positive" | "negative";
+
 interface GeneratedCase {
   id: string;
   code: string;
@@ -36,6 +38,7 @@ interface GeneratedCase {
   rejectionReason?: string;
   expertOpinion: ExpertOpinion;
   expertRejections?: ExpertRejection[];
+  nature: CaseNature;
 }
 
 const mockCases: GeneratedCase[] = [
@@ -46,6 +49,7 @@ const mockCases: GeneratedCase[] = [
     status: "pending",
     createdAt: "2024-01-15 10:30",
     expertOpinion: "pending",
+    nature: "positive",
     bddContent: `Feature: 用户登录
   Scenario: 使用有效凭证登录
     Given 用户在登录页面
@@ -70,6 +74,7 @@ const mockCases: GeneratedCase[] = [
     status: "pending",
     createdAt: "2024-01-15 10:32",
     expertOpinion: "pending",
+    nature: "negative",
     bddContent: `Feature: 用户登录
   Scenario: 使用错误密码登录
     Given 用户在登录页面
@@ -93,6 +98,7 @@ const mockCases: GeneratedCase[] = [
     status: "accepted",
     createdAt: "2024-01-15 10:35",
     expertOpinion: "adopted",
+    nature: "positive",
     bddContent: `Feature: 用户注册
   Scenario: 使用有效信息注册新用户
     Given 用户在注册页面
@@ -113,6 +119,7 @@ const mockCases: GeneratedCase[] = [
     status: "pending",
     createdAt: "2024-01-15 10:38",
     expertOpinion: "pending",
+    nature: "positive",
     bddContent: `Feature: 密码重置
   Scenario: 通过邮箱重置密码
     Given 用户在忘记密码页面
@@ -130,6 +137,7 @@ const mockCases: GeneratedCase[] = [
     status: "rejected",
     createdAt: "2024-01-15 10:40",
     expertOpinion: "rejected",
+    nature: "negative",
     expertRejections: [
       { expertName: "李专家", rejectTag: "步骤不完整", rejectReason: "缺少边界值测试步骤，建议补充空值和超长输入的验证", reviewTime: "2024-01-15 14:30" },
       { rejectTag: "测试数据不合理", rejectReason: "测试数据覆盖不全面", reviewTime: "2024-01-15 16:00" },
@@ -184,6 +192,19 @@ const expertOpinionConfig: Record<ExpertOpinion, { label: string; icon: typeof C
     icon: HelpCircle,
     className: "bg-gray-500/10 text-gray-600 border-gray-200",
     clickable: false,
+  },
+};
+
+const natureConfig: Record<CaseNature, { label: string; icon: typeof CheckCircle; className: string }> = {
+  positive: {
+    label: "正例",
+    icon: CheckCircle,
+    className: "bg-green-500/10 text-green-600 border-green-200",
+  },
+  negative: {
+    label: "反例",
+    icon: XCircle,
+    className: "bg-orange-500/10 text-orange-600 border-orange-200",
   },
 };
 
@@ -321,9 +342,10 @@ export default function CaseReview() {
 
       {/* Case List */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[80px_1fr_120px_100px_100px_100px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[80px_1fr_80px_120px_100px_100px_100px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>编号</div>
           <div>用例名称</div>
+          <div>性质</div>
           <div>创建时间</div>
           <div>状态</div>
           <div>专家意见</div>
@@ -336,11 +358,13 @@ export default function CaseReview() {
             const StatusIcon = status.icon;
             const expertOpinion = expertOpinionConfig[testCase.expertOpinion];
             const ExpertOpinionIcon = expertOpinion.icon;
+            const nature = natureConfig[testCase.nature];
+            const NatureIcon = nature.icon;
 
             return (
               <div
                 key={testCase.id}
-                className="grid grid-cols-[80px_1fr_120px_100px_100px_100px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[80px_1fr_80px_120px_100px_100px_100px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">
@@ -350,6 +374,15 @@ export default function CaseReview() {
                 </div>
                 <div className="flex items-center">
                   <span className="font-medium text-foreground">{testCase.name}</span>
+                </div>
+                <div className="flex items-center">
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs gap-1", nature.className)}
+                  >
+                    <NatureIcon className="w-3 h-3" />
+                    {nature.label}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5" />
