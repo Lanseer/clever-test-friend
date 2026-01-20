@@ -10,7 +10,8 @@ import {
   MoreHorizontal,
   Eye,
   History,
-  Download
+  Download,
+  FilePlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +29,7 @@ interface Document {
   id: string;
   name: string;
   version: string;
-  status: "published" | "draft" | "archived";
+  type: string;
   updatedAt: string;
   author: string;
   category: string;
@@ -36,11 +37,11 @@ interface Document {
 }
 
 const mockDocuments: Document[] = [
-  { id: "1", name: "API接口规范文档", version: "v2.3.0", status: "published", updatedAt: "2024-01-15", author: "张三", category: "接口规范", createdBy: "Lanseer" },
-  { id: "2", name: "测试用例模板", version: "v1.5.0", status: "published", updatedAt: "2024-01-14", author: "李四", category: "测试模板", createdBy: "Lanseer" },
-  { id: "3", name: "自动化测试框架指南", version: "v3.0.0", status: "draft", updatedAt: "2024-01-13", author: "王五", category: "框架指南", createdBy: "Admin" },
-  { id: "4", name: "性能测试标准", version: "v1.2.0", status: "published", updatedAt: "2024-01-12", author: "赵六", category: "性能标准", createdBy: "Lanseer" },
-  { id: "5", name: "安全测试规范", version: "v2.0.0", status: "archived", updatedAt: "2024-01-10", author: "钱七", category: "安全规范", createdBy: "Admin" },
+  { id: "1", name: "API接口规范文档", version: "v2.3.0", type: "API", updatedAt: "2024-01-15", author: "张三", category: "接口规范", createdBy: "Lanseer" },
+  { id: "2", name: "测试用例模板", version: "v1.5.0", type: "FSD", updatedAt: "2024-01-14", author: "李四", category: "测试模板", createdBy: "Lanseer" },
+  { id: "3", name: "自动化测试框架指南", version: "v3.0.0", type: "PRD", updatedAt: "2024-01-13", author: "王五", category: "框架指南", createdBy: "Admin" },
+  { id: "4", name: "性能测试标准", version: "v1.2.0", type: "Design", updatedAt: "2024-01-12", author: "赵六", category: "性能标准", createdBy: "Lanseer" },
+  { id: "5", name: "安全测试规范", version: "v2.0.0", type: "Other", updatedAt: "2024-01-10", author: "钱七", category: "安全规范", createdBy: "Admin" },
 ];
 
 const categories = ["全部", "接口规范", "测试模板", "框架指南", "性能标准", "安全规范"];
@@ -56,13 +57,12 @@ export default function Baseline() {
     return matchesSearch && matchesCategory;
   });
 
-  const getStatusBadge = (status: Document["status"]) => {
-    const config = {
-      published: { label: "已发布", className: "bg-success/10 text-success border-success/20" },
-      draft: { label: "草稿", className: "bg-warning/10 text-warning border-warning/20" },
-      archived: { label: "已归档", className: "bg-muted text-muted-foreground border-border" },
-    };
-    return config[status];
+  const typeConfig: Record<string, { label: string; className: string }> = {
+    FSD: { label: "FSD", className: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+    PRD: { label: "PRD", className: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
+    API: { label: "API", className: "bg-green-500/10 text-green-600 border-green-500/20" },
+    Design: { label: "Design", className: "bg-orange-500/10 text-orange-600 border-orange-500/20" },
+    Other: { label: "Other", className: "bg-muted text-muted-foreground border-border" },
   };
 
   return (
@@ -124,14 +124,14 @@ export default function Baseline() {
             <div className="col-span-4">文档名称</div>
             <div className="col-span-2">版本</div>
             <div className="col-span-2">创建人</div>
-            <div className="col-span-1">状态</div>
+            <div className="col-span-1">类型</div>
             <div className="col-span-2">更新时间</div>
             <div className="col-span-1">操作</div>
           </div>
 
           <div className="divide-y divide-border">
             {filteredDocuments.map((doc, index) => {
-              const statusConfig = getStatusBadge(doc.status);
+              const docTypeConfig = typeConfig[doc.type] || typeConfig.Other;
               return (
                 <div
                   key={doc.id}
@@ -162,8 +162,8 @@ export default function Baseline() {
                     <span className="text-sm text-foreground">{doc.createdBy}</span>
                   </div>
                   <div className="col-span-1 flex items-center">
-                    <Badge variant="outline" className={statusConfig.className}>
-                      {statusConfig.label}
+                    <Badge variant="outline" className={docTypeConfig.className}>
+                      {docTypeConfig.label}
                     </Badge>
                   </div>
                   <div className="col-span-2 flex items-center gap-2 text-sm text-muted-foreground">
@@ -181,6 +181,10 @@ export default function Baseline() {
                         <DropdownMenuItem>
                           <Eye className="w-4 h-4 mr-2" />
                           查看详情
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <FilePlus className="w-4 h-4 mr-2" />
+                          新增版本
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <History className="w-4 h-4 mr-2" />
