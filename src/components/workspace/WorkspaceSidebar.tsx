@@ -51,7 +51,7 @@ const workspaceMenuItems: MenuItem[] = [
     icon: ClipboardList,
     children: [
       { title: "测试用例", url: "management/cases", icon: FlaskConical },
-      { title: "AI生成用例", url: "management/ai-cases", icon: Sparkles },
+      { title: "智能用例设计", url: "management/ai-cases", icon: Sparkles },
     ]
   },
   { title: "测试数据", url: "data", icon: Database },
