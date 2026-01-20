@@ -165,9 +165,7 @@ export default function AIGeneratedCases() {
   );
 
   const handleOpenReport = (record: GenerationRecord) => {
-    setSelectedRecord(record);
-    setSidebarType("report");
-    setSidebarOpen(true);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/report`);
   };
 
   const handleOpenFailure = (record: GenerationRecord) => {
