@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, ChevronDown, FileText, Users, UserCheck, Layers, Target, ExternalLink } from "lucide-react";
+import { ChevronRight, ChevronDown, FileText, Users, UserCheck, Layers, Target, ExternalLink, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -354,6 +354,18 @@ export default function TestReport() {
                             <MiniStats stats={testPoint.selfReviewStats} label="自评" />
                             <MiniStats stats={testPoint.expertReviewStats} label="专家" />
                           </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 gap-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/report/test-point/${testPoint.id}/source`);
+                            }}
+                          >
+                            <BookOpen className="w-3.5 h-3.5" />
+                            来源文档
+                          </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
