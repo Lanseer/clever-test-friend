@@ -337,18 +337,9 @@ export default function TestReport() {
                           <Target className="w-4 h-4 text-blue-500" />
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium text-foreground">{testPoint.name}</div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs font-normal">
-                                <FileText className="w-3 h-3 mr-1" />
-                                {testPoint.sourceDoc}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                {testPoint.sourceDocVersion}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {testPoint.caseCount} 个用例
-                              </span>
-                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {testPoint.caseCount} 个用例
+                            </span>
                           </div>
                           <div className="flex items-center gap-6">
                             <MiniStats stats={testPoint.selfReviewStats} label="自评" />
