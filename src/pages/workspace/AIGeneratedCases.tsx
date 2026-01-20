@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Sparkles, ClipboardCheck, MoreHorizontal } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -200,12 +200,12 @@ export default function AIGeneratedCases() {
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">AI生成用例</h1>
+          <h1 className="text-2xl font-bold text-foreground">智能用例设计</h1>
           <p className="text-muted-foreground mt-1">查看和管理AI自动生成的测试用例记录</p>
         </div>
         <Button onClick={handleOpenGenerateDialog} className="gap-2">
-          <Sparkles className="w-4 h-4" />
-          AI生成
+          <Plus className="w-4 h-4" />
+          新增任务
         </Button>
       </div>
 
