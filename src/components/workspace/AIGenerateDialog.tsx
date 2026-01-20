@@ -183,7 +183,7 @@ export function AIGenerateDialog({
     onOpenChange(false);
   };
 
-  const isValid = name.trim() && (initMethod === "upload" ? uploadedFile !== null : selectedDocs.length > 0);
+  const isValid = name.trim() && selectedDocs.length > 0 && (initMethod === "upload" ? uploadedFile !== null : true);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -209,78 +209,7 @@ export function AIGenerateDialog({
               />
             </div>
 
-            {/* 初始化用例方式 */}
-            {!isRegenerate && (
-              <div className="space-y-3">
-                <Label>初始化用例方式</Label>
-                <RadioGroup
-                  value={initMethod}
-                  onValueChange={(value) => setInitMethod(value as "smart" | "upload")}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="smart" id="smart" />
-                    <Label htmlFor="smart" className="cursor-pointer font-normal">智能生成</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="upload" id="upload" />
-                    <Label htmlFor="upload" className="cursor-pointer font-normal">本地上传</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            )}
-
-            {/* 本地上传文件 */}
-            {initMethod === "upload" && !isRegenerate && (
-              <div className="space-y-2">
-                <Label>上传文件</Label>
-                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                  <input
-                    type="file"
-                    id="file-upload"
-                    className="hidden"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setUploadedFile(file);
-                    }}
-                  />
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    {uploadedFile ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <FileText className="w-5 h-5 text-primary" />
-                        <span className="text-sm font-medium">{uploadedFile.name}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-5 w-5"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setUploadedFile(null);
-                          }}
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
-                        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          点击或拖拽文件到此处上传
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          支持 xlsx, xls, csv 格式
-                        </p>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {/* 选择文档和版本 - 仅在智能生成模式显示 */}
-            {(initMethod === "smart" || isRegenerate) && (
+            {/* 选择文档和版本 - 两种模式都需要 */}
             <div className="space-y-2">
               <Label>选择知识库文档</Label>
               <div className="flex gap-2">
@@ -366,7 +295,6 @@ export function AIGenerateDialog({
                 </p>
               )}
             </div>
-            )}
 
             {/* 选择标签 */}
             <div className="space-y-2">
@@ -394,6 +322,76 @@ export function AIGenerateDialog({
                 </p>
               )}
             </div>
+
+            {/* 初始化用例方式 */}
+            {!isRegenerate && (
+              <div className="space-y-3">
+                <Label>初始化用例方式</Label>
+                <RadioGroup
+                  value={initMethod}
+                  onValueChange={(value) => setInitMethod(value as "smart" | "upload")}
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="smart" id="smart" />
+                    <Label htmlFor="smart" className="cursor-pointer font-normal">智能生成</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="upload" id="upload" />
+                    <Label htmlFor="upload" className="cursor-pointer font-normal">本地上传</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+
+            {/* 本地上传文件 */}
+            {initMethod === "upload" && !isRegenerate && (
+              <div className="space-y-2">
+                <Label>上传文件</Label>
+                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setUploadedFile(file);
+                    }}
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    {uploadedFile ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <FileText className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-medium">{uploadedFile.name}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setUploadedFile(null);
+                          }}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          点击或拖拽文件到此处上传
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          支持 xlsx, xls, csv 格式
+                        </p>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
 
