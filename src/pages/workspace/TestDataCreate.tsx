@@ -175,7 +175,7 @@ export default function TestDataCreate() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Side - Data Editor */}
         <div className="lg:col-span-2">
-          <Card>
+          <Card className="h-full flex flex-col">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg flex items-center justify-between">
                 数据编辑
@@ -184,54 +184,50 @@ export default function TestDataCreate() {
                   添加字段
                 </Button>
               </CardTitle>
+              {/* Unified Header for Key/Value */}
+              <div className="grid grid-cols-[1fr_1fr_40px] gap-3 mt-4 px-4">
+                <Label className="text-sm font-medium text-muted-foreground">Key</Label>
+                <Label className="text-sm font-medium text-muted-foreground">Value</Label>
+                <div></div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {dataEntries.map((entry, index) => (
+            <CardContent className="space-y-3 flex-1">
+              {dataEntries.map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex items-start gap-3 p-4 rounded-lg border bg-muted/20"
+                  className="grid grid-cols-[1fr_1fr_40px] gap-3 items-center"
                 >
-                  <div className="flex-1 grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground">Key</Label>
-                      <Input
-                        placeholder="字段名称"
-                        value={entry.key}
-                        onChange={(e) => updateDataEntry(entry.id, "key", e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs text-muted-foreground">Value</Label>
-                        <Select
-                          value={entry.valueType}
-                          onValueChange={(value: "direct" | "smart") =>
-                            handleValueTypeChange(entry.id, value)
-                          }
-                        >
-                          <SelectTrigger className="h-6 w-24 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="direct">直接填写</SelectItem>
-                            <SelectItem value="smart">
-                              <span className="flex items-center gap-1">
-                                <Sparkles className="w-3 h-3" />
-                                智能造数
-                              </span>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Input
-                        placeholder={
-                          entry.valueType === "smart" ? "AI生成的数据..." : "字段值"
-                        }
-                        value={entry.value}
-                        onChange={(e) => updateDataEntry(entry.id, "value", e.target.value)}
-                        className={entry.valueType === "smart" ? "bg-primary/5" : ""}
-                      />
-                    </div>
+                  <Input
+                    placeholder="字段名称"
+                    value={entry.key}
+                    onChange={(e) => updateDataEntry(entry.id, "key", e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={entry.valueType === "smart" ? "AI生成的数据..." : "字段值"}
+                      value={entry.value}
+                      onChange={(e) => updateDataEntry(entry.id, "value", e.target.value)}
+                      className={`flex-1 ${entry.valueType === "smart" ? "bg-primary/5" : ""}`}
+                    />
+                    <Select
+                      value={entry.valueType}
+                      onValueChange={(value: "direct" | "smart") =>
+                        handleValueTypeChange(entry.id, value)
+                      }
+                    >
+                      <SelectTrigger className="w-24 shrink-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="direct">直接填写</SelectItem>
+                        <SelectItem value="smart">
+                          <span className="flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" />
+                            智能造数
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Button
                     variant="ghost"
@@ -248,106 +244,124 @@ export default function TestDataCreate() {
           </Card>
         </div>
 
-        {/* Right Side - Tags & Files */}
-        <div className="space-y-6">
-          {/* Tags Configuration */}
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                配置标签
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="输入标签..."
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addTag()}
-                />
-                <Button variant="outline" size="icon" onClick={addTag}>
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="gap-1 pr-1">
-                    {tag}
-                    <button
-                      onClick={() => removeTag(tag)}
-                      className="ml-1 hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                ))}
-                {tags.length === 0 && (
-                  <p className="text-sm text-muted-foreground">暂无标签</p>
+        {/* Right Side - Tags & Files in one Card */}
+        <div className="lg:col-span-1">
+          <Card className="h-full">
+            <CardContent className="p-6 space-y-6">
+              {/* Tags Section */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  标签
+                </Label>
+                <Select
+                  onValueChange={(value) => {
+                    if (value && !tags.includes(value)) {
+                      setTags([...tags, value]);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择或输入标签..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="功能测试">功能测试</SelectItem>
+                    <SelectItem value="性能测试">性能测试</SelectItem>
+                    <SelectItem value="接口测试">接口测试</SelectItem>
+                    <SelectItem value="回归测试">回归测试</SelectItem>
+                    <SelectItem value="冒烟测试">冒烟测试</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="输入自定义标签后按回车..."
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && tagInput.trim() && !tags.includes(tagInput.trim())) {
+                        setTags([...tags, tagInput.trim()]);
+                        setTagInput("");
+                      }
+                    }}
+                  />
+                </div>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="gap-1 pr-1">
+                        {tag}
+                        <button
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 hover:bg-muted rounded-full p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
 
-          {/* File Upload */}
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                上传文件
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                <input
-                  type="file"
-                  id="file-upload"
-                  className="hidden"
-                  multiple
-                  onChange={handleFileUpload}
-                />
-                <label
-                  htmlFor="file-upload"
-                  className="cursor-pointer flex flex-col items-center"
-                >
-                  <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    点击或拖拽文件到此处上传
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    支持 CSV, JSON, Excel 等格式
-                  </p>
-                </label>
-              </div>
+              {/* Divider */}
+              <div className="border-t" />
 
-              {uploadedFiles.length > 0 && (
-                <div className="space-y-2">
-                  {uploadedFiles.map((file) => (
-                    <div
-                      key={file.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
-                    >
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-sm font-medium truncate max-w-[150px]">
-                            {file.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{file.size}</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => removeFile(file.id)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
+              {/* File Upload Section */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium flex items-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  上传文件
+                </Label>
+                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    multiple
+                    onChange={handleFileUpload}
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="cursor-pointer flex flex-col items-center"
+                  >
+                    <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      点击或拖拽文件到此处上传
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      支持 CSV, JSON, Excel 等格式
+                    </p>
+                  </label>
                 </div>
-              )}
+
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-2">
+                    {uploadedFiles.map((file) => (
+                      <div
+                        key={file.id}
+                        className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium truncate max-w-[150px]">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{file.size}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => removeFile(file.id)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
