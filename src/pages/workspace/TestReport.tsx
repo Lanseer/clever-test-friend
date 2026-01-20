@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, ChevronDown, FileText, CheckCircle, XCircle, Clock, Users, UserCheck, Layers, Target, TestTube } from "lucide-react";
+import { ChevronRight, ChevronDown, FileText, Users, UserCheck, Layers, Target, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // 统计数据接口
@@ -14,19 +15,13 @@ interface ReviewStats {
   pending: number;
 }
 
-// 用例接口
-interface TestCase {
-  id: string;
-  name: string;
-  selfReviewStatus: "adopted" | "rejected" | "pending";
-  expertReviewStatus: "adopted" | "rejected" | "pending";
-}
-
 // 测试点接口
 interface TestPoint {
   id: string;
   name: string;
-  cases: TestCase[];
+  sourceDoc: string;
+  sourceDocVersion: string;
+  caseCount: number;
   selfReviewStats: ReviewStats;
   expertReviewStats: ReviewStats;
 }
@@ -53,37 +48,29 @@ const mockDimensions: TestDimension[] = [
       {
         id: "tp-1-1",
         name: "账号密码登录",
+        sourceDoc: "用户登录功能规格说明书",
+        sourceDocVersion: "v2.1",
+        caseCount: 48,
         selfReviewStats: { total: 15, adopted: 13, rejected: 1, pending: 1 },
         expertReviewStats: { total: 13, adopted: 11, rejected: 1, pending: 1 },
-        cases: [
-          { id: "case-1-1-1", name: "正确账号密码登录成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-1-1-2", name: "账号为空时登录失败", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-1-1-3", name: "密码为空时登录失败", selfReviewStatus: "adopted", expertReviewStatus: "pending" },
-          { id: "case-1-1-4", name: "账号不存在时提示错误", selfReviewStatus: "rejected", expertReviewStatus: "rejected" },
-          { id: "case-1-1-5", name: "密码错误时提示错误", selfReviewStatus: "pending", expertReviewStatus: "pending" },
-        ],
       },
       {
         id: "tp-1-2",
         name: "验证码登录",
+        sourceDoc: "用户登录功能规格说明书",
+        sourceDocVersion: "v2.1",
+        caseCount: 36,
         selfReviewStats: { total: 12, adopted: 10, rejected: 1, pending: 1 },
         expertReviewStats: { total: 10, adopted: 9, rejected: 0, pending: 1 },
-        cases: [
-          { id: "case-1-2-1", name: "正确手机号获取验证码", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-1-2-2", name: "错误验证码登录失败", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-1-2-3", name: "验证码过期处理", selfReviewStatus: "rejected", expertReviewStatus: "pending" },
-        ],
       },
       {
         id: "tp-1-3",
         name: "第三方登录",
+        sourceDoc: "第三方集成接口文档",
+        sourceDocVersion: "v1.0",
+        caseCount: 42,
         selfReviewStats: { total: 18, adopted: 15, rejected: 2, pending: 1 },
         expertReviewStats: { total: 15, adopted: 12, rejected: 2, pending: 1 },
-        cases: [
-          { id: "case-1-3-1", name: "微信授权登录成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-1-3-2", name: "支付宝授权登录成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-1-3-3", name: "授权取消处理", selfReviewStatus: "rejected", expertReviewStatus: "rejected" },
-        ],
       },
     ],
   },
@@ -97,34 +84,29 @@ const mockDimensions: TestDimension[] = [
       {
         id: "tp-2-1",
         name: "订单创建",
+        sourceDoc: "订单流程设计文档",
+        sourceDocVersion: "v3.0",
+        caseCount: 52,
         selfReviewStats: { total: 25, adopted: 20, rejected: 3, pending: 2 },
         expertReviewStats: { total: 20, adopted: 17, rejected: 2, pending: 1 },
-        cases: [
-          { id: "case-2-1-1", name: "单商品下单成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-2-1-2", name: "多商品下单成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-2-1-3", name: "库存不足时下单失败", selfReviewStatus: "rejected", expertReviewStatus: "rejected" },
-        ],
       },
       {
         id: "tp-2-2",
         name: "订单支付",
+        sourceDoc: "支付模块接口文档",
+        sourceDocVersion: "v2.0",
+        caseCount: 38,
         selfReviewStats: { total: 22, adopted: 18, rejected: 3, pending: 1 },
         expertReviewStats: { total: 18, adopted: 16, rejected: 1, pending: 1 },
-        cases: [
-          { id: "case-2-2-1", name: "微信支付成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-2-2-2", name: "支付宝支付成功", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-2-2-3", name: "支付超时处理", selfReviewStatus: "pending", expertReviewStatus: "pending" },
-        ],
       },
       {
         id: "tp-2-3",
         name: "订单取消",
+        sourceDoc: "订单流程设计文档",
+        sourceDocVersion: "v3.0",
+        caseCount: 28,
         selfReviewStats: { total: 21, adopted: 17, rejected: 2, pending: 2 },
         expertReviewStats: { total: 17, adopted: 15, rejected: 1, pending: 1 },
-        cases: [
-          { id: "case-2-3-1", name: "未支付订单取消", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-2-3-2", name: "已支付订单退款", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-        ],
       },
     ],
   },
@@ -138,32 +120,29 @@ const mockDimensions: TestDimension[] = [
       {
         id: "tp-3-1",
         name: "商品列表",
+        sourceDoc: "商品管理PRD",
+        sourceDocVersion: "v1.5",
+        caseCount: 32,
         selfReviewStats: { total: 18, adopted: 16, rejected: 1, pending: 1 },
         expertReviewStats: { total: 16, adopted: 14, rejected: 1, pending: 1 },
-        cases: [
-          { id: "case-3-1-1", name: "商品列表分页加载", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-3-1-2", name: "商品列表筛选排序", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-        ],
       },
       {
         id: "tp-3-2",
         name: "商品详情",
+        sourceDoc: "商品管理PRD",
+        sourceDocVersion: "v1.5",
+        caseCount: 45,
         selfReviewStats: { total: 20, adopted: 17, rejected: 2, pending: 1 },
         expertReviewStats: { total: 17, adopted: 15, rejected: 1, pending: 1 },
-        cases: [
-          { id: "case-3-2-1", name: "商品图片轮播展示", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-3-2-2", name: "商品规格选择", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-        ],
       },
       {
         id: "tp-3-3",
         name: "商品搜索",
+        sourceDoc: "搜索功能设计文档",
+        sourceDocVersion: "v2.0",
+        caseCount: 28,
         selfReviewStats: { total: 14, adopted: 12, rejected: 2, pending: 0 },
         expertReviewStats: { total: 12, adopted: 11, rejected: 1, pending: 0 },
-        cases: [
-          { id: "case-3-3-1", name: "关键词搜索商品", selfReviewStatus: "adopted", expertReviewStatus: "adopted" },
-          { id: "case-3-3-2", name: "搜索历史记录", selfReviewStatus: "rejected", expertReviewStatus: "rejected" },
-        ],
       },
     ],
   },
@@ -241,21 +220,6 @@ function StatsCard({
   );
 }
 
-// 状态徽章组件
-function StatusBadge({ status }: { status: "adopted" | "rejected" | "pending" }) {
-  const config = {
-    adopted: { label: "已采纳", className: "bg-green-500/10 text-green-600 border-green-200" },
-    rejected: { label: "不采纳", className: "bg-red-500/10 text-red-600 border-red-200" },
-    pending: { label: "待评审", className: "bg-amber-500/10 text-amber-600 border-amber-200" },
-  };
-  
-  return (
-    <Badge variant="outline" className={cn("text-xs", config[status].className)}>
-      {config[status].label}
-    </Badge>
-  );
-}
-
 // 小型统计展示
 function MiniStats({ stats, label }: { stats: ReviewStats; label: string }) {
   return (
@@ -275,7 +239,6 @@ export default function TestReport() {
   const navigate = useNavigate();
   const { workspaceId, recordId } = useParams();
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(new Set(["dim-1"]));
-  const [expandedTestPoints, setExpandedTestPoints] = useState<Set<string>>(new Set());
 
   const selfReviewTotal = calculateTotalStats(mockDimensions, "self");
   const expertReviewTotal = calculateTotalStats(mockDimensions, "expert");
@@ -287,18 +250,6 @@ export default function TestReport() {
         next.delete(dimId);
       } else {
         next.add(dimId);
-      }
-      return next;
-    });
-  };
-
-  const toggleTestPoint = (tpId: string) => {
-    setExpandedTestPoints((prev) => {
-      const next = new Set(prev);
-      if (next.has(tpId)) {
-        next.delete(tpId);
-      } else {
-        next.add(tpId);
       }
       return next;
     });
@@ -377,58 +328,47 @@ export default function TestReport() {
                 {/* 测试点列表 */}
                 {isDimExpanded && (
                   <div className="border-t bg-muted/20">
-                    {dimension.testPoints.map((testPoint) => {
-                      const isTpExpanded = expandedTestPoints.has(testPoint.id);
-
-                      return (
-                        <div key={testPoint.id}>
-                          {/* 测试点行 */}
-                          <div
-                            className="flex items-center gap-3 px-6 py-3 pl-14 cursor-pointer hover:bg-muted/30 transition-colors"
-                            onClick={() => toggleTestPoint(testPoint.id)}
-                          >
-                            <div className="w-5 h-5 flex items-center justify-center text-muted-foreground">
-                              {isTpExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                            </div>
-                            <Target className="w-4 h-4 text-blue-500" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-foreground">{testPoint.name}</div>
-                            </div>
-                            <div className="flex items-center gap-6">
-                              <MiniStats stats={testPoint.selfReviewStats} label="自评" />
-                              <MiniStats stats={testPoint.expertReviewStats} label="专家" />
+                    {dimension.testPoints.map((testPoint) => (
+                      <div key={testPoint.id}>
+                        {/* 测试点行 */}
+                        <div
+                          className="flex items-center gap-3 px-6 py-3 pl-14 hover:bg-muted/30 transition-colors"
+                        >
+                          <Target className="w-4 h-4 text-blue-500" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-foreground">{testPoint.name}</div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs font-normal">
+                                <FileText className="w-3 h-3 mr-1" />
+                                {testPoint.sourceDoc}
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs">
+                                {testPoint.sourceDocVersion}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {testPoint.caseCount} 个用例
+                              </span>
                             </div>
                           </div>
-
-                          {/* 用例列表 */}
-                          {isTpExpanded && (
-                            <div className="border-t bg-muted/10">
-                              {testPoint.cases.map((testCase) => (
-                                <div
-                                  key={testCase.id}
-                                  className="flex items-center gap-3 px-6 py-2.5 pl-24 hover:bg-muted/20 transition-colors"
-                                >
-                                  <TestTube className="w-4 h-4 text-muted-foreground" />
-                                  <div className="flex-1 min-w-0">
-                                    <span className="text-sm text-foreground">{testCase.name}</span>
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-xs text-muted-foreground">自评:</span>
-                                      <StatusBadge status={testCase.selfReviewStatus} />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-xs text-muted-foreground">专家:</span>
-                                      <StatusBadge status={testCase.expertReviewStatus} />
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          <div className="flex items-center gap-6">
+                            <MiniStats stats={testPoint.selfReviewStats} label="自评" />
+                            <MiniStats stats={testPoint.expertReviewStats} label="专家" />
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 gap-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/report/test-point/${testPoint.id}`);
+                            }}
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            查看用例
+                          </Button>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
