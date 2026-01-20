@@ -7,6 +7,7 @@ import {
   User, 
   Tag,
   MoreHorizontal,
+  FilePlus,
   Eye,
   History,
   Download,
@@ -276,6 +277,10 @@ export default function Knowledge() {
                         <DropdownMenuItem onClick={() => handleOpenDiffDialog(doc)}>
                           <GitCompare className="w-4 h-4 mr-2" />
                           查看版本差异
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <FilePlus className="w-4 h-4 mr-2" />
+                          新增版本
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Download className="w-4 h-4 mr-2" />
