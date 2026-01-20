@@ -39,7 +39,7 @@ export default function TestDataCreate() {
     { id: "1", key: "", value: "", valueType: "direct" },
   ]);
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
+  
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [smartDialogOpen, setSmartDialogOpen] = useState(false);
   const [currentEntryId, setCurrentEntryId] = useState<string | null>(null);
@@ -97,12 +97,6 @@ export default function TestDataCreate() {
     setCurrentEntryId(null);
   };
 
-  const addTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput("");
-    }
-  };
 
   const removeTag = (tag: string) => {
     setTags(tags.filter((t) => t !== tag));
@@ -185,7 +179,7 @@ export default function TestDataCreate() {
                 </Button>
               </CardTitle>
               {/* Unified Header for Key/Value */}
-              <div className="grid grid-cols-[1fr_1fr_40px] gap-3 mt-4 px-4">
+              <div className="grid grid-cols-[1fr_1fr_72px] gap-3 mt-4 px-4">
                 <Label className="text-sm font-medium text-muted-foreground">Key</Label>
                 <Label className="text-sm font-medium text-muted-foreground">Value</Label>
                 <div></div>
@@ -195,49 +189,39 @@ export default function TestDataCreate() {
               {dataEntries.map((entry) => (
                 <div
                   key={entry.id}
-                  className="grid grid-cols-[1fr_1fr_40px] gap-3 items-center"
+                  className="grid grid-cols-[1fr_1fr_72px] gap-3 items-center"
                 >
                   <Input
                     placeholder="字段名称"
                     value={entry.key}
                     onChange={(e) => updateDataEntry(entry.id, "key", e.target.value)}
                   />
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder={entry.valueType === "smart" ? "AI生成的数据..." : "字段值"}
-                      value={entry.value}
-                      onChange={(e) => updateDataEntry(entry.id, "value", e.target.value)}
-                      className={`flex-1 ${entry.valueType === "smart" ? "bg-primary/5" : ""}`}
-                    />
-                    <Select
-                      value={entry.valueType}
-                      onValueChange={(value: "direct" | "smart") =>
-                        handleValueTypeChange(entry.id, value)
-                      }
+                  <Input
+                    placeholder={entry.valueType === "smart" ? "AI生成的数据..." : "字段值"}
+                    value={entry.value}
+                    onChange={(e) => updateDataEntry(entry.id, "value", e.target.value)}
+                    className={entry.valueType === "smart" ? "bg-primary/5" : ""}
+                  />
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      onClick={() => handleValueTypeChange(entry.id, "smart")}
+                      title="智能造数"
                     >
-                      <SelectTrigger className="w-24 shrink-0">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="direct">直接填写</SelectItem>
-                        <SelectItem value="smart">
-                          <span className="flex items-center gap-1">
-                            <Sparkles className="w-3 h-3" />
-                            智能造数
-                          </span>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <Sparkles className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => removeDataEntry(entry.id)}
+                      disabled={dataEntries.length === 1}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => removeDataEntry(entry.id)}
-                    disabled={dataEntries.length === 1}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
               ))}
             </CardContent>
@@ -272,19 +256,6 @@ export default function TestDataCreate() {
                     <SelectItem value="冒烟测试">冒烟测试</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="输入自定义标签后按回车..."
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && tagInput.trim() && !tags.includes(tagInput.trim())) {
-                        setTags([...tags, tagInput.trim()]);
-                        setTagInput("");
-                      }
-                    }}
-                  />
-                </div>
                 {tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {tags.map((tag) => (
