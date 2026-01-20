@@ -16,6 +16,7 @@ import TestData from "./workspace/TestData";
 import TestDataCreate from "./workspace/TestDataCreate";
 import TestReport from "./workspace/TestReport";
 import TestReportCases from "./workspace/TestReportCases";
+import TestReportSource from "./workspace/TestReportSource";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -89,6 +90,7 @@ export default function WorkspaceDetail() {
             <Route path="tags" element={<Tags />} />
             <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
+            <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
         </main>
