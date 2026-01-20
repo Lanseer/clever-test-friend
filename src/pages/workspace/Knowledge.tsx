@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import VersionDiffDialog from "@/components/workspace/VersionDiffDialog";
+import { CreateKnowledgeDocDialog } from "@/components/workspace/CreateKnowledgeDocDialog";
 
 interface KnowledgeDocument {
   id: string;
@@ -137,6 +138,7 @@ export default function Knowledge() {
   const [selectedType, setSelectedType] = useState("全部");
   const [diffDialogOpen, setDiffDialogOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<KnowledgeDocument | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const filteredDocs = mockKnowledgeDocs.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -169,7 +171,10 @@ export default function Knowledge() {
               <h1 className="text-2xl font-bold text-foreground">知识库</h1>
               <p className="text-sm text-muted-foreground mt-1">项目文档中心 · FSD / PRD / API接口文档</p>
             </div>
-            <Button className="gradient-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity">
+            <Button 
+              className="gradient-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
+              onClick={() => setCreateDialogOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               新建文档
             </Button>
@@ -313,6 +318,12 @@ export default function Knowledge() {
           versionHistory={mockVersionHistory[selectedDoc.id] || []}
         />
       )}
+
+      {/* Create Document Dialog */}
+      <CreateKnowledgeDocDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
     </div>
   );
 }
