@@ -12,6 +12,8 @@ import AIAssistant from "./workspace/AIAssistant";
 import ExpertReviewDetail from "./workspace/ExpertReviewDetail";
 import Tags from "./workspace/Tags";
 import Dashboard from "./Index";
+import TestData from "./workspace/TestData";
+import TestDataCreate from "./workspace/TestDataCreate";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -79,6 +81,9 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review" element={<ExpertReviewDetail />} />
+            <Route path="data" element={<TestData />} />
+            <Route path="data/create" element={<TestDataCreate />} />
+            <Route path="data/:dataId/edit" element={<TestDataCreate />} />
             <Route path="tags" element={<Tags />} />
             <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
           </Routes>
