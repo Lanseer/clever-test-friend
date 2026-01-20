@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, FileUp, X } from "lucide-react";
+import { Upload, FileUp, X, FileText, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CreateKnowledgeDocDialogProps {
   open: boolean;
@@ -32,6 +34,18 @@ const documentTypes = [
   { value: "Other", label: "其他" },
 ];
 
+// Mock baseline documents
+const baselineDocuments = [
+  { id: "1", name: "接口规范模板 v2.0", category: "接口规范", version: "v2.0.0" },
+  { id: "2", name: "测试用例模板", category: "测试模板", version: "v1.5.0" },
+  { id: "3", name: "自动化框架指南", category: "框架指南", version: "v3.0.0" },
+  { id: "4", name: "性能测试标准", category: "性能标准", version: "v1.2.0" },
+  { id: "5", name: "安全测试规范", category: "安全规范", version: "v2.1.0" },
+  { id: "6", name: "API设计规范", category: "接口规范", version: "v1.8.0" },
+];
+
+type UploadMode = "local" | "baseline";
+
 export function CreateKnowledgeDocDialog({ open, onOpenChange }: CreateKnowledgeDocDialogProps) {
   const [formData, setFormData] = useState({
     name: "",
@@ -40,6 +54,8 @@ export function CreateKnowledgeDocDialog({ open, onOpenChange }: CreateKnowledge
   });
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadMode, setUploadMode] = useState<UploadMode>("local");
+  const [selectedBaselineDoc, setSelectedBaselineDoc] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -66,23 +82,33 @@ export function CreateKnowledgeDocDialog({ open, onOpenChange }: CreateKnowledge
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 处理表单提交
-    console.log("提交数据:", { ...formData, file });
+    console.log("提交数据:", { ...formData, file, uploadMode, selectedBaselineDoc });
     onOpenChange(false);
-    // 重置表单
-    setFormData({ name: "", type: "", version: "v1.0.0" });
-    setFile(null);
+    resetForm();
   };
 
   const removeFile = () => {
     setFile(null);
   };
 
-  const handleClose = () => {
-    onOpenChange(false);
-    // 重置表单
+  const resetForm = () => {
     setFormData({ name: "", type: "", version: "v1.0.0" });
     setFile(null);
+    setUploadMode("local");
+    setSelectedBaselineDoc(null);
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    resetForm();
+  };
+
+  const isFormValid = () => {
+    const baseValid = formData.name && formData.type && formData.version;
+    if (uploadMode === "local") {
+      return baseValid && file;
+    }
+    return baseValid && selectedBaselineDoc;
   };
 
   return (
@@ -141,53 +167,125 @@ export function CreateKnowledgeDocDialog({ open, onOpenChange }: CreateKnowledge
 
             <div className="grid gap-2">
               <Label>上传文档 *</Label>
-              <div
-                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                  isDragging
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
-                }`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-              >
-                {file ? (
-                  <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
-                    <div className="flex items-center gap-3">
-                      <FileUp className="w-8 h-8 text-primary" />
-                      <div className="text-left">
-                        <p className="text-sm font-medium text-foreground">{file.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={removeFile}
-                      className="h-8 w-8"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <label className="cursor-pointer">
-                    <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm text-foreground mb-1">拖拽文件至此处或点击上传</p>
-                    <p className="text-xs text-muted-foreground">
-                      支持 PDF、Word、Excel、Markdown 等格式
-                    </p>
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={handleFileChange}
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.md,.txt"
-                    />
-                  </label>
-                )}
+              {/* Upload Mode Tabs */}
+              <div className="flex gap-2 mb-2">
+                <Button
+                  type="button"
+                  variant={uploadMode === "local" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setUploadMode("local");
+                    setSelectedBaselineDoc(null);
+                  }}
+                  className={cn(
+                    "flex-1",
+                    uploadMode === "local" && "gradient-primary text-primary-foreground"
+                  )}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  本地上传
+                </Button>
+                <Button
+                  type="button"
+                  variant={uploadMode === "baseline" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setUploadMode("baseline");
+                    setFile(null);
+                  }}
+                  className={cn(
+                    "flex-1",
+                    uploadMode === "baseline" && "gradient-primary text-primary-foreground"
+                  )}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  从基线文档选择
+                </Button>
               </div>
+
+              {/* Local Upload */}
+              {uploadMode === "local" && (
+                <div
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    isDragging
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                >
+                  {file ? (
+                    <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
+                      <div className="flex items-center gap-3">
+                        <FileUp className="w-8 h-8 text-primary" />
+                        <div className="text-left">
+                          <p className="text-sm font-medium text-foreground">{file.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={removeFile}
+                        className="h-8 w-8"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer">
+                      <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                      <p className="text-sm text-foreground mb-1">拖拽文件至此处或点击上传</p>
+                      <p className="text-xs text-muted-foreground">
+                        支持 PDF、Word、Excel、Markdown 等格式
+                      </p>
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileChange}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.md,.txt"
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+
+              {/* Baseline Document Selection */}
+              {uploadMode === "baseline" && (
+                <ScrollArea className="h-[200px] border rounded-lg">
+                  <div className="p-2 space-y-1">
+                    {baselineDocuments.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors",
+                          selectedBaselineDoc === doc.id
+                            ? "bg-primary/10 border border-primary/30"
+                            : "hover:bg-muted/50"
+                        )}
+                        onClick={() => setSelectedBaselineDoc(doc.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{doc.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {doc.category} · {doc.version}
+                            </p>
+                          </div>
+                        </div>
+                        {selectedBaselineDoc === doc.id && (
+                          <Check className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
             </div>
           </div>
           <DialogFooter>
@@ -197,7 +295,7 @@ export function CreateKnowledgeDocDialog({ open, onOpenChange }: CreateKnowledge
             <Button
               type="submit"
               className="gradient-primary text-primary-foreground"
-              disabled={!formData.name || !formData.type || !formData.version || !file}
+              disabled={!isFormValid()}
             >
               创建文档
             </Button>
