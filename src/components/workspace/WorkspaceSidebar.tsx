@@ -12,7 +12,8 @@ import {
   ChevronDown,
   FlaskConical,
   Sparkles,
-  Network
+  Network,
+  FileCode
 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -59,6 +60,7 @@ const workspaceMenuItems: MenuItem[] = [
   { title: "测试报告", url: "report", icon: FileText },
   { title: "知识库", url: "knowledge", icon: BookOpen },
   { title: "测试本体", url: "ontology", icon: Network },
+  { title: "用例模板", url: "templates", icon: FileCode },
   { title: "环境", url: "environment", icon: Server },
   { title: "标签", url: "tags", icon: Tags },
 ];
