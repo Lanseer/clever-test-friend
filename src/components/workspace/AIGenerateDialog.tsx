@@ -99,6 +99,13 @@ const mockDocuments: Document[] = [
 
 const availableTags = ["冒烟测试", "回归测试", "功能测试", "接口测试", "性能测试", "安全测试"];
 
+const caseTemplates = [
+  { id: "tpl-1", name: "BDD标准模板", type: "BDD" },
+  { id: "tpl-2", name: "API接口测试模板", type: "API" },
+  { id: "tpl-3", name: "UI自动化模板", type: "UI" },
+  { id: "tpl-4", name: "性能测试模板", type: "Performance" },
+];
+
 export function AIGenerateDialog({
   open,
   onOpenChange,
@@ -113,6 +120,7 @@ export function AIGenerateDialog({
   const [currentVersionId, setCurrentVersionId] = useState<string>("");
   const [initMethod, setInitMethod] = useState<"smart" | "upload">("smart");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
 
   const isRegenerate = mode === "regenerate";
 
@@ -131,6 +139,7 @@ export function AIGenerateDialog({
       setCurrentVersionId("");
       setInitMethod("smart");
       setUploadedFile(null);
+      setSelectedTemplate("");
     }
   }, [open, initialData]);
 
@@ -329,7 +338,12 @@ export function AIGenerateDialog({
                 <Label>初始化用例方式</Label>
                 <RadioGroup
                   value={initMethod}
-                  onValueChange={(value) => setInitMethod(value as "smart" | "upload")}
+                  onValueChange={(value) => {
+                    setInitMethod(value as "smart" | "upload");
+                    if (value === "upload") {
+                      setSelectedTemplate("");
+                    }
+                  }}
                   className="flex gap-6"
                 >
                   <div className="flex items-center space-x-2">
@@ -341,6 +355,28 @@ export function AIGenerateDialog({
                     <Label htmlFor="upload" className="cursor-pointer font-normal">本地上传</Label>
                   </div>
                 </RadioGroup>
+              </div>
+            )}
+
+            {/* 选择用例模板 - 仅智能生成时显示 */}
+            {initMethod === "smart" && !isRegenerate && (
+              <div className="space-y-2">
+                <Label>选择用例模板</Label>
+                <Select
+                  value={selectedTemplate}
+                  onValueChange={setSelectedTemplate}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="请选择用例模板（可选）" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {caseTemplates.map((tpl) => (
+                      <SelectItem key={tpl.id} value={tpl.id}>
+                        {tpl.name} ({tpl.type})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
