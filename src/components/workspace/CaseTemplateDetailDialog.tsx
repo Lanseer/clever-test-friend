@@ -5,7 +5,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CaseTemplate {
@@ -53,26 +52,24 @@ export function CaseTemplateDetailDialog({
           </p>
         </DialogHeader>
 
-        <Tabs defaultValue="format" className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="format">规范格式</TabsTrigger>
-            <TabsTrigger value="example">示例</TabsTrigger>
-          </TabsList>
-          <TabsContent value="format" className="mt-4">
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">规范格式</h4>
             <ScrollArea className="h-[400px] rounded-lg border bg-muted/30 p-4">
               <pre className="text-sm font-mono whitespace-pre-wrap text-foreground">
                 {template.format}
               </pre>
             </ScrollArea>
-          </TabsContent>
-          <TabsContent value="example" className="mt-4">
+          </div>
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">示例</h4>
             <ScrollArea className="h-[400px] rounded-lg border bg-muted/30 p-4">
               <pre className="text-sm font-mono whitespace-pre-wrap text-foreground">
                 {template.example}
               </pre>
             </ScrollArea>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
