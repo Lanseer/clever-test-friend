@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Layers, Target, ChevronRight, ChevronDown, FileCheck, UserPlus } from "lucide-react";
+import { ArrowLeft, Search, Layers, Target, ChevronRight, ChevronDown, Eye, History, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,8 +16,7 @@ interface TestPoint {
   id: string;
   name: string;
   total: number;
-  adopted: number;
-  rejected: number;
+  passed: number;
 }
 
 interface TestDimension {
@@ -25,8 +24,7 @@ interface TestDimension {
   name: string;
   description: string;
   total: number;
-  adopted: number;
-  rejected: number;
+  passed: number;
   testPoints: TestPoint[];
 }
 
@@ -36,12 +34,11 @@ const mockDimensions: TestDimension[] = [
     name: "用户管理",
     description: "用户注册、登录、权限相关测试",
     total: 45,
-    adopted: 35,
-    rejected: 5,
+    passed: 35,
     testPoints: [
-      { id: "tp-1", name: "用户登录", total: 15, adopted: 12, rejected: 2 },
-      { id: "tp-2", name: "用户注册", total: 18, adopted: 14, rejected: 2 },
-      { id: "tp-3", name: "密码重置", total: 12, adopted: 9, rejected: 1 },
+      { id: "tp-1", name: "用户登录", total: 15, passed: 12 },
+      { id: "tp-2", name: "用户注册", total: 18, passed: 14 },
+      { id: "tp-3", name: "密码重置", total: 12, passed: 9 },
     ],
   },
   {
@@ -49,12 +46,11 @@ const mockDimensions: TestDimension[] = [
     name: "订单管理",
     description: "订单创建、支付、退款流程测试",
     total: 62,
-    adopted: 50,
-    rejected: 8,
+    passed: 50,
     testPoints: [
-      { id: "tp-4", name: "订单创建", total: 22, adopted: 18, rejected: 3 },
-      { id: "tp-5", name: "订单支付", total: 25, adopted: 20, rejected: 3 },
-      { id: "tp-6", name: "订单退款", total: 15, adopted: 12, rejected: 2 },
+      { id: "tp-4", name: "订单创建", total: 22, passed: 18 },
+      { id: "tp-5", name: "订单支付", total: 25, passed: 20 },
+      { id: "tp-6", name: "订单退款", total: 15, passed: 12 },
     ],
   },
   {
@@ -62,12 +58,11 @@ const mockDimensions: TestDimension[] = [
     name: "商品管理",
     description: "商品上架、编辑、库存管理测试",
     total: 38,
-    adopted: 30,
-    rejected: 4,
+    passed: 30,
     testPoints: [
-      { id: "tp-7", name: "商品上架", total: 14, adopted: 11, rejected: 2 },
-      { id: "tp-8", name: "商品编辑", total: 12, adopted: 10, rejected: 1 },
-      { id: "tp-9", name: "库存管理", total: 12, adopted: 9, rejected: 1 },
+      { id: "tp-7", name: "商品上架", total: 14, passed: 11 },
+      { id: "tp-8", name: "商品编辑", total: 12, passed: 10 },
+      { id: "tp-9", name: "库存管理", total: 12, passed: 9 },
     ],
   },
 ];
@@ -77,20 +72,17 @@ const calculateTotalStats = (dimensions: TestDimension[]) => {
   return dimensions.reduce(
     (acc, dim) => ({
       total: acc.total + dim.total,
-      adopted: acc.adopted + dim.adopted,
-      rejected: acc.rejected + dim.rejected,
+      passed: acc.passed + dim.passed,
     }),
-    { total: 0, adopted: 0, rejected: 0 }
+    { total: 0, passed: 0 }
   );
 };
 
 // 简化的统计显示组件
-function ExpertMiniStats({ total, adopted, rejected }: { total: number; adopted: number; rejected: number }) {
+function ExpertMiniStats({ total, passed }: { total: number; passed: number }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-green-600 font-medium">{adopted}</span>
-      <span className="text-muted-foreground">/</span>
-      <span className="text-red-600">{rejected}</span>
+      <span className="text-green-600 font-medium">{passed}</span>
       <span className="text-muted-foreground">/</span>
       <span className="text-muted-foreground">{total}</span>
     </div>
@@ -106,7 +98,7 @@ export default function ExpertReview() {
   );
 
   const totalStats = calculateTotalStats(mockDimensions);
-  const pendingCount = totalStats.total - totalStats.adopted - totalStats.rejected;
+  const pendingCount = totalStats.total - totalStats.passed;
 
   const toggleDimension = (dimensionId: string) => {
     setExpandedDimensions((prev) => {
@@ -136,6 +128,10 @@ export default function ExpertReview() {
 
   const handleNavigateToExpertReviewDetail = (testPointId: string) => {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/expert-review/${testPointId}`);
+  };
+
+  const handleNavigateToRecords = () => {
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/expert-review-records`);
   };
 
   return (
@@ -173,9 +169,9 @@ export default function ExpertReview() {
             生成记录: AI-001 · 共 {totalStats.total} 个用例，{pendingCount} 个待评审
           </p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <UserPlus className="w-4 h-4" />
-          邀请专家
+        <Button variant="outline" className="gap-2" onClick={handleNavigateToRecords}>
+          <History className="w-4 h-4" />
+          评审记录
         </Button>
       </div>
 
@@ -199,16 +195,16 @@ export default function ExpertReview() {
           <div className="text-sm text-muted-foreground">总用例数</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
+          <div className="text-2xl font-bold text-green-600">{totalStats.passed}</div>
+          <div className="text-sm text-muted-foreground">通过</div>
+        </div>
+        <div className="bg-card border rounded-lg p-4">
+          <div className="text-2xl font-bold text-red-600">{totalStats.total - totalStats.passed - pendingCount}</div>
+          <div className="text-sm text-muted-foreground">拒绝</div>
+        </div>
+        <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
           <div className="text-sm text-muted-foreground">待评审</div>
-        </div>
-        <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-green-600">{totalStats.adopted}</div>
-          <div className="text-sm text-muted-foreground">已采纳</div>
-        </div>
-        <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-red-600">{totalStats.rejected}</div>
-          <div className="text-sm text-muted-foreground">已拒绝</div>
         </div>
       </div>
 
@@ -245,7 +241,7 @@ export default function ExpertReview() {
                       <span className="text-sm text-muted-foreground">· {dimension.description}</span>
                     </div>
                   </div>
-                  <ExpertMiniStats total={dimension.total} adopted={dimension.adopted} rejected={dimension.rejected} />
+                  <ExpertMiniStats total={dimension.total} passed={dimension.passed} />
                 </div>
 
                 {/* Test Points */}
@@ -260,7 +256,7 @@ export default function ExpertReview() {
                     <div className="flex-1 min-w-0">
                       <span className="text-sm text-foreground">{testPoint.name}</span>
                     </div>
-                    <ExpertMiniStats total={testPoint.total} adopted={testPoint.adopted} rejected={testPoint.rejected} />
+                    <ExpertMiniStats total={testPoint.total} passed={testPoint.passed} />
                     <Button
                       variant="outline"
                       size="sm"
@@ -270,8 +266,8 @@ export default function ExpertReview() {
                         handleNavigateToExpertReviewDetail(testPoint.id);
                       }}
                     >
-                      <FileCheck className="w-3.5 h-3.5" />
-                      专家评审
+                      <Eye className="w-3.5 h-3.5" />
+                      查看详情
                     </Button>
                   </div>
                 ))}
