@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, ChevronDown, FileText, Users, UserCheck, Layers, Target, ExternalLink, BookOpen } from "lucide-react";
+import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 // 统计数据接口
 interface ReviewStats {
@@ -15,153 +19,74 @@ interface ReviewStats {
   pending: number;
 }
 
-// 测试点接口
-interface TestPoint {
-  id: string;
+// 问题分类数据
+interface IssueCategory {
   name: string;
-  sourceDoc: string;
-  sourceDocVersion: string;
-  caseCount: number;
-  selfReviewStats: ReviewStats;
-  expertReviewStats: ReviewStats;
+  count: number;
+  color: string;
 }
 
-// 测试维度接口
-interface TestDimension {
-  id: string;
+// 丢弃原因数据
+interface DiscardReason {
   name: string;
-  description: string;
-  testPoints: TestPoint[];
-  selfReviewStats: ReviewStats;
-  expertReviewStats: ReviewStats;
+  count: number;
+  color: string;
 }
 
-// Mock数据
-const mockDimensions: TestDimension[] = [
-  {
-    id: "dim-1",
-    name: "用户登录模块",
-    description: "覆盖用户登录相关的所有功能测试",
-    selfReviewStats: { total: 45, adopted: 38, rejected: 4, pending: 3 },
-    expertReviewStats: { total: 38, adopted: 32, rejected: 3, pending: 3 },
-    testPoints: [
-      {
-        id: "tp-1-1",
-        name: "账号密码登录",
-        sourceDoc: "用户登录功能规格说明书",
-        sourceDocVersion: "v2.1",
-        caseCount: 48,
-        selfReviewStats: { total: 15, adopted: 13, rejected: 1, pending: 1 },
-        expertReviewStats: { total: 13, adopted: 11, rejected: 1, pending: 1 },
-      },
-      {
-        id: "tp-1-2",
-        name: "验证码登录",
-        sourceDoc: "用户登录功能规格说明书",
-        sourceDocVersion: "v2.1",
-        caseCount: 36,
-        selfReviewStats: { total: 12, adopted: 10, rejected: 1, pending: 1 },
-        expertReviewStats: { total: 10, adopted: 9, rejected: 0, pending: 1 },
-      },
-      {
-        id: "tp-1-3",
-        name: "第三方登录",
-        sourceDoc: "第三方集成接口文档",
-        sourceDocVersion: "v1.0",
-        caseCount: 42,
-        selfReviewStats: { total: 18, adopted: 15, rejected: 2, pending: 1 },
-        expertReviewStats: { total: 15, adopted: 12, rejected: 2, pending: 1 },
-      },
-    ],
-  },
-  {
-    id: "dim-2",
-    name: "订单管理模块",
-    description: "覆盖订单创建、支付、取消等流程",
-    selfReviewStats: { total: 68, adopted: 55, rejected: 8, pending: 5 },
-    expertReviewStats: { total: 55, adopted: 48, rejected: 4, pending: 3 },
-    testPoints: [
-      {
-        id: "tp-2-1",
-        name: "订单创建",
-        sourceDoc: "订单流程设计文档",
-        sourceDocVersion: "v3.0",
-        caseCount: 52,
-        selfReviewStats: { total: 25, adopted: 20, rejected: 3, pending: 2 },
-        expertReviewStats: { total: 20, adopted: 17, rejected: 2, pending: 1 },
-      },
-      {
-        id: "tp-2-2",
-        name: "订单支付",
-        sourceDoc: "支付模块接口文档",
-        sourceDocVersion: "v2.0",
-        caseCount: 38,
-        selfReviewStats: { total: 22, adopted: 18, rejected: 3, pending: 1 },
-        expertReviewStats: { total: 18, adopted: 16, rejected: 1, pending: 1 },
-      },
-      {
-        id: "tp-2-3",
-        name: "订单取消",
-        sourceDoc: "订单流程设计文档",
-        sourceDocVersion: "v3.0",
-        caseCount: 28,
-        selfReviewStats: { total: 21, adopted: 17, rejected: 2, pending: 2 },
-        expertReviewStats: { total: 17, adopted: 15, rejected: 1, pending: 1 },
-      },
-    ],
-  },
-  {
-    id: "dim-3",
-    name: "商品展示模块",
-    description: "覆盖商品列表、详情、搜索等功能",
-    selfReviewStats: { total: 52, adopted: 45, rejected: 5, pending: 2 },
-    expertReviewStats: { total: 45, adopted: 40, rejected: 3, pending: 2 },
-    testPoints: [
-      {
-        id: "tp-3-1",
-        name: "商品列表",
-        sourceDoc: "商品管理PRD",
-        sourceDocVersion: "v1.5",
-        caseCount: 32,
-        selfReviewStats: { total: 18, adopted: 16, rejected: 1, pending: 1 },
-        expertReviewStats: { total: 16, adopted: 14, rejected: 1, pending: 1 },
-      },
-      {
-        id: "tp-3-2",
-        name: "商品详情",
-        sourceDoc: "商品管理PRD",
-        sourceDocVersion: "v1.5",
-        caseCount: 45,
-        selfReviewStats: { total: 20, adopted: 17, rejected: 2, pending: 1 },
-        expertReviewStats: { total: 17, adopted: 15, rejected: 1, pending: 1 },
-      },
-      {
-        id: "tp-3-3",
-        name: "商品搜索",
-        sourceDoc: "搜索功能设计文档",
-        sourceDocVersion: "v2.0",
-        caseCount: 28,
-        selfReviewStats: { total: 14, adopted: 12, rejected: 2, pending: 0 },
-        expertReviewStats: { total: 12, adopted: 11, rejected: 1, pending: 0 },
-      },
-    ],
-  },
+// 覆盖率补充数据
+interface CoverageSupplement {
+  name: string;
+  count: number;
+  icon: typeof Search;
+}
+
+// Mock 自评问题分类数据
+const selfReviewIssues: IssueCategory[] = [
+  { name: "场景问题", count: 10, color: "#f59e0b" },
+  { name: "信息问题", count: 20, color: "#3b82f6" },
+  { name: "数据问题", count: 30, color: "#ef4444" },
 ];
 
-// 计算总计统计
-const calculateTotalStats = (dimensions: TestDimension[], type: "self" | "expert"): ReviewStats => {
-  return dimensions.reduce(
-    (acc, dim) => {
-      const stats = type === "self" ? dim.selfReviewStats : dim.expertReviewStats;
-      return {
-        total: acc.total + stats.total,
-        adopted: acc.adopted + stats.adopted,
-        rejected: acc.rejected + stats.rejected,
-        pending: acc.pending + stats.pending,
-      };
-    },
-    { total: 0, adopted: 0, rejected: 0, pending: 0 }
-  );
+// Mock 专家评审问题分类数据
+const expertReviewIssues: IssueCategory[] = [
+  { name: "场景问题", count: 8, color: "#f59e0b" },
+  { name: "信息问题", count: 15, color: "#3b82f6" },
+  { name: "数据问题", count: 12, color: "#ef4444" },
+];
+
+// Mock 丢弃原因数据
+const discardReasons: DiscardReason[] = [
+  { name: "场景重复", count: 20, color: "#94a3b8" },
+  { name: "场景与需求不符", count: 10, color: "#f97316" },
+  { name: "场景与功能不符", count: 20, color: "#dc2626" },
+];
+
+// Mock 覆盖率补充数据
+const coverageSupplements: CoverageSupplement[] = [
+  { name: "隐藏需求挖掘补充", count: 100, icon: Search },
+  { name: "等价类补充", count: 120, icon: Layers },
+  { name: "边界值补充", count: 120, icon: Target },
+  { name: "流程补充", count: 12, icon: TrendingUp },
+  { name: "特殊场景补充", count: 20, icon: Plus },
+];
+
+// Mock 案例数据
+const mockCases = [
+  { id: "TC-001", name: "用户登录-密码错误场景", dimension: "用户登录模块", nature: "负向" },
+  { id: "TC-002", name: "订单创建-库存不足场景", dimension: "订单管理模块", nature: "负向" },
+  { id: "TC-003", name: "支付超时处理", dimension: "订单管理模块", nature: "负向" },
+  { id: "TC-004", name: "商品搜索-关键词为空", dimension: "商品展示模块", nature: "负向" },
+  { id: "TC-005", name: "验证码过期场景", dimension: "用户登录模块", nature: "负向" },
+];
+
+// 汇总统计
+const selfReviewTotal: ReviewStats = { total: 165, adopted: 138, rejected: 17, pending: 10 };
+const expertReviewTotal: ReviewStats = { total: 138, adopted: 120, rejected: 10, pending: 8 };
+
+// 覆盖率数据
+const coverageData = {
+  totalCoverage: 80,
+  uncoveredCount: 200,
 };
 
 // 统计卡片组件
@@ -169,15 +94,23 @@ function StatsCard({
   title, 
   icon: Icon, 
   stats, 
-  colorScheme 
+  colorScheme,
+  issues,
+  onIssueClick
 }: { 
   title: string; 
   icon: typeof Users; 
   stats: ReviewStats;
   colorScheme: "blue" | "purple";
+  issues: IssueCategory[];
+  onIssueClick: (category: string) => void;
 }) {
   const adoptedPercentage = stats.total > 0 ? (stats.adopted / stats.total) * 100 : 0;
   
+  const chartConfig = {
+    count: { label: "数量" },
+  };
+
   return (
     <Card className="flex-1">
       <CardHeader className="pb-2">
@@ -189,8 +122,8 @@ function StatsCard({
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-4 gap-4 mb-3">
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-foreground">{stats.total}</div>
             <div className="text-xs text-muted-foreground">总用例</div>
@@ -215,44 +148,292 @@ function StatsCard({
           </div>
           <Progress value={adoptedPercentage} className="h-2" />
         </div>
+
+        {/* 问题分类汇总 */}
+        <div className="pt-3 border-t">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-medium">问题分类汇总</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <ChartContainer config={chartConfig} className="h-[80px] w-[80px]">
+              <PieChart>
+                <Pie
+                  data={issues}
+                  dataKey="count"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={20}
+                  outerRadius={35}
+                >
+                  {issues.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ChartContainer>
+            <div className="flex-1 space-y-2">
+              {issues.map((issue) => (
+                <div key={issue.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2.5 h-2.5 rounded-full" 
+                      style={{ backgroundColor: issue.color }}
+                    />
+                    <span className="text-xs text-muted-foreground">{issue.name}</span>
+                  </div>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="h-auto p-0 text-xs font-medium"
+                    onClick={() => onIssueClick(issue.name)}
+                  >
+                    {issue.count}条
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
 }
 
-// 小型统计展示
-function MiniStats({ stats, label }: { stats: ReviewStats; label: string }) {
+// 丢弃情况卡片
+function DiscardCard({ 
+  reasons, 
+  onReasonClick 
+}: { 
+  reasons: DiscardReason[];
+  onReasonClick: (reason: string) => void;
+}) {
+  const totalDiscarded = reasons.reduce((sum, r) => sum + r.count, 0);
+  
+  const chartConfig = {
+    count: { label: "数量" },
+  };
+
   return (
-    <div className="flex items-center gap-2 text-xs">
-      <span className="text-muted-foreground">{label}:</span>
-      <span className="font-medium text-foreground">{stats.total}</span>
-      <span className="text-green-600">{stats.adopted}</span>
-      <span className="text-muted-foreground">/</span>
-      <span className="text-red-500">{stats.rejected}</span>
-      <span className="text-muted-foreground">/</span>
-      <span className="text-amber-500">{stats.pending}</span>
-    </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <Trash2 className="w-4 h-4 text-red-500" />
+          丢弃情况汇总
+          <Badge variant="secondary" className="ml-auto">{totalDiscarded}条</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-6">
+          <ChartContainer config={chartConfig} className="h-[120px] w-[160px]">
+            <BarChart data={reasons} layout="vertical">
+              <XAxis type="number" hide />
+              <YAxis 
+                type="category" 
+                dataKey="name" 
+                width={90}
+                tick={{ fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                {reasons.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+          <div className="flex-1 space-y-3">
+            {reasons.map((reason) => (
+              <div key={reason.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded" 
+                    style={{ backgroundColor: reason.color }}
+                  />
+                  <span className="text-sm">{reason.name}</span>
+                </div>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 font-medium"
+                  onClick={() => onReasonClick(reason.name)}
+                >
+                  {reason.count}条
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 覆盖率卡片
+function CoverageCard({ supplements }: { supplements: CoverageSupplement[] }) {
+  const totalSupplement = supplements.reduce((sum, s) => sum + s.count, 0);
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <Target className="w-4 h-4 text-green-500" />
+          覆盖率情况
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* 覆盖率概要 */}
+        <div className="flex items-center gap-6">
+          <div className="relative w-24 h-24">
+            <svg className="w-24 h-24 transform -rotate-90">
+              <circle
+                cx="48"
+                cy="48"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                className="text-muted"
+              />
+              <circle
+                cx="48"
+                cy="48"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray={`${coverageData.totalCoverage * 2.51} 251`}
+                className="text-green-500"
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xl font-bold">{coverageData.totalCoverage}%</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">总覆盖率</span>
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                {coverageData.totalCoverage}%
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">未覆盖</span>
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                {coverageData.uncoveredCount}条
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">补充用例</span>
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                {totalSupplement}条
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* 补充用例分类 */}
+        <div className="pt-3 border-t">
+          <div className="flex items-center gap-2 mb-3">
+            <Plus className="w-4 h-4 text-blue-500" />
+            <span className="text-sm font-medium">补充用例分类</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {supplements.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div 
+                  key={item.name}
+                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-muted-foreground truncate">{item.name}</div>
+                    <div className="text-sm font-medium">{item.count}条</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 案例列表弹窗
+function CaseListDialog({ 
+  open, 
+  onOpenChange, 
+  title, 
+  cases 
+}: { 
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  cases: typeof mockCases;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            {title}
+            <Badge variant="secondary" className="ml-2">{cases.length}条</Badge>
+          </DialogTitle>
+        </DialogHeader>
+        <div className="border rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">用例编号</TableHead>
+                <TableHead>用例名称</TableHead>
+                <TableHead className="w-[120px]">所属维度</TableHead>
+                <TableHead className="w-[80px]">性质</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {cases.map((caseItem) => (
+                <TableRow key={caseItem.id}>
+                  <TableCell className="font-mono text-xs">{caseItem.id}</TableCell>
+                  <TableCell className="font-medium">{caseItem.name}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{caseItem.dimension}</TableCell>
+                  <TableCell>
+                    <Badge variant={caseItem.nature === "正向" ? "default" : "secondary"}>
+                      {caseItem.nature}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 export default function TestReport() {
   const navigate = useNavigate();
-  const { workspaceId, recordId } = useParams();
-  const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(new Set(["dim-1"]));
+  const { workspaceId } = useParams();
+  const [caseDialogOpen, setCaseDialogOpen] = useState(false);
+  const [caseDialogTitle, setCaseDialogTitle] = useState("");
 
-  const selfReviewTotal = calculateTotalStats(mockDimensions, "self");
-  const expertReviewTotal = calculateTotalStats(mockDimensions, "expert");
+  const handleIssueClick = (category: string) => {
+    setCaseDialogTitle(`${category}相关用例`);
+    setCaseDialogOpen(true);
+  };
 
-  const toggleDimension = (dimId: string) => {
-    setExpandedDimensions((prev) => {
-      const next = new Set(prev);
-      if (next.has(dimId)) {
-        next.delete(dimId);
-      } else {
-        next.add(dimId);
-      }
-      return next;
-    });
+  const handleDiscardClick = (reason: string) => {
+    setCaseDialogTitle(`${reason}用例`);
+    setCaseDialogOpen(true);
   };
 
   return (
@@ -274,111 +455,46 @@ export default function TestReport() {
           评审报告
         </h1>
         <p className="text-muted-foreground mt-1">
-          按测试维度、测试点、用例层级展示评审汇总数据
+          用例评审数据分析与覆盖率汇总
         </p>
       </div>
 
-      {/* 汇总统计卡片 */}
-      <div className="flex gap-4 mb-6">
+      {/* 评审汇总卡片 */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <StatsCard 
           title="用例自评汇总" 
           icon={UserCheck} 
           stats={selfReviewTotal} 
           colorScheme="blue"
+          issues={selfReviewIssues}
+          onIssueClick={handleIssueClick}
         />
         <StatsCard 
           title="专家评审汇总" 
           icon={Users} 
           stats={expertReviewTotal} 
           colorScheme="purple"
+          issues={expertReviewIssues}
+          onIssueClick={handleIssueClick}
         />
       </div>
 
-      {/* 层级数据展示 */}
-      <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="px-6 py-3 bg-muted/50 border-b">
-          <h2 className="font-medium text-foreground">测试维度详情</h2>
-        </div>
-
-        <div className="divide-y">
-          {mockDimensions.map((dimension) => {
-            const isDimExpanded = expandedDimensions.has(dimension.id);
-
-            return (
-              <div key={dimension.id} className="bg-card">
-                {/* 测试维度行 */}
-                <div
-                  className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-muted/30 transition-colors"
-                  onClick={() => toggleDimension(dimension.id)}
-                >
-                  <div className="w-5 h-5 flex items-center justify-center text-muted-foreground">
-                    {isDimExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </div>
-                  <Layers className="w-5 h-5 text-primary" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-foreground">{dimension.name}</div>
-                    <div className="text-xs text-muted-foreground">{dimension.description}</div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <MiniStats stats={dimension.selfReviewStats} label="自评" />
-                    <MiniStats stats={dimension.expertReviewStats} label="专家" />
-                  </div>
-                </div>
-
-                {/* 测试点列表 */}
-                {isDimExpanded && (
-                  <div className="border-t bg-muted/20">
-                    {dimension.testPoints.map((testPoint) => (
-                      <div key={testPoint.id}>
-                        {/* 测试点行 */}
-                        <div
-                          className="flex items-center gap-3 px-6 py-3 pl-14 hover:bg-muted/30 transition-colors"
-                        >
-                          <Target className="w-4 h-4 text-blue-500" />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-foreground">{testPoint.name}</div>
-                            <span className="text-xs text-muted-foreground">
-                              {testPoint.caseCount} 个用例
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-6">
-                            <MiniStats stats={testPoint.selfReviewStats} label="自评" />
-                            <MiniStats stats={testPoint.expertReviewStats} label="专家" />
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 gap-1"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/report/test-point/${testPoint.id}/source`);
-                            }}
-                          >
-                            <BookOpen className="w-3.5 h-3.5" />
-                            来源文档
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 gap-1"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/report/test-point/${testPoint.id}`);
-                            }}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            查看用例
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+      {/* 丢弃情况和覆盖率 */}
+      <div className="grid grid-cols-2 gap-4">
+        <DiscardCard 
+          reasons={discardReasons} 
+          onReasonClick={handleDiscardClick}
+        />
+        <CoverageCard supplements={coverageSupplements} />
       </div>
+
+      {/* 案例列表弹窗 */}
+      <CaseListDialog
+        open={caseDialogOpen}
+        onOpenChange={setCaseDialogOpen}
+        title={caseDialogTitle}
+        cases={mockCases}
+      />
     </div>
   );
 }
