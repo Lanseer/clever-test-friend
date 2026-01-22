@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus } from "lucide-react";
+import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus, RefreshCw, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -436,6 +437,14 @@ export default function TestReport() {
     setCaseDialogOpen(true);
   };
 
+  const handleUpdateReport = () => {
+    toast.success("报告数据已更新");
+  };
+
+  const handleDownloadReport = () => {
+    toast.success("报告下载已开始");
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* 页面标题 */}
@@ -450,13 +459,27 @@ export default function TestReport() {
           <ChevronRight className="w-4 h-4" />
           <span className="text-foreground">评审报告</span>
         </div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <FileText className="w-6 h-6 text-primary" />
-          评审报告
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          用例评审数据分析与覆盖率汇总
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <FileText className="w-6 h-6 text-primary" />
+              评审报告
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              用例评审数据分析与覆盖率汇总
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleUpdateReport}>
+              <RefreshCw className="w-4 h-4 mr-1.5" />
+              更新报告
+            </Button>
+            <Button size="sm" onClick={handleDownloadReport}>
+              <Download className="w-4 h-4 mr-1.5" />
+              下载报告
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* 评审汇总卡片 */}
