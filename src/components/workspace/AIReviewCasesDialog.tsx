@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, AlertCircle, XCircle, Check, X, FileText, Code, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { CaseSourceInfo } from "./CaseSourceInfo";
 
 interface ReviewCase {
   id: string;
@@ -382,21 +383,8 @@ export function AIReviewCasesDialog({
                   </ScrollArea>
                 </div>
 
-                {/* Right: Source Document */}
-                <div className="flex flex-col border rounded-lg overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b">
-                    <FileText className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-sm">来源文档内容</span>
-                  </div>
-                  <ScrollArea className="flex-1 p-4">
-                    <div className="prose prose-sm max-w-none">
-                      <div
-                        className="text-sm"
-                        dangerouslySetInnerHTML={{ __html: getMockSourceDocument(selectedCase) }}
-                      />
-                    </div>
-                  </ScrollArea>
-                </div>
+                {/* Right: Case Source */}
+                <CaseSourceInfo caseId={selectedCase.id} className="flex-1" />
               </div>
 
               {/* Bottom Navigation */}

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { CaseSourceInfo } from "./CaseSourceInfo";
 
 interface ExpertRejection {
   expertName?: string;
@@ -72,6 +73,10 @@ function CaseDetailDialog({ open, onOpenChange, caseItem }: CaseDetailDialogProp
               <div className="bg-muted/50 rounded-lg p-3 text-sm">
                 登录成功后跳转到首页，显示用户信息
               </div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">案例来源</div>
+              <CaseSourceInfo caseId={caseItem.id} showHeader={false} compact />
             </div>
           </div>
         </ScrollArea>
