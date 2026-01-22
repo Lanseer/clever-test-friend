@@ -14,6 +14,7 @@ import AIReview from "./workspace/AIReview";
 import AIAssistant from "./workspace/AIAssistant";
 import ExpertReview from "./workspace/ExpertReview";
 import ExpertReviewDetail from "./workspace/ExpertReviewDetail";
+import ExpertReviewRecords from "./workspace/ExpertReviewRecords";
 import Tags from "./workspace/Tags";
 import Dashboard from "./Index";
 import TestData from "./workspace/TestData";
@@ -94,6 +95,8 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/expert-review" element={<ExpertReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review" element={<ExpertReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review/:testPointId" element={<ExpertReviewDetail />} />
+            <Route path="management/ai-cases/:recordId/expert-review-records" element={<ExpertReviewRecords />} />
+            <Route path="management/ai-cases/:recordId/expert-review-records/:reviewId/cases" element={<ExpertReviewDetail />} />
             <Route path="data" element={<TestData />} />
             <Route path="data/create" element={<TestDataCreate />} />
             <Route path="data/:dataId/edit" element={<TestDataCreate />} />
