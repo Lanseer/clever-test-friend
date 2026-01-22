@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { InitiateExpertReviewDialog } from "@/components/workspace/InitiateExpertReviewDialog";
 
 interface TestPoint {
   id: string;
@@ -96,6 +97,7 @@ export default function ExpertReview() {
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
     new Set(mockDimensions.map((d) => d.id))
   );
+  const [initiateDialogOpen, setInitiateDialogOpen] = useState(false);
 
   const totalStats = calculateTotalStats(mockDimensions);
   const pendingCount = totalStats.total - totalStats.passed;
@@ -172,6 +174,10 @@ export default function ExpertReview() {
         <Button variant="outline" className="gap-2" onClick={handleNavigateToRecords}>
           <History className="w-4 h-4" />
           评审记录
+        </Button>
+        <Button className="gap-2" onClick={() => setInitiateDialogOpen(true)}>
+          <Plus className="w-4 h-4" />
+          发起评审
         </Button>
       </div>
 
@@ -283,6 +289,14 @@ export default function ExpertReview() {
           </div>
         )}
       </div>
+
+      <InitiateExpertReviewDialog
+        open={initiateDialogOpen}
+        onOpenChange={setInitiateDialogOpen}
+        onConfirm={() => {
+          setInitiateDialogOpen(false);
+        }}
+      />
     </div>
   );
 }
