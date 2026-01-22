@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal, History } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -312,6 +312,10 @@ export default function AIGeneratedCases() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/generation-records`)}>
+                            <History className="w-4 h-4 mr-2" />
+                            生成记录
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleOpenReport(record)}>
                             <FileText className="w-4 h-4 mr-2" />
                             评审报告
