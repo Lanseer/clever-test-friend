@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal, History, Users } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal, History, Users, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { ReportSidebar } from "@/components/workspace/ReportSidebar";
 import { AIGenerateDialog } from "@/components/workspace/AIGenerateDialog";
 import { AIThinkingSidebar } from "@/components/workspace/AIThinkingSidebar";
+import { ConfirmGenerationResultDialog } from "@/components/workspace/ConfirmGenerationResultDialog";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type GenerationStatus = "generating" | "completed" | "failed";
+type GenerationStatus = "generating" | "completed" | "failed" | "pending_confirm";
 
 interface SelectedDocument {
   docId: string;
@@ -146,11 +148,17 @@ const statusConfig: Record<GenerationStatus, { label: string; icon: typeof Loade
     icon: XCircle,
     className: "bg-red-500/10 text-red-600 border-red-200",
   },
+  pending_confirm: {
+    label: "待确认",
+    icon: AlertCircle,
+    className: "bg-amber-500/10 text-amber-600 border-amber-200",
+  },
 };
 
 export default function AIGeneratedCases() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarType, setSidebarType] = useState<"report" | "failure">("report");
@@ -160,6 +168,9 @@ export default function AIGeneratedCases() {
   const [regenerateRecord, setRegenerateRecord] = useState<GenerationRecord | null>(null);
   const [thinkingSidebarOpen, setThinkingSidebarOpen] = useState(false);
   const [thinkingBatch, setThinkingBatch] = useState<{ id: string; batchCode: string; status: "generating"; startTime: string; totalCases: number; currentStage?: string; progress?: number } | null>(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [confirmRecord, setConfirmRecord] = useState<GenerationRecord | null>(null);
+  const [records, setRecords] = useState<GenerationRecord[]>(mockRecords);
 
   const handleOpenThinking = (record: GenerationRecord) => {
     setThinkingBatch({
@@ -174,7 +185,7 @@ export default function AIGeneratedCases() {
     setThinkingSidebarOpen(true);
   };
 
-  const filteredRecords = mockRecords.filter(
+  const filteredRecords = records.filter(
     (record) =>
       record.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       record.code.toLowerCase().includes(searchQuery.toLowerCase())
@@ -208,6 +219,33 @@ export default function AIGeneratedCases() {
 
   const handleConfirmGenerate = (data: { name: string; documents: SelectedDocument[]; tags: string[] }) => {
     console.log("生成用例:", data);
+    // Simulate regeneration: set status to pending_confirm for the record
+    if (generateMode === "regenerate" && regenerateRecord) {
+      setRecords((prev) =>
+        prev.map((r) =>
+          r.id === regenerateRecord.id ? { ...r, status: "pending_confirm" as GenerationStatus } : r
+        )
+      );
+    }
+  };
+
+  const handleOpenConfirmDialog = (record: GenerationRecord) => {
+    setConfirmRecord(record);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmResult = () => {
+    if (confirmRecord) {
+      setRecords((prev) =>
+        prev.map((r) =>
+          r.id === confirmRecord.id ? { ...r, status: "completed" as GenerationStatus } : r
+        )
+      );
+      toast({
+        title: "确认成功",
+        description: "本次生成用例已确认，可以进行评审",
+      });
+    }
   };
 
   return (
@@ -254,6 +292,7 @@ export default function AIGeneratedCases() {
             const StatusIcon = status.icon;
             const isCompleted = record.status === "completed";
             const isFailed = record.status === "failed";
+            const isPendingConfirm = record.status === "pending_confirm";
 
             return (
               <div
@@ -391,6 +430,17 @@ export default function AIGeneratedCases() {
                   {record.status === "generating" && (
                     <span className="text-xs text-muted-foreground whitespace-nowrap">生成中...</span>
                   )}
+                  {isPendingConfirm && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-7 px-3 text-xs gap-1 whitespace-nowrap bg-amber-500 hover:bg-amber-600"
+                      onClick={() => handleOpenConfirmDialog(record)}
+                    >
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      结果待确认
+                    </Button>
+                  )}
                 </div>
               </div>
             );
@@ -444,6 +494,12 @@ export default function AIGeneratedCases() {
         open={thinkingSidebarOpen}
         onOpenChange={setThinkingSidebarOpen}
         batch={thinkingBatch}
+      />
+
+      <ConfirmGenerationResultDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        onConfirm={handleConfirmResult}
       />
     </div>
   );
