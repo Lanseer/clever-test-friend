@@ -230,10 +230,21 @@ export function AIReviewCasesDialog({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="py-3 border-b">
+          <div className="py-3 border-b flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
               共 <span className="font-medium text-foreground">{cases.length}</span> 个用例
             </span>
+            {(type === "excellent" || type === "passed") && (
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={handleBatchAdopt}
+                className="gap-1"
+              >
+                <Check className="w-3.5 h-3.5" />
+                批量采纳
+              </Button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto">

@@ -22,6 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { toast } from "sonner";
 
 type CaseStatus = "pending" | "accepted" | "rejected" | "discarded";
 type AIScore = "excellent" | "qualified" | "unqualified";
@@ -301,10 +302,27 @@ export default function CaseSelfReview() {
             className="pl-10"
           />
         </div>
-        <Button onClick={handleBatchReview} disabled={pendingCount === 0} className="gap-2">
-          <FileCheck className="w-4 h-4" />
-          批量自评 ({pendingCount})
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleBatchReview} disabled={pendingCount === 0} className="gap-2">
+            <FileCheck className="w-4 h-4" />
+            批量自评
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              const pendingCases = cases.filter(c => c.status === "pending");
+              if (pendingCases.length > 0) {
+                setCases(prev => prev.map(c => c.status === "pending" ? { ...c, status: "accepted" as CaseStatus } : c));
+                toast.success(`已批量采纳 ${pendingCases.length} 个用例`);
+              }
+            }} 
+            disabled={pendingCount === 0} 
+            className="gap-2"
+          >
+            <CheckCircle className="w-4 h-4" />
+            批量采纳
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
