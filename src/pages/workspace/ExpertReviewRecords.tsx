@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Clock, Eye, Plus, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { InitiateExpertReviewDialog } from "@/components/workspace/InitiateExpertReviewDialog";
 
 type ReviewRecordStatus = "ongoing" | "closed";
 
@@ -73,10 +71,13 @@ const statusConfig: Record<ReviewRecordStatus, { label: string; className: strin
 export default function ExpertReviewRecords() {
   const navigate = useNavigate();
   const { workspaceId, recordId } = useParams();
-  const [initiateDialogOpen, setInitiateDialogOpen] = useState(false);
 
   const handleViewDetail = (reviewId: string) => {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/expert-review-records/${reviewId}/cases`);
+  };
+
+  const handleInitiateReview = () => {
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/initiate-expert-review`);
   };
 
   return (
@@ -114,7 +115,7 @@ export default function ExpertReviewRecords() {
             生成记录: AI-001 · 查看所有专家评审记录
           </p>
         </div>
-        <Button className="gap-2" onClick={() => setInitiateDialogOpen(true)}>
+        <Button className="gap-2" onClick={handleInitiateReview}>
           <Plus className="w-4 h-4" />
           发起评审
         </Button>
@@ -198,13 +199,6 @@ export default function ExpertReviewRecords() {
         )}
       </div>
 
-      <InitiateExpertReviewDialog
-        open={initiateDialogOpen}
-        onOpenChange={setInitiateDialogOpen}
-        onConfirm={() => {
-          setInitiateDialogOpen(false);
-        }}
-      />
     </div>
   );
 }
