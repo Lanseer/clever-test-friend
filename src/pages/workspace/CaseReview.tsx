@@ -92,15 +92,11 @@ const calculateTotalStats = (dimensions: TestDimension[]) => {
 
 // 简化的统计显示组件
 function SimpleMiniStats({ total, passed }: { total: number; passed: number }) {
-  const pending = total - passed;
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="text-green-600 font-medium">{passed}</span>
       <span className="text-muted-foreground">/</span>
       <span className="text-muted-foreground">{total}</span>
-      {pending > 0 && (
-        <span className="text-xs text-amber-600 ml-1">({pending}待评审)</span>
-      )}
     </div>
   );
 }
