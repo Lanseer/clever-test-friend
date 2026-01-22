@@ -11,7 +11,8 @@ import { toast } from "sonner";
 interface AIReviewRecord {
   id: string;
   code: string;
-  reviewTime: string;
+  startTime: string;
+  endTime: string | null;
   totalCases: number;
   excellentCases: number;
   passedCases: number;
@@ -89,12 +90,21 @@ export function AIReviewSummarySidebar({ open, onOpenChange, record }: AIReviewS
               <Badge variant="outline" className="font-mono">{record.code}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">评审时间</span>
+              <span className="text-sm text-muted-foreground">开始时间</span>
               <div className="flex items-center gap-1 text-sm">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                {record.reviewTime}
+                {record.startTime}
               </div>
             </div>
+            {record.endTime && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">结束时间</span>
+                <div className="flex items-center gap-1 text-sm">
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                  {record.endTime}
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />

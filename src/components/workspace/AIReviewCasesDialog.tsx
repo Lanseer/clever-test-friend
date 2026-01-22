@@ -33,6 +33,9 @@ interface ReviewCase {
   reason?: string;
   bddContent?: string;
   sourceDocument?: string;
+  batchCode?: string;
+  nature?: "positive" | "negative";
+  createdAt?: string;
 }
 
 interface AIReviewCasesDialogProps {
@@ -227,85 +230,69 @@ export function AIReviewCasesDialog({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex items-center justify-between py-3 border-b">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>已采纳: <span className="font-medium text-green-600">{adoptedCount}</span></span>
-              <span>待处理: <span className="font-medium text-amber-600">{cases.length - adoptedCount}</span></span>
-            </div>
-            <Button 
-              size="sm" 
-              onClick={handleBatchAdopt}
-              className="gap-1"
-            >
-              <Check className="w-4 h-4" />
-              批量采纳
-            </Button>
+          <div className="py-3 border-b">
+            <span className="text-sm text-muted-foreground">
+              共 <span className="font-medium text-foreground">{cases.length}</span> 个用例
+            </span>
           </div>
 
           <div className="flex-1 overflow-y-auto">
             <div className="rounded-lg border overflow-hidden">
-              <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-                <div className="col-span-2">编号</div>
-                <div className="col-span-5">用例名称</div>
-                <div className="col-span-2">采纳状态</div>
-                <div className="col-span-3">操作</div>
-              </div>
-
-              <div className="divide-y max-h-[400px] overflow-y-auto">
-                {cases.map((caseItem, index) => (
-                  <div
-                    key={caseItem.id}
-                    className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/30 transition-colors animate-fade-in"
-                    style={{ animationDelay: `${index * 30}ms` }}
-                  >
-                    <div className="col-span-2 flex items-center">
-                      <Badge variant="outline" className="font-mono text-xs">
-                        {caseItem.code}
-                      </Badge>
-                    </div>
-                    <div className="col-span-5 flex items-center">
-                      <div>
-                        <button
-                          className="font-medium text-sm text-primary hover:underline text-left"
-                          onClick={() => handleCaseClick(caseItem, index)}
-                        >
-                          {caseItem.name}
-                        </button>
-                        {caseItem.reason && (
-                          <p className="text-xs text-muted-foreground mt-0.5">{caseItem.reason}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-span-2 flex items-center">
-                      {getAdoptionStatus(caseItem)}
-                    </div>
-                    <div className="col-span-3 flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 px-2 text-xs gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
-                        onClick={() => handleAdopt(caseItem.id)}
-                        disabled={caseItem.adopted === true}
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                        采纳
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 px-2 text-xs gap-1 text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                        onClick={() => {
-                          setSelectedCase(caseItem);
-                          setShowRejectDialog(true);
-                        }}
-                        disabled={caseItem.adopted === false}
-                      >
-                        <X className="w-3.5 h-3.5" />
-                        不采纳
-                      </Button>
-                    </div>
+              <div className="overflow-x-auto">
+                <div className="min-w-[700px]">
+                  <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+                    <div className="col-span-1">批次</div>
+                    <div className="col-span-2">编号</div>
+                    <div className="col-span-4">用例名称</div>
+                    <div className="col-span-2">性质</div>
+                    <div className="col-span-3">创建时间</div>
                   </div>
-                ))}
+
+                  <div className="divide-y max-h-[400px] overflow-y-auto">
+                    {cases.map((caseItem, index) => (
+                      <div
+                        key={caseItem.id}
+                        className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-muted/30 transition-colors animate-fade-in"
+                        style={{ animationDelay: `${index * 30}ms` }}
+                      >
+                        <div className="col-span-1 flex items-center">
+                          <span className="text-xs text-muted-foreground">
+                            {caseItem.batchCode || "B001"}
+                          </span>
+                        </div>
+                        <div className="col-span-2 flex items-center">
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {caseItem.code}
+                          </Badge>
+                        </div>
+                        <div className="col-span-4 flex items-center">
+                          <button
+                            className="font-medium text-sm text-primary hover:underline text-left truncate"
+                            onClick={() => handleCaseClick(caseItem, index)}
+                          >
+                            {caseItem.name}
+                          </button>
+                        </div>
+                        <div className="col-span-2 flex items-center">
+                          <Badge 
+                            variant="outline" 
+                            className={cn(
+                              "text-xs",
+                              caseItem.nature === "negative" 
+                                ? "bg-orange-50 text-orange-600 border-orange-200"
+                                : "bg-blue-50 text-blue-600 border-blue-200"
+                            )}
+                          >
+                            {caseItem.nature === "negative" ? "反向" : "正向"}
+                          </Badge>
+                        </div>
+                        <div className="col-span-3 flex items-center text-sm text-muted-foreground">
+                          {caseItem.createdAt || "2024-01-15 14:30"}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -401,8 +388,8 @@ export function AIReviewCasesDialog({
                 </div>
               </div>
 
-              {/* Bottom Actions */}
-              <div className="flex-shrink-0 flex items-center justify-between pt-4 border-t mt-4">
+              {/* Bottom Navigation */}
+              <div className="flex-shrink-0 flex items-center justify-center pt-4 border-t mt-4">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -413,6 +400,9 @@ export function AIReviewCasesDialog({
                     <ChevronLeft className="w-4 h-4" />
                     上一个
                   </Button>
+                  <span className="text-sm text-muted-foreground mx-2">
+                    {currentIndex + 1} / {cases.length}
+                  </span>
                   <Button
                     variant="outline"
                     onClick={handleNext}
@@ -421,37 +411,6 @@ export function AIReviewCasesDialog({
                   >
                     下一个
                     <ChevronRight className="w-4 h-4" />
-                  </Button>
-                  <span className="text-sm text-muted-foreground ml-2">
-                    {currentIndex + 1} / {cases.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowDiscardDialog(true)}
-                    className="gap-2 text-muted-foreground hover:text-destructive hover:border-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    丢弃
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowRejectDialog(true)}
-                    className="gap-2 text-orange-600 border-orange-200 hover:bg-orange-50 hover:text-orange-700"
-                    disabled={selectedCase.adopted === false}
-                  >
-                    <X className="w-4 h-4" />
-                    不采纳
-                  </Button>
-                  <Button 
-                    onClick={() => handleAdopt(selectedCase.id)} 
-                    className="gap-2 px-8"
-                    disabled={selectedCase.adopted === true}
-                  >
-                    <Check className="w-4 h-4" />
-                    采纳
                   </Button>
                 </div>
               </div>
