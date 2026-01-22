@@ -23,6 +23,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { toast } from "sonner";
+import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 
 type CaseStatus = "pending" | "accepted" | "rejected" | "discarded";
 type AIScore = "excellent" | "qualified" | "unqualified";
@@ -487,11 +488,10 @@ export default function CaseSelfReview() {
                 </pre>
               </div>
               <div>
-                <Label className="text-muted-foreground">来源文档</Label>
-                <div 
-                  className="mt-1 p-3 bg-muted/50 rounded-lg text-sm prose prose-sm max-w-none overflow-auto max-h-48"
-                  dangerouslySetInnerHTML={{ __html: detailCase.sourceDocument }}
-                />
+                <Label className="text-muted-foreground">案例来源</Label>
+                <div className="mt-1">
+                  <CaseSourceInfo caseId={detailCase.id} showHeader={false} compact />
+                </div>
               </div>
             </div>
           )}

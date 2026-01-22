@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CaseSourceInfo } from "./CaseSourceInfo";
 import {
   Dialog,
   DialogContent,
@@ -184,21 +185,8 @@ export function CaseReviewDialog({
               </ScrollArea>
             </div>
 
-            {/* Right: Source Document */}
-            <div className="flex flex-col border rounded-lg overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b">
-                <FileText className="w-4 h-4 text-primary" />
-                <span className="font-medium text-sm">来源文档内容</span>
-              </div>
-              <ScrollArea className="flex-1 p-4">
-                <div className="prose prose-sm max-w-none">
-                  <div
-                    className="text-sm"
-                    dangerouslySetInnerHTML={{ __html: currentCase.sourceDocument }}
-                  />
-                </div>
-              </ScrollArea>
-            </div>
+            {/* Right: Case Source */}
+            <CaseSourceInfo caseId={currentCase.id} className="flex-1" />
           </div>
 
           {/* Bottom Actions */}

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 import {
   Table,
   TableBody,
@@ -441,15 +442,10 @@ export default function ExpertCaseReview() {
                 </ScrollArea>
               </div>
 
-              {/* Right: Source Document */}
+              {/* Right: Case Source */}
               <div className="flex flex-col overflow-hidden">
-                <h3 className="font-medium mb-3">来源文档</h3>
-                <ScrollArea className="flex-1 border rounded-lg p-4 bg-muted/30">
-                  <div 
-                    className="text-sm prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: currentBatchCase.sourceDocument }}
-                  />
-                </ScrollArea>
+                <h3 className="font-medium mb-3">案例来源</h3>
+                <CaseSourceInfo caseId={currentBatchCase.id} showHeader={false} className="flex-1" />
               </div>
             </div>
           )}
