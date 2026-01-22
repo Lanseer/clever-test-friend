@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, HelpCircle } from "lucide-react";
+import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, Star, ThumbsUp, ThumbsDown, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,16 +23,9 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-type CaseStatus = "pending" | "accepted" | "rejected";
-type ExpertOpinion = "adopted" | "rejected" | "pending";
+type CaseStatus = "pending" | "accepted" | "rejected" | "discarded";
+type AIScore = "excellent" | "qualified" | "unqualified";
 type CaseNature = "positive" | "negative";
-
-interface ExpertRejection {
-  expertName?: string;
-  rejectTag: string;
-  rejectReason: string;
-  reviewTime: string;
-}
 
 interface GeneratedCase {
   id: string;
@@ -43,8 +36,7 @@ interface GeneratedCase {
   sourceDocument: string;
   createdAt: string;
   rejectionReason?: string;
-  expertOpinion: ExpertOpinion;
-  expertRejections?: ExpertRejection[];
+  aiScore: AIScore;
   nature: CaseNature;
 }
 
@@ -67,7 +59,7 @@ const generateMockCases = (testPointId: string): GeneratedCase[] => {
       name: `${info.name}成功场景`,
       status: "pending",
       createdAt: "2024-01-15 10:30",
-      expertOpinion: "pending",
+      aiScore: "excellent",
       nature: "positive",
       bddContent: `Feature: ${info.name}
   Scenario: ${info.name}成功
@@ -82,7 +74,7 @@ const generateMockCases = (testPointId: string): GeneratedCase[] => {
       name: `${info.name}失败场景-参数错误`,
       status: "pending",
       createdAt: "2024-01-15 10:32",
-      expertOpinion: "pending",
+      aiScore: "qualified",
       nature: "negative",
       bddContent: `Feature: ${info.name}
   Scenario: ${info.name}失败-参数错误
@@ -97,7 +89,7 @@ const generateMockCases = (testPointId: string): GeneratedCase[] => {
       name: `${info.name}边界测试`,
       status: "accepted",
       createdAt: "2024-01-15 10:35",
-      expertOpinion: "adopted",
+      aiScore: "excellent",
       nature: "positive",
       bddContent: `Feature: ${info.name}
   Scenario: ${info.name}边界条件
@@ -112,11 +104,9 @@ const generateMockCases = (testPointId: string): GeneratedCase[] => {
       name: `${info.name}异常处理`,
       status: "rejected",
       createdAt: "2024-01-15 10:38",
-      expertOpinion: "rejected",
+      aiScore: "unqualified",
       nature: "negative",
-      expertRejections: [
-        { expertName: "李专家", rejectTag: "步骤不完整", rejectReason: "缺少异常恢复步骤", reviewTime: "2024-01-15 14:30" },
-      ],
+      rejectionReason: "缺少异常恢复步骤",
       bddContent: `Feature: ${info.name}
   Scenario: ${info.name}异常处理
     Given 系统发生异常
@@ -124,45 +114,62 @@ const generateMockCases = (testPointId: string): GeneratedCase[] => {
     Then 系统应该优雅处理`,
       sourceDocument: `<h3>${info.name}异常处理</h3><p>异常处理规格说明...</p>`,
     },
+    {
+      id: "5",
+      code: "TC-005",
+      name: `${info.name}丢弃用例`,
+      status: "discarded",
+      createdAt: "2024-01-15 10:40",
+      aiScore: "unqualified",
+      nature: "negative",
+      bddContent: `Feature: ${info.name}
+  Scenario: ${info.name}丢弃
+    Given 测试场景
+    When 操作
+    Then 结果`,
+      sourceDocument: `<h3>${info.name}丢弃</h3><p>说明...</p>`,
+    },
   ];
 };
 
 const statusConfig: Record<CaseStatus, { label: string; icon: typeof CheckCircle; className: string }> = {
   pending: {
-    label: "待评审",
+    label: "待自评",
     icon: Clock,
     className: "bg-amber-500/10 text-amber-600 border-amber-200",
   },
   accepted: {
-    label: "已通过",
-    icon: CheckCircle,
-    className: "bg-green-500/10 text-green-600 border-green-200",
-  },
-  rejected: {
-    label: "不通过",
-    icon: XCircle,
-    className: "bg-red-500/10 text-red-600 border-red-200",
-  },
-};
-
-const expertOpinionConfig: Record<ExpertOpinion, { label: string; icon: typeof CheckCircle; className: string; clickable: boolean }> = {
-  adopted: {
     label: "采纳",
-    icon: CheckCircle,
+    icon: ThumbsUp,
     className: "bg-green-500/10 text-green-600 border-green-200",
-    clickable: false,
   },
   rejected: {
     label: "不采纳",
-    icon: XCircle,
-    className: "bg-red-500/10 text-red-600 border-red-200 cursor-pointer hover:bg-red-500/20",
-    clickable: true,
+    icon: ThumbsDown,
+    className: "bg-red-500/10 text-red-600 border-red-200",
   },
-  pending: {
-    label: "待评审",
-    icon: HelpCircle,
-    className: "bg-gray-500/10 text-gray-600 border-gray-200",
-    clickable: false,
+  discarded: {
+    label: "丢弃",
+    icon: Trash2,
+    className: "bg-gray-500/10 text-gray-500 border-gray-200",
+  },
+};
+
+const aiScoreConfig: Record<AIScore, { label: string; icon: typeof Star; className: string }> = {
+  excellent: {
+    label: "优秀",
+    icon: Star,
+    className: "bg-green-500/10 text-green-600 border-green-200",
+  },
+  qualified: {
+    label: "合格",
+    icon: CheckCircle,
+    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+  },
+  unqualified: {
+    label: "不合格",
+    icon: XCircle,
+    className: "bg-red-500/10 text-red-600 border-red-200",
   },
 };
 
@@ -186,8 +193,6 @@ export default function CaseSelfReview() {
   const [cases, setCases] = useState(() => generateMockCases(testPointId || "tp-1"));
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [selectedCaseIndex, setSelectedCaseIndex] = useState(0);
-  const [viewRejectDialogOpen, setViewRejectDialogOpen] = useState(false);
-  const [viewingCase, setViewingCase] = useState<GeneratedCase | null>(null);
   const [caseDetailDialogOpen, setCaseDetailDialogOpen] = useState(false);
   const [detailCase, setDetailCase] = useState<GeneratedCase | null>(null);
 
@@ -202,6 +207,7 @@ export default function CaseSelfReview() {
   const pendingCount = cases.filter((c) => c.status === "pending").length;
   const acceptedCount = cases.filter((c) => c.status === "accepted").length;
   const rejectedCount = cases.filter((c) => c.status === "rejected").length;
+  const discardedCount = cases.filter((c) => c.status === "discarded").length;
 
   const handleOpenReview = (index: number) => {
     setSelectedCaseIndex(index);
@@ -217,23 +223,20 @@ export default function CaseSelfReview() {
 
   const handleAcceptCase = (caseId: string) => {
     setCases((prev) =>
-      prev.map((c) => (c.id === caseId ? { ...c, status: "accepted" as CaseStatus, expertOpinion: "adopted" as ExpertOpinion } : c))
+      prev.map((c) => (c.id === caseId ? { ...c, status: "accepted" as CaseStatus } : c))
     );
   };
 
   const handleRejectCase = (caseId: string, reason: string) => {
     setCases((prev) =>
-      prev.map((c) => (c.id === caseId ? { ...c, status: "rejected" as CaseStatus, rejectionReason: reason, expertOpinion: "rejected" as ExpertOpinion } : c))
+      prev.map((c) => (c.id === caseId ? { ...c, status: "rejected" as CaseStatus, rejectionReason: reason } : c))
     );
   };
 
   const handleDiscardCase = (caseId: string) => {
-    setCases((prev) => prev.filter((c) => c.id !== caseId));
-  };
-
-  const handleViewReject = (testCase: GeneratedCase) => {
-    setViewingCase(testCase);
-    setViewRejectDialogOpen(true);
+    setCases((prev) =>
+      prev.map((c) => (c.id === caseId ? { ...c, status: "discarded" as CaseStatus } : c))
+    );
   };
 
   const handleViewCaseDetail = (testCase: GeneratedCase) => {
@@ -300,39 +303,43 @@ export default function CaseSelfReview() {
         </div>
         <Button onClick={handleBatchReview} disabled={pendingCount === 0} className="gap-2">
           <FileCheck className="w-4 h-4" />
-          批量评审 ({pendingCount})
+          批量自评 ({pendingCount})
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold">{cases.length}</div>
           <div className="text-sm text-muted-foreground">总用例数</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
-          <div className="text-sm text-muted-foreground">待评审</div>
+          <div className="text-sm text-muted-foreground">待自评</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-green-600">{acceptedCount}</div>
-          <div className="text-sm text-muted-foreground">已通过</div>
+          <div className="text-sm text-muted-foreground">采纳</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
-          <div className="text-sm text-muted-foreground">不通过</div>
+          <div className="text-sm text-muted-foreground">不采纳</div>
+        </div>
+        <div className="bg-card border rounded-lg p-4">
+          <div className="text-2xl font-bold text-gray-500">{discardedCount}</div>
+          <div className="text-sm text-muted-foreground">丢弃</div>
         </div>
       </div>
 
       {/* Case List */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[80px_1fr_80px_120px_100px_100px_100px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[80px_1fr_80px_120px_80px_100px_80px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>编号</div>
           <div>用例名称</div>
           <div>性质</div>
           <div>创建时间</div>
-          <div>状态</div>
-          <div>专家意见</div>
+          <div>智能评分</div>
+          <div>自评状态</div>
           <div>操作</div>
         </div>
 
@@ -340,15 +347,15 @@ export default function CaseSelfReview() {
           {filteredCases.map((testCase, index) => {
             const status = statusConfig[testCase.status];
             const StatusIcon = status.icon;
-            const expertOpinion = expertOpinionConfig[testCase.expertOpinion];
-            const ExpertOpinionIcon = expertOpinion.icon;
+            const aiScore = aiScoreConfig[testCase.aiScore];
+            const AIScoreIcon = aiScore.icon;
             const nature = natureConfig[testCase.nature];
             const NatureIcon = nature.icon;
 
             return (
               <div
                 key={testCase.id}
-                className="grid grid-cols-[80px_1fr_80px_120px_100px_100px_100px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[80px_1fr_80px_120px_80px_100px_80px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">
@@ -357,7 +364,12 @@ export default function CaseSelfReview() {
                   </Badge>
                 </div>
                 <div className="flex items-center">
-                  <span className="font-medium text-foreground">{testCase.name}</span>
+                  <span 
+                    className="font-medium text-foreground cursor-pointer hover:text-primary hover:underline"
+                    onClick={() => handleViewCaseDetail(testCase)}
+                  >
+                    {testCase.name}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <Badge
@@ -375,25 +387,19 @@ export default function CaseSelfReview() {
                 <div className="flex items-center">
                   <Badge
                     variant="outline"
-                    className={cn(
-                      "text-xs gap-1",
-                      status.className,
-                      testCase.status === "rejected" && "cursor-pointer hover:bg-red-500/20"
-                    )}
-                    onClick={() => testCase.status === "rejected" && handleViewReject(testCase)}
+                    className={cn("text-xs gap-1", aiScore.className)}
                   >
-                    <StatusIcon className="w-3 h-3" />
-                    {status.label}
+                    <AIScoreIcon className="w-3 h-3" />
+                    {aiScore.label}
                   </Badge>
                 </div>
                 <div className="flex items-center">
                   <Badge
                     variant="outline"
-                    className={cn("text-xs gap-1", expertOpinion.className)}
-                    onClick={() => testCase.expertOpinion === "rejected" && handleViewReject(testCase)}
+                    className={cn("text-xs gap-1", status.className)}
                   >
-                    <ExpertOpinionIcon className="w-3 h-3" />
-                    {expertOpinion.label}
+                    <StatusIcon className="w-3 h-3" />
+                    {status.label}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
@@ -402,9 +408,10 @@ export default function CaseSelfReview() {
                     size="sm"
                     className="h-7 px-3 text-xs gap-1"
                     onClick={() => handleOpenReview(index)}
+                    disabled={testCase.status !== "pending"}
                   >
                     <FileCheck className="w-3.5 h-3.5" />
-                    评审
+                    自评
                   </Button>
                 </div>
               </div>
@@ -423,75 +430,15 @@ export default function CaseSelfReview() {
       <CaseReviewDialog
         open={reviewDialogOpen}
         onOpenChange={setReviewDialogOpen}
-        cases={filteredCases}
+        cases={filteredCases.map(c => ({
+          ...c,
+          status: c.status === "discarded" ? "rejected" : c.status
+        })) as any}
         initialIndex={selectedCaseIndex}
         onAccept={handleAcceptCase}
         onReject={handleRejectCase}
         onDiscard={handleDiscardCase}
       />
-
-      {/* View Reject Reason Dialog */}
-      <Dialog open={viewRejectDialogOpen} onOpenChange={setViewRejectDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>不通过详情</DialogTitle>
-          </DialogHeader>
-          {viewingCase && (
-            <div className="space-y-4 flex-1 overflow-auto">
-              <div>
-                <Label className="text-muted-foreground">用例名称</Label>
-                <p 
-                  className="mt-1 font-medium text-primary cursor-pointer hover:underline"
-                  onClick={() => handleViewCaseDetail(viewingCase)}
-                >
-                  {viewingCase.name}
-                </p>
-              </div>
-              <div>
-                <Label className="text-muted-foreground">用例编号</Label>
-                <p className="mt-1 font-mono text-sm">{viewingCase.code}</p>
-              </div>
-              
-              <div className="space-y-3">
-                <Label className="text-muted-foreground">
-                  专家意见 ({viewingCase.expertRejections?.length || 0} 位专家不采纳)
-                </Label>
-                {viewingCase.expertRejections?.map((rejection, idx) => (
-                  <div key={idx} className="bg-muted/50 rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                          {rejection.expertName || "匿名"}
-                        </span>
-                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-200">
-                          {rejection.rejectTag}
-                        </Badge>
-                      </div>
-                      <span className="text-xs text-muted-foreground">{rejection.reviewTime}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {rejection.rejectReason || "未填写原因"}
-                    </p>
-                  </div>
-                ))}
-                {(!viewingCase.expertRejections || viewingCase.expertRejections.length === 0) && viewingCase.rejectionReason && (
-                  <div className="bg-muted/50 rounded-lg p-3">
-                    <p className="text-sm text-muted-foreground">{viewingCase.rejectionReason}</p>
-                  </div>
-                )}
-                {(!viewingCase.expertRejections || viewingCase.expertRejections.length === 0) && !viewingCase.rejectionReason && (
-                  <p className="text-sm text-muted-foreground">暂无不通过原因</p>
-                )}
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setViewRejectDialogOpen(false)}>
-              关闭
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Case Detail Dialog */}
       <Dialog open={caseDetailDialogOpen} onOpenChange={setCaseDetailDialogOpen}>

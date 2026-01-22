@@ -86,7 +86,6 @@ const calculateTotalStats = (dimensions: TestDimension[]) => {
 
 // 简化的统计显示组件
 function ExpertMiniStats({ total, adopted, rejected }: { total: number; adopted: number; rejected: number }) {
-  const pending = total - adopted - rejected;
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="text-green-600 font-medium">{adopted}</span>
@@ -94,9 +93,6 @@ function ExpertMiniStats({ total, adopted, rejected }: { total: number; adopted:
       <span className="text-red-600">{rejected}</span>
       <span className="text-muted-foreground">/</span>
       <span className="text-muted-foreground">{total}</span>
-      {pending > 0 && (
-        <span className="text-xs text-amber-600 ml-1">({pending}待评审)</span>
-      )}
     </div>
   );
 }
