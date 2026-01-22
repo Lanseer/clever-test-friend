@@ -459,8 +459,8 @@ export function AIGenerateDialog({
                 </div>
               )}
 
-              {/* 选择用例模板 - 仅本地上传时显示 */}
-              {initMethod === "upload" && !isRegenerate && (
+              {/* 选择用例模板 - 智能生成时显示，本地上传时隐藏 */}
+              {initMethod === "smart" && !isRegenerate && (
                 <div className="space-y-2">
                   <Label>案例模板</Label>
                   <Select
