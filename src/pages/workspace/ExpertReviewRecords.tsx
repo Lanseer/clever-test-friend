@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/breadcrumb";
 import { InitiateExpertReviewDialog } from "@/components/workspace/InitiateExpertReviewDialog";
 
+type ReviewRecordStatus = "ongoing" | "closed";
+
 interface ReviewRecord {
   id: string;
+  status: ReviewRecordStatus;
   createdAt: string;
   initiator: string;
   total: number;
@@ -26,6 +29,7 @@ interface ReviewRecord {
 const mockReviewRecords: ReviewRecord[] = [
   {
     id: "review-001",
+    status: "ongoing",
     createdAt: "2024-01-20 14:30",
     initiator: "张三",
     total: 45,
@@ -35,6 +39,7 @@ const mockReviewRecords: ReviewRecord[] = [
   },
   {
     id: "review-002",
+    status: "ongoing",
     createdAt: "2024-01-18 10:15",
     initiator: "李四",
     total: 32,
@@ -44,6 +49,7 @@ const mockReviewRecords: ReviewRecord[] = [
   },
   {
     id: "review-003",
+    status: "closed",
     createdAt: "2024-01-15 09:00",
     initiator: "王五",
     total: 28,
@@ -52,6 +58,17 @@ const mockReviewRecords: ReviewRecord[] = [
     pending: 0,
   },
 ];
+
+const statusConfig: Record<ReviewRecordStatus, { label: string; className: string }> = {
+  ongoing: {
+    label: "进行中",
+    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+  },
+  closed: {
+    label: "已关闭",
+    className: "bg-gray-500/10 text-gray-600 border-gray-200",
+  },
+};
 
 export default function ExpertReviewRecords() {
   const navigate = useNavigate();
@@ -105,7 +122,8 @@ export default function ExpertReviewRecords() {
 
       {/* Records Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[160px_120px_100px_100px_100px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[80px_160px_120px_100px_100px_100px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+          <div>状态</div>
           <div>发起时间</div>
           <div>发起人</div>
           <div>总用例数</div>
@@ -116,53 +134,61 @@ export default function ExpertReviewRecords() {
         </div>
 
         <div className="divide-y">
-          {mockReviewRecords.map((record, index) => (
-            <div
-              key={record.id}
-              className="grid grid-cols-[160px_120px_100px_100px_100px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="flex items-center gap-2 text-sm">
-                <Clock className="w-4 h-4 text-muted-foreground" />
-                {record.createdAt}
+          {mockReviewRecords.map((record, index) => {
+            const status = statusConfig[record.status];
+            return (
+              <div
+                key={record.id}
+                className="grid grid-cols-[80px_160px_120px_100px_100px_100px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="flex items-center">
+                  <Badge variant="outline" className={status.className}>
+                    {status.label}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  {record.createdAt}
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  {record.initiator}
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="outline" className="font-medium">
+                    {record.total}
+                  </Badge>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-200">
+                    {record.adopted}
+                  </Badge>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-200">
+                    {record.rejected}
+                  </Badge>
+                </div>
+                <div className="flex items-center">
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200">
+                    {record.pending}
+                  </Badge>
+                </div>
+                <div className="flex items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs gap-1"
+                    onClick={() => handleViewDetail(record.id)}
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    查看详情
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <User className="w-4 h-4 text-muted-foreground" />
-                {record.initiator}
-              </div>
-              <div className="flex items-center">
-                <Badge variant="outline" className="font-medium">
-                  {record.total}
-                </Badge>
-              </div>
-              <div className="flex items-center">
-                <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-200">
-                  {record.adopted}
-                </Badge>
-              </div>
-              <div className="flex items-center">
-                <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-200">
-                  {record.rejected}
-                </Badge>
-              </div>
-              <div className="flex items-center">
-                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200">
-                  {record.pending}
-                </Badge>
-              </div>
-              <div className="flex items-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-3 text-xs gap-1"
-                  onClick={() => handleViewDetail(record.id)}
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  查看详情
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {mockReviewRecords.length === 0 && (
