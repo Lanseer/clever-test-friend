@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Loader2, CheckCircle, XCircle, Clock, Eye } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle, XCircle, Clock, Eye, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -139,7 +139,7 @@ export default function GenerationRecords() {
 
       {/* Batch List */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[120px_1fr_100px_120px_100px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[120px_1fr_100px_100px_140px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>批次编号</div>
           <div>生成时间</div>
           <div>状态</div>
@@ -156,7 +156,7 @@ export default function GenerationRecords() {
             return (
               <div
                 key={batch.id}
-                className="grid grid-cols-[120px_1fr_100px_120px_100px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[120px_1fr_100px_100px_140px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">
@@ -185,8 +185,8 @@ export default function GenerationRecords() {
                     {batch.totalCases > 0 ? `${batch.totalCases} 个` : "-"}
                   </span>
                 </div>
-                <div className="flex items-center">
-                  {isGenerating && (
+                <div className="flex items-center gap-2">
+                  {isGenerating ? (
                     <Button
                       variant="outline"
                       size="sm"
@@ -196,7 +196,17 @@ export default function GenerationRecords() {
                       <Eye className="w-3.5 h-3.5" />
                       查看进度
                     </Button>
-                  )}
+                  ) : batch.status === "completed" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-3 text-xs gap-1"
+                      onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batch.id}/cases`)}
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      查看用例
+                    </Button>
+                  ) : null}
                 </div>
               </div>
             );
