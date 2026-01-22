@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Plus, Trash2, Copy, Check, ArrowRight, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, Copy, Check, ArrowRight, ArrowLeft, ChevronDown, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,23 +19,83 @@ interface CaseItem {
   selected: boolean;
 }
 
+interface TestPoint {
+  id: string;
+  name: string;
+  cases: CaseItem[];
+}
+
+interface TestDimension {
+  id: string;
+  name: string;
+  testPoints: TestPoint[];
+}
+
 interface InitiateExpertReviewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (data: { emails: string[]; selectedCases: string[] }) => void;
 }
 
-const mockPendingCases: CaseItem[] = [
-  { id: "1", code: "TC-001", name: "用户登录功能验证", selected: false },
-  { id: "2", code: "TC-002", name: "用户注册表单验证", selected: false },
-  { id: "3", code: "TC-003", name: "密码重置流程", selected: false },
-  { id: "4", code: "TC-004", name: "用户权限校验", selected: false },
-  { id: "5", code: "TC-005", name: "会话超时处理", selected: false },
-  { id: "6", code: "TC-006", name: "多设备登录限制", selected: false },
-  { id: "7", code: "TC-007", name: "用户信息修改", selected: false },
-  { id: "8", code: "TC-008", name: "账户注销流程", selected: false },
-  { id: "9", code: "TC-009", name: "邮箱验证流程", selected: false },
-  { id: "10", code: "TC-010", name: "手机验证流程", selected: false },
+const mockDimensions: TestDimension[] = [
+  {
+    id: "dim-1",
+    name: "用户认证",
+    testPoints: [
+      {
+        id: "tp-1",
+        name: "登录功能",
+        cases: [
+          { id: "1", code: "TC-001", name: "用户登录功能验证", selected: false },
+          { id: "2", code: "TC-002", name: "登录失败处理", selected: false },
+        ],
+      },
+      {
+        id: "tp-2",
+        name: "注册功能",
+        cases: [
+          { id: "3", code: "TC-003", name: "用户注册表单验证", selected: false },
+          { id: "4", code: "TC-004", name: "邮箱验证流程", selected: false },
+        ],
+      },
+    ],
+  },
+  {
+    id: "dim-2",
+    name: "权限管理",
+    testPoints: [
+      {
+        id: "tp-3",
+        name: "角色权限",
+        cases: [
+          { id: "5", code: "TC-005", name: "用户权限校验", selected: false },
+          { id: "6", code: "TC-006", name: "管理员权限验证", selected: false },
+        ],
+      },
+      {
+        id: "tp-4",
+        name: "会话管理",
+        cases: [
+          { id: "7", code: "TC-007", name: "会话超时处理", selected: false },
+          { id: "8", code: "TC-008", name: "多设备登录限制", selected: false },
+        ],
+      },
+    ],
+  },
+  {
+    id: "dim-3",
+    name: "账户管理",
+    testPoints: [
+      {
+        id: "tp-5",
+        name: "信息维护",
+        cases: [
+          { id: "9", code: "TC-009", name: "用户信息修改", selected: false },
+          { id: "10", code: "TC-010", name: "密码重置流程", selected: false },
+        ],
+      },
+    ],
+  },
 ];
 
 export function InitiateExpertReviewDialog({
@@ -44,19 +104,117 @@ export function InitiateExpertReviewDialog({
   onConfirm,
 }: InitiateExpertReviewDialogProps) {
   const [step, setStep] = useState<1 | 2>(1);
-  const [cases, setCases] = useState<CaseItem[]>(mockPendingCases);
+  const [dimensions, setDimensions] = useState<TestDimension[]>(mockDimensions);
   const [emails, setEmails] = useState<string[]>([""]);
   const [copied, setCopied] = useState(false);
+  const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
+    new Set(mockDimensions.map((d) => d.id))
+  );
+  const [expandedPoints, setExpandedPoints] = useState<Set<string>>(
+    new Set(mockDimensions.flatMap((d) => d.testPoints.map((tp) => tp.id)))
+  );
 
   const reviewLink = `https://review.example.com/expert/${Date.now()}`;
 
-  const handleCaseToggle = (id: string) => {
-    setCases(cases.map((c) => (c.id === id ? { ...c, selected: !c.selected } : c)));
+  const toggleDimension = (dimId: string) => {
+    setExpandedDimensions((prev) => {
+      const next = new Set(prev);
+      if (next.has(dimId)) {
+        next.delete(dimId);
+      } else {
+        next.add(dimId);
+      }
+      return next;
+    });
+  };
+
+  const togglePoint = (pointId: string) => {
+    setExpandedPoints((prev) => {
+      const next = new Set(prev);
+      if (next.has(pointId)) {
+        next.delete(pointId);
+      } else {
+        next.add(pointId);
+      }
+      return next;
+    });
+  };
+
+  const handleCaseToggle = (caseId: string) => {
+    setDimensions((dims) =>
+      dims.map((dim) => ({
+        ...dim,
+        testPoints: dim.testPoints.map((tp) => ({
+          ...tp,
+          cases: tp.cases.map((c) =>
+            c.id === caseId ? { ...c, selected: !c.selected } : c
+          ),
+        })),
+      }))
+    );
+  };
+
+  const handlePointToggle = (pointId: string, checked: boolean) => {
+    setDimensions((dims) =>
+      dims.map((dim) => ({
+        ...dim,
+        testPoints: dim.testPoints.map((tp) =>
+          tp.id === pointId
+            ? { ...tp, cases: tp.cases.map((c) => ({ ...c, selected: checked })) }
+            : tp
+        ),
+      }))
+    );
+  };
+
+  const handleDimensionToggle = (dimId: string, checked: boolean) => {
+    setDimensions((dims) =>
+      dims.map((dim) =>
+        dim.id === dimId
+          ? {
+              ...dim,
+              testPoints: dim.testPoints.map((tp) => ({
+                ...tp,
+                cases: tp.cases.map((c) => ({ ...c, selected: checked })),
+              })),
+            }
+          : dim
+      )
+    );
   };
 
   const handleSelectAll = (checked: boolean) => {
-    setCases(cases.map((c) => ({ ...c, selected: checked })));
+    setDimensions((dims) =>
+      dims.map((dim) => ({
+        ...dim,
+        testPoints: dim.testPoints.map((tp) => ({
+          ...tp,
+          cases: tp.cases.map((c) => ({ ...c, selected: checked })),
+        })),
+      }))
+    );
   };
+
+  const getAllCases = () => dimensions.flatMap((d) => d.testPoints.flatMap((tp) => tp.cases));
+  const allCases = getAllCases();
+  const selectedCount = allCases.filter((c) => c.selected).length;
+  const allSelected = allCases.length > 0 && allCases.every((c) => c.selected);
+  const someSelected = allCases.some((c) => c.selected) && !allSelected;
+
+  const getPointStats = (tp: TestPoint) => {
+    const selected = tp.cases.filter((c) => c.selected).length;
+    const all = tp.cases.length;
+    return { selected, all, allSelected: selected === all && all > 0, someSelected: selected > 0 && selected < all };
+  };
+
+  const getDimensionStats = (dim: TestDimension) => {
+    const cases = dim.testPoints.flatMap((tp) => tp.cases);
+    const selected = cases.filter((c) => c.selected).length;
+    const all = cases.length;
+    return { selected, all, allSelected: selected === all && all > 0, someSelected: selected > 0 && selected < all };
+  };
+
+  const canProceed = selectedCount > 0;
 
   const handleAddEmail = () => {
     setEmails([...emails, ""]);
@@ -80,15 +238,17 @@ export function InitiateExpertReviewDialog({
 
   const handleConfirm = () => {
     const validEmails = emails.filter((e) => e.trim() !== "");
-    const selectedCaseIds = cases.filter((c) => c.selected).map((c) => c.id);
+    const selectedCaseIds = allCases.filter((c) => c.selected).map((c) => c.id);
     onConfirm({ emails: validEmails, selectedCases: selectedCaseIds });
     handleClose();
   };
 
   const handleClose = () => {
     setStep(1);
-    setCases(mockPendingCases);
+    setDimensions(mockDimensions);
     setEmails([""]);
+    setExpandedDimensions(new Set(mockDimensions.map((d) => d.id)));
+    setExpandedPoints(new Set(mockDimensions.flatMap((d) => d.testPoints.map((tp) => tp.id))));
     onOpenChange(false);
   };
 
@@ -99,11 +259,6 @@ export function InitiateExpertReviewDialog({
   const handleBack = () => {
     setStep(1);
   };
-
-  const allSelected = cases.every((c) => c.selected);
-  const someSelected = cases.some((c) => c.selected) && !allSelected;
-  const selectedCount = cases.filter((c) => c.selected).length;
-  const canProceed = selectedCount > 0;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -146,7 +301,7 @@ export function InitiateExpertReviewDialog({
               <div className="flex items-center justify-between">
                 <Label>选择要评审的用例</Label>
                 <span className="text-sm text-muted-foreground">
-                  已选择 {selectedCount} / {cases.length} 个用例
+                  已选择 {selectedCount} / {allCases.length} 个用例
                 </span>
               </div>
               <div className="border rounded-lg overflow-hidden flex-1">
@@ -161,22 +316,101 @@ export function InitiateExpertReviewDialog({
                 </div>
                 <ScrollArea className="h-[300px]">
                   <div className="divide-y">
-                    {cases.map((caseItem) => (
-                      <div
-                        key={caseItem.id}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/30 cursor-pointer"
-                        onClick={() => handleCaseToggle(caseItem.id)}
-                      >
-                        <Checkbox
-                          checked={caseItem.selected}
-                          onCheckedChange={() => handleCaseToggle(caseItem.id)}
-                        />
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {caseItem.code}
-                        </span>
-                        <span className="text-sm">{caseItem.name}</span>
-                      </div>
-                    ))}
+                    {dimensions.map((dim) => {
+                      const dimStats = getDimensionStats(dim);
+                      const isDimExpanded = expandedDimensions.has(dim.id);
+                      return (
+                        <div key={dim.id}>
+                          {/* Dimension Header */}
+                          <div
+                            className="flex items-center gap-2 px-4 py-2.5 bg-muted/30 hover:bg-muted/50 cursor-pointer"
+                            onClick={() => toggleDimension(dim.id)}
+                          >
+                            <button
+                              className="p-0.5 hover:bg-muted rounded"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleDimension(dim.id);
+                              }}
+                            >
+                              {isDimExpanded ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                            </button>
+                            <Checkbox
+                              checked={dimStats.allSelected}
+                              onCheckedChange={(checked) => handleDimensionToggle(dim.id, !!checked)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="data-[state=indeterminate]:bg-primary"
+                              {...(dimStats.someSelected ? { "data-state": "indeterminate" } : {})}
+                            />
+                            <span className="text-sm font-medium">{dim.name}</span>
+                            <span className="text-xs text-muted-foreground ml-auto">
+                              {dimStats.selected}/{dimStats.all}
+                            </span>
+                          </div>
+                          {/* Test Points */}
+                          {isDimExpanded && dim.testPoints.map((tp) => {
+                            const tpStats = getPointStats(tp);
+                            const isPointExpanded = expandedPoints.has(tp.id);
+                            return (
+                              <div key={tp.id}>
+                                {/* Test Point Header */}
+                                <div
+                                  className="flex items-center gap-2 px-4 py-2 pl-10 hover:bg-muted/20 cursor-pointer"
+                                  onClick={() => togglePoint(tp.id)}
+                                >
+                                  <button
+                                    className="p-0.5 hover:bg-muted rounded"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      togglePoint(tp.id);
+                                    }}
+                                  >
+                                    {isPointExpanded ? (
+                                      <ChevronDown className="w-3.5 h-3.5" />
+                                    ) : (
+                                      <ChevronRight className="w-3.5 h-3.5" />
+                                    )}
+                                  </button>
+                                  <Checkbox
+                                    checked={tpStats.allSelected}
+                                    onCheckedChange={(checked) => handlePointToggle(tp.id, !!checked)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="data-[state=indeterminate]:bg-primary"
+                                    {...(tpStats.someSelected ? { "data-state": "indeterminate" } : {})}
+                                  />
+                                  <span className="text-sm">{tp.name}</span>
+                                  <span className="text-xs text-muted-foreground ml-auto">
+                                    {tpStats.selected}/{tpStats.all}
+                                  </span>
+                                </div>
+                                {/* Cases */}
+                                {isPointExpanded && tp.cases.map((caseItem) => (
+                                  <div
+                                    key={caseItem.id}
+                                    className="flex items-center gap-3 px-4 py-2 pl-16 hover:bg-muted/10 cursor-pointer"
+                                    onClick={() => handleCaseToggle(caseItem.id)}
+                                  >
+                                    <Checkbox
+                                      checked={caseItem.selected}
+                                      onCheckedChange={() => handleCaseToggle(caseItem.id)}
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <span className="text-xs text-muted-foreground font-mono">
+                                      {caseItem.code}
+                                    </span>
+                                    <span className="text-sm">{caseItem.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                   </div>
                 </ScrollArea>
               </div>
