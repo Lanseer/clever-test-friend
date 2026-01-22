@@ -481,36 +481,40 @@ export function AIGenerateDialog({
                 </div>
               )}
 
-              {/* 测试本体 */}
-              <div className="space-y-2">
-                <Label>测试本体</Label>
-                <Select
-                  value={testOntology}
-                  onValueChange={setTestOntology}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="请选择测试本体（可选）" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {testOntologies.map((onto) => (
-                      <SelectItem key={onto.id} value={onto.id}>
-                        {onto.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* 测试本体 - 智能生成时显示，本地上传时隐藏 */}
+              {initMethod === "smart" && !isRegenerate && (
+                <div className="space-y-2">
+                  <Label>测试本体</Label>
+                  <Select
+                    value={testOntology}
+                    onValueChange={setTestOntology}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="请选择测试本体（可选）" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {testOntologies.map((onto) => (
+                        <SelectItem key={onto.id} value={onto.id}>
+                          {onto.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-              {/* 提示词 */}
-              <div className="space-y-2">
-                <Label>提示词</Label>
-                <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="请输入提示词，用于指导AI生成测试用例（可选）"
-                  className="min-h-[80px]"
-                />
-              </div>
+              {/* 提示词 - 智能生成时显示，本地上传时隐藏 */}
+              {initMethod === "smart" && !isRegenerate && (
+                <div className="space-y-2">
+                  <Label>提示词</Label>
+                  <Textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="请输入提示词，用于指导AI生成测试用例（可选）"
+                    className="min-h-[80px]"
+                  />
+                </div>
+              )}
 
               {/* 本地上传文件 */}
               {initMethod === "upload" && !isRegenerate && (
