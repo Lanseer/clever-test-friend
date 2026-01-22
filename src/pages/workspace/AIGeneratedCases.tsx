@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal, History } from "lucide-react";
+import { Search, RefreshCw, FileCheck, Clock, User, Loader2, CheckCircle, XCircle, FileText, AlertTriangle, Plus, ClipboardCheck, MoreHorizontal, History, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ReportSidebar } from "@/components/workspace/ReportSidebar";
 import { AIGenerateDialog } from "@/components/workspace/AIGenerateDialog";
+import { AIThinkingSidebar } from "@/components/workspace/AIThinkingSidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -157,6 +158,21 @@ export default function AIGeneratedCases() {
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [generateMode, setGenerateMode] = useState<"create" | "regenerate">("create");
   const [regenerateRecord, setRegenerateRecord] = useState<GenerationRecord | null>(null);
+  const [thinkingSidebarOpen, setThinkingSidebarOpen] = useState(false);
+  const [thinkingBatch, setThinkingBatch] = useState<{ id: string; batchCode: string; status: "generating"; startTime: string; totalCases: number; currentStage?: string; progress?: number } | null>(null);
+
+  const handleOpenThinking = (record: GenerationRecord) => {
+    setThinkingBatch({
+      id: record.id,
+      batchCode: record.code,
+      status: "generating",
+      startTime: record.createdAt,
+      totalCases: 0,
+      currentStage: "generating",
+      progress: 65,
+    });
+    setThinkingSidebarOpen(true);
+  };
 
   const filteredRecords = mockRecords.filter(
     (record) =>
@@ -258,7 +274,15 @@ export default function AIGeneratedCases() {
                   </button>
                 </div>
                 <div className="flex items-center">
-                  <Badge variant="outline" className={cn("text-xs gap-1 whitespace-nowrap", status.className)}>
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      "text-xs gap-1 whitespace-nowrap", 
+                      status.className,
+                      record.status === "generating" && "cursor-pointer hover:opacity-80"
+                    )}
+                    onClick={record.status === "generating" ? () => handleOpenThinking(record) : undefined}
+                  >
                     <StatusIcon className={cn("w-3 h-3", record.status === "generating" && "animate-spin")} />
                     {status.label}
                   </Badge>
@@ -293,17 +317,26 @@ export default function AIGeneratedCases() {
                   <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                   {record.createdAt}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   {isCompleted && (
                     <>
                       <Button
-                        variant="default"
+                        variant="outline"
                         size="sm"
-                        className="h-7 px-3 text-xs gap-1 whitespace-nowrap"
+                        className="h-7 px-2 text-xs gap-1 whitespace-nowrap"
                         onClick={() => handleOpenReview(record)}
                       >
                         <ClipboardCheck className="w-3.5 h-3.5" />
-                        评审
+                        用例自评
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1 whitespace-nowrap"
+                        onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}/expert-review`)}
+                      >
+                        <Users className="w-3.5 h-3.5" />
+                        专家评审
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -403,6 +436,12 @@ export default function AIGeneratedCases() {
             : undefined
         }
         onConfirm={handleConfirmGenerate}
+      />
+
+      <AIThinkingSidebar
+        open={thinkingSidebarOpen}
+        onOpenChange={setThinkingSidebarOpen}
+        batch={thinkingBatch}
       />
     </div>
   );
