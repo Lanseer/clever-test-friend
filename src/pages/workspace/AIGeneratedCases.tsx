@@ -235,17 +235,18 @@ export default function AIGeneratedCases() {
         </div>
       </div>
 
-      <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[80px_minmax(150px,2fr)_90px_80px_90px_90px_130px_100px] gap-3 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          <div className="whitespace-nowrap">编号</div>
-          <div className="whitespace-nowrap">名称</div>
-          <div className="whitespace-nowrap">状态</div>
-          <div className="whitespace-nowrap">评审人</div>
-          <div className="whitespace-nowrap">用例自评</div>
-          <div className="whitespace-nowrap">专家评审</div>
-          <div className="whitespace-nowrap">创建时间</div>
-          <div className="whitespace-nowrap">操作</div>
-        </div>
+      <div className="rounded-xl border bg-card overflow-x-auto">
+        <div className="min-w-[900px]">
+          <div className="grid grid-cols-[80px_minmax(150px,2fr)_90px_80px_90px_90px_130px_100px] gap-3 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+            <div className="whitespace-nowrap">编号</div>
+            <div className="whitespace-nowrap">名称</div>
+            <div className="whitespace-nowrap">状态</div>
+            <div className="whitespace-nowrap">评审人</div>
+            <div className="whitespace-nowrap">用例自评</div>
+            <div className="whitespace-nowrap">专家评审</div>
+            <div className="whitespace-nowrap">创建时间</div>
+            <div className="whitespace-nowrap">操作</div>
+          </div>
 
         <div className="divide-y">
           {filteredRecords.map((record, index) => {
@@ -396,12 +397,13 @@ export default function AIGeneratedCases() {
           })}
         </div>
 
-        {filteredRecords.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的生成记录</p>
-          </div>
-        )}
+          {filteredRecords.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Search className="w-12 h-12 mb-4 opacity-50" />
+              <p>未找到匹配的生成记录</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <ReportSidebar
