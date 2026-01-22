@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 
 interface Document {
   id: string;
@@ -38,6 +40,12 @@ interface FormData {
   name: string;
   documents: SelectedDocument[];
   tags: string[];
+  testActivity: string;
+  testPhase: string;
+  testCategory: string;
+  caseTemplate: string;
+  testOntology: string;
+  prompt: string;
 }
 
 interface AIGenerateDialogProps {
@@ -106,6 +114,16 @@ const caseTemplates = [
   { id: "tpl-4", name: "性能测试模板", type: "Performance" },
 ];
 
+const testOntologies = [
+  { id: "onto-1", name: "银行核心系统测试本体" },
+  { id: "onto-2", name: "支付系统测试本体" },
+  { id: "onto-3", name: "用户管理测试本体" },
+  { id: "onto-4", name: "交易系统测试本体" },
+];
+
+const testPhases = ["单元测试", "集成测试", "SIT测试", "UAT测试", "投产测试"];
+const testCategories = ["功能测试", "数据测试", "专项测试"];
+
 export function AIGenerateDialog({
   open,
   onOpenChange,
@@ -121,6 +139,10 @@ export function AIGenerateDialog({
   const [initMethod, setInitMethod] = useState<"smart" | "upload">("smart");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [testPhase, setTestPhase] = useState<string>("");
+  const [testCategory, setTestCategory] = useState<string>("");
+  const [testOntology, setTestOntology] = useState<string>("");
+  const [prompt, setPrompt] = useState<string>("");
 
   const isRegenerate = mode === "regenerate";
 
@@ -140,6 +162,10 @@ export function AIGenerateDialog({
       setInitMethod("smart");
       setUploadedFile(null);
       setSelectedTemplate("");
+      setTestPhase("");
+      setTestCategory("");
+      setTestOntology("");
+      setPrompt("");
     }
   }, [open, initialData]);
 
@@ -188,11 +214,17 @@ export function AIGenerateDialog({
       name,
       documents: selectedDocs,
       tags: selectedTags,
+      testActivity: "测试案例设计",
+      testPhase,
+      testCategory,
+      caseTemplate: selectedTemplate,
+      testOntology,
+      prompt,
     });
     onOpenChange(false);
   };
 
-  const isValid = name.trim() && selectedDocs.length > 0 && (initMethod === "upload" ? uploadedFile !== null : true);
+  const isValid = name.trim() && selectedDocs.length > 0 && testPhase && testCategory && (initMethod === "upload" ? uploadedFile !== null : true);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -205,229 +237,330 @@ export function AIGenerateDialog({
 
         <ScrollArea className="max-h-[60vh] pr-4">
           <div className="space-y-6 py-4">
-            {/* 名称 */}
-            <div className="space-y-2">
-              <Label htmlFor="name">名称</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="请输入生成任务名称"
-                disabled={isRegenerate}
-                className={isRegenerate ? "bg-muted" : ""}
-              />
-            </div>
-
-            {/* 选择文档和版本 - 两种模式都需要 */}
-            <div className="space-y-2">
-              <Label>选择知识库文档</Label>
-              <div className="flex gap-2">
-                <Select
-                  value={currentDocId}
-                  onValueChange={(value) => {
-                    setCurrentDocId(value);
-                    setCurrentVersionId("");
-                  }}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="选择文档" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableDocuments.map((doc) => (
-                      <SelectItem key={doc.id} value={doc.id}>
-                        {doc.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={currentVersionId}
-                  onValueChange={setCurrentVersionId}
-                  disabled={!currentDocId}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="选择版本" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currentDocVersions.map((version) => (
-                      <SelectItem key={version.id} value={version.id}>
-                        {version.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleAddDocument}
-                  disabled={!currentDocId || !currentVersionId}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
+            {/* 基础信息 Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <h3 className="font-semibold text-sm">基础信息</h3>
               </div>
 
-              {/* 已选文档列表 */}
-              {selectedDocs.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {selectedDocs.map((doc) => (
-                    <div
-                      key={doc.docId}
-                      className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
+              {/* 名称 */}
+              <div className="space-y-2">
+                <Label htmlFor="name">名称</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="请输入生成任务名称"
+                  disabled={isRegenerate}
+                  className={isRegenerate ? "bg-muted" : ""}
+                />
+              </div>
+
+              {/* 测试活动 */}
+              <div className="space-y-2">
+                <Label>测试活动</Label>
+                <Input
+                  value="测试案例设计"
+                  disabled
+                  className="bg-muted"
+                />
+              </div>
+
+              {/* 测试阶段 */}
+              <div className="space-y-2">
+                <Label>测试阶段</Label>
+                <Select
+                  value={testPhase}
+                  onValueChange={setTestPhase}
+                  disabled={isRegenerate}
+                >
+                  <SelectTrigger className={isRegenerate ? "bg-muted" : ""}>
+                    <SelectValue placeholder="请选择测试阶段" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {testPhases.map((phase) => (
+                      <SelectItem key={phase} value={phase}>
+                        {phase}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 测试大类 */}
+              <div className="space-y-2">
+                <Label>测试大类</Label>
+                <Select
+                  value={testCategory}
+                  onValueChange={setTestCategory}
+                  disabled={isRegenerate}
+                >
+                  <SelectTrigger className={isRegenerate ? "bg-muted" : ""}>
+                    <SelectValue placeholder="请选择测试大类" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {testCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 选择标签 */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  选择标签
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {availableTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant={selectedTags.includes(tag) ? "default" : "outline"}
+                      className={`cursor-pointer transition-colors ${
+                        isRegenerate ? "cursor-not-allowed opacity-60" : "hover:bg-primary/80"
+                      }`}
+                      onClick={() => handleToggleTag(tag)}
                     >
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">{doc.docName}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {doc.versionName}
-                        </Badge>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleRemoveDocument(doc.docId)}
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
+                      {tag}
+                    </Badge>
                   ))}
                 </div>
-              )}
-
-              {selectedDocs.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  请选择至少一个文档
-                </p>
-              )}
+                {isRegenerate && (
+                  <p className="text-xs text-muted-foreground">
+                    再次生成时不可修改标签
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* 选择标签 */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                选择标签
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {availableTags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant={selectedTags.includes(tag) ? "default" : "outline"}
-                    className={`cursor-pointer transition-colors ${
-                      isRegenerate ? "cursor-not-allowed opacity-60" : "hover:bg-primary/80"
-                    }`}
-                    onClick={() => handleToggleTag(tag)}
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-              {isRegenerate && (
-                <p className="text-xs text-muted-foreground">
-                  再次生成时不可修改标签
-                </p>
-              )}
-            </div>
+            <Separator />
 
-            {/* 初始化用例方式 */}
-            {!isRegenerate && (
-              <div className="space-y-3">
-                <Label>初始化用例方式</Label>
-                <RadioGroup
-                  value={initMethod}
-                  onValueChange={(value) => {
-                    setInitMethod(value as "smart" | "upload");
-                    if (value === "upload") {
-                      setSelectedTemplate("");
-                    }
-                  }}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="smart" id="smart" />
-                    <Label htmlFor="smart" className="cursor-pointer font-normal">智能生成</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="upload" id="upload" />
-                    <Label htmlFor="upload" className="cursor-pointer font-normal">本地上传</Label>
-                  </div>
-                </RadioGroup>
+            {/* 智能设计 Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <h3 className="font-semibold text-sm">智能设计</h3>
               </div>
-            )}
 
-            {/* 选择用例模板 - 仅智能生成时显示 */}
-            {initMethod === "smart" && !isRegenerate && (
+              {/* 选择文档和版本 */}
               <div className="space-y-2">
-                <Label>选择用例模板</Label>
-                <Select
-                  value={selectedTemplate}
-                  onValueChange={setSelectedTemplate}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="请选择用例模板（可选）" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {caseTemplates.map((tpl) => (
-                      <SelectItem key={tpl.id} value={tpl.id}>
-                        {tpl.name} ({tpl.type})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* 本地上传文件 */}
-            {initMethod === "upload" && !isRegenerate && (
-              <div className="space-y-2">
-                <Label>上传文件</Label>
-                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                  <input
-                    type="file"
-                    id="file-upload"
-                    className="hidden"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setUploadedFile(file);
+                <Label>知识库文档</Label>
+                <div className="flex gap-2">
+                  <Select
+                    value={currentDocId}
+                    onValueChange={(value) => {
+                      setCurrentDocId(value);
+                      setCurrentVersionId("");
                     }}
-                  />
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    {uploadedFile ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <FileText className="w-5 h-5 text-primary" />
-                        <span className="text-sm font-medium">{uploadedFile.name}</span>
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="选择文档" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableDocuments.map((doc) => (
+                        <SelectItem key={doc.id} value={doc.id}>
+                          {doc.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={currentVersionId}
+                    onValueChange={setCurrentVersionId}
+                    disabled={!currentDocId}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="选择版本" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currentDocVersions.map((version) => (
+                        <SelectItem key={version.id} value={version.id}>
+                          {version.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handleAddDocument}
+                    disabled={!currentDocId || !currentVersionId}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* 已选文档列表 */}
+                {selectedDocs.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {selectedDocs.map((doc) => (
+                      <div
+                        key={doc.docId}
+                        className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">{doc.docName}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {doc.versionName}
+                          </Badge>
+                        </div>
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-5 w-5"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setUploadedFile(null);
-                          }}
+                          className="h-6 w-6"
+                          onClick={() => handleRemoveDocument(doc.docId)}
                         >
                           <X className="w-3.5 h-3.5" />
                         </Button>
                       </div>
-                    ) : (
-                      <>
-                        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          点击或拖拽文件到此处上传
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          支持 xlsx, xls, csv 格式
-                        </p>
-                      </>
-                    )}
-                  </label>
-                </div>
+                    ))}
+                  </div>
+                )}
+
+                {selectedDocs.length === 0 && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    请选择至少一个文档
+                  </p>
+                )}
               </div>
-            )}
+
+              {/* 初始化用例方式 */}
+              {!isRegenerate && (
+                <div className="space-y-3">
+                  <Label>初始化用例方式</Label>
+                  <RadioGroup
+                    value={initMethod}
+                    onValueChange={(value) => {
+                      setInitMethod(value as "smart" | "upload");
+                      if (value === "upload") {
+                        setSelectedTemplate("");
+                      }
+                    }}
+                    className="flex gap-6"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="smart" id="smart" />
+                      <Label htmlFor="smart" className="cursor-pointer font-normal">智能生成</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="upload" id="upload" />
+                      <Label htmlFor="upload" className="cursor-pointer font-normal">本地上传</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+
+              {/* 选择用例模板 - 仅本地上传时显示 */}
+              {initMethod === "upload" && !isRegenerate && (
+                <div className="space-y-2">
+                  <Label>案例模板</Label>
+                  <Select
+                    value={selectedTemplate}
+                    onValueChange={setSelectedTemplate}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="请选择案例模板（可选）" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {caseTemplates.map((tpl) => (
+                        <SelectItem key={tpl.id} value={tpl.id}>
+                          {tpl.name} ({tpl.type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* 测试本体 */}
+              <div className="space-y-2">
+                <Label>测试本体</Label>
+                <Select
+                  value={testOntology}
+                  onValueChange={setTestOntology}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="请选择测试本体（可选）" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {testOntologies.map((onto) => (
+                      <SelectItem key={onto.id} value={onto.id}>
+                        {onto.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 提示词 */}
+              <div className="space-y-2">
+                <Label>提示词</Label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="请输入提示词，用于指导AI生成测试用例（可选）"
+                  className="min-h-[80px]"
+                />
+              </div>
+
+              {/* 本地上传文件 */}
+              {initMethod === "upload" && !isRegenerate && (
+                <div className="space-y-2">
+                  <Label>上传文件</Label>
+                  <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                    <input
+                      type="file"
+                      id="file-upload"
+                      className="hidden"
+                      accept=".xlsx,.xls,.csv"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setUploadedFile(file);
+                      }}
+                    />
+                    <label htmlFor="file-upload" className="cursor-pointer">
+                      {uploadedFile ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <FileText className="w-5 h-5 text-primary" />
+                          <span className="text-sm font-medium">{uploadedFile.name}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setUploadedFile(null);
+                            }}
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            点击或拖拽文件到此处上传
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            支持 xlsx, xls, csv 格式
+                          </p>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </ScrollArea>
 
