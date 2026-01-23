@@ -224,7 +224,10 @@ export function AIGenerateDialog({
     onOpenChange(false);
   };
 
-  const isValid = name.trim() && selectedDocs.length > 0 && testPhase && testCategory && (initMethod === "upload" ? uploadedFile !== null : true);
+  // 再次生成模式下，仅要求选择文档即可
+  const isValid = isRegenerate 
+    ? selectedDocs.length > 0 
+    : (name.trim() && selectedDocs.length > 0 && testPhase && testCategory && (initMethod === "upload" ? uploadedFile !== null : true));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -434,9 +437,11 @@ export function AIGenerateDialog({
               </div>
 
               {/* 初始化用例方式 */}
-              {!isRegenerate && (
-                <div className="space-y-3">
-                  <Label>初始化用例方式</Label>
+              <div className="space-y-3">
+                <Label>初始化用例方式</Label>
+                {isRegenerate ? (
+                  <Input value="智能生成" disabled className="bg-muted" />
+                ) : (
                   <RadioGroup
                     value={initMethod}
                     onValueChange={(value) => {
@@ -456,55 +461,71 @@ export function AIGenerateDialog({
                       <Label htmlFor="upload" className="cursor-pointer font-normal">本地上传</Label>
                     </div>
                   </RadioGroup>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* 选择用例模板 - 智能生成时显示，本地上传时隐藏 */}
-              {initMethod === "smart" && !isRegenerate && (
+              {initMethod === "smart" && (
                 <div className="space-y-2">
                   <Label>案例模板</Label>
-                  <Select
-                    value={selectedTemplate}
-                    onValueChange={setSelectedTemplate}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="请选择案例模板（可选）" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {caseTemplates.map((tpl) => (
-                        <SelectItem key={tpl.id} value={tpl.id}>
-                          {tpl.name} ({tpl.type})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {isRegenerate ? (
+                    <Input 
+                      value={caseTemplates.find(t => t.id === selectedTemplate)?.name || "BDD标准模板 (BDD)"} 
+                      disabled 
+                      className="bg-muted" 
+                    />
+                  ) : (
+                    <Select
+                      value={selectedTemplate}
+                      onValueChange={setSelectedTemplate}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="请选择案例模板（可选）" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {caseTemplates.map((tpl) => (
+                          <SelectItem key={tpl.id} value={tpl.id}>
+                            {tpl.name} ({tpl.type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               )}
 
               {/* 测试本体 - 智能生成时显示，本地上传时隐藏 */}
-              {initMethod === "smart" && !isRegenerate && (
+              {initMethod === "smart" && (
                 <div className="space-y-2">
                   <Label>测试本体</Label>
-                  <Select
-                    value={testOntology}
-                    onValueChange={setTestOntology}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="请选择测试本体（可选）" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {testOntologies.map((onto) => (
-                        <SelectItem key={onto.id} value={onto.id}>
-                          {onto.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {isRegenerate ? (
+                    <Input 
+                      value={testOntologies.find(o => o.id === testOntology)?.name || "银行核心系统测试本体"} 
+                      disabled 
+                      className="bg-muted" 
+                    />
+                  ) : (
+                    <Select
+                      value={testOntology}
+                      onValueChange={setTestOntology}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="请选择测试本体（可选）" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {testOntologies.map((onto) => (
+                          <SelectItem key={onto.id} value={onto.id}>
+                            {onto.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               )}
 
-              {/* 提示词 - 智能生成时显示，本地上传时隐藏 */}
-              {initMethod === "smart" && !isRegenerate && (
+              {/* 提示词 - 智能生成时显示，本地上传时隐藏，再次生成时也可编辑 */}
+              {initMethod === "smart" && (
                 <div className="space-y-2">
                   <Label>提示词</Label>
                   <Textarea
