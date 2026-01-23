@@ -5,6 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
   Send, 
@@ -13,13 +19,16 @@ import {
   Loader2,
   CheckCircle,
   FileText,
-  Sparkles
+  Sparkles,
+  Check,
+  Eye
 } from "lucide-react";
 
 interface TestCase {
   id: string;
   name: string;
   feature: string;
+  confirmed: boolean;
   status: "pending" | "processed" | "modified";
   content: string;
 }
@@ -43,21 +52,24 @@ const mockPendingCases: TestCase[] = [
     id: "1",
     name: "用户登录成功场景",
     feature: "用户认证",
-    status: "pending",
+    status: "modified",
+    confirmed: false,
     content: "Given 用户在登录页面\nWhen 输入有效用户名和密码\nThen 登录成功",
   },
   {
     id: "2", 
     name: "用户登录失败-密码错误",
     feature: "用户认证",
-    status: "pending",
+    status: "modified",
+    confirmed: false,
     content: "Given 用户在登录页面\nWhen 输入错误密码\nThen 显示错误提示",
   },
   {
     id: "3",
     name: "密码重置流程",
     feature: "用户认证",
-    status: "pending",
+    status: "modified",
+    confirmed: false,
     content: "Given 用户在忘记密码页面\nWhen 输入注册邮箱\nThen 收到重置邮件",
   },
   {
@@ -65,6 +77,7 @@ const mockPendingCases: TestCase[] = [
     name: "用户资料更新",
     feature: "用户管理",
     status: "pending",
+    confirmed: false,
     content: "Given 用户已登录\nWhen 更新个人资料\nThen 保存成功",
   },
   {
@@ -72,6 +85,7 @@ const mockPendingCases: TestCase[] = [
     name: "购物车添加商品",
     feature: "购物车",
     status: "pending",
+    confirmed: false,
     content: "Given 用户在商品页\nWhen 点击添加\nThen 商品加入购物车",
   },
 ];
@@ -82,13 +96,18 @@ export default function AIAssistant() {
   
   const [cases, setCases] = useState<TestCase[]>(mockPendingCases);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [thinkingSteps, setThinkingSteps] = useState<ThinkingStep[]>([]);
+  const [thinkingSteps, setThinkingSteps] = useState<ThinkingStep[]>([
+    { id: "example", content: "好的，查找到108条用例的内容格式有问题，现在开始处理", status: "completed" },
+  ]);
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<TestCase | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const pendingCount = cases.filter(c => c.status === "pending").length;
-  const processedCount = cases.filter(c => c.status !== "pending").length;
+  const modifiedCount = cases.filter(c => c.status === "modified").length;
+  const confirmedCount = cases.filter(c => c.confirmed).length;
+  const unconfirmedCount = cases.filter(c => c.status === "modified" && !c.confirmed).length;
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -96,7 +115,7 @@ export default function AIAssistant() {
         {
           id: "init",
           role: "assistant",
-          content: `检测到 ${pendingCount} 条未评审用例，请问需要我帮你做什么调整？\n\n例如：\n• 优化所有用例的场景描述\n• 检查并修正断言错误\n• 补充缺失的前置条件\n• 统一用例格式`,
+          content: `检测到 ${modifiedCount} 条已修改用例，请问需要我帮你做什么调整？\n\n例如：\n• 查找有哪些用例描述格式有问题并帮我修改\n• 优化所有用例的场景描述\n• 检查并修正断言错误\n• 补充缺失的前置条件`,
           timestamp: new Date(),
         },
       ]);
@@ -132,13 +151,15 @@ export default function AIAssistant() {
     ]);
     await new Promise(resolve => setTimeout(resolve, 1800));
     
-    // Update cases
+    // Update cases - mark as modified
     const casesToProcess = Math.min(3, cases.filter(c => c.status === "pending").length);
-    setCases(prev => prev.map((c, index) => 
-      index < casesToProcess && c.status === "pending" 
-        ? { ...c, status: "modified" as const } 
-        : c
-    ));
+    if (casesToProcess > 0) {
+      setCases(prev => prev.map((c, index) => 
+        index < casesToProcess && c.status === "pending" 
+          ? { ...c, status: "modified" as const } 
+          : c
+      ));
+    }
     
     // Step 4 - completed
     setThinkingSteps(prev => [
@@ -188,15 +209,15 @@ export default function AIAssistant() {
     }
   };
 
-  const getStatusBadge = (status: TestCase["status"]) => {
-    switch (status) {
-      case "pending":
-        return <Badge variant="secondary" className="text-xs">待评审</Badge>;
-      case "processed":
-        return <Badge variant="default" className="text-xs">已处理</Badge>;
-      case "modified":
-        return <Badge className="bg-amber-500 hover:bg-amber-600 text-xs">已修改</Badge>;
-    }
+  const handleConfirmCase = (caseId: string) => {
+    setCases(prev => prev.map(c => 
+      c.id === caseId ? { ...c, confirmed: true } : c
+    ));
+  };
+
+  const handleViewCase = (testCase: TestCase) => {
+    setSelectedCase(testCase);
+    setDetailDialogOpen(true);
   };
 
   return (
@@ -215,7 +236,7 @@ export default function AIAssistant() {
           <div>
             <h1 className="text-xl font-semibold flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              AI 助手
+              智能助手
             </h1>
             <p className="text-sm text-muted-foreground">
               智能协助用例评审与优化
@@ -223,41 +244,63 @@ export default function AIAssistant() {
           </div>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>待评审: <strong className="text-amber-600">{pendingCount}</strong></span>
-          <span>已处理: <strong className="text-green-600">{processedCount}</strong></span>
+          <span>已修改: <strong className="text-amber-600">{modifiedCount}</strong></span>
+          <span>已确认: <strong className="text-green-600">{confirmedCount}</strong></span>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Case List */}
-        <div className="w-72 border-r flex flex-col flex-shrink-0">
+        <div className="w-80 border-r flex flex-col flex-shrink-0">
           <div className="p-3 border-b bg-muted/30">
             <h2 className="font-medium text-sm flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              待评审用例列表
+              已修改用例列表
             </h2>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-2">
-              {cases.map((testCase) => (
+              {cases.filter(c => c.status === "modified").map((testCase) => (
                 <Card 
                   key={testCase.id} 
-                  className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                    testCase.status === "modified" ? "border-amber-400/50 bg-amber-50/30" : ""
+                  className={`transition-colors ${
+                    testCase.confirmed 
+                      ? "border-border bg-card" 
+                      : "border-amber-400/50 bg-amber-50/30"
                   }`}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
+                        <p 
+                          className={`font-medium text-sm truncate cursor-pointer hover:underline ${
+                            testCase.confirmed ? "text-foreground" : "text-amber-700"
+                          }`}
+                          onClick={() => handleViewCase(testCase)}
+                        >
                           {testCase.name}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {testCase.feature}
                         </p>
                       </div>
-                      {getStatusBadge(testCase.status)}
+                      {!testCase.confirmed && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-2 text-xs gap-1 flex-shrink-0"
+                          onClick={() => handleConfirmCase(testCase.id)}
+                        >
+                          <Check className="h-3 w-3" />
+                          确认修改
+                        </Button>
+                      )}
+                      {testCase.confirmed && (
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-600 border-green-200">
+                          已确认
+                        </Badge>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -272,34 +315,28 @@ export default function AIAssistant() {
           <div className="border-b bg-muted/20 flex-shrink-0">
             <div className="p-3 border-b">
               <h2 className="font-medium text-sm flex items-center gap-2">
-                <Bot className="h-4 w-4" />
-                AI 思考过程
+                <Sparkles className="h-4 w-4" />
+                智能案例修改助手
               </h2>
             </div>
             <div className="h-28 overflow-auto p-3">
-              {thinkingSteps.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  等待处理指令...
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {thinkingSteps.map((step) => (
-                    <div 
-                      key={step.id} 
-                      className="flex items-center gap-2 text-sm"
-                    >
-                      {step.status === "processing" ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
-                      ) : (
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      )}
-                      <span className={step.status === "completed" ? "text-muted-foreground" : ""}>
-                        {step.content}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="space-y-2">
+                {thinkingSteps.map((step) => (
+                  <div 
+                    key={step.id} 
+                    className="flex items-center gap-2 text-sm"
+                  >
+                    {step.status === "processing" ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    )}
+                    <span className={step.status === "completed" ? "text-muted-foreground" : ""}>
+                      {step.content}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -348,7 +385,7 @@ export default function AIAssistant() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="输入您的指令，例如：优化所有用例的场景描述..."
+                  placeholder="输入您的指令，例如：查找有哪些用例描述格式有问题并帮我修改..."
                   disabled={isProcessing}
                   className="flex-1"
                 />
@@ -367,6 +404,46 @@ export default function AIAssistant() {
           </div>
         </div>
       </div>
+
+      {/* Case Detail Dialog */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              用例详情
+            </DialogTitle>
+          </DialogHeader>
+          {selectedCase && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">用例名称</p>
+                <p className="font-medium mt-1">{selectedCase.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">所属功能</p>
+                <p className="mt-1">{selectedCase.feature}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">用例内容</p>
+                <pre className="mt-1 p-3 bg-muted rounded-lg text-sm whitespace-pre-wrap">
+                  {selectedCase.content}
+                </pre>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">状态:</p>
+                {selectedCase.confirmed ? (
+                  <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+                    已确认
+                  </Badge>
+                ) : (
+                  <Badge className="bg-amber-500">待确认</Badge>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

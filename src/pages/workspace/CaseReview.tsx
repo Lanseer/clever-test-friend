@@ -205,7 +205,7 @@ export default function CaseReview() {
             onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/ai-assistant`)}
           >
             <Bot className="w-4 h-4" />
-            AI助手
+            智能助手
           </Button>
         </div>
       </div>
