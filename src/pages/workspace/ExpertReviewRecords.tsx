@@ -123,7 +123,7 @@ export default function ExpertReviewRecords() {
 
       {/* Records Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[80px_160px_120px_100px_100px_100px_100px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[80px_160px_100px_80px_80px_80px_80px_100px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>状态</div>
           <div>发起时间</div>
           <div>发起人</div>
@@ -140,7 +140,7 @@ export default function ExpertReviewRecords() {
             return (
               <div
                 key={record.id}
-                className="grid grid-cols-[80px_160px_120px_100px_100px_100px_100px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[80px_160px_100px_80px_80px_80px_80px_100px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">

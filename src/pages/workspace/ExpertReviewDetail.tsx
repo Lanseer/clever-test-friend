@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, CheckCircle, XCircle, HelpCircle, Users } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, XCircle, HelpCircle, Users, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
 type ExpertOpinion = "passed" | "rejected" | "reviewing" | "pending";
 type CaseNature = "positive" | "negative";
@@ -22,6 +23,7 @@ interface ExpertRejection {
   rejectTag: string;
   rejectReason: string;
   reviewTime: string;
+  solution?: string;
 }
 
 interface ExpertCase {
@@ -93,13 +95,44 @@ const natureConfig: Record<CaseNature, { label: string; icon: typeof CheckCircle
 export default function ExpertReviewDetail() {
   const navigate = useNavigate();
   const { workspaceId, recordId } = useParams();
-  const [cases] = useState<ExpertCase[]>(mockExpertCases);
+  const [cases, setCases] = useState<ExpertCase[]>(mockExpertCases);
   const [viewRejectDialogOpen, setViewRejectDialogOpen] = useState(false);
   const [viewingCase, setViewingCase] = useState<ExpertCase | null>(null);
+  const [solutions, setSolutions] = useState<Record<string, string>>({});
 
   const handleViewReject = (caseItem: ExpertCase) => {
     setViewingCase(caseItem);
+    // Initialize solutions state for this case's rejections
+    const initialSolutions: Record<string, string> = {};
+    caseItem.rejections?.forEach((rejection, idx) => {
+      const key = `${caseItem.id}-${idx}`;
+      initialSolutions[key] = rejection.solution || "";
+    });
+    setSolutions(initialSolutions);
     setViewRejectDialogOpen(true);
+  };
+
+  const handleSolutionChange = (caseId: string, rejectionIdx: number, value: string) => {
+    const key = `${caseId}-${rejectionIdx}`;
+    setSolutions(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveSolutions = () => {
+    if (!viewingCase) return;
+    
+    setCases(prev => prev.map(c => {
+      if (c.id === viewingCase.id && c.rejections) {
+        return {
+          ...c,
+          rejections: c.rejections.map((rejection, idx) => ({
+            ...rejection,
+            solution: solutions[`${c.id}-${idx}`] || rejection.solution
+          }))
+        };
+      }
+      return c;
+    }));
+    setViewRejectDialogOpen(false);
   };
 
   const passedCount = cases.filter(c => c.opinion === "passed").length;
@@ -149,13 +182,14 @@ export default function ExpertReviewDetail() {
 
       {/* Cases Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[100px_100px_1fr_80px_140px_120px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[100px_100px_1fr_80px_140px_120px_100px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>批次编号</div>
           <div>用例编号</div>
           <div>用例名称</div>
           <div>性质</div>
           <div>创建时间</div>
           <div>专家意见</div>
+          <div>操作</div>
         </div>
 
         <div className="divide-y">
@@ -168,7 +202,7 @@ export default function ExpertReviewDetail() {
             return (
               <div
                 key={caseItem.id}
-                className="grid grid-cols-[100px_100px_1fr_80px_140px_120px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[100px_100px_1fr_80px_140px_120px_100px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center">
@@ -201,7 +235,6 @@ export default function ExpertReviewDetail() {
                   <Badge
                     variant="outline"
                     className={cn("text-xs gap-1", opinion.className)}
-                    onClick={() => caseItem.opinion === "rejected" && handleViewReject(caseItem)}
                   >
                     <OpinionIcon className="w-3 h-3" />
                     {opinion.showCount 
@@ -210,47 +243,75 @@ export default function ExpertReviewDetail() {
                     }
                   </Badge>
                 </div>
+                <div className="flex items-center">
+                  {caseItem.opinion === "rejected" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs gap-1"
+                      onClick={() => handleViewReject(caseItem)}
+                    >
+                      <Lightbulb className="w-3.5 h-3.5" />
+                      解决方案
+                    </Button>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* View Reject Reason Dialog */}
+      {/* View Reject Reason Dialog with Solutions */}
       <Dialog open={viewRejectDialogOpen} onOpenChange={setViewRejectDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>拒绝详情</DialogTitle>
+            <DialogTitle>拒绝详情与解决方案</DialogTitle>
           </DialogHeader>
           {viewingCase && (
-            <div className="space-y-4">
-              <div>
-                <Label className="text-muted-foreground">用例名称</Label>
-                <p className="mt-1 font-medium">{viewingCase.name}</p>
+            <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">用例名称</Label>
+                  <p className="mt-1 font-medium">{viewingCase.name}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">用例编号</Label>
+                  <p className="mt-1 font-mono text-sm">{viewingCase.caseCode}</p>
+                </div>
               </div>
-              <div>
-                <Label className="text-muted-foreground">用例编号</Label>
-                <p className="mt-1 font-mono text-sm">{viewingCase.caseCode}</p>
-              </div>
-              <div>
-                <Label className="text-muted-foreground">专家拒绝原因</Label>
-                <ScrollArea className="mt-2 max-h-[300px]">
-                  <div className="space-y-3 pr-4">
+              <div className="flex-1 overflow-hidden flex flex-col">
+                <Label className="text-muted-foreground mb-2">专家拒绝原因与解决方案</Label>
+                <ScrollArea className="flex-1">
+                  <div className="space-y-4 pr-4">
                     {viewingCase.rejections?.map((rejection, idx) => (
-                      <div key={idx} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                      <div key={idx} className="bg-muted/50 rounded-lg p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Users className="w-3.5 h-3.5 text-muted-foreground" />
                             <span className="text-sm font-medium">{rejection.expertName}</span>
+                            <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-200">
+                              {rejection.rejectTag}
+                            </Badge>
                           </div>
                           <span className="text-xs text-muted-foreground">{rejection.reviewTime}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-200">
-                            {rejection.rejectTag}
-                          </Badge>
+                        <div className="bg-background rounded-md p-3 border">
+                          <Label className="text-xs text-muted-foreground">拒绝原因</Label>
+                          <p className="text-sm mt-1">{rejection.rejectReason}</p>
                         </div>
-                        <p className="text-sm text-muted-foreground">{rejection.rejectReason}</p>
+                        <div>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Lightbulb className="w-3 h-3" />
+                            解决方案
+                          </Label>
+                          <Textarea
+                            className="mt-1 min-h-[80px]"
+                            placeholder="请填写针对此拒绝原因的解决方案..."
+                            value={solutions[`${viewingCase.id}-${idx}`] || ""}
+                            onChange={(e) => handleSolutionChange(viewingCase.id, idx, e.target.value)}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -258,9 +319,12 @@ export default function ExpertReviewDetail() {
               </div>
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setViewRejectDialogOpen(false)}>
-              关闭
+              取消
+            </Button>
+            <Button onClick={handleSaveSolutions}>
+              保存解决方案
             </Button>
           </DialogFooter>
         </DialogContent>
