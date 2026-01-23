@@ -485,6 +485,9 @@ export default function TestReport() {
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <FileText className="w-6 h-6 text-primary" />
               评审报告
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                更新于 2024-01-15 14:30
+              </span>
             </h1>
             <p className="text-muted-foreground mt-1">
               用例评审数据分析与覆盖率汇总
