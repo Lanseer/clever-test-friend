@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus, RefreshCw, Download } from "lucide-react";
+import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus, RefreshCw, Download, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -97,7 +97,8 @@ function StatsCard({
   stats, 
   colorScheme,
   issues,
-  onIssueClick
+  onIssueClick,
+  onExportIssues
 }: { 
   title: string; 
   icon: typeof Users; 
@@ -105,6 +106,7 @@ function StatsCard({
   colorScheme: "blue" | "purple";
   issues: IssueCategory[];
   onIssueClick: (category: string) => void;
+  onExportIssues: () => void;
 }) {
   const adoptedPercentage = stats.total > 0 ? (stats.adopted / stats.total) * 100 : 0;
   
@@ -152,9 +154,20 @@ function StatsCard({
 
         {/* 问题分类汇总 */}
         <div className="pt-3 border-t">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-medium">问题分类汇总</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medium">问题分类汇总</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground"
+              onClick={onExportIssues}
+            >
+              <FileDown className="w-3.5 h-3.5 mr-1" />
+              导出问题清单
+            </Button>
           </div>
           <div className="flex items-center gap-4">
             <ChartContainer config={chartConfig} className="h-[80px] w-[80px]">
@@ -445,6 +458,14 @@ export default function TestReport() {
     toast.success("报告下载已开始");
   };
 
+  const handleExportSelfReviewIssues = () => {
+    toast.success("自评问题清单导出已开始");
+  };
+
+  const handleExportExpertReviewIssues = () => {
+    toast.success("专家评审问题清单导出已开始");
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* 页面标题 */}
@@ -491,6 +512,7 @@ export default function TestReport() {
           colorScheme="blue"
           issues={selfReviewIssues}
           onIssueClick={handleIssueClick}
+          onExportIssues={handleExportSelfReviewIssues}
         />
         <StatsCard 
           title="专家评审汇总" 
@@ -499,6 +521,7 @@ export default function TestReport() {
           colorScheme="purple"
           issues={expertReviewIssues}
           onIssueClick={handleIssueClick}
+          onExportIssues={handleExportExpertReviewIssues}
         />
       </div>
 
