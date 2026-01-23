@@ -174,16 +174,36 @@ const Index = () => {
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsData.map((stat) => (
-          <Card key={stat.title} className="border shadow-sm">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+        {statsData.map((stat, index) => (
+          <Card 
+            key={stat.title} 
+            className="border-0 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group"
+          >
+            <CardContent className="p-0">
+              <div className="relative">
+                {/* 渐变背景条 */}
+                <div 
+                  className={cn(
+                    "absolute top-0 left-0 right-0 h-1",
+                    index === 0 && "bg-gradient-to-r from-blue-500 to-blue-400",
+                    index === 1 && "bg-gradient-to-r from-amber-500 to-amber-400",
+                    index === 2 && "bg-gradient-to-r from-green-500 to-green-400",
+                    index === 3 && "bg-gradient-to-r from-purple-500 to-purple-400"
+                  )}
+                />
+                <div className="p-5 pt-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                      <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                    </div>
+                    <div className={cn(
+                      "p-3 rounded-xl transition-transform duration-300 group-hover:scale-110",
+                      stat.bgColor
+                    )}>
+                      <stat.icon className={cn("w-6 h-6", stat.color)} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
