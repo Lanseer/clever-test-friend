@@ -71,6 +71,24 @@ const monthTrendData = [
   { date: "第4周", count: 28 },
 ];
 
+// 用例增加趋势数据（用例数量）
+const caseWeekTrendData = [
+  { date: "周一", count: 45 },
+  { date: "周二", count: 72 },
+  { date: "周三", count: 28 },
+  { date: "周四", count: 96 },
+  { date: "周五", count: 63 },
+  { date: "周六", count: 18 },
+  { date: "周日", count: 35 },
+];
+
+const caseMonthTrendData = [
+  { date: "第1周", count: 156 },
+  { date: "第2周", count: 225 },
+  { date: "第3周", count: 298 },
+  { date: "第4周", count: 245 },
+];
+
 // 自评用例质量分布数据
 const selfWeekQualityData = [
   { name: "采纳", value: 68, color: "#22c55e" },
@@ -136,12 +154,14 @@ const lineChartConfig = {
 
 const Index = () => {
   const [trendPeriod, setTrendPeriod] = useState<"week" | "month">("week");
+  const [caseTrendPeriod, setCaseTrendPeriod] = useState<"week" | "month">("week");
   const [qualityPeriod, setQualityPeriod] = useState<"week" | "month">("week");
   const [qualityType, setQualityType] = useState<"self" | "expert">("self");
   const [issuePeriod, setIssuePeriod] = useState<"week" | "month">("week");
   const [issueType, setIssueType] = useState<"self" | "expert">("self");
 
   const trendData = trendPeriod === "week" ? weekTrendData : monthTrendData;
+  const caseTrendData = caseTrendPeriod === "week" ? caseWeekTrendData : caseMonthTrendData;
   
   // 根据类型和时间段选择质量分布数据
   const getQualityData = () => {
@@ -261,6 +281,57 @@ const Index = () => {
           </CardContent>
         </Card>
 
+        {/* 用例增加趋势 - 折线图 */}
+        <Card className="border shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-semibold">用例增加趋势</CardTitle>
+              <Select
+                value={caseTrendPeriod}
+                onValueChange={(value: "week" | "month") => setCaseTrendPeriod(value)}
+              >
+                <SelectTrigger className="w-32 h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">过去一周</SelectItem>
+                  <SelectItem value="month">过去一个月</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={lineChartConfig} className="h-[280px] w-full">
+              <LineChart data={caseTrendData} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 12 }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                  dot={{ fill: "#22c55e", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 图表区域 - 第二行 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 用例质量分布 - 环形图 */}
         <Card className="border shadow-sm">
           <CardHeader className="pb-2">
