@@ -301,10 +301,16 @@ export default function CaseTemplates() {
             className="pl-10"
           />
         </div>
-        <Button onClick={handleAdd}>
-          <Plus className="w-4 h-4 mr-2" />
-          新增模板
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => toast({ title: "导入功能", description: "模板导入功能开发中" })}>
+            <FileCode className="w-4 h-4 mr-2" />
+            导入模板
+          </Button>
+          <Button onClick={handleAdd}>
+            <Plus className="w-4 h-4 mr-2" />
+            新增模板
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-xl border bg-card">

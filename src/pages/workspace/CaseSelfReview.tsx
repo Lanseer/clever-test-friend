@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, Star, ThumbsUp, ThumbsDown, Trash2 } from "lucide-react";
+import { ArrowLeft, Search, FileCheck, CheckCircle, Clock, XCircle, Calendar, Star, ThumbsUp, ThumbsDown, Trash2, Lightbulb } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -197,6 +198,9 @@ export default function CaseSelfReview() {
   const [selectedCaseIndex, setSelectedCaseIndex] = useState(0);
   const [caseDetailDialogOpen, setCaseDetailDialogOpen] = useState(false);
   const [detailCase, setDetailCase] = useState<GeneratedCase | null>(null);
+  const [solutionDialogOpen, setSolutionDialogOpen] = useState(false);
+  const [solutionCase, setSolutionCase] = useState<GeneratedCase | null>(null);
+  const [solution, setSolution] = useState("");
 
   const info = testPointInfo[testPointId || "tp-1"] || { name: "测试点", dimensionName: "测试维度" };
 
@@ -244,6 +248,19 @@ export default function CaseSelfReview() {
   const handleViewCaseDetail = (testCase: GeneratedCase) => {
     setDetailCase(testCase);
     setCaseDetailDialogOpen(true);
+  };
+
+  const handleOpenSolution = (testCase: GeneratedCase) => {
+    setSolutionCase(testCase);
+    setSolution("");
+    setSolutionDialogOpen(true);
+  };
+
+  const handleSaveSolution = () => {
+    if (solutionCase && solution.trim()) {
+      toast.success("解决方案已保存");
+      setSolutionDialogOpen(false);
+    }
   };
 
   return (
@@ -359,7 +376,7 @@ export default function CaseSelfReview() {
           <div>创建时间</div>
           <div>智能评分</div>
           <div>自评状态</div>
-          <div>操作</div>
+          <div className="text-center">操作</div>
         </div>
 
         <div className="divide-y">
@@ -421,17 +438,29 @@ export default function CaseSelfReview() {
                     {status.label}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-7 px-3 text-xs gap-1"
-                    onClick={() => handleOpenReview(index)}
-                    disabled={testCase.status !== "pending"}
-                  >
-                    <FileCheck className="w-3.5 h-3.5" />
-                    自评
-                  </Button>
+                <div className="flex items-center justify-center gap-1">
+                  {testCase.status === "pending" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs gap-1"
+                      onClick={() => handleOpenReview(index)}
+                    >
+                      <FileCheck className="w-3.5 h-3.5" />
+                      自评
+                    </Button>
+                  )}
+                  {testCase.status === "rejected" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs gap-1"
+                      onClick={() => handleOpenSolution(testCase)}
+                    >
+                      <Lightbulb className="w-3.5 h-3.5" />
+                      解决方案
+                    </Button>
+                  )}
                 </div>
               </div>
             );
@@ -498,6 +527,54 @@ export default function CaseSelfReview() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setCaseDetailDialogOpen(false)}>
               关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Solution Dialog */}
+      <Dialog open={solutionDialogOpen} onOpenChange={setSolutionDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>解决方案</DialogTitle>
+          </DialogHeader>
+          {solutionCase && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg border bg-muted/30 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {solutionCase.code}
+                  </Badge>
+                  <span className="font-medium text-sm">{solutionCase.name}</span>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">不采纳原因</Label>
+                  <div className="flex items-start gap-2 p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                    <ThumbsDown className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-red-700 dark:text-red-400">
+                      {solutionCase.rejectionReason || "未填写不采纳原因"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="solution">解决方案</Label>
+                <Textarea
+                  id="solution"
+                  placeholder="请填写针对此用例的解决方案..."
+                  value={solution}
+                  onChange={(e) => setSolution(e.target.value)}
+                  className="min-h-[120px]"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSolutionDialogOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={handleSaveSolution} disabled={!solution.trim()}>
+              保存
             </Button>
           </DialogFooter>
         </DialogContent>
