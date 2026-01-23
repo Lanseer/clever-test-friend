@@ -253,11 +253,24 @@ export default function AIAssistant() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Case List */}
         <div className="w-80 border-r flex flex-col flex-shrink-0">
-          <div className="p-3 border-b bg-muted/30">
+          <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
             <h2 className="font-medium text-sm flex items-center gap-2">
               <FileText className="h-4 w-4" />
               已修改用例列表
             </h2>
+            {unconfirmedCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => setCases(prev => prev.map(c => 
+                  c.status === "modified" && !c.confirmed ? { ...c, confirmed: true } : c
+                ))}
+              >
+                <Check className="h-3 w-3 mr-1" />
+                批量确认
+              </Button>
+            )}
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-2">
