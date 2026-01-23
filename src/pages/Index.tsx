@@ -215,7 +215,7 @@ const Index = () => {
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                      <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
                     </div>
                     <div className={cn(
                       "p-3 rounded-xl transition-transform duration-300 group-hover:scale-110",
@@ -434,10 +434,7 @@ const Index = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* 图表区域 - 第二行 */}
-      <div className="grid grid-cols-1 gap-6">
         {/* 用例问题分类统计 */}
         <Card className="border shadow-sm">
           <CardHeader className="pb-2">
