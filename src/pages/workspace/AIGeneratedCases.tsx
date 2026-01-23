@@ -308,7 +308,7 @@ export default function AIGeneratedCases() {
                 <div className="flex items-center min-w-0">
                   <button
                     className="font-medium text-primary hover:underline truncate text-left"
-                    onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${record.id}`)}
+                    onClick={() => handleOpenReport(record)}
                   >
                     {record.name}
                   </button>
