@@ -338,31 +338,18 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold">用例质量分布</CardTitle>
               <div className="flex items-center gap-2">
-                {/* 自评/专家切换 */}
-                <div className="flex items-center bg-muted rounded-lg p-0.5">
-                  <button
-                    onClick={() => setQualityType("self")}
-                    className={cn(
-                      "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                      qualityType === "self"
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    自评
-                  </button>
-                  <button
-                    onClick={() => setQualityType("expert")}
-                    className={cn(
-                      "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                      qualityType === "expert"
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    专家
-                  </button>
-                </div>
+                <Select
+                  value={qualityType}
+                  onValueChange={(value: "self" | "expert") => setQualityType(value)}
+                >
+                  <SelectTrigger className="w-20 h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="self">自评</SelectItem>
+                    <SelectItem value="expert">专家</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Select
                   value={qualityPeriod}
                   onValueChange={(value: "week" | "month") => setQualityPeriod(value)}
@@ -444,31 +431,18 @@ const Index = () => {
                 <CardTitle className="text-base font-semibold">用例问题分类</CardTitle>
               </div>
               <div className="flex items-center gap-2">
-                {/* 自评/专家切换 */}
-                <div className="flex items-center bg-muted rounded-lg p-0.5">
-                  <button
-                    onClick={() => setIssueType("self")}
-                    className={cn(
-                      "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                      issueType === "self"
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    自评
-                  </button>
-                  <button
-                    onClick={() => setIssueType("expert")}
-                    className={cn(
-                      "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                      issueType === "expert"
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    专家
-                  </button>
-                </div>
+                <Select
+                  value={issueType}
+                  onValueChange={(value: "self" | "expert") => setIssueType(value)}
+                >
+                  <SelectTrigger className="w-20 h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="self">自评</SelectItem>
+                    <SelectItem value="expert">专家</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Select
                   value={issuePeriod}
                   onValueChange={(value: "week" | "month") => setIssuePeriod(value)}
