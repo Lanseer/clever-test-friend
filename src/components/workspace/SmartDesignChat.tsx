@@ -105,8 +105,10 @@ export function SmartDesignChat({
   }, [messages]);
 
   const currentDocVersions = mockDocuments.find((d) => d.id === currentDocId)?.versions || [];
+  // Keep the currently selected doc in the dropdown list; otherwise Radix SelectValue
+  // cannot render the selected label (it relies on an existing SelectItem).
   const availableDocuments = mockDocuments.filter(
-    (doc) => !selectedDocs.some((sd) => sd.docId === doc.id)
+    (doc) => doc.id === currentDocId || !selectedDocs.some((sd) => sd.docId === doc.id)
   );
 
   const upsertSelectedDoc = (docId: string, versionId: string) => {
