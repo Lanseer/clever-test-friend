@@ -197,7 +197,7 @@ export function SmartDesignChat({ selectedTaskId, onNoTaskPrompt, onGenerationCo
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm">
       {/* Chat Messages */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">

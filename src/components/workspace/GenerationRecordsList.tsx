@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Clock, FileText, AlertCircle, Sparkles } from "lucide-react";
+import { Clock, FileText, AlertCircle, Sparkles, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,17 +16,19 @@ interface GenerationRecordsListProps {
   taskName: string | null;
   records: GenerationRecord[];
   onConfirmResult: (recordId: string) => void;
+  onViewCases?: (recordId: string) => void;
 }
 
 export function GenerationRecordsList({ 
   taskId, 
   taskName,
   records,
-  onConfirmResult 
+  onConfirmResult,
+  onViewCases
 }: GenerationRecordsListProps) {
   if (!taskId) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-sm p-4 bg-gradient-to-b from-muted/20 to-transparent">
+      <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-sm p-4 bg-white/30 dark:bg-background/30 backdrop-blur-sm">
         <Sparkles className="w-8 h-8 mb-2 text-primary/40" />
         <span>请先选择一个设计任务</span>
       </div>
@@ -35,10 +36,10 @@ export function GenerationRecordsList({
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-sky-50/50 to-transparent dark:from-sky-950/20">
-      <div className="px-2 py-3 border-b border-border/30">
+    <div className="h-full flex flex-col bg-white/40 dark:bg-background/40 backdrop-blur-sm">
+      <div className="px-2 py-3 border-b border-sky-200/50 dark:border-sky-800/30">
         <h3 className="font-medium text-sm flex items-center gap-2">
-          <FileText className="w-4 h-4 text-primary" />
+          <FileText className="w-4 h-4 text-sky-600" />
           生成记录
         </h3>
         {taskName && (
@@ -59,34 +60,36 @@ export function GenerationRecordsList({
               <div
                 key={record.id}
                 className={cn(
-                  "p-3 rounded-lg border transition-all",
+                  "p-2.5 rounded-lg border transition-all",
                   record.status === "pending_confirm" 
-                    ? "border-amber-400/50 bg-gradient-to-r from-amber-50/50 to-amber-100/30 shadow-sm shadow-amber-200/30" 
-                    : "border-border/50 bg-card/50 hover:bg-card/80"
+                    ? "border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30 shadow-sm" 
+                    : "border-sky-200/60 bg-white/60 dark:bg-sky-950/20 hover:bg-white/80"
                 )}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">
+                <div className="flex items-center justify-between mb-1.5">
+                  <button 
+                    className="text-sm font-medium text-sky-700 dark:text-sky-400 hover:text-sky-600 hover:underline flex items-center gap-1 transition-colors"
+                    onClick={() => onViewCases?.(record.id)}
+                  >
                     第 {records.length - index} 次生成
-                  </span>
+                    <ExternalLink className="w-3 h-3" />
+                  </button>
                   {record.status === "pending_confirm" ? (
-                    <Badge className="bg-gradient-to-r from-amber-500 to-amber-400 text-xs border-0">
+                    <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-[10px] px-1.5 py-0 border-0">
                       待确认
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="bg-green-50/50 text-green-600 border-green-200/50 text-xs">
+                    <Badge variant="outline" className="bg-emerald-50/80 text-emerald-600 border-emerald-200/60 text-[10px] px-1.5 py-0">
                       已确认
                     </Badge>
                   )}
                 </div>
                 
-                <div className="space-y-1 text-xs text-muted-foreground">
+                <div className="space-y-0.5 text-[11px] text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <FileText className="w-3 h-3" />
-                    <span>生成总数: </span>
-                    <span className="font-medium text-foreground">
-                      {record.count}
-                    </span>
+                    <span>生成: </span>
+                    <span className="font-medium text-foreground">{record.count} 条</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
@@ -98,7 +101,7 @@ export function GenerationRecordsList({
                   <Button
                     variant="default"
                     size="sm"
-                    className="w-full mt-2 h-7 text-xs gap-1 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 border-0 shadow-sm"
+                    className="w-full mt-2 h-6 text-[11px] gap-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border-0 shadow-sm"
                     onClick={() => onConfirmResult(record.id)}
                   >
                     <AlertCircle className="w-3 h-3" />
