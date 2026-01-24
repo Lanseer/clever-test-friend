@@ -1,4 +1,5 @@
-import { Clock, FileText, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Clock, FileText, AlertCircle, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,53 +9,36 @@ interface GenerationRecord {
   id: string;
   count: number;
   createdAt: string;
-  status: "completed" | "pending_confirm";
+  status: "pending_confirm" | "confirmed";
 }
 
 interface GenerationRecordsListProps {
   taskId: string | null;
   taskName: string | null;
+  records: GenerationRecord[];
   onConfirmResult: (recordId: string) => void;
 }
-
-// Mock generation records per task
-const mockRecordsByTask: Record<string, GenerationRecord[]> = {
-  "1": [
-    { id: "gen-1-1", count: 24, createdAt: "2024-01-15 10:30", status: "completed" },
-    { id: "gen-1-2", count: 18, createdAt: "2024-01-14 14:20", status: "completed" },
-  ],
-  "2": [
-    { id: "gen-2-1", count: 0, createdAt: "2024-01-15 14:20", status: "pending_confirm" },
-  ],
-  "3": [
-    { id: "gen-3-1", count: 32, createdAt: "2024-01-14 16:45", status: "completed" },
-    { id: "gen-3-2", count: 28, createdAt: "2024-01-13 09:00", status: "pending_confirm" },
-  ],
-  "5": [
-    { id: "gen-5-1", count: 18, createdAt: "2024-01-13 11:00", status: "completed" },
-  ],
-};
 
 export function GenerationRecordsList({ 
   taskId, 
   taskName,
+  records,
   onConfirmResult 
 }: GenerationRecordsListProps) {
-  const records = taskId ? mockRecordsByTask[taskId] || [] : [];
-
   if (!taskId) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-        请先选择一个设计任务
+      <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-sm p-4 bg-gradient-to-b from-muted/20 to-transparent">
+        <Sparkles className="w-8 h-8 mb-2 text-primary/40" />
+        <span>请先选择一个设计任务</span>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-3 border-b bg-muted/30">
+    <div className="h-full flex flex-col bg-gradient-to-b from-muted/30 to-transparent">
+      <div className="p-3 border-b border-border/50">
         <h3 className="font-medium text-sm flex items-center gap-2">
-          <FileText className="w-4 h-4" />
+          <FileText className="w-4 h-4 text-primary" />
           生成记录
         </h3>
         {taskName && (
@@ -75,10 +59,10 @@ export function GenerationRecordsList({
               <div
                 key={record.id}
                 className={cn(
-                  "p-3 rounded-lg border transition-colors",
+                  "p-3 rounded-lg border transition-all",
                   record.status === "pending_confirm" 
-                    ? "border-amber-400/50 bg-amber-50/30" 
-                    : "border-border bg-card hover:bg-muted/30"
+                    ? "border-amber-400/50 bg-gradient-to-r from-amber-50/50 to-amber-100/30 shadow-sm shadow-amber-200/30" 
+                    : "border-border/50 bg-card/50 hover:bg-card/80"
                 )}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -86,12 +70,12 @@ export function GenerationRecordsList({
                     第 {records.length - index} 次生成
                   </span>
                   {record.status === "pending_confirm" ? (
-                    <Badge className="bg-amber-500 text-xs">
+                    <Badge className="bg-gradient-to-r from-amber-500 to-amber-400 text-xs border-0">
                       待确认
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 text-xs">
-                      已完成
+                    <Badge variant="outline" className="bg-green-50/50 text-green-600 border-green-200/50 text-xs">
+                      已确认
                     </Badge>
                   )}
                 </div>
@@ -101,7 +85,7 @@ export function GenerationRecordsList({
                     <FileText className="w-3 h-3" />
                     <span>生成总数: </span>
                     <span className="font-medium text-foreground">
-                      {record.status === "pending_confirm" ? "-" : record.count}
+                      {record.count}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -114,7 +98,7 @@ export function GenerationRecordsList({
                   <Button
                     variant="default"
                     size="sm"
-                    className="w-full mt-2 h-7 text-xs gap-1 bg-amber-500 hover:bg-amber-600"
+                    className="w-full mt-2 h-7 text-xs gap-1 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 border-0 shadow-sm"
                     onClick={() => onConfirmResult(record.id)}
                   >
                     <AlertCircle className="w-3 h-3" />
