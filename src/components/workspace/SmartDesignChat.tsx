@@ -109,23 +109,35 @@ export function SmartDesignChat({
     (doc) => !selectedDocs.some((sd) => sd.docId === doc.id)
   );
 
-  const handleAddDocument = () => {
-    if (!currentDocId || !currentVersionId) return;
-    const doc = mockDocuments.find((d) => d.id === currentDocId);
-    const version = doc?.versions.find((v) => v.id === currentVersionId);
-    if (doc && version) {
-      setSelectedDocs([
-        ...selectedDocs,
-        {
-          docId: doc.id,
-          docName: doc.name,
-          versionId: version.id,
-          versionName: version.name,
-        },
-      ]);
-      setCurrentDocId("");
-      setCurrentVersionId("");
-    }
+  const upsertSelectedDoc = (docId: string, versionId: string) => {
+    const doc = mockDocuments.find((d) => d.id === docId);
+    const version = doc?.versions.find((v) => v.id === versionId);
+    if (!doc || !version) return;
+
+    setSelectedDocs((prev) => {
+      const exists = prev.some((d) => d.docId === docId);
+      if (!exists) {
+        return [
+          ...prev,
+          {
+            docId: doc.id,
+            docName: doc.name,
+            versionId: version.id,
+            versionName: version.name,
+          },
+        ];
+      }
+
+      return prev.map((d) =>
+        d.docId === docId
+          ? {
+              ...d,
+              versionId: version.id,
+              versionName: version.name,
+            }
+          : d
+      );
+    });
   };
 
   const handleRemoveDocument = (docId: string) => {
@@ -346,6 +358,8 @@ export function SmartDesignChat({
                   if (doc && doc.versions.length > 0) {
                     const latestVersion = doc.versions[doc.versions.length - 1];
                     setCurrentVersionId(latestVersion.id);
+                    // Also immediately show this doc above with the latest version
+                    upsertSelectedDoc(value, latestVersion.id);
                   } else {
                     setCurrentVersionId("");
                   }
@@ -365,7 +379,11 @@ export function SmartDesignChat({
 
               <Select
                 value={currentVersionId}
-                onValueChange={setCurrentVersionId}
+                onValueChange={(val) => {
+                  setCurrentVersionId(val);
+                  // If the doc is already selected, switching version updates it
+                  if (currentDocId) upsertSelectedDoc(currentDocId, val);
+                }}
                 disabled={!currentDocId}
               >
                 <SelectTrigger className="w-[70px] h-7 text-xs bg-muted/50 border-border/50">
@@ -379,17 +397,6 @@ export function SmartDesignChat({
                   ))}
                 </SelectContent>
               </Select>
-
-              {/* Add button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={handleAddDocument}
-                disabled={!currentDocId || !currentVersionId}
-              >
-                添加
-              </Button>
 
               {/* Fixed BDD Template Badge */}
               <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
