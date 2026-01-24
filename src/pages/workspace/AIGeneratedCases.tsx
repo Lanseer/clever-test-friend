@@ -176,13 +176,27 @@ export default function AIGeneratedCases() {
   };
 
   return (
-    <div className="h-[calc(100vh-3rem)] flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="h-[calc(100vh-3rem)] flex flex-col relative overflow-hidden">
+      {/* Sky Blue Starry Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-100/80 via-blue-50/60 to-indigo-100/50 dark:from-sky-950/30 dark:via-blue-950/20 dark:to-indigo-950/30" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Stars decoration */}
+        <div className="absolute top-[10%] left-[15%] w-1 h-1 bg-sky-400/60 rounded-full animate-pulse" />
+        <div className="absolute top-[20%] right-[25%] w-1.5 h-1.5 bg-blue-400/50 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-[5%] right-[40%] w-1 h-1 bg-indigo-400/40 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-[35%] left-[8%] w-0.5 h-0.5 bg-sky-300/50 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-[15%] left-[60%] w-1 h-1 bg-blue-300/40 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
+        <div className="absolute top-[8%] right-[10%] w-1.5 h-1.5 bg-sky-400/50 rounded-full animate-pulse" style={{ animationDelay: '0.8s' }} />
+        <div className="absolute top-[25%] left-[35%] w-0.5 h-0.5 bg-indigo-300/60 rounded-full animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute top-[40%] right-[55%] w-1 h-1 bg-blue-400/30 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }} />
+      </div>
+
       {/* Main Content - Split into Top (Chat) and Bottom (Tasks) */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         {/* Top Section - Chat Area (larger) */}
-        <div className="flex-[3] border-b border-border/50 flex min-h-0">
+        <div className="flex-[4] border-b border-border/30 flex min-h-0">
           {/* Left - Generation Records */}
-          <div className="w-56 border-r border-border/50 flex-shrink-0">
+          <div className="w-48 border-r border-border/30 flex-shrink-0">
             <GenerationRecordsList
               taskId={selectedTaskId}
               taskName={selectedTask?.name || null}
@@ -202,8 +216,8 @@ export default function AIGeneratedCases() {
         </div>
 
         {/* Bottom Section - Task Cards (smaller) */}
-        <div className="flex-[1] flex flex-col min-h-0 bg-gradient-to-t from-muted/20 to-transparent">
-          <div className="px-4 py-2 border-b border-border/50 flex items-center justify-between flex-shrink-0">
+        <div className="h-[180px] flex flex-col min-h-0 bg-gradient-to-t from-white/40 to-transparent dark:from-background/40">
+          <div className="px-4 py-2 border-b border-border/30 flex items-center justify-between flex-shrink-0">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
               智能设计任务
@@ -214,12 +228,12 @@ export default function AIGeneratedCases() {
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus className="w-3 h-3" />
-              新增任务
+              测试任务
             </Button>
           </div>
           
-          <ScrollArea className="flex-1 px-4 py-2">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+          <div className="flex-1 px-4 py-2 overflow-x-auto">
+            <div className="flex gap-3 h-full">
               {tasks.map((task) => (
                 <SmartDesignTaskCard
                   key={task.id}
@@ -232,7 +246,7 @@ export default function AIGeneratedCases() {
                 />
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </div>
       </div>
 

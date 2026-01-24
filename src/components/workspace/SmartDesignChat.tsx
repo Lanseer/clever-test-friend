@@ -332,12 +332,12 @@ export function SmartDesignChat({ selectedTaskId, onNoTaskPrompt, onGenerationCo
                 </Popover>
               )}
 
-              <div className="flex-1" />
-
-              {/* Fixed BDD Template Badge */}
+              {/* Fixed BDD Template Badge - left aligned */}
               <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
                 BDD标准模板
               </Badge>
+              
+              <div className="flex-1" />
             </div>
 
             {/* Send Button */}
