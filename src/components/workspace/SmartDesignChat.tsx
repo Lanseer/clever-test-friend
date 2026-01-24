@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { GenerationRecordsPopover } from "./GenerationRecordsPopover";
 
 interface SelectedDocument {
   docId: string;
@@ -31,10 +32,21 @@ interface Message {
   timestamp: Date;
 }
 
+interface GenerationRecord {
+  id: string;
+  count: number;
+  createdAt: string;
+  status: "pending_confirm" | "confirmed";
+}
+
 interface SmartDesignChatProps {
   selectedTaskId: string | null;
+  selectedTaskName: string | null;
+  records: GenerationRecord[];
   onNoTaskPrompt: () => void;
   onGenerationComplete: () => void;
+  onConfirmResult: (recordId: string) => void;
+  onViewCases: (recordId: string) => void;
 }
 
 // Mock documents
@@ -65,7 +77,15 @@ const mockDocuments = [
   },
 ];
 
-export function SmartDesignChat({ selectedTaskId, onNoTaskPrompt, onGenerationComplete }: SmartDesignChatProps) {
+export function SmartDesignChat({ 
+  selectedTaskId, 
+  selectedTaskName,
+  records,
+  onNoTaskPrompt, 
+  onGenerationComplete,
+  onConfirmResult,
+  onViewCases,
+}: SmartDesignChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "init",
@@ -179,7 +199,7 @@ export function SmartDesignChat({ selectedTaskId, onNoTaskPrompt, onGenerationCo
       const newMessages = [...prev];
       newMessages[newMessages.length - 1] = {
         ...newMessages[newMessages.length - 1],
-        content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成\n\n本次共生成 ${caseCount} 条测试用例，请在左侧生成记录中确认结果。`,
+        content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成\n\n本次共生成 ${caseCount} 条测试用例，请点击右上角「生成记录」确认结果。`,
       };
       return newMessages;
     });
@@ -198,6 +218,24 @@ export function SmartDesignChat({ selectedTaskId, onNoTaskPrompt, onGenerationCo
 
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm">
+      {/* Header with task name and records button */}
+      <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <Bot className="w-5 h-5 text-sky-600 flex-shrink-0" />
+          <div className="min-w-0">
+            <h3 className="font-medium text-sm text-sky-800 dark:text-sky-200">智能设计助手</h3>
+            {selectedTaskName && (
+              <p className="text-xs text-muted-foreground truncate">{selectedTaskName}</p>
+            )}
+          </div>
+        </div>
+        <GenerationRecordsPopover
+          records={records}
+          onConfirmResult={onConfirmResult}
+          onViewCases={onViewCases}
+        />
+      </div>
+
       {/* Chat Messages */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">

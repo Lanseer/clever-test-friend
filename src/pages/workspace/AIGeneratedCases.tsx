@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Plus, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { SmartDesignChat } from "@/components/workspace/SmartDesignChat";
-import { GenerationRecordsList } from "@/components/workspace/GenerationRecordsList";
-import { SmartDesignTaskCard } from "@/components/workspace/SmartDesignTaskCard";
+import { SmartDesignTaskList } from "@/components/workspace/SmartDesignTaskList";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { ConfirmGenerationResultDialog } from "@/components/workspace/ConfirmGenerationResultDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -131,6 +127,20 @@ export default function AIGeneratedCases() {
     });
   };
 
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(tasks.filter(t => t.id !== taskId));
+    const newRecords = { ...recordsByTask };
+    delete newRecords[taskId];
+    setRecordsByTask(newRecords);
+    if (selectedTaskId === taskId) {
+      setSelectedTaskId(tasks[0]?.id || null);
+    }
+    toast({
+      title: "删除成功",
+      description: "任务已删除",
+    });
+  };
+
   const handleGenerationComplete = () => {
     if (!selectedTaskId) return;
     
@@ -180,7 +190,7 @@ export default function AIGeneratedCases() {
   };
 
   return (
-    <div className="h-[calc(100vh)] -m-6 flex flex-col overflow-hidden relative">
+    <div className="h-[calc(100vh)] -m-6 flex overflow-hidden relative">
       {/* Enhanced Sky Blue Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-sky-200 via-blue-100 to-indigo-200 dark:from-sky-900/60 dark:via-blue-900/40 dark:to-indigo-900/50" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-100/40 via-transparent to-transparent" />
@@ -199,67 +209,31 @@ export default function AIGeneratedCases() {
         <div className="absolute top-[35%] left-[20%] w-0.5 h-0.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.8s' }} />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-        {/* Top Section - Chat Area */}
-        <div className="flex-1 border-b border-sky-300/30 flex min-h-0">
-          {/* Left - Generation Records */}
-          <div className="w-44 border-r border-sky-300/30 flex-shrink-0">
-            <GenerationRecordsList
-              taskId={selectedTaskId}
-              taskName={selectedTask?.name || null}
-              records={currentRecords}
-              onConfirmResult={handleConfirmResult}
-              onViewCases={handleViewCases}
-            />
-          </div>
+      {/* Left Panel - Task List */}
+      <div className="w-72 flex-shrink-0 border-r border-sky-300/30 relative z-10">
+        <SmartDesignTaskList
+          tasks={tasks}
+          selectedTaskId={selectedTaskId}
+          onSelectTask={handleSelectTask}
+          onSelfReview={handleSelfReview}
+          onExpertReview={handleExpertReview}
+          onReport={handleReport}
+          onDelete={handleDeleteTask}
+          onCreateTask={() => setCreateDialogOpen(true)}
+        />
+      </div>
 
-          {/* Right - Chat Area */}
-          <div className="flex-1">
-            <SmartDesignChat
-              selectedTaskId={selectedTaskId}
-              onNoTaskPrompt={handleNoTaskPrompt}
-              onGenerationComplete={handleGenerationComplete}
-            />
-          </div>
-        </div>
-
-        {/* Bottom Section - Task Cards */}
-        <div className="h-[200px] flex flex-col min-h-0 bg-white/20 dark:bg-background/20 backdrop-blur-sm">
-          <div className="px-4 py-2 border-b border-sky-300/30 flex items-center flex-shrink-0">
-            <h2 className="font-semibold text-sm flex items-center gap-2 text-sky-800 dark:text-sky-200">
-              <Sparkles className="w-4 h-4 text-sky-600" />
-              智能设计任务
-            </h2>
-          </div>
-          
-          <div className="flex-1 px-4 py-3 overflow-x-auto">
-            <div className="flex gap-3 h-full">
-              {tasks.map((task) => (
-                <SmartDesignTaskCard
-                  key={task.id}
-                  task={task}
-                  isSelected={task.id === selectedTaskId}
-                  onSelect={handleSelectTask}
-                  onSelfReview={handleSelfReview}
-                  onExpertReview={handleExpertReview}
-                  onReport={handleReport}
-                />
-              ))}
-              
-              {/* Add New Task Card */}
-              <div
-                className="w-[180px] h-full flex-shrink-0 rounded-lg border-2 border-dashed border-sky-300/60 hover:border-sky-400 bg-white/30 dark:bg-card/30 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/50 dark:hover:bg-card/50 flex items-center justify-center group"
-                onClick={() => setCreateDialogOpen(true)}
-              >
-                <div className="flex flex-col items-center gap-2 text-sky-500 group-hover:text-sky-600 transition-colors">
-                  <Plus className="w-8 h-8" />
-                  <span className="text-xs font-medium">新建任务</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Right Panel - Chat Area */}
+      <div className="flex-1 relative z-10">
+        <SmartDesignChat
+          selectedTaskId={selectedTaskId}
+          selectedTaskName={selectedTask?.name || null}
+          records={currentRecords}
+          onNoTaskPrompt={handleNoTaskPrompt}
+          onGenerationComplete={handleGenerationComplete}
+          onConfirmResult={handleConfirmResult}
+          onViewCases={handleViewCases}
+        />
       </div>
 
       {/* Create Task Dialog */}
