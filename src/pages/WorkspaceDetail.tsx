@@ -89,6 +89,7 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/generation-records" element={<GenerationRecords />} />
+            <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/self-review/:testPointId" element={<CaseSelfReview />} />

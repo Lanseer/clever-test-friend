@@ -63,16 +63,7 @@ export default function BatchCaseList() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink 
-              className="cursor-pointer"
-              onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/generation-records`)}
-            >
-              生成记录
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>用例列表</BreadcrumbPage>
+            <BreadcrumbPage>生成用例列表</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -82,14 +73,14 @@ export default function BatchCaseList() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/generation-records`)}
+          onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">用例列表</h1>
+          <h1 className="text-2xl font-bold text-foreground">生成用例列表</h1>
           <p className="text-muted-foreground mt-1">
-            批次 BATCH-00{batchId} · 共 {mockCases.length} 个用例
+            批次 {batchId?.substring(0, 8)} · 共 {mockCases.length} 个用例
           </p>
         </div>
       </div>
