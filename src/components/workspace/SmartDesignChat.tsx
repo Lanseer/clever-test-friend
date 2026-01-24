@@ -44,7 +44,7 @@ interface SmartDesignChatProps {
   onViewCases: (recordId: string) => void;
 }
 
-// Mock documents
+// Mock documents - versions ordered from oldest to newest (last is latest)
 const mockDocuments = [
   {
     id: "doc-1",
@@ -52,6 +52,7 @@ const mockDocuments = [
     versions: [
       { id: "v1-1", name: "v1.0" },
       { id: "v1-2", name: "v1.1" },
+      { id: "v1-3", name: "v1.2" },
     ],
   },
   {
@@ -60,6 +61,7 @@ const mockDocuments = [
     versions: [
       { id: "v2-1", name: "v1.0" },
       { id: "v2-2", name: "v2.0" },
+      { id: "v2-3", name: "v2.1" },
     ],
   },
   {
@@ -107,24 +109,7 @@ export function SmartDesignChat({
     (doc) => !selectedDocs.some((sd) => sd.docId === doc.id)
   );
 
-  const handleAddDocument = () => {
-    if (!currentDocId || !currentVersionId) return;
-    const doc = mockDocuments.find((d) => d.id === currentDocId);
-    const version = doc?.versions.find((v) => v.id === currentVersionId);
-    if (doc && version) {
-      setSelectedDocs([
-        ...selectedDocs,
-        {
-          docId: doc.id,
-          docName: doc.name,
-          versionId: version.id,
-          versionName: version.name,
-        },
-      ]);
-      setCurrentDocId("");
-      setCurrentVersionId("");
-    }
-  };
+  // Document adding is now handled automatically in onValueChange
 
   const handleRemoveDocument = (docId: string) => {
     setSelectedDocs(selectedDocs.filter((d) => d.docId !== docId));
@@ -216,17 +201,12 @@ export function SmartDesignChat({
 
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm">
-      {/* Header with task name and records button */}
+      {/* Header with centered task name and records button */}
       <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <Bot className="w-5 h-5 text-sky-600 flex-shrink-0" />
-          <div className="min-w-0">
-            <h3 className="font-medium text-sm text-sky-800 dark:text-sky-200">智能设计助手</h3>
-            {selectedTaskName && (
-              <p className="text-xs text-muted-foreground truncate">{selectedTaskName}</p>
-            )}
-          </div>
-        </div>
+        <div className="w-24" /> {/* Spacer for centering */}
+        <h2 className="font-semibold text-base text-sky-900 dark:text-sky-100 truncate max-w-[60%]">
+          {selectedTaskName || "请选择任务"}
+        </h2>
         <GenerationRecordsPopover
           records={records}
           onConfirmResult={onConfirmResult}
@@ -344,41 +324,40 @@ export function SmartDesignChat({
                 value={currentDocId}
                 onValueChange={(value) => {
                   setCurrentDocId(value);
-                  setCurrentVersionId("");
+                  // Auto-select latest version when document is selected
+                  const doc = mockDocuments.find((d) => d.id === value);
+                  if (doc && doc.versions.length > 0) {
+                    const latestVersion = doc.versions[doc.versions.length - 1];
+                    setCurrentVersionId(latestVersion.id);
+                    // Auto-add the document with latest version
+                    setTimeout(() => {
+                      const version = latestVersion;
+                      if (doc && version) {
+                        setSelectedDocs((prev) => [
+                          ...prev,
+                          {
+                            docId: doc.id,
+                            docName: doc.name,
+                            versionId: version.id,
+                            versionName: version.name,
+                          },
+                        ]);
+                        setCurrentDocId("");
+                        setCurrentVersionId("");
+                      }
+                    }, 0);
+                  } else {
+                    setCurrentVersionId("");
+                  }
                 }}
               >
-                <SelectTrigger className="w-[140px] h-7 text-xs bg-muted/50 border-border/50">
+                <SelectTrigger className="w-[160px] h-7 text-xs bg-muted/50 border-border/50">
                   <SelectValue placeholder="选择文档" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableDocuments.map((doc) => (
                     <SelectItem key={doc.id} value={doc.id} className="text-xs">
                       {doc.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={currentVersionId}
-                onValueChange={(val) => {
-                  setCurrentVersionId(val);
-                  // Auto-add when version selected
-                  setTimeout(() => {
-                    if (currentDocId && val) {
-                      handleAddDocument();
-                    }
-                  }, 0);
-                }}
-                disabled={!currentDocId}
-              >
-                <SelectTrigger className="w-[70px] h-7 text-xs bg-muted/50 border-border/50">
-                  <SelectValue placeholder="版本" />
-                </SelectTrigger>
-                <SelectContent>
-                  {currentDocVersions.map((version) => (
-                    <SelectItem key={version.id} value={version.id} className="text-xs">
-                      {version.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
