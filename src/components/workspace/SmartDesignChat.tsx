@@ -109,7 +109,7 @@ export function SmartDesignChat({
     (doc) => !selectedDocs.some((sd) => sd.docId === doc.id)
   );
 
-  const upsertSelectedDoc = (docId: string, versionId: string, isNewDoc: boolean = false) => {
+  const upsertSelectedDoc = (docId: string, versionId: string) => {
     const doc = mockDocuments.find((d) => d.id === docId);
     const version = doc?.versions.find((v) => v.id === versionId);
     if (!doc || !version) return;
@@ -138,12 +138,6 @@ export function SmartDesignChat({
           : d
       );
     });
-
-    // Reset dropdowns after adding a new document so user can select another
-    if (isNewDoc) {
-      setCurrentDocId("");
-      setCurrentVersionId("");
-    }
   };
 
   const handleRemoveDocument = (docId: string) => {
@@ -358,12 +352,14 @@ export function SmartDesignChat({
               <Select
                 value={currentDocId}
                 onValueChange={(value) => {
+                  setCurrentDocId(value);
                   // Auto-select latest version when document is selected
                   const doc = mockDocuments.find((d) => d.id === value);
                   if (doc && doc.versions.length > 0) {
                     const latestVersion = doc.versions[doc.versions.length - 1];
-                    // Add doc with latest version and reset dropdowns
-                    upsertSelectedDoc(value, latestVersion.id, true);
+                    setCurrentVersionId(latestVersion.id);
+                    // Add doc with latest version to list above
+                    upsertSelectedDoc(value, latestVersion.id);
                   }
                 }}
               >
