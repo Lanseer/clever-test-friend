@@ -180,7 +180,7 @@ export default function AIGeneratedCases() {
   };
 
   return (
-    <div className="fixed inset-0 left-[var(--sidebar-width,16rem)] flex flex-col overflow-hidden">
+    <div className="absolute inset-0 flex flex-col overflow-hidden">
       {/* Enhanced Sky Blue Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-sky-200 via-blue-100 to-indigo-200 dark:from-sky-900/60 dark:via-blue-900/40 dark:to-indigo-900/50" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-100/40 via-transparent to-transparent" />
