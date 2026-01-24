@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, ChevronDown } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -11,11 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { GenerationRecordsPopover } from "./GenerationRecordsPopover";
 
 interface SelectedDocument {
@@ -99,7 +94,8 @@ export function SmartDesignChat({
   const [selectedDocs, setSelectedDocs] = useState<SelectedDocument[]>([]);
   const [currentDocId, setCurrentDocId] = useState("");
   const [currentVersionId, setCurrentVersionId] = useState("");
-  const [docsPopoverOpen, setDocsPopoverOpen] = useState(false);
+  const [showConfirmTag, setShowConfirmTag] = useState(false);
+  const [lastGeneratedCount, setLastGeneratedCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -195,17 +191,19 @@ export function SmartDesignChat({
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
     const caseCount = Math.floor(Math.random() * 20) + 15;
+    setLastGeneratedCount(caseCount);
     setMessages((prev) => {
       const newMessages = [...prev];
       newMessages[newMessages.length - 1] = {
         ...newMessages[newMessages.length - 1],
-        content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成\n\n本次共生成 ${caseCount} 条测试用例，请点击右上角「生成记录」确认结果。`,
+        content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成`,
       };
       return newMessages;
     });
 
     setIsProcessing(false);
     setSelectedDocs([]);
+    setShowConfirmTag(true);
     onGenerationComplete();
   };
 
@@ -267,13 +265,68 @@ export function SmartDesignChat({
               )}
             </div>
           ))}
+          
+          {/* Confirm Tag after generation */}
+          {showConfirmTag && (
+            <div className="flex justify-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+                <Bot className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-3 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-amber-800 dark:text-amber-200">
+                    本次共生成 <span className="font-semibold">{lastGeneratedCount}</span> 条用例
+                  </span>
+                  <Button
+                    size="sm"
+                    className="h-7 text-xs bg-amber-500 hover:bg-amber-600 text-white"
+                    onClick={() => {
+                      const pendingRecord = records.find(r => r.status === "pending_confirm");
+                      if (pendingRecord) {
+                        onConfirmResult(pendingRecord.id);
+                      }
+                      setShowConfirmTag(false);
+                    }}
+                  >
+                    <Check className="w-3 h-3 mr-1" />
+                    确认结果
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 
       {/* Input Area with embedded controls */}
       <div className="p-3 flex-shrink-0">
-        <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg overflow-hidden">
+          {/* Selected Documents - displayed above textarea */}
+          {selectedDocs.length > 0 && (
+            <div className="px-3 pt-3 pb-1">
+              <div className="flex flex-wrap gap-2">
+                {selectedDocs.map((doc) => (
+                  <div
+                    key={doc.docId}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs"
+                  >
+                    <FileText className="w-3 h-3" />
+                    <span className="max-w-[120px] truncate">{doc.docName}</span>
+                    <span className="text-primary/70">({doc.versionName})</span>
+                    <button
+                      className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                      onClick={() => handleRemoveDocument(doc.docId)}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           <Textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -330,45 +383,6 @@ export function SmartDesignChat({
                   ))}
                 </SelectContent>
               </Select>
-
-              {/* Selected docs count with popover */}
-              {selectedDocs.length > 0 && (
-                <Popover open={docsPopoverOpen} onOpenChange={setDocsPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="h-7 text-xs gap-1 bg-primary/10 hover:bg-primary/20 text-primary"
-                    >
-                      <FileText className="w-3 h-3" />
-                      {selectedDocs.length} 个文档
-                      <ChevronDown className="w-3 h-3" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-2" align="start">
-                    <div className="space-y-1">
-                      {selectedDocs.map((doc) => (
-                        <div
-                          key={doc.docId}
-                          className="flex items-center justify-between p-2 rounded-lg bg-muted/50 text-xs"
-                        >
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <FileText className="w-3 h-3 flex-shrink-0 text-muted-foreground" />
-                            <span className="truncate">{doc.docName}</span>
-                            <span className="text-muted-foreground">({doc.versionName})</span>
-                          </div>
-                          <button
-                            className="ml-2 hover:bg-destructive/10 rounded-full p-1 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleRemoveDocument(doc.docId)}
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              )}
 
               {/* Fixed BDD Template Badge - left aligned */}
               <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
