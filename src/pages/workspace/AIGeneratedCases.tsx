@@ -180,7 +180,7 @@ export default function AIGeneratedCases() {
   };
 
   return (
-    <div className="h-[calc(100vh-3rem)] flex flex-col relative overflow-hidden -m-6 p-6">
+    <div className="fixed inset-0 left-[var(--sidebar-width,16rem)] flex flex-col overflow-hidden">
       {/* Enhanced Sky Blue Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-sky-200 via-blue-100 to-indigo-200 dark:from-sky-900/60 dark:via-blue-900/40 dark:to-indigo-900/50" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-100/40 via-transparent to-transparent" />
@@ -225,20 +225,12 @@ export default function AIGeneratedCases() {
         </div>
 
         {/* Bottom Section - Task Cards */}
-        <div className="h-[200px] flex flex-col min-h-0 bg-white/30 dark:bg-background/30 backdrop-blur-sm">
-          <div className="px-4 py-2 border-b border-sky-300/30 flex items-center justify-between flex-shrink-0">
+        <div className="h-[200px] flex flex-col min-h-0 bg-white/20 dark:bg-background/20 backdrop-blur-sm">
+          <div className="px-4 py-2 border-b border-sky-300/30 flex items-center flex-shrink-0">
             <h2 className="font-semibold text-sm flex items-center gap-2 text-sky-800 dark:text-sky-200">
               <Sparkles className="w-4 h-4 text-sky-600" />
               智能设计任务
             </h2>
-            <Button 
-              size="sm" 
-              className="gap-1 h-7 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 shadow-md shadow-sky-500/30"
-              onClick={() => setCreateDialogOpen(true)}
-            >
-              <Plus className="w-3 h-3" />
-              测试任务
-            </Button>
           </div>
           
           <div className="flex-1 px-4 py-3 overflow-x-auto">
@@ -254,6 +246,17 @@ export default function AIGeneratedCases() {
                   onReport={handleReport}
                 />
               ))}
+              
+              {/* Add New Task Card */}
+              <div
+                className="w-[180px] h-full flex-shrink-0 rounded-lg border-2 border-dashed border-sky-300/60 hover:border-sky-400 bg-white/30 dark:bg-card/30 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/50 dark:hover:bg-card/50 flex items-center justify-center group"
+                onClick={() => setCreateDialogOpen(true)}
+              >
+                <div className="flex flex-col items-center gap-2 text-sky-500 group-hover:text-sky-600 transition-colors">
+                  <Plus className="w-8 h-8" />
+                  <span className="text-xs font-medium">新建任务</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
