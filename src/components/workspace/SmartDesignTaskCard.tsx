@@ -32,10 +32,10 @@ export function SmartDesignTaskCard({
   return (
     <div
       className={cn(
-        "p-3 rounded-lg border cursor-pointer transition-all",
+        "w-[200px] flex-shrink-0 p-3 rounded-lg border cursor-pointer transition-all flex flex-col",
         isSelected
-          ? "border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg shadow-primary/10 ring-1 ring-primary/30"
-          : "border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 hover:shadow-md"
+          ? "border-primary bg-gradient-to-br from-primary/15 to-sky-100/50 dark:to-sky-900/30 shadow-lg shadow-primary/20 ring-2 ring-primary/40"
+          : "border-border/40 bg-white/60 dark:bg-card/60 backdrop-blur-sm hover:border-primary/40 hover:bg-white/80 dark:hover:bg-card/80 hover:shadow-md"
       )}
       onClick={() => onSelect(task.id)}
     >
@@ -48,22 +48,26 @@ export function SmartDesignTaskCard({
         </div>
       </div>
 
-      {/* Stats - Compact */}
+      {/* Stats - Vertical layout */}
       <div className="flex gap-2 mb-2 text-xs">
-        <div className="flex-1 text-center p-1.5 bg-muted/30 rounded">
-          <span className="text-muted-foreground">自评 </span>
-          <span className="text-green-600 font-medium">{task.selfReviewPassed}</span>
-          <span className="text-muted-foreground">/{task.selfReviewTotal}</span>
+        <div className="flex-1 text-center p-1.5 bg-sky-50/50 dark:bg-sky-900/20 rounded border border-sky-200/30">
+          <div className="text-muted-foreground">自评</div>
+          <div className="mt-0.5">
+            <span className="text-green-600 font-medium">{task.selfReviewPassed}</span>
+            <span className="text-muted-foreground">/{task.selfReviewTotal}</span>
+          </div>
         </div>
-        <div className="flex-1 text-center p-1.5 bg-muted/30 rounded">
-          <span className="text-muted-foreground">专家 </span>
-          <span className="text-green-600 font-medium">{task.expertReviewPassed}</span>
-          <span className="text-muted-foreground">/{task.expertReviewTotal}</span>
+        <div className="flex-1 text-center p-1.5 bg-sky-50/50 dark:bg-sky-900/20 rounded border border-sky-200/30">
+          <div className="text-muted-foreground">专家</div>
+          <div className="mt-0.5">
+            <span className="text-green-600 font-medium">{task.expertReviewPassed}</span>
+            <span className="text-muted-foreground">/{task.expertReviewTotal}</span>
+          </div>
         </div>
       </div>
 
-      {/* Actions - Compact */}
-      <div className="flex gap-1">
+      {/* Actions */}
+      <div className="flex gap-1 mt-auto">
         <Button
           variant="ghost"
           size="sm"

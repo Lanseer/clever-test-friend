@@ -35,8 +35,8 @@ export function GenerationRecordsList({
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-muted/30 to-transparent">
-      <div className="p-3 border-b border-border/50">
+    <div className="h-full flex flex-col bg-gradient-to-b from-sky-50/50 to-transparent dark:from-sky-950/20">
+      <div className="px-2 py-3 border-b border-border/30">
         <h3 className="font-medium text-sm flex items-center gap-2">
           <FileText className="w-4 h-4 text-primary" />
           生成记录
@@ -49,7 +49,7 @@ export function GenerationRecordsList({
       </div>
       
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-2">
+        <div className="px-2 py-2 space-y-2">
           {records.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
               暂无生成记录
