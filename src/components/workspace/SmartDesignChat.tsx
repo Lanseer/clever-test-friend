@@ -363,7 +363,7 @@ export function SmartDesignChat({
                   }
                 }}
               >
-                <SelectTrigger className="w-[140px] h-7 text-xs bg-muted/50 border-border/50">
+                <SelectTrigger className="w-[140px] h-7 text-xs bg-background/80 border-border/50 text-foreground">
                   <SelectValue placeholder="选择文档" />
                 </SelectTrigger>
                 <SelectContent>
@@ -384,7 +384,7 @@ export function SmartDesignChat({
                 }}
                 disabled={!currentDocId}
               >
-                <SelectTrigger className="w-[70px] h-7 text-xs bg-muted/50 border-border/50">
+                <SelectTrigger className="w-[70px] h-7 text-xs bg-background/80 border-border/50 text-foreground">
                   <SelectValue placeholder="版本" />
                 </SelectTrigger>
                 <SelectContent>
