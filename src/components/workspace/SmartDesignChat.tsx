@@ -109,7 +109,24 @@ export function SmartDesignChat({
     (doc) => !selectedDocs.some((sd) => sd.docId === doc.id)
   );
 
-  // Document adding is now handled automatically in onValueChange
+  const handleAddDocument = () => {
+    if (!currentDocId || !currentVersionId) return;
+    const doc = mockDocuments.find((d) => d.id === currentDocId);
+    const version = doc?.versions.find((v) => v.id === currentVersionId);
+    if (doc && version) {
+      setSelectedDocs([
+        ...selectedDocs,
+        {
+          docId: doc.id,
+          docName: doc.name,
+          versionId: version.id,
+          versionName: version.name,
+        },
+      ]);
+      setCurrentDocId("");
+      setCurrentVersionId("");
+    }
+  };
 
   const handleRemoveDocument = (docId: string) => {
     setSelectedDocs(selectedDocs.filter((d) => d.docId !== docId));
@@ -329,29 +346,12 @@ export function SmartDesignChat({
                   if (doc && doc.versions.length > 0) {
                     const latestVersion = doc.versions[doc.versions.length - 1];
                     setCurrentVersionId(latestVersion.id);
-                    // Auto-add the document with latest version
-                    setTimeout(() => {
-                      const version = latestVersion;
-                      if (doc && version) {
-                        setSelectedDocs((prev) => [
-                          ...prev,
-                          {
-                            docId: doc.id,
-                            docName: doc.name,
-                            versionId: version.id,
-                            versionName: version.name,
-                          },
-                        ]);
-                        setCurrentDocId("");
-                        setCurrentVersionId("");
-                      }
-                    }, 0);
                   } else {
                     setCurrentVersionId("");
                   }
                 }}
               >
-                <SelectTrigger className="w-[160px] h-7 text-xs bg-muted/50 border-border/50">
+                <SelectTrigger className="w-[140px] h-7 text-xs bg-muted/50 border-border/50">
                   <SelectValue placeholder="选择文档" />
                 </SelectTrigger>
                 <SelectContent>
@@ -363,7 +363,35 @@ export function SmartDesignChat({
                 </SelectContent>
               </Select>
 
-              {/* Fixed BDD Template Badge - left aligned */}
+              <Select
+                value={currentVersionId}
+                onValueChange={setCurrentVersionId}
+                disabled={!currentDocId}
+              >
+                <SelectTrigger className="w-[70px] h-7 text-xs bg-muted/50 border-border/50">
+                  <SelectValue placeholder="版本" />
+                </SelectTrigger>
+                <SelectContent>
+                  {currentDocVersions.map((version) => (
+                    <SelectItem key={version.id} value={version.id} className="text-xs">
+                      {version.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Add button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={handleAddDocument}
+                disabled={!currentDocId || !currentVersionId}
+              >
+                添加
+              </Button>
+
+              {/* Fixed BDD Template Badge */}
               <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
                 BDD标准模板
               </Badge>
