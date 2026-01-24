@@ -175,33 +175,42 @@ export default function AIGeneratedCases() {
     });
   };
 
+  const handleViewCases = (recordId: string) => {
+    navigate(`/workspace/${workspaceId}/management/batch-cases/${recordId}`);
+  };
+
   return (
     <div className="h-[calc(100vh-3rem)] flex flex-col relative overflow-hidden">
-      {/* Sky Blue Starry Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-100/80 via-blue-50/60 to-indigo-100/50 dark:from-sky-950/30 dark:via-blue-950/20 dark:to-indigo-950/30" />
+      {/* Enhanced Sky Blue Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-200 via-blue-100 to-indigo-200 dark:from-sky-900/60 dark:via-blue-900/40 dark:to-indigo-900/50" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-100/40 via-transparent to-transparent" />
+      
+      {/* Animated Stars */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Stars decoration */}
-        <div className="absolute top-[10%] left-[15%] w-1 h-1 bg-sky-400/60 rounded-full animate-pulse" />
-        <div className="absolute top-[20%] right-[25%] w-1.5 h-1.5 bg-blue-400/50 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute top-[5%] right-[40%] w-1 h-1 bg-indigo-400/40 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-[35%] left-[8%] w-0.5 h-0.5 bg-sky-300/50 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-[15%] left-[60%] w-1 h-1 bg-blue-300/40 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
-        <div className="absolute top-[8%] right-[10%] w-1.5 h-1.5 bg-sky-400/50 rounded-full animate-pulse" style={{ animationDelay: '0.8s' }} />
-        <div className="absolute top-[25%] left-[35%] w-0.5 h-0.5 bg-indigo-300/60 rounded-full animate-pulse" style={{ animationDelay: '1.2s' }} />
-        <div className="absolute top-[40%] right-[55%] w-1 h-1 bg-blue-400/30 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }} />
+        <div className="absolute top-[8%] left-[12%] w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-lg shadow-white/50" />
+        <div className="absolute top-[15%] right-[20%] w-2 h-2 bg-sky-200 rounded-full animate-pulse shadow-lg shadow-sky-200/60" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-[5%] right-[45%] w-1 h-1 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-[25%] left-[5%] w-1 h-1 bg-cyan-200 rounded-full animate-pulse shadow-md shadow-cyan-200/40" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-[12%] left-[55%] w-1.5 h-1.5 bg-white/90 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
+        <div className="absolute top-[6%] right-[8%] w-2 h-2 bg-sky-100 rounded-full animate-pulse shadow-lg shadow-sky-100/50" style={{ animationDelay: '0.8s' }} />
+        <div className="absolute top-[20%] left-[30%] w-1 h-1 bg-indigo-200/80 rounded-full animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute top-[30%] right-[60%] w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }} />
+        <div className="absolute top-[18%] right-[35%] w-1 h-1 bg-cyan-100 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[35%] left-[20%] w-0.5 h-0.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.8s' }} />
       </div>
 
-      {/* Main Content - Split into Top (Chat) and Bottom (Tasks) */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-        {/* Top Section - Chat Area (larger) */}
-        <div className="flex-[4] border-b border-border/30 flex min-h-0">
+        {/* Top Section - Chat Area */}
+        <div className="flex-1 border-b border-sky-300/30 flex min-h-0">
           {/* Left - Generation Records */}
-          <div className="w-48 border-r border-border/30 flex-shrink-0">
+          <div className="w-44 border-r border-sky-300/30 flex-shrink-0">
             <GenerationRecordsList
               taskId={selectedTaskId}
               taskName={selectedTask?.name || null}
               records={currentRecords}
               onConfirmResult={handleConfirmResult}
+              onViewCases={handleViewCases}
             />
           </div>
 
@@ -215,16 +224,16 @@ export default function AIGeneratedCases() {
           </div>
         </div>
 
-        {/* Bottom Section - Task Cards (smaller) */}
-        <div className="h-[180px] flex flex-col min-h-0 bg-gradient-to-t from-white/40 to-transparent dark:from-background/40">
-          <div className="px-4 py-2 border-b border-border/30 flex items-center justify-between flex-shrink-0">
-            <h2 className="font-semibold text-sm flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
+        {/* Bottom Section - Task Cards */}
+        <div className="h-[200px] flex flex-col min-h-0 bg-white/30 dark:bg-background/30 backdrop-blur-sm">
+          <div className="px-4 py-2 border-b border-sky-300/30 flex items-center justify-between flex-shrink-0">
+            <h2 className="font-semibold text-sm flex items-center gap-2 text-sky-800 dark:text-sky-200">
+              <Sparkles className="w-4 h-4 text-sky-600" />
               智能设计任务
             </h2>
             <Button 
               size="sm" 
-              className="gap-1 h-7 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-sm"
+              className="gap-1 h-7 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 shadow-md shadow-sky-500/30"
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus className="w-3 h-3" />
@@ -232,7 +241,7 @@ export default function AIGeneratedCases() {
             </Button>
           </div>
           
-          <div className="flex-1 px-4 py-2 overflow-x-auto">
+          <div className="flex-1 px-4 py-3 overflow-x-auto">
             <div className="flex gap-3 h-full">
               {tasks.map((task) => (
                 <SmartDesignTaskCard
