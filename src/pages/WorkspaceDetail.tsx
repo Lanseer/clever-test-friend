@@ -1,6 +1,7 @@
 import { useParams, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
+import { useRole } from "@/contexts/RoleContext";
 import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
 import TestCaseDetail from "./workspace/TestCaseDetail";
@@ -33,48 +34,45 @@ const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "rnd": { name: "研发中心", description: "研发中心测试工作空间" },
 };
 
-// 默认仪表板组件
-function WorkspaceDashboard({ workspace }: { workspace: { name: string; description: string } | null }) {
-  return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-foreground mb-2">
-        {workspace?.name || "工作空间"} - 测试工作台
-      </h1>
-      <p className="text-muted-foreground mb-6">{workspace?.description}</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="p-6 rounded-xl border bg-card">
-          <h3 className="font-semibold text-foreground mb-2">快速统计</h3>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>测试用例: 128 个</p>
-            <p>执行计划: 5 个</p>
-            <p>通过率: 94.5%</p>
-          </div>
-        </div>
-        <div className="p-6 rounded-xl border bg-card">
-          <h3 className="font-semibold text-foreground mb-2">最近活动</h3>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>• 执行了回归测试计划</p>
-            <p>• 新增了 12 个测试用例</p>
-            <p>• 生成了测试报告</p>
-          </div>
-        </div>
-        <div className="p-6 rounded-xl border bg-card">
-          <h3 className="font-semibold text-foreground mb-2">团队成员</h3>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>成员数: 8 人</p>
-            <p>在线: 5 人</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function WorkspaceDetail() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const workspace = workspaceId ? mockWorkspaces[workspaceId] : null;
+  const { isAdmin } = useRole();
 
+  // Normal user: no sidebar, directly show AIGeneratedCases (Smart Design)
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex w-full bg-background">
+        <main className="flex-1 p-6 overflow-auto">
+          <Routes>
+            <Route index element={<Navigate to="management/ai-cases" replace />} />
+            <Route path="management/ai-cases" element={<AIGeneratedCases />} />
+            <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId/generation-records" element={<GenerationRecords />} />
+            <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/self-review/:testPointId" element={<CaseSelfReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
+            <Route path="management/ai-cases/:recordId/expert-review" element={<ExpertReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review" element={<ExpertReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review/:testPointId" element={<ExpertReviewDetail />} />
+            <Route path="management/ai-cases/:recordId/expert-review-records" element={<ExpertReviewRecords />} />
+            <Route path="management/ai-cases/:recordId/expert-review-records/:reviewId/cases" element={<ExpertReviewDetail />} />
+            <Route path="management/ai-cases/:recordId/initiate-expert-review" element={<InitiateExpertReview />} />
+            <Route path="management/ai-cases/:recordId/expert-case-review" element={<ExpertCaseReview />} />
+            <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
+            <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
+            <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
+            <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
+          </Routes>
+        </main>
+      </div>
+    );
+  }
+
+  // Admin: show sidebar with admin menu
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
@@ -110,7 +108,7 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
-            <Route path="*" element={<WorkspaceDashboard workspace={workspace} />} />
+            <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </main>
       </div>
