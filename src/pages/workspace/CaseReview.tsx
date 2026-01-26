@@ -257,12 +257,24 @@ export default function CaseReview() {
   };
 
   const handleConfirmAiSuggestions = () => {
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
     setDimensions(prev => prev.map(dim => ({
       ...dim,
       testPoints: dim.testPoints.map(tp => {
         const suggestion = aiSuggestions.get(tp.id);
         if (suggestion) {
-          return { ...tp, reviewResult: suggestion };
+          const actionLabel = reviewResultConfig[suggestion].label;
+          const newHistory: ReviewHistoryItem = {
+            timestamp,
+            action: `智能审查将状态改为${actionLabel}`
+          };
+          return { 
+            ...tp, 
+            reviewResult: suggestion,
+            reviewHistory: [...(tp.reviewHistory || []), newHistory]
+          };
         }
         return tp;
       })
@@ -464,7 +476,7 @@ export default function CaseReview() {
                       {/* 审查记录 - 显示最新记录 */}
                       <div className="col-span-1 px-2 py-1 flex items-center">
                         <span className="text-xs text-muted-foreground truncate">
-                          {tp.reviewHistory.length > 0 
+                          {tp.reviewHistory && tp.reviewHistory.length > 0 
                             ? `${tp.reviewHistory[tp.reviewHistory.length - 1].timestamp} ${tp.reviewHistory[tp.reviewHistory.length - 1].action}`
                             : "-"
                           }
