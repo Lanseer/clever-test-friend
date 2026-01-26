@@ -37,6 +37,8 @@ interface ReviewCase {
   batchCode?: string;
   nature?: "positive" | "negative";
   createdAt?: string;
+  outline?: string;
+  scenario?: string;
 }
 
 interface AIReviewCasesDialogProps {
@@ -251,12 +253,12 @@ export function AIReviewCasesDialog({
           <div className="flex-1 overflow-y-auto">
             <div className="rounded-lg border overflow-hidden">
               <div className="overflow-x-auto">
-                <div className="min-w-[700px]">
+                <div className="min-w-[800px]">
                   <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
                     <div className="col-span-1">批次</div>
                     <div className="col-span-2">编号</div>
-                    <div className="col-span-4">用例名称</div>
-                    <div className="col-span-2">性质</div>
+                    <div className="col-span-3">大纲</div>
+                    <div className="col-span-3">场景</div>
                     <div className="col-span-3">创建时间</div>
                   </div>
 
@@ -277,26 +279,19 @@ export function AIReviewCasesDialog({
                             {caseItem.code}
                           </Badge>
                         </div>
-                        <div className="col-span-4 flex items-center">
+                        <div className="col-span-3 flex items-center">
+                          <span className="text-sm text-muted-foreground truncate" title={caseItem.outline || "用户管理"}>
+                            {caseItem.outline || "用户管理"}
+                          </span>
+                        </div>
+                        <div className="col-span-3 flex items-center">
                           <button
                             className="font-medium text-sm text-primary hover:underline text-left truncate"
                             onClick={() => handleCaseClick(caseItem, index)}
+                            title={caseItem.scenario || caseItem.name}
                           >
-                            {caseItem.name}
+                            {caseItem.scenario || caseItem.name}
                           </button>
-                        </div>
-                        <div className="col-span-2 flex items-center">
-                          <Badge 
-                            variant="outline" 
-                            className={cn(
-                              "text-xs",
-                              caseItem.nature === "negative" 
-                                ? "bg-orange-50 text-orange-600 border-orange-200"
-                                : "bg-blue-50 text-blue-600 border-blue-200"
-                            )}
-                          >
-                            {caseItem.nature === "negative" ? "反向" : "正向"}
-                          </Badge>
                         </div>
                         <div className="col-span-3 flex items-center text-sm text-muted-foreground">
                           {caseItem.createdAt || "2024-01-15 14:30"}
