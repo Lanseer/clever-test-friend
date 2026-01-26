@@ -461,13 +461,13 @@ export default function CaseReview() {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div 
-                              className="max-w-[50%] min-w-0 cursor-pointer hover:text-primary transition-colors"
+                              className="max-w-[50%] min-w-0 cursor-pointer text-primary hover:text-primary/80 hover:underline transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleOpenSidebar(dimension.id, testPoint);
                               }}
                             >
-                              <span className="text-sm text-foreground truncate block">
+                              <span className="text-sm truncate block">
                                 {testPoint.name}
                               </span>
                             </div>
@@ -688,16 +688,16 @@ export default function CaseReview() {
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent className="w-[480px] sm:max-w-[480px] flex flex-col">
           <SheetHeader>
-            <SheetTitle>测试点详情</SheetTitle>
+            <SheetTitle>场景详情</SheetTitle>
           </SheetHeader>
           
           {sidebarTestPoint && (
             <div className="flex-1 flex flex-col overflow-hidden">
               <ScrollArea className="flex-1 pr-4">
                 <div className="space-y-6 py-4">
-                  {/* 测试点名称 */}
+                  {/* 场景名称 */}
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">测试点名称</Label>
+                    <Label className="text-muted-foreground text-xs">场景名称</Label>
                     <p className="text-sm text-foreground">{sidebarTestPoint.testPoint.name}</p>
                   </div>
                   
