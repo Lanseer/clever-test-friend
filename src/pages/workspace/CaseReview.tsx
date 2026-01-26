@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Bot, Layers, Target, ChevronRight, ChevronDown, FileCheck } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Bot, Layers, Target, ChevronRight, ChevronDown, Star, CheckCircle, XCircle, ThumbsUp, ThumbsDown, Clock, Eye, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   Breadcrumb,
@@ -12,12 +13,29 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+
+type AIScore = "excellent" | "qualified" | "unqualified";
+type AdoptionStatus = "adopted" | "notAdopted" | "pending";
 
 interface TestPoint {
   id: string;
   name: string;
   total: number;
   passed: number;
+  aiScore: AIScore;
+  adoptionStatus: AdoptionStatus;
+  rejectionTags?: string[];
+  rejectionReason?: string;
 }
 
 interface TestDimension {
@@ -37,9 +55,9 @@ const mockDimensions: TestDimension[] = [
     total: 45,
     passed: 38,
     testPoints: [
-      { id: "tp-1", name: "用户登录", total: 15, passed: 12 },
-      { id: "tp-2", name: "用户注册", total: 18, passed: 16 },
-      { id: "tp-3", name: "密码重置", total: 12, passed: 10 },
+      { id: "tp-1", name: "用户登录", total: 15, passed: 12, aiScore: "excellent", adoptionStatus: "pending" },
+      { id: "tp-2", name: "用户注册", total: 18, passed: 16, aiScore: "qualified", adoptionStatus: "adopted" },
+      { id: "tp-3", name: "密码重置", total: 12, passed: 10, aiScore: "unqualified", adoptionStatus: "notAdopted", rejectionTags: ["覆盖不完整", "步骤缺失"], rejectionReason: "测试步骤不够详细，缺少边界条件测试" },
     ],
   },
   {
@@ -49,9 +67,9 @@ const mockDimensions: TestDimension[] = [
     total: 62,
     passed: 55,
     testPoints: [
-      { id: "tp-4", name: "订单创建", total: 22, passed: 20 },
-      { id: "tp-5", name: "订单支付", total: 25, passed: 22 },
-      { id: "tp-6", name: "订单退款", total: 15, passed: 13 },
+      { id: "tp-4", name: "订单创建", total: 22, passed: 20, aiScore: "excellent", adoptionStatus: "adopted" },
+      { id: "tp-5", name: "订单支付", total: 25, passed: 22, aiScore: "qualified", adoptionStatus: "pending" },
+      { id: "tp-6", name: "订单退款", total: 15, passed: 13, aiScore: "qualified", adoptionStatus: "pending" },
     ],
   },
   {
@@ -61,9 +79,9 @@ const mockDimensions: TestDimension[] = [
     total: 38,
     passed: 32,
     testPoints: [
-      { id: "tp-7", name: "商品上架", total: 14, passed: 12 },
-      { id: "tp-8", name: "商品编辑", total: 12, passed: 10 },
-      { id: "tp-9", name: "库存管理", total: 12, passed: 10 },
+      { id: "tp-7", name: "商品上架", total: 14, passed: 12, aiScore: "excellent", adoptionStatus: "adopted" },
+      { id: "tp-8", name: "商品编辑", total: 12, passed: 10, aiScore: "unqualified", adoptionStatus: "notAdopted", rejectionTags: ["逻辑错误"], rejectionReason: "编辑场景测试逻辑有误" },
+      { id: "tp-9", name: "库存管理", total: 12, passed: 10, aiScore: "qualified", adoptionStatus: "pending" },
     ],
   },
   {
@@ -73,10 +91,55 @@ const mockDimensions: TestDimension[] = [
     total: 25,
     passed: 22,
     testPoints: [
-      { id: "tp-10", name: "销售报表", total: 10, passed: 9 },
-      { id: "tp-11", name: "数据导出", total: 15, passed: 13 },
+      { id: "tp-10", name: "销售报表", total: 10, passed: 9, aiScore: "excellent", adoptionStatus: "adopted" },
+      { id: "tp-11", name: "数据导出", total: 15, passed: 13, aiScore: "qualified", adoptionStatus: "pending" },
     ],
   },
+];
+
+const aiScoreConfig: Record<AIScore, { label: string; icon: typeof Star; className: string }> = {
+  excellent: {
+    label: "优秀",
+    icon: Star,
+    className: "bg-green-500/10 text-green-600 border-green-200",
+  },
+  qualified: {
+    label: "合格",
+    icon: CheckCircle,
+    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+  },
+  unqualified: {
+    label: "不合格",
+    icon: XCircle,
+    className: "bg-red-500/10 text-red-600 border-red-200",
+  },
+};
+
+const adoptionStatusConfig: Record<AdoptionStatus, { label: string; icon: typeof ThumbsUp; className: string }> = {
+  adopted: {
+    label: "采纳",
+    icon: ThumbsUp,
+    className: "bg-green-500/10 text-green-600 border-green-200 cursor-pointer hover:bg-green-500/20",
+  },
+  notAdopted: {
+    label: "不采纳",
+    icon: ThumbsDown,
+    className: "bg-red-500/10 text-red-600 border-red-200 cursor-pointer hover:bg-red-500/20",
+  },
+  pending: {
+    label: "待自评",
+    icon: Clock,
+    className: "bg-amber-500/10 text-amber-600 border-amber-200",
+  },
+};
+
+const rejectionTagOptions = [
+  "覆盖不完整",
+  "步骤缺失",
+  "逻辑错误",
+  "描述不清",
+  "重复用例",
+  "优先级不当",
 ];
 
 // 计算总统计
@@ -105,11 +168,22 @@ export default function CaseReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [dimensions, setDimensions] = useState(mockDimensions);
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
     new Set(mockDimensions.map((d) => d.id))
   );
+  
+  // 不采纳对话框状态
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectingTestPoint, setRejectingTestPoint] = useState<{ dimId: string; tpId: string } | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [rejectionReason, setRejectionReason] = useState("");
+  
+  // 查看状态对话框
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [viewingTestPoint, setViewingTestPoint] = useState<TestPoint | null>(null);
 
-  const totalStats = calculateTotalStats(mockDimensions);
+  const totalStats = calculateTotalStats(dimensions);
   const pendingCount = totalStats.total - totalStats.passed;
 
   const toggleDimension = (dimensionId: string) => {
@@ -125,7 +199,7 @@ export default function CaseReview() {
   };
 
   // 过滤维度和测试点
-  const filteredDimensions = mockDimensions
+  const filteredDimensions = dimensions
     .map((dim) => ({
       ...dim,
       testPoints: dim.testPoints.filter((tp) =>
@@ -138,8 +212,74 @@ export default function CaseReview() {
         dim.testPoints.length > 0
     );
 
-  const handleNavigateToSelfReview = (testPointId: string) => {
+  const handleNavigateToCaseList = (testPointId: string) => {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/self-review/${testPointId}`);
+  };
+
+  const handleAdopt = (dimId: string, tpId: string) => {
+    setDimensions(prev => prev.map(dim => {
+      if (dim.id === dimId) {
+        return {
+          ...dim,
+          testPoints: dim.testPoints.map(tp => {
+            if (tp.id === tpId) {
+              return { ...tp, adoptionStatus: "adopted" as AdoptionStatus };
+            }
+            return tp;
+          })
+        };
+      }
+      return dim;
+    }));
+    toast.success("已采纳");
+  };
+
+  const handleOpenRejectDialog = (dimId: string, tpId: string) => {
+    setRejectingTestPoint({ dimId, tpId });
+    setSelectedTags([]);
+    setRejectionReason("");
+    setRejectDialogOpen(true);
+  };
+
+  const handleConfirmReject = () => {
+    if (rejectingTestPoint && selectedTags.length > 0 && rejectionReason.trim()) {
+      setDimensions(prev => prev.map(dim => {
+        if (dim.id === rejectingTestPoint.dimId) {
+          return {
+            ...dim,
+            testPoints: dim.testPoints.map(tp => {
+              if (tp.id === rejectingTestPoint.tpId) {
+                return { 
+                  ...tp, 
+                  adoptionStatus: "notAdopted" as AdoptionStatus,
+                  rejectionTags: selectedTags,
+                  rejectionReason: rejectionReason
+                };
+              }
+              return tp;
+            })
+          };
+        }
+        return dim;
+      }));
+      setRejectDialogOpen(false);
+      toast.success("已标记为不采纳");
+    }
+  };
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const handleViewStatus = (testPoint: TestPoint) => {
+    if (testPoint.adoptionStatus !== "pending") {
+      setViewingTestPoint(testPoint);
+      setStatusDialogOpen(true);
+    }
   };
 
   return (
@@ -267,32 +407,93 @@ export default function CaseReview() {
                 </div>
 
                 {/* Test Points */}
-                {isExpanded && dimension.testPoints.map((testPoint) => (
-                  <div
-                    key={testPoint.id}
-                    className="flex items-center gap-3 px-6 py-3 pl-16 hover:bg-muted/20 transition-colors border-t border-muted/50"
-                  >
-                    <div className="w-6 h-6 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0">
-                      <Target className="w-3.5 h-3.5 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm text-foreground">{testPoint.name}</span>
-                    </div>
-                    <SimpleMiniStats total={testPoint.total} passed={testPoint.passed} />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 px-3 text-xs gap-1 ml-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleNavigateToSelfReview(testPoint.id);
-                      }}
+                {isExpanded && dimension.testPoints.map((testPoint) => {
+                  const aiScore = aiScoreConfig[testPoint.aiScore];
+                  const AIScoreIcon = aiScore.icon;
+                  const adoptionStatus = adoptionStatusConfig[testPoint.adoptionStatus];
+                  const AdoptionIcon = adoptionStatus.icon;
+                  
+                  return (
+                    <div
+                      key={testPoint.id}
+                      className="flex items-center gap-3 px-6 py-3 pl-16 hover:bg-muted/20 transition-colors border-t border-muted/50"
                     >
-                      <FileCheck className="w-3.5 h-3.5" />
-                      用例自评
-                    </Button>
-                  </div>
-                ))}
+                      <div className="w-6 h-6 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0">
+                        <Target className="w-3.5 h-3.5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm text-foreground">{testPoint.name}</span>
+                      </div>
+                      
+                      {/* 智能评分 */}
+                      <Badge
+                        variant="outline"
+                        className={cn("text-xs gap-1", aiScore.className)}
+                      >
+                        <AIScoreIcon className="w-3 h-3" />
+                        {aiScore.label}
+                      </Badge>
+                      
+                      {/* 采纳状态 */}
+                      <Badge
+                        variant="outline"
+                        className={cn("text-xs gap-1", adoptionStatus.className)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewStatus(testPoint);
+                        }}
+                      >
+                        <AdoptionIcon className="w-3 h-3" />
+                        {adoptionStatus.label}
+                      </Badge>
+                      
+                      <SimpleMiniStats total={testPoint.total} passed={testPoint.passed} />
+                      
+                      {/* 采纳/不采纳按钮 */}
+                      {testPoint.adoptionStatus === "pending" && (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2 text-xs gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAdopt(dimension.id, testPoint.id);
+                            }}
+                          >
+                            <ThumbsUp className="w-3.5 h-3.5" />
+                            采纳
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2 text-xs gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenRejectDialog(dimension.id, testPoint.id);
+                            }}
+                          >
+                            <ThumbsDown className="w-3.5 h-3.5" />
+                            不采纳
+                          </Button>
+                        </div>
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-3 text-xs gap-1 ml-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNavigateToCaseList(testPoint.id);
+                        }}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        查看用例
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             );
           })}
@@ -305,6 +506,113 @@ export default function CaseReview() {
           </div>
         )}
       </div>
+
+      {/* 不采纳对话框 */}
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>填写不采纳信息</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>选择标签 <span className="text-red-500">*</span></Label>
+              <div className="flex flex-wrap gap-2">
+                {rejectionTagOptions.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant={selectedTags.includes(tag) ? "default" : "outline"}
+                    className={cn(
+                      "cursor-pointer transition-colors",
+                      selectedTags.includes(tag) 
+                        ? "bg-primary text-primary-foreground" 
+                        : "hover:bg-muted"
+                    )}
+                    onClick={() => toggleTag(tag)}
+                  >
+                    <Tag className="w-3 h-3 mr-1" />
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reason">不采纳原因 <span className="text-red-500">*</span></Label>
+              <Textarea
+                id="reason"
+                placeholder="请输入不采纳的具体原因..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+              取消
+            </Button>
+            <Button 
+              onClick={handleConfirmReject}
+              disabled={selectedTags.length === 0 || !rejectionReason.trim()}
+            >
+              确认
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 查看状态对话框 */}
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {viewingTestPoint?.adoptionStatus === "adopted" ? "采纳详情" : "不采纳详情"}
+            </DialogTitle>
+          </DialogHeader>
+          {viewingTestPoint && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium">{viewingTestPoint.name}</span>
+              </div>
+              
+              {viewingTestPoint.adoptionStatus === "adopted" ? (
+                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                    <ThumbsUp className="w-4 h-4" />
+                    <span className="font-medium">已采纳</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs">不采纳标签</Label>
+                    <div className="flex flex-wrap gap-1">
+                      {viewingTestPoint.rejectionTags?.map((tag) => (
+                        <Badge key={tag} variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs">不采纳原因</Label>
+                    <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                      <p className="text-sm text-red-700 dark:text-red-400">
+                        {viewingTestPoint.rejectionReason}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
+              关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
