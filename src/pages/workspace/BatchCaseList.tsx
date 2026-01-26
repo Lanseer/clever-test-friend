@@ -18,16 +18,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
+import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 
 interface BatchCase {
   id: string;
@@ -130,16 +122,13 @@ const docTypeConfig: Record<string, { label: string; className: string }> = {
 
 export default function BatchCaseList() {
   const navigate = useNavigate();
-  const { workspaceId, batchId } = useParams();
+  const { workspaceId, recordId } = useParams();
   const [metaExpanded, setMetaExpanded] = useState(true);
   const [expandedDimensions, setExpandedDimensions] = useState<Record<string, boolean>>(() => 
     mockDimensions.reduce((acc, dim) => ({ ...acc, [dim.id]: true }), {})
   );
   const [caseDetailOpen, setCaseDetailOpen] = useState(false);
-  const [selectedCase, setSelectedCase] = useState<BatchCase | null>(null);
-  const [selectedTestPoint, setSelectedTestPoint] = useState<TestPoint | null>(null);
-  const [caseListOpen, setCaseListOpen] = useState(false);
-  const [caseSearchQuery, setCaseSearchQuery] = useState("");
+  const [selectedCaseData, setSelectedCaseData] = useState<CaseDetailData | null>(null);
 
   const totalCases = mockDimensions.reduce(
     (acc, dim) => acc + dim.testPoints.reduce((tpAcc, tp) => tpAcc + tp.cases.length, 0),
@@ -151,41 +140,14 @@ export default function BatchCaseList() {
   };
 
   const handleViewCases = (testPoint: TestPoint) => {
-    setSelectedTestPoint(testPoint);
-    setCaseSearchQuery("");
-    setCaseListOpen(true);
-  };
-
-  const handleViewCaseDetail = (testCase: BatchCase) => {
-    setSelectedCase(testCase);
+    // 打开 CaseDetailSidebar，显示该测试点的用例信息
+    setSelectedCaseData({
+      id: testPoint.id,
+      reviewResult: "pending",
+      caseCount: testPoint.cases.length,
+    });
     setCaseDetailOpen(true);
   };
-
-  const getMockBddContent = (testCase: BatchCase) => {
-    return `Feature: ${testCase.name}
-
-  Scenario: ${testCase.name}
-    Given 用户已经注册并拥有有效的账户
-    And 用户位于登录页面
-    When 用户输入正确的用户名 "testuser"
-    And 用户输入正确的密码 "Password123"
-    And 用户点击登录按钮
-    Then 系统应该验证用户凭证
-    And 用户应该被重定向到主页
-    And 系统应该显示欢迎消息
-
-  Examples:
-    | 用户名    | 密码        | 预期结果   |
-    | testuser  | Password123 | 登录成功   |
-    | admin     | Admin@456   | 登录成功   |
-    | user01    | User#789    | 登录成功   |`;
-  };
-
-  const filteredCases = selectedTestPoint?.cases.filter(
-    (c) =>
-      c.name.toLowerCase().includes(caseSearchQuery.toLowerCase()) ||
-      c.code.toLowerCase().includes(caseSearchQuery.toLowerCase())
-  ) || [];
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -219,7 +181,7 @@ export default function BatchCaseList() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">生成用例列表</h1>
           <p className="text-muted-foreground mt-1">
-            批次 {batchId?.substring(0, 8)} · 共 {totalCases} 个用例
+            批次 {recordId?.substring(0, 8)} · 共 {totalCases} 个用例
           </p>
         </div>
       </div>
@@ -345,135 +307,12 @@ export default function BatchCaseList() {
         ))}
       </div>
 
-      {/* Case List Sheet */}
-      <Sheet open={caseListOpen} onOpenChange={setCaseListOpen}>
-        <SheetContent className="w-[600px] sm:max-w-[600px] flex flex-col">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" />
-              {selectedTestPoint?.name} - 用例列表
-            </SheetTitle>
-          </SheetHeader>
-
-          {/* Search */}
-          <div className="py-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="搜索用例编号或名称..."
-                value={caseSearchQuery}
-                onChange={(e) => setCaseSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          {/* Case List */}
-          <ScrollArea className="flex-1">
-            <div className="rounded-lg border">
-              <div className="grid grid-cols-[70px_1fr_80px_110px] gap-2 px-3 py-2 bg-muted/50 text-xs font-medium text-muted-foreground border-b sticky top-0">
-                <div>编号</div>
-                <div>用例名称</div>
-                <div>用例性质</div>
-                <div>创建时间</div>
-              </div>
-
-              <div className="divide-y">
-                {filteredCases.map((testCase) => {
-                  const nature = natureConfig[testCase.nature];
-
-                  return (
-                    <div
-                      key={testCase.id}
-                      className="grid grid-cols-[70px_1fr_80px_110px] gap-2 px-3 py-2 hover:bg-muted/30 transition-colors cursor-pointer"
-                      onClick={() => handleViewCaseDetail(testCase)}
-                    >
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="font-mono text-[10px] px-1">
-                          {testCase.code}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-foreground truncate">{testCase.name}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Badge variant="outline" className={`text-[10px] px-1 ${nature.className}`}>
-                          {nature.label}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        {testCase.createdAt}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {filteredCases.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                  <Search className="w-12 h-12 mb-4 opacity-50" />
-                  <p>未找到匹配的用例</p>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
-
       {/* Case Detail Sidebar */}
-      <Sheet open={caseDetailOpen} onOpenChange={setCaseDetailOpen}>
-        <SheetContent className="w-[520px] sm:max-w-[520px] flex flex-col">
-          <SheetHeader>
-            <SheetTitle>案例详情</SheetTitle>
-          </SheetHeader>
-          
-          {selectedCase && (
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <ScrollArea className="flex-1 pr-4">
-                <div className="space-y-6 py-4">
-                  {/* 案例信息 */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">用例编号</Label>
-                      <Badge variant="outline" className="text-xs font-mono">
-                        {selectedCase.code}
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">用例性质</Label>
-                      <Badge variant="outline" className={`text-xs ${natureConfig[selectedCase.nature].className}`}>
-                        {natureConfig[selectedCase.nature].label}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs">用例名称</Label>
-                    <p className="text-sm font-medium">{selectedCase.name}</p>
-                  </div>
-                  
-                  {/* 案例来源详情 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">案例来源</Label>
-                    <CaseSourceInfo caseId={selectedCase.id} showHeader={false} />
-                  </div>
-                  
-                  {/* BDD 完整内容 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">案例详情 (BDD)</Label>
-                    <Textarea
-                      className="min-h-[300px] font-mono text-xs bg-muted/30 resize-none"
-                      value={getMockBddContent(selectedCase)}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </ScrollArea>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
+      <CaseDetailSidebar
+        open={caseDetailOpen}
+        onOpenChange={setCaseDetailOpen}
+        caseData={selectedCaseData}
+      />
     </div>
   );
 }
