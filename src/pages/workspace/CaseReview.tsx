@@ -87,9 +87,9 @@ const mockDimensions: TestDimension[] = [
     name: "01-业务流程维度",
     testPoints: [
       { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory", caseCount: 12, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
-      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
+      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
       { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
-      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", category: "重复", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
+      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
     ],
   },
   {
@@ -308,27 +308,27 @@ export default function CaseReview() {
         </div>
       </div>
 
-      {/* Statistics */}
-      <div className="flex items-center gap-6 mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">总场景:</span>
-          <span className="text-sm font-medium">{statistics.totalScenarios}</span>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-5 gap-3 mb-6">
+        <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+          <span className="text-xs text-muted-foreground mb-1">总场景</span>
+          <span className="text-xl font-semibold">{statistics.totalScenarios}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">总案例:</span>
-          <span className="text-sm font-medium">{statistics.totalCases}</span>
+        <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+          <span className="text-xs text-muted-foreground mb-1">总案例</span>
+          <span className="text-xl font-semibold">{statistics.totalCases}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">采纳:</span>
-          <span className="text-sm font-medium text-green-600">{statistics.adopted}</span>
+        <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+          <span className="text-xs text-muted-foreground mb-1">采纳</span>
+          <span className="text-xl font-semibold text-green-600">{statistics.adopted}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">需完善:</span>
-          <span className="text-sm font-medium text-amber-600">{statistics.needsImprovement}</span>
+        <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+          <span className="text-xs text-muted-foreground mb-1">需完善</span>
+          <span className="text-xl font-semibold text-amber-600">{statistics.needsImprovement}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">丢弃:</span>
-          <span className="text-sm font-medium text-red-600">{statistics.needsDiscard}</span>
+        <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+          <span className="text-xs text-muted-foreground mb-1">丢弃</span>
+          <span className="text-xl font-semibold text-red-600">{statistics.needsDiscard}</span>
         </div>
       </div>
 
