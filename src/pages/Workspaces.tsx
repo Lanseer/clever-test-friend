@@ -10,7 +10,9 @@ import {
   Settings,
   Trash2,
   ArrowRight,
-  Folder
+  Folder,
+  Shield,
+  UserRound
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +23,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useRole, UserRole } from "@/contexts/RoleContext";
 
 interface Workspace {
   id: string;
@@ -41,15 +51,27 @@ const mockWorkspaces: Workspace[] = [
 
 export default function Workspaces() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const { setRole } = useRole();
 
   const filteredWorkspaces = mockWorkspaces.filter(ws =>
     ws.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ws.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleWorkspaceClick = (workspaceId: string) => {
-    navigate(`/workspace/${workspaceId}`);
+  const handleWorkspaceClick = (workspace: Workspace) => {
+    setSelectedWorkspace(workspace);
+    setRoleDialogOpen(true);
+  };
+
+  const handleRoleSelect = (role: UserRole) => {
+    setRole(role);
+    setRoleDialogOpen(false);
+    if (selectedWorkspace) {
+      navigate(`/workspace/${selectedWorkspace.id}`);
+    }
   };
 
   return (
@@ -89,7 +111,7 @@ export default function Workspaces() {
               key={workspace.id}
               className="group bg-card rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden animate-scale-in cursor-pointer"
               style={{ animationDelay: `${index * 50}ms` }}
-              onClick={() => handleWorkspaceClick(workspace.id)}
+              onClick={() => handleWorkspaceClick(workspace)}
             >
               {/* Color Bar */}
               <div 
@@ -183,6 +205,44 @@ export default function Workspaces() {
           </div>
         )}
       </div>
+
+      {/* Role Selection Dialog */}
+      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>选择进入角色</DialogTitle>
+            <DialogDescription>
+              请选择您要以哪种角色进入 <span className="font-medium text-foreground">{selectedWorkspace?.name}</span> 工作空间
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <button
+              onClick={() => handleRoleSelect("admin")}
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-border hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
+            >
+              <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+                <Shield className="w-8 h-8 text-amber-500" />
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-foreground">管理员</p>
+                <p className="text-xs text-muted-foreground mt-1">完整功能访问</p>
+              </div>
+            </button>
+            <button
+              onClick={() => handleRoleSelect("user")}
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-border hover:border-blue-500 hover:bg-blue-500/5 transition-all group"
+            >
+              <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                <UserRound className="w-8 h-8 text-blue-500" />
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-foreground">普通人员</p>
+                <p className="text-xs text-muted-foreground mt-1">智能设计功能</p>
+              </div>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { FolderOpen, ChevronLeft, ChevronRight, Zap, User, LogOut, Settings, Shield, UserRound } from "lucide-react";
+import { FolderOpen, ChevronLeft, ChevronRight, Zap, User, LogOut, Settings } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -21,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useRole } from "@/contexts/RoleContext";
 
 const menuItems = [
   { title: "工作空间", url: "/workspaces", icon: FolderOpen },
@@ -30,7 +29,6 @@ const menuItems = [
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const { role, setRole, isAdmin } = useRole();
 
   return (
     <Sidebar
@@ -81,53 +79,6 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-2 border-t border-sidebar-border space-y-1">
-        {/* Role Switcher */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "w-full justify-start text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent h-9",
-                isCollapsed && "justify-center px-0"
-              )}
-            >
-              <div className={cn(
-                "w-6 h-6 rounded-full flex items-center justify-center",
-                isAdmin ? "bg-amber-500/20" : "bg-blue-500/20"
-              )}>
-                {isAdmin ? (
-                  <Shield className="w-3.5 h-3.5 text-amber-500" />
-                ) : (
-                  <UserRound className="w-3.5 h-3.5 text-blue-500" />
-                )}
-              </div>
-              {!isCollapsed && (
-                <div className="ml-2 text-left">
-                  <p className="text-xs font-medium">{isAdmin ? "管理员" : "普通人员"}</p>
-                  <p className="text-[10px] text-sidebar-foreground/50">点击切换角色</p>
-                </div>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem 
-              onClick={() => setRole("admin")}
-              className={cn(role === "admin" && "bg-accent")}
-            >
-              <Shield className="w-4 h-4 mr-2 text-amber-500" />
-              管理员
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setRole("user")}
-              className={cn(role === "user" && "bg-accent")}
-            >
-              <UserRound className="w-4 h-4 mr-2 text-blue-500" />
-              普通人员
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -145,7 +96,7 @@ export function AppSidebar() {
               {!isCollapsed && (
                 <div className="ml-2 text-left">
                   <p className="text-xs font-medium">Lanseer</p>
-                  <p className="text-[10px] text-sidebar-foreground/50">{isAdmin ? "管理员" : "普通人员"}</p>
+                  <p className="text-[10px] text-sidebar-foreground/50">测试人员</p>
                 </div>
               )}
             </Button>
