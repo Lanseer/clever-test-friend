@@ -4,6 +4,7 @@ import { SmartDesignChat } from "@/components/workspace/SmartDesignChat";
 import { SmartDesignTaskList } from "@/components/workspace/SmartDesignTaskList";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { ConfirmGenerationResultDialog } from "@/components/workspace/ConfirmGenerationResultDialog";
+import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -73,6 +74,8 @@ export default function AIGeneratedCases() {
   const [noTaskAlertOpen, setNoTaskAlertOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingRecordId, setPendingRecordId] = useState<string | null>(null);
+  const [caseDetailOpen, setCaseDetailOpen] = useState(false);
+  const [selectedCaseData, setSelectedCaseData] = useState<CaseDetailData | null>(null);
 
   const selectedTask = tasks.find(t => t.id === selectedTaskId) || null;
   const currentRecords = selectedTaskId ? recordsByTask[selectedTaskId] || [] : [];
@@ -186,7 +189,14 @@ export default function AIGeneratedCases() {
   };
 
   const handleViewCases = (recordId: string) => {
-    navigate(`/workspace/${workspaceId}/management/batch-cases/${recordId}`);
+    // Find the record to get the case count
+    const record = Object.values(recordsByTask).flat().find(r => r.id === recordId);
+    setSelectedCaseData({
+      id: recordId,
+      reviewResult: "pending",
+      caseCount: record?.count || 0,
+    });
+    setCaseDetailOpen(true);
   };
 
   return (
@@ -267,11 +277,16 @@ export default function AIGeneratedCases() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Confirm Generation Result Dialog */}
       <ConfirmGenerationResultDialog
         open={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
         onConfirm={handleConfirmGeneration}
+      />
+
+      <CaseDetailSidebar
+        open={caseDetailOpen}
+        onOpenChange={setCaseDetailOpen}
+        caseData={selectedCaseData}
       />
     </div>
   );
