@@ -339,23 +339,23 @@ export default function CaseReview() {
               <div className="bg-[hsl(200,70%,50%)] text-white">
                 {/* First row - group headers */}
                 <div className="grid grid-cols-12 text-sm">
-                  <div className="col-span-4 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                  <div className="col-span-5 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     场景基本信息
                   </div>
-                  <div className="col-span-8 px-3 py-2 text-center font-medium">
+                  <div className="col-span-7 px-3 py-2 text-center font-medium">
                     用户审查
                   </div>
                 </div>
                 {/* Second row - column headers */}
                 <div className="grid grid-cols-12 text-sm bg-[hsl(200,65%,55%)]">
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">来源</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
-                  <div className="col-span-3 px-3 py-2 text-center">审查记录</div>
+                  <div className="col-span-2 px-3 py-2 text-center">审查记录</div>
                 </div>
               </div>
               
@@ -373,9 +373,12 @@ export default function CaseReview() {
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
                         <span className="font-mono text-xs">{tp.code}</span>
                       </div>
-                      {/* 场景描述 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center">
+                      {/* 场景描述 - hover显示完整内容 */}
+                      <div className="col-span-2 px-3 py-3 border-r border-border flex items-center group relative">
                         <span className="truncate text-foreground text-xs">{tp.name}</span>
+                        <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-2 min-w-[200px] max-w-[300px]">
+                          <span className="text-xs text-foreground whitespace-normal">{tp.name}</span>
+                        </div>
                       </div>
                       {/* 场景来源 - Badge显示 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
@@ -467,7 +470,7 @@ export default function CaseReview() {
                         )}
                       </div>
                       {/* 审查记录 - 显示最新记录，hover显示完整历史 */}
-                      <div className="col-span-3 px-2 py-1 flex items-center group relative">
+                      <div className="col-span-2 px-2 py-1 flex items-center group relative">
                         <span className="text-xs text-muted-foreground truncate">
                           {tp.reviewHistory && tp.reviewHistory.length > 0 
                             ? `${tp.reviewHistory[tp.reviewHistory.length - 1].timestamp} ${tp.reviewHistory[tp.reviewHistory.length - 1].action}`
