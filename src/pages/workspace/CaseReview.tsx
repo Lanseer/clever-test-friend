@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Layers, Target, ChevronRight, ChevronDown, ThumbsUp, ThumbsDown, Eye, Tag } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,196 +27,114 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 import { toast } from "sonner";
 
-type AIScore = "excellent" | "qualified" | "unqualified";
-type AdoptionStatus = "adopted" | "notAdopted" | "pending";
+type ReviewResult = "adopted" | "needsImprovement" | "needsDiscard" | "pending";
 
 interface TestPoint {
   id: string;
+  code: string;
   name: string;
-  total: number;
-  passed: number;
-  aiScore: AIScore;
-  adoptionStatus: AdoptionStatus;
-  rejectionTags?: string[];
-  rejectionReason?: string;
+  source: string;
+  caseCount: number;
+  reviewResult: ReviewResult;
+  category?: string;
+  solution?: string;
+  remark?: string;
 }
 
 interface TestDimension {
   id: string;
   name: string;
-  description: string;
-  total: number;
-  passed: number;
   testPoints: TestPoint[];
 }
 
 const mockDimensions: TestDimension[] = [
   {
     id: "dim-1",
-    name: "用户管理",
-    description: "用户注册、登录、权限相关测试",
-    total: 45,
-    passed: 38,
+    name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", name: "用户登录", total: 15, passed: 12, aiScore: "excellent", adoptionStatus: "pending" },
-      { id: "tp-2", name: "用户注册", total: 18, passed: 16, aiScore: "qualified", adoptionStatus: "adopted" },
-      { id: "tp-3", name: "密码重置", total: 12, passed: 10, aiScore: "unqualified", adoptionStatus: "notAdopted", rejectionTags: ["覆盖不完整", "步骤缺失"], rejectionReason: "测试步骤不够详细，缺少边界条件测试" },
+      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "需求文档", caseCount: 12, reviewResult: "adopted" },
+      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "用例库", caseCount: 18, reviewResult: "adopted" },
+      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "需求文档", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景/完善信息/完善数据" },
+      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "安全规范", caseCount: 5, reviewResult: "needsDiscard", category: "重复/非本功能/" },
     ],
   },
   {
     id: "dim-2",
-    name: "订单管理",
-    description: "订单创建、支付、退款流程测试",
-    total: 62,
-    passed: 55,
+    name: "02-业务功能维度",
     testPoints: [
-      { id: "tp-4", name: "订单创建", total: 22, passed: 20, aiScore: "excellent", adoptionStatus: "adopted" },
-      { id: "tp-5", name: "订单支付", total: 25, passed: 22, aiScore: "qualified", adoptionStatus: "pending" },
-      { id: "tp-6", name: "订单退款", total: 15, passed: 13, aiScore: "qualified", adoptionStatus: "pending" },
+      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "需求文档", caseCount: 22, reviewResult: "adopted" },
+      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "用例库", caseCount: 15, reviewResult: "pending" },
     ],
   },
   {
     id: "dim-3",
-    name: "商品管理",
-    description: "商品上架、编辑、库存管理测试",
-    total: 38,
-    passed: 32,
+    name: "03-业务要素维度",
     testPoints: [
-      { id: "tp-7", name: "商品上架", total: 14, passed: 12, aiScore: "excellent", adoptionStatus: "adopted" },
-      { id: "tp-8", name: "商品编辑", total: 12, passed: 10, aiScore: "unqualified", adoptionStatus: "notAdopted", rejectionTags: ["逻辑错误"], rejectionReason: "编辑场景测试逻辑有误" },
-      { id: "tp-9", name: "库存管理", total: 12, passed: 10, aiScore: "qualified", adoptionStatus: "pending" },
-    ],
-  },
-  {
-    id: "dim-4",
-    name: "报表统计",
-    description: "数据报表、导出功能测试",
-    total: 25,
-    passed: 22,
-    testPoints: [
-      { id: "tp-10", name: "销售报表", total: 10, passed: 9, aiScore: "excellent", adoptionStatus: "adopted" },
-      { id: "tp-11", name: "数据导出", total: 15, passed: 13, aiScore: "qualified", adoptionStatus: "pending" },
+      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "需求文档", caseCount: 14, reviewResult: "adopted" },
+      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "用例库", caseCount: 10, reviewResult: "pending" },
     ],
   },
 ];
 
-const aiScoreConfig: Record<AIScore, { label: string; className: string }> = {
-  excellent: {
-    label: "优秀",
-    className: "text-green-600",
-  },
-  qualified: {
-    label: "合格",
-    className: "text-blue-600",
-  },
-  unqualified: {
-    label: "不合格",
-    className: "text-red-600",
-  },
-};
-
-const adoptionStatusConfig: Record<AdoptionStatus, { label: string; className: string }> = {
+const reviewResultConfig: Record<ReviewResult, { label: string; className: string }> = {
   adopted: {
     label: "采纳",
     className: "text-green-600",
   },
-  notAdopted: {
-    label: "不采纳",
+  needsImprovement: {
+    label: "需完善",
+    className: "text-amber-600",
+  },
+  needsDiscard: {
+    label: "需丢弃",
     className: "text-red-600",
   },
   pending: {
-    label: "待自评",
-    className: "text-amber-600",
+    label: "待审查",
+    className: "text-muted-foreground",
   },
 };
 
-const rejectionTagOptions = [
-  "覆盖不完整",
-  "步骤缺失",
+const categoryOptions = [
+  "完善场景",
+  "完善信息",
+  "完善数据",
+  "重复",
+  "非本功能",
   "逻辑错误",
-  "描述不清",
-  "重复用例",
-  "优先级不当",
 ];
-
-// 计算总统计
-const calculateTotalStats = (dimensions: TestDimension[]) => {
-  return dimensions.reduce(
-    (acc, dim) => ({
-      total: acc.total + dim.total,
-      passed: acc.passed + dim.passed,
-    }),
-    { total: 0, passed: 0 }
-  );
-};
-
-// 简化的统计显示组件
-function SimpleMiniStats({ total, passed }: { total: number; passed: number }) {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="text-green-600 font-medium">{passed}</span>
-      <span className="text-muted-foreground">/</span>
-      <span className="text-muted-foreground">{total}</span>
-    </div>
-  );
-}
 
 export default function CaseReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [dimensions, setDimensions] = useState(mockDimensions);
-  const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
-    new Set(mockDimensions.map((d) => d.id))
-  );
   
-  // 不采纳对话框状态
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [rejectingTestPoint, setRejectingTestPoint] = useState<{ dimId: string; tpId: string } | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [rejectionReason, setRejectionReason] = useState("");
-  
-  // 查看状态对话框
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [viewingTestPoint, setViewingTestPoint] = useState<TestPoint | null>(null);
+  // 对话框状态
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewingTestPoint, setReviewingTestPoint] = useState<{ dimId: string; tp: TestPoint } | null>(null);
+  const [selectedResult, setSelectedResult] = useState<ReviewResult>("adopted");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [solution, setSolution] = useState("");
+  const [remark, setRemark] = useState("");
   
   // 侧边栏状态
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarTestPoint, setSidebarTestPoint] = useState<{ dimId: string; testPoint: TestPoint } | null>(null);
-
-  const totalStats = calculateTotalStats(dimensions);
-  const pendingCount = totalStats.total - totalStats.passed;
-
-  const toggleDimension = (dimensionId: string) => {
-    setExpandedDimensions((prev) => {
-      const next = new Set(prev);
-      if (next.has(dimensionId)) {
-        next.delete(dimensionId);
-      } else {
-        next.add(dimensionId);
-      }
-      return next;
-    });
-  };
+  const [sidebarTestPoint, setSidebarTestPoint] = useState<{ dimId: string; tp: TestPoint } | null>(null);
 
   // 过滤维度和测试点
   const filteredDimensions = dimensions
     .map((dim) => ({
       ...dim,
       testPoints: dim.testPoints.filter((tp) =>
-        tp.name.toLowerCase().includes(searchQuery.toLowerCase())
+        tp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tp.code.toLowerCase().includes(searchQuery.toLowerCase())
       ),
     }))
     .filter(
@@ -229,44 +147,29 @@ export default function CaseReview() {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/self-review/${testPointId}`);
   };
 
-  const handleAdopt = (dimId: string, tpId: string) => {
-    setDimensions(prev => prev.map(dim => {
-      if (dim.id === dimId) {
-        return {
-          ...dim,
-          testPoints: dim.testPoints.map(tp => {
-            if (tp.id === tpId) {
-              return { ...tp, adoptionStatus: "adopted" as AdoptionStatus };
-            }
-            return tp;
-          })
-        };
-      }
-      return dim;
-    }));
-    toast.success("已采纳");
+  const handleOpenReviewDialog = (dimId: string, tp: TestPoint) => {
+    setReviewingTestPoint({ dimId, tp });
+    setSelectedResult(tp.reviewResult === "pending" ? "adopted" : tp.reviewResult);
+    setSelectedCategories(tp.category ? tp.category.split("/").filter(Boolean) : []);
+    setSolution(tp.solution || "");
+    setRemark(tp.remark || "");
+    setReviewDialogOpen(true);
   };
 
-  const handleOpenRejectDialog = (dimId: string, tpId: string) => {
-    setRejectingTestPoint({ dimId, tpId });
-    setSelectedTags([]);
-    setRejectionReason("");
-    setRejectDialogOpen(true);
-  };
-
-  const handleConfirmReject = () => {
-    if (rejectingTestPoint && selectedTags.length > 0 && rejectionReason.trim()) {
+  const handleConfirmReview = () => {
+    if (reviewingTestPoint) {
       setDimensions(prev => prev.map(dim => {
-        if (dim.id === rejectingTestPoint.dimId) {
+        if (dim.id === reviewingTestPoint.dimId) {
           return {
             ...dim,
             testPoints: dim.testPoints.map(tp => {
-              if (tp.id === rejectingTestPoint.tpId) {
+              if (tp.id === reviewingTestPoint.tp.id) {
                 return { 
                   ...tp, 
-                  adoptionStatus: "notAdopted" as AdoptionStatus,
-                  rejectionTags: selectedTags,
-                  rejectionReason: rejectionReason
+                  reviewResult: selectedResult,
+                  category: selectedCategories.length > 0 ? selectedCategories.join("/") + "/" : undefined,
+                  solution: solution || undefined,
+                  remark: remark || undefined,
                 };
               }
               return tp;
@@ -275,47 +178,26 @@ export default function CaseReview() {
         }
         return dim;
       }));
-      setRejectDialogOpen(false);
-      toast.success("已标记为不采纳");
+      setReviewDialogOpen(false);
+      toast.success("审查结果已保存");
     }
   };
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(cat) 
+        ? prev.filter(c => c !== cat)
+        : [...prev, cat]
     );
   };
 
-  const handleViewStatus = (testPoint: TestPoint) => {
-    if (testPoint.adoptionStatus !== "pending") {
-      setViewingTestPoint(testPoint);
-      setStatusDialogOpen(true);
-    }
-  };
-
-  const handleOpenSidebar = (dimId: string, testPoint: TestPoint) => {
-    setSidebarTestPoint({ dimId, testPoint });
+  const handleOpenSidebar = (dimId: string, tp: TestPoint) => {
+    setSidebarTestPoint({ dimId, tp });
     setSidebarOpen(true);
   };
 
-  const handleSidebarAdopt = () => {
-    if (sidebarTestPoint) {
-      handleAdopt(sidebarTestPoint.dimId, sidebarTestPoint.testPoint.id);
-      setSidebarOpen(false);
-    }
-  };
-
-  const handleSidebarReject = () => {
-    if (sidebarTestPoint) {
-      handleOpenRejectDialog(sidebarTestPoint.dimId, sidebarTestPoint.testPoint.id);
-      setSidebarOpen(false);
-    }
-  };
-
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-full mx-auto">
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
@@ -344,10 +226,7 @@ export default function CaseReview() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">用例自评</h1>
-          <p className="text-muted-foreground mt-1">
-            生成记录: AI-001 · 共 {totalStats.total} 个用例，{pendingCount} 个待评审
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">账户开户-案例审查</h1>
         </div>
       </div>
 
@@ -356,7 +235,7 @@ export default function CaseReview() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜索用例..."
+            placeholder="搜索编号或场景描述..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -374,317 +253,222 @@ export default function CaseReview() {
         </div>
       </div>
 
-      {/* Stats - 只保留自评统计 */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold">{totalStats.total}</div>
-          <div className="text-sm text-muted-foreground">总用例数</div>
-        </div>
-        <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
-          <div className="text-sm text-muted-foreground">待评审</div>
-        </div>
-        <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-green-600">{totalStats.passed}</div>
-          <div className="text-sm text-muted-foreground">已通过</div>
-        </div>
-        <div className="bg-card border rounded-lg p-4">
-          <div className="text-2xl font-bold text-red-600">{totalStats.total - totalStats.passed}</div>
-          <div className="text-sm text-muted-foreground">不通过</div>
-        </div>
-      </div>
-
-      {/* Hierarchical Case List */}
-      <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          测试用例
-        </div>
-
-        <div className="divide-y">
-          {filteredDimensions.map((dimension) => {
-            const isExpanded = expandedDimensions.has(dimension.id);
-
-            return (
-              <div key={dimension.id}>
-                {/* Dimension Row */}
-                <div
-                  className="flex items-center gap-3 px-6 py-4 hover:bg-muted/30 transition-colors cursor-pointer"
-                  onClick={() => toggleDimension(dimension.id)}
-                >
-                  <button className="flex-shrink-0">
-                    {isExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </button>
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Layers className="w-4 h-4 text-primary" />
+      {/* Dimension Tables */}
+      <div className="space-y-6">
+        {filteredDimensions.map((dimension) => (
+          <div key={dimension.id} className="overflow-hidden">
+            {/* Dimension Header */}
+            <div className="bg-[hsl(200,60%,94%)] border-l-4 border-l-[hsl(200,70%,50%)] px-4 py-3 font-medium text-foreground">
+              {dimension.name}
+            </div>
+            
+            {/* Table */}
+            <div className="border border-t-0 overflow-x-auto">
+              {/* Table Header */}
+              <div className="bg-[hsl(200,70%,50%)] text-white">
+                {/* First row - group headers */}
+                <div className="grid grid-cols-12 text-sm">
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] flex items-center justify-center font-medium row-span-2">
+                    序号
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">{dimension.name}</span>
-                      <span className="text-sm text-muted-foreground">· {dimension.description}</span>
-                    </div>
+                  <div className="col-span-5 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                    场景基本信息
                   </div>
-                  <div className="flex items-center gap-2 text-sm flex-shrink-0">
-                    <span className="text-green-600 font-medium">{dimension.passed}</span>
-                    <span className="text-muted-foreground">/</span>
-                    <span className="text-muted-foreground">{dimension.total}</span>
+                  <div className="col-span-6 px-3 py-2 text-center font-medium">
+                    用户审查
                   </div>
                 </div>
-
-                {/* Test Points */}
-                {isExpanded && dimension.testPoints.map((testPoint) => {
-                  const aiScore = aiScoreConfig[testPoint.aiScore];
-                  const adoptionStatus = adoptionStatusConfig[testPoint.adoptionStatus];
+                {/* Second row - column headers */}
+                <div className="grid grid-cols-12 text-sm bg-[hsl(200,65%,55%)]">
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)]"></div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景来源</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">对应案例数</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
+                  <div className="col-span-1 px-3 py-2 text-center">备注</div>
+                </div>
+              </div>
+              
+              {/* Table Body */}
+              <div className="divide-y divide-border bg-background">
+                {dimension.testPoints.map((tp, index) => {
+                  const resultConfig = reviewResultConfig[tp.reviewResult];
                   
                   return (
                     <div
-                      key={testPoint.id}
-                      className="flex items-center gap-3 px-6 py-3 pl-16 hover:bg-muted/20 transition-colors border-t border-muted/50"
+                      key={tp.id}
+                      className="grid grid-cols-12 text-sm hover:bg-muted/30 transition-colors"
                     >
-                      <div className="w-6 h-6 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0">
-                        <Target className="w-3.5 h-3.5 text-muted-foreground" />
+                      {/* 序号 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center text-muted-foreground">
+                        {index + 1}
                       </div>
-                      
-                      {/* 左侧文字区域 - 最多占一半宽度，可点击打开侧边栏 */}
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div 
-                              className="max-w-[50%] min-w-0 cursor-pointer text-primary hover:text-primary/80 hover:underline transition-colors"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenSidebar(dimension.id, testPoint);
-                              }}
-                            >
-                              <span className="text-sm truncate block">
-                                {testPoint.name}
-                              </span>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-sm">
-                            <p>{testPoint.name}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      
-                      <div className="flex-1" />
-                      
-                      {/* 智能评分和采纳状态 - 无背景无图标纯文字 */}
-                      <div className="flex items-center gap-4 flex-shrink-0">
-                        <span className={cn("text-xs whitespace-nowrap", aiScore.className)}>
-                          {aiScore.label}
-                        </span>
-                        
+                      {/* 编号 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        <span className="font-mono text-xs">{tp.code}</span>
+                      </div>
+                      {/* 场景描述 - 可点击打开侧边栏 */}
+                      <div 
+                        className="col-span-2 px-3 py-3 border-r border-border flex items-center cursor-pointer text-primary hover:text-primary/80 hover:underline"
+                        onClick={() => handleOpenSidebar(dimension.id, tp)}
+                      >
+                        <span className="truncate">{tp.name}</span>
+                      </div>
+                      {/* 场景来源 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center text-muted-foreground">
+                        {tp.source}
+                      </div>
+                      {/* 对应案例数 - 可点击查看用例 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
                         <span 
-                          className={cn(
-                            "text-xs whitespace-nowrap cursor-pointer hover:underline",
-                            adoptionStatus.className
-                          )}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewStatus(testPoint);
-                          }}
+                          className="text-primary hover:underline cursor-pointer"
+                          onClick={() => handleNavigateToCaseList(tp.id)}
                         >
-                          {adoptionStatus.label}
+                          {tp.caseCount}
                         </span>
                       </div>
-                      
-                      {/* 操作按钮区域 - 只保留图标，始终可点击 */}
-                      <div className="flex items-center gap-1 ml-8 flex-shrink-0">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className={cn(
-                                  "h-7 w-7",
-                                  testPoint.adoptionStatus === "adopted" 
-                                    ? "text-green-600 bg-green-50" 
-                                    : "text-green-600 hover:text-green-700 hover:bg-green-50"
-                                )}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAdopt(dimension.id, testPoint.id);
-                                }}
-                              >
-                                <ThumbsUp className="w-4 h-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>采纳</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className={cn(
-                                  "h-7 w-7",
-                                  testPoint.adoptionStatus === "notAdopted" 
-                                    ? "text-red-600 bg-red-50" 
-                                    : "text-red-600 hover:text-red-700 hover:bg-red-50"
-                                )}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenRejectDialog(dimension.id, testPoint.id);
-                                }}
-                              >
-                                <ThumbsDown className="w-4 h-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>不采纳</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleNavigateToCaseList(testPoint.id);
-                                }}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>查看用例</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                      {/* 审查结果 - 可点击修改 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        <span 
+                          className={cn("cursor-pointer hover:underline", resultConfig.className)}
+                          onClick={() => handleOpenReviewDialog(dimension.id, tp)}
+                        >
+                          {resultConfig.label}
+                        </span>
+                      </div>
+                      {/* 分类 */}
+                      <div className="col-span-2 px-3 py-3 border-r border-border flex items-center text-muted-foreground text-xs">
+                        {tp.category || "-"}
+                      </div>
+                      {/* 处理方案 */}
+                      <div className="col-span-2 px-3 py-3 border-r border-border flex items-center text-muted-foreground text-xs">
+                        {tp.solution || "-"}
+                      </div>
+                      {/* 备注 */}
+                      <div className="col-span-1 px-3 py-3 flex items-center text-muted-foreground text-xs">
+                        {tp.remark || "-"}
                       </div>
                     </div>
                   );
                 })}
+                
+                {dimension.testPoints.length === 0 && (
+                  <div className="col-span-12 px-3 py-6 text-center text-muted-foreground">
+                    暂无数据
+                  </div>
+                )}
               </div>
-            );
-          })}
-        </div>
-
-        {filteredDimensions.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的测试用例</p>
+            </div>
           </div>
-        )}
+        ))}
       </div>
 
-      {/* 不采纳对话框 */}
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+      {filteredDimensions.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+          <Search className="w-12 h-12 mb-4 opacity-50" />
+          <p>未找到匹配的测试场景</p>
+        </div>
+      )}
+
+      {/* 审查对话框 */}
+      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>填写不采纳信息</DialogTitle>
+            <DialogTitle>审查结果</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>选择标签 <span className="text-red-500">*</span></Label>
-              <div className="flex flex-wrap gap-2">
-                {rejectionTagOptions.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant={selectedTags.includes(tag) ? "default" : "outline"}
-                    className={cn(
-                      "cursor-pointer transition-colors",
-                      selectedTags.includes(tag) 
-                        ? "bg-primary text-primary-foreground" 
-                        : "hover:bg-muted"
-                    )}
-                    onClick={() => toggleTag(tag)}
-                  >
-                    <Tag className="w-3 h-3 mr-1" />
-                    {tag}
-                  </Badge>
-                ))}
+          {reviewingTestPoint && (
+            <div className="space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50">
+                <div className="text-sm font-medium">{reviewingTestPoint.tp.name}</div>
+                <div className="text-xs text-muted-foreground mt-1">编号: {reviewingTestPoint.tp.code}</div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>审查结果 <span className="text-red-500">*</span></Label>
+                <div className="flex flex-wrap gap-2">
+                  {(["adopted", "needsImprovement", "needsDiscard"] as ReviewResult[]).map((result) => {
+                    const config = reviewResultConfig[result];
+                    return (
+                      <Badge
+                        key={result}
+                        variant={selectedResult === result ? "default" : "outline"}
+                        className={cn(
+                          "cursor-pointer transition-colors",
+                          selectedResult === result 
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-muted"
+                        )}
+                        onClick={() => setSelectedResult(result)}
+                      >
+                        {config.label}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {(selectedResult === "needsImprovement" || selectedResult === "needsDiscard") && (
+                <div className="space-y-2">
+                  <Label>分类</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {categoryOptions.map((cat) => (
+                      <Badge
+                        key={cat}
+                        variant={selectedCategories.includes(cat) ? "default" : "outline"}
+                        className={cn(
+                          "cursor-pointer transition-colors",
+                          selectedCategories.includes(cat) 
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-muted"
+                        )}
+                        onClick={() => toggleCategory(cat)}
+                      >
+                        <Tag className="w-3 h-3 mr-1" />
+                        {cat}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="solution">处理方案</Label>
+                <Textarea
+                  id="solution"
+                  placeholder="请输入处理方案..."
+                  value={solution}
+                  onChange={(e) => setSolution(e.target.value)}
+                  className="min-h-[80px]"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="remark">备注</Label>
+                <Textarea
+                  id="remark"
+                  placeholder="请输入备注..."
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
+                  className="min-h-[60px]"
+                />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="reason">不采纳原因 <span className="text-red-500">*</span></Label>
-              <Textarea
-                id="reason"
-                placeholder="请输入不采纳的具体原因..."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                className="min-h-[100px]"
-              />
-            </div>
-          </div>
+          )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
               取消
             </Button>
-            <Button 
-              onClick={handleConfirmReject}
-              disabled={selectedTags.length === 0 || !rejectionReason.trim()}
-            >
+            <Button onClick={handleConfirmReview}>
               确认
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* 查看状态对话框 */}
-      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {viewingTestPoint?.adoptionStatus === "adopted" ? "采纳详情" : "不采纳详情"}
-            </DialogTitle>
-          </DialogHeader>
-          {viewingTestPoint && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-muted-foreground" />
-                <span className="font-medium">{viewingTestPoint.name}</span>
-              </div>
-              
-              {viewingTestPoint.adoptionStatus === "adopted" ? (
-                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                    <ThumbsUp className="w-4 h-4" />
-                    <span className="font-medium">已采纳</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs">不采纳标签</Label>
-                    <div className="flex flex-wrap gap-1">
-                      {viewingTestPoint.rejectionTags?.map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs">不采纳原因</Label>
-                    <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                      <p className="text-sm text-red-700 dark:text-red-400">
-                        {viewingTestPoint.rejectionReason}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
-              关闭
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 测试点详情侧边栏 */}
+      {/* 场景详情侧边栏 */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent className="w-[480px] sm:max-w-[480px] flex flex-col">
           <SheetHeader>
@@ -695,11 +479,23 @@ export default function CaseReview() {
             <div className="flex-1 flex flex-col overflow-hidden">
               <ScrollArea className="flex-1 pr-4">
                 <div className="space-y-6 py-4">
-                  {/* 场景描述 - 可编辑文本域 */}
+                  {/* 基本信息 */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">编号</Label>
+                      <p className="text-sm font-mono">{sidebarTestPoint.tp.code}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">场景来源</Label>
+                      <p className="text-sm">{sidebarTestPoint.tp.source}</p>
+                    </div>
+                  </div>
+                  
+                  {/* 场景描述 */}
                   <div className="space-y-2">
                     <Label className="text-muted-foreground text-xs">场景描述</Label>
                     <Textarea
-                      value={sidebarTestPoint.testPoint.name}
+                      value={sidebarTestPoint.tp.name}
                       onChange={(e) => {
                         const newName = e.target.value;
                         setDimensions(prev => prev.map(dim => {
@@ -707,7 +503,7 @@ export default function CaseReview() {
                             return {
                               ...dim,
                               testPoints: dim.testPoints.map(tp => {
-                                if (tp.id === sidebarTestPoint.testPoint.id) {
+                                if (tp.id === sidebarTestPoint.tp.id) {
                                   return { ...tp, name: newName };
                                 }
                                 return tp;
@@ -718,7 +514,7 @@ export default function CaseReview() {
                         }));
                         setSidebarTestPoint(prev => prev ? {
                           ...prev,
-                          testPoint: { ...prev.testPoint, name: newName }
+                          tp: { ...prev.tp, name: newName }
                         } : null);
                       }}
                       className="min-h-[80px] text-sm"
@@ -726,58 +522,61 @@ export default function CaseReview() {
                     />
                   </div>
                   
-                  {/* 状态信息 */}
-                  <div className="flex items-center gap-6">
+                  {/* 审查状态 */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">智能评分</Label>
-                      <p className={cn("text-sm font-medium", aiScoreConfig[sidebarTestPoint.testPoint.aiScore].className)}>
-                        {aiScoreConfig[sidebarTestPoint.testPoint.aiScore].label}
+                      <Label className="text-muted-foreground text-xs">审查结果</Label>
+                      <p className={cn("text-sm font-medium", reviewResultConfig[sidebarTestPoint.tp.reviewResult].className)}>
+                        {reviewResultConfig[sidebarTestPoint.tp.reviewResult].label}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">采纳状态</Label>
-                      <p className={cn("text-sm font-medium", adoptionStatusConfig[sidebarTestPoint.testPoint.adoptionStatus].className)}>
-                        {adoptionStatusConfig[sidebarTestPoint.testPoint.adoptionStatus].label}
+                      <Label className="text-muted-foreground text-xs">对应案例数</Label>
+                      <p 
+                        className="text-sm text-primary cursor-pointer hover:underline"
+                        onClick={() => {
+                          handleNavigateToCaseList(sidebarTestPoint.tp.id);
+                          setSidebarOpen(false);
+                        }}
+                      >
+                        {sidebarTestPoint.tp.caseCount}
                       </p>
                     </div>
                   </div>
                   
-                  {/* 场景来源 */}
+                  {sidebarTestPoint.tp.category && (
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">分类</Label>
+                      <p className="text-sm">{sidebarTestPoint.tp.category}</p>
+                    </div>
+                  )}
+                  
+                  {sidebarTestPoint.tp.solution && (
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">处理方案</Label>
+                      <p className="text-sm">{sidebarTestPoint.tp.solution}</p>
+                    </div>
+                  )}
+                  
+                  {/* 场景来源详情 */}
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">场景来源</Label>
-                    <CaseSourceInfo caseId={sidebarTestPoint.testPoint.id} showHeader={false} />
+                    <Label className="text-muted-foreground text-xs">来源详情</Label>
+                    <CaseSourceInfo caseId={sidebarTestPoint.tp.id} showHeader={false} />
                   </div>
                 </div>
               </ScrollArea>
               
               <SheetFooter className="pt-4 border-t mt-auto">
-                <div className="flex items-center gap-2 w-full">
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "flex-1",
-                      sidebarTestPoint.testPoint.adoptionStatus === "notAdopted"
-                        ? "text-red-600 bg-red-50 border-red-200"
-                        : "text-red-600 hover:text-red-700 hover:bg-red-50"
-                    )}
-                    onClick={handleSidebarReject}
-                  >
-                    <ThumbsDown className="w-4 h-4 mr-2" />
-                    不采纳
-                  </Button>
-                  <Button
-                    className={cn(
-                      "flex-1",
-                      sidebarTestPoint.testPoint.adoptionStatus === "adopted"
-                        ? "bg-primary"
-                        : ""
-                    )}
-                    onClick={handleSidebarAdopt}
-                  >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    采纳
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    handleOpenReviewDialog(sidebarTestPoint.dimId, sidebarTestPoint.tp);
+                    setSidebarOpen(false);
+                  }}
+                >
+                  修改审查结果
+                </Button>
               </SheetFooter>
             </div>
           )}
