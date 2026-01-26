@@ -403,7 +403,6 @@ export default function CaseReview() {
                       <span className="text-sm text-muted-foreground">· {dimension.description}</span>
                     </div>
                   </div>
-                  <SimpleMiniStats total={dimension.total} passed={dimension.passed} />
                 </div>
 
                 {/* Test Points */}
@@ -425,72 +424,76 @@ export default function CaseReview() {
                         <span className="text-sm text-foreground">{testPoint.name}</span>
                       </div>
                       
-                      {/* 智能评分 */}
-                      <Badge
-                        variant="outline"
-                        className={cn("text-xs gap-1", aiScore.className)}
-                      >
-                        <AIScoreIcon className="w-3 h-3" />
-                        {aiScore.label}
-                      </Badge>
+                      {/* 智能评分和采纳状态 - 固定宽度对齐 */}
+                      <div className="flex items-center gap-2 w-[180px] justify-end flex-shrink-0">
+                        <Badge
+                          variant="outline"
+                          className={cn("text-xs gap-1 w-[70px] justify-center", aiScore.className)}
+                        >
+                          <AIScoreIcon className="w-3 h-3" />
+                          {aiScore.label}
+                        </Badge>
+                        
+                        <Badge
+                          variant="outline"
+                          className={cn("text-xs gap-1 w-[70px] justify-center", adoptionStatus.className)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewStatus(testPoint);
+                          }}
+                        >
+                          <AdoptionIcon className="w-3 h-3" />
+                          {adoptionStatus.label}
+                        </Badge>
+                      </div>
                       
-                      {/* 采纳状态 */}
-                      <Badge
-                        variant="outline"
-                        className={cn("text-xs gap-1", adoptionStatus.className)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewStatus(testPoint);
-                        }}
-                      >
-                        <AdoptionIcon className="w-3 h-3" />
-                        {adoptionStatus.label}
-                      </Badge>
+                      {/* 分隔线 */}
+                      <div className="h-6 w-px bg-border flex-shrink-0" />
                       
-                      <SimpleMiniStats total={testPoint.total} passed={testPoint.passed} />
-                      
-                      {/* 采纳/不采纳按钮 */}
-                      {testPoint.adoptionStatus === "pending" && (
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 px-2 text-xs gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAdopt(dimension.id, testPoint.id);
-                            }}
-                          >
-                            <ThumbsUp className="w-3.5 h-3.5" />
-                            采纳
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 px-2 text-xs gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenRejectDialog(dimension.id, testPoint.id);
-                            }}
-                          >
-                            <ThumbsDown className="w-3.5 h-3.5" />
-                            不采纳
-                          </Button>
-                        </div>
-                      )}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 px-3 text-xs gap-1 ml-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNavigateToCaseList(testPoint.id);
-                        }}
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        查看用例
-                      </Button>
+                      {/* 操作按钮区域 - 固定宽度 */}
+                      <div className="flex items-center gap-2 w-[220px] justify-end flex-shrink-0">
+                        {testPoint.adoptionStatus === "pending" && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2 text-xs gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAdopt(dimension.id, testPoint.id);
+                              }}
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                              采纳
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2 text-xs gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenRejectDialog(dimension.id, testPoint.id);
+                              }}
+                            >
+                              <ThumbsDown className="w-3.5 h-3.5" />
+                              不采纳
+                            </Button>
+                          </>
+                        )}
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-3 text-xs gap-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleNavigateToCaseList(testPoint.id);
+                          }}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          查看用例
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
