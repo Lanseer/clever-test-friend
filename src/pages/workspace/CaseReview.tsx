@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Bot, Layers, Target, ChevronRight, ChevronDown, Star, CheckCircle, XCircle, ThumbsUp, ThumbsDown, Clock, Eye, Tag } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Bot, Layers, Target, ChevronRight, ChevronDown, ThumbsUp, ThumbsDown, Eye, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +20,23 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 import { toast } from "sonner";
 
 type AIScore = "excellent" | "qualified" | "unqualified";
@@ -97,39 +112,33 @@ const mockDimensions: TestDimension[] = [
   },
 ];
 
-const aiScoreConfig: Record<AIScore, { label: string; icon: typeof Star; className: string }> = {
+const aiScoreConfig: Record<AIScore, { label: string; className: string }> = {
   excellent: {
     label: "优秀",
-    icon: Star,
-    className: "bg-green-500/10 text-green-600 border-green-200",
+    className: "text-green-600",
   },
   qualified: {
     label: "合格",
-    icon: CheckCircle,
-    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+    className: "text-blue-600",
   },
   unqualified: {
     label: "不合格",
-    icon: XCircle,
-    className: "bg-red-500/10 text-red-600 border-red-200",
+    className: "text-red-600",
   },
 };
 
-const adoptionStatusConfig: Record<AdoptionStatus, { label: string; icon: typeof ThumbsUp; className: string }> = {
+const adoptionStatusConfig: Record<AdoptionStatus, { label: string; className: string }> = {
   adopted: {
     label: "采纳",
-    icon: ThumbsUp,
-    className: "bg-green-500/10 text-green-600 border-green-200 cursor-pointer hover:bg-green-500/20",
+    className: "text-green-600",
   },
   notAdopted: {
     label: "不采纳",
-    icon: ThumbsDown,
-    className: "bg-red-500/10 text-red-600 border-red-200 cursor-pointer hover:bg-red-500/20",
+    className: "text-red-600",
   },
   pending: {
     label: "待自评",
-    icon: Clock,
-    className: "bg-amber-500/10 text-amber-600 border-amber-200",
+    className: "text-amber-600",
   },
 };
 
@@ -182,6 +191,10 @@ export default function CaseReview() {
   // 查看状态对话框
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [viewingTestPoint, setViewingTestPoint] = useState<TestPoint | null>(null);
+  
+  // 侧边栏状态
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarTestPoint, setSidebarTestPoint] = useState<{ dimId: string; testPoint: TestPoint } | null>(null);
 
   const totalStats = calculateTotalStats(dimensions);
   const pendingCount = totalStats.total - totalStats.passed;
@@ -279,6 +292,25 @@ export default function CaseReview() {
     if (testPoint.adoptionStatus !== "pending") {
       setViewingTestPoint(testPoint);
       setStatusDialogOpen(true);
+    }
+  };
+
+  const handleOpenSidebar = (dimId: string, testPoint: TestPoint) => {
+    setSidebarTestPoint({ dimId, testPoint });
+    setSidebarOpen(true);
+  };
+
+  const handleSidebarAdopt = () => {
+    if (sidebarTestPoint) {
+      handleAdopt(sidebarTestPoint.dimId, sidebarTestPoint.testPoint.id);
+      setSidebarOpen(false);
+    }
+  };
+
+  const handleSidebarReject = () => {
+    if (sidebarTestPoint) {
+      handleOpenRejectDialog(sidebarTestPoint.dimId, sidebarTestPoint.testPoint.id);
+      setSidebarOpen(false);
     }
   };
 
@@ -413,9 +445,7 @@ export default function CaseReview() {
                 {/* Test Points */}
                 {isExpanded && dimension.testPoints.map((testPoint) => {
                   const aiScore = aiScoreConfig[testPoint.aiScore];
-                  const AIScoreIcon = aiScore.icon;
                   const adoptionStatus = adoptionStatusConfig[testPoint.adoptionStatus];
-                  const AdoptionIcon = adoptionStatus.icon;
                   
                   return (
                     <div
@@ -425,72 +455,111 @@ export default function CaseReview() {
                       <div className="w-6 h-6 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0">
                         <Target className="w-3.5 h-3.5 text-muted-foreground" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm text-foreground">{testPoint.name}</span>
-                      </div>
                       
-                      {/* 智能评分和采纳状态 - 无背景纯文字 */}
+                      {/* 左侧文字区域 - 最多占一半宽度，可点击打开侧边栏 */}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div 
+                              className="max-w-[50%] min-w-0 cursor-pointer hover:text-primary transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenSidebar(dimension.id, testPoint);
+                              }}
+                            >
+                              <span className="text-sm text-foreground truncate block">
+                                {testPoint.name}
+                              </span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-sm">
+                            <p>{testPoint.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
+                      <div className="flex-1" />
+                      
+                      {/* 智能评分和采纳状态 - 无背景无图标纯文字 */}
                       <div className="flex items-center gap-4 flex-shrink-0">
-                        <span className={cn("text-xs flex items-center gap-1 whitespace-nowrap", aiScore.className.replace(/bg-\S+\/10\s?/, "").replace(/border-\S+\s?/, ""))}>
-                          <AIScoreIcon className="w-3 h-3" />
+                        <span className={cn("text-xs whitespace-nowrap", aiScore.className)}>
                           {aiScore.label}
                         </span>
                         
                         <span 
                           className={cn(
-                            "text-xs flex items-center gap-1 whitespace-nowrap cursor-pointer hover:underline",
-                            adoptionStatus.className.replace(/bg-\S+\/10\s?/, "").replace(/border-\S+\s?/, "").replace(/cursor-pointer\s?/, "").replace(/hover:bg-\S+\/20\s?/, "")
+                            "text-xs whitespace-nowrap cursor-pointer hover:underline",
+                            adoptionStatus.className
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleViewStatus(testPoint);
                           }}
                         >
-                          <AdoptionIcon className="w-3 h-3" />
                           {adoptionStatus.label}
                         </span>
                       </div>
                       
-                      {/* 操作按钮区域 - 明显间距 */}
-                      <div className="flex items-center gap-2 ml-8 flex-shrink-0">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 px-2 text-xs gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAdopt(dimension.id, testPoint.id);
-                          }}
-                          disabled={testPoint.adoptionStatus !== "pending"}
-                        >
-                          <ThumbsUp className="w-3.5 h-3.5" />
-                          采纳
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 px-2 text-xs gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenRejectDialog(dimension.id, testPoint.id);
-                          }}
-                          disabled={testPoint.adoptionStatus !== "pending"}
-                        >
-                          <ThumbsDown className="w-3.5 h-3.5" />
-                          不采纳
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 px-3 text-xs gap-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleNavigateToCaseList(testPoint.id);
-                          }}
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          查看用例
-                        </Button>
+                      {/* 操作按钮区域 - 只保留图标 */}
+                      <div className="flex items-center gap-1 ml-8 flex-shrink-0">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAdopt(dimension.id, testPoint.id);
+                                }}
+                                disabled={testPoint.adoptionStatus !== "pending"}
+                              >
+                                <ThumbsUp className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>采纳</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenRejectDialog(dimension.id, testPoint.id);
+                                }}
+                                disabled={testPoint.adoptionStatus !== "pending"}
+                              >
+                                <ThumbsDown className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>不采纳</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleNavigateToCaseList(testPoint.id);
+                                }}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>查看用例</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </div>
                   );
@@ -614,6 +683,73 @@ export default function CaseReview() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 测试点详情侧边栏 */}
+      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent className="w-[480px] sm:max-w-[480px] flex flex-col">
+          <SheetHeader>
+            <SheetTitle>测试点详情</SheetTitle>
+          </SheetHeader>
+          
+          {sidebarTestPoint && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <ScrollArea className="flex-1 pr-4">
+                <div className="space-y-6 py-4">
+                  {/* 测试点名称 */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground text-xs">测试点名称</Label>
+                    <p className="text-sm text-foreground">{sidebarTestPoint.testPoint.name}</p>
+                  </div>
+                  
+                  {/* 状态信息 */}
+                  <div className="flex items-center gap-6">
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">智能评分</Label>
+                      <p className={cn("text-sm font-medium", aiScoreConfig[sidebarTestPoint.testPoint.aiScore].className)}>
+                        {aiScoreConfig[sidebarTestPoint.testPoint.aiScore].label}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">采纳状态</Label>
+                      <p className={cn("text-sm font-medium", adoptionStatusConfig[sidebarTestPoint.testPoint.adoptionStatus].className)}>
+                        {adoptionStatusConfig[sidebarTestPoint.testPoint.adoptionStatus].label}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* 场景来源 */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground text-xs">场景来源</Label>
+                    <CaseSourceInfo caseId={sidebarTestPoint.testPoint.id} showHeader={false} />
+                  </div>
+                </div>
+              </ScrollArea>
+              
+              <SheetFooter className="pt-4 border-t mt-auto">
+                <div className="flex items-center gap-2 w-full">
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={handleSidebarReject}
+                    disabled={sidebarTestPoint.testPoint.adoptionStatus !== "pending"}
+                  >
+                    <ThumbsDown className="w-4 h-4 mr-2" />
+                    不采纳
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={handleSidebarAdopt}
+                    disabled={sidebarTestPoint.testPoint.adoptionStatus !== "pending"}
+                  >
+                    <ThumbsUp className="w-4 h-4 mr-2" />
+                    采纳
+                  </Button>
+                </div>
+              </SheetFooter>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
