@@ -203,14 +203,14 @@ export function SmartDesignTaskList({
                 {/* Stats */}
                 <div className="flex gap-2 mb-2">
                   <div className="flex-1 text-center py-1.5 px-2 bg-sky-50/80 dark:bg-sky-900/30 rounded border border-sky-200/50">
-                    <div className="text-[10px] text-muted-foreground">自评</div>
+                    <div className="text-[10px] text-muted-foreground">内部审查</div>
                     <div className="text-xs font-medium">
                       <span className="text-emerald-600">{task.selfReviewPassed}</span>
                       <span className="text-muted-foreground">/{task.selfReviewTotal}</span>
                     </div>
                   </div>
                   <div className="flex-1 text-center py-1.5 px-2 bg-sky-50/80 dark:bg-sky-900/30 rounded border border-sky-200/50">
-                    <div className="text-[10px] text-muted-foreground">专家</div>
+                    <div className="text-[10px] text-muted-foreground">外部评审</div>
                     <div className="text-xs font-medium">
                       <span className="text-emerald-600">{task.expertReviewPassed}</span>
                       <span className="text-muted-foreground">/{task.expertReviewTotal}</span>
@@ -230,7 +230,7 @@ export function SmartDesignTaskList({
                     }}
                   >
                     <ClipboardCheck className="w-3 h-3 mr-1" />
-                    自评
+                    内部审查
                   </Button>
                   <Button
                     variant="ghost"
@@ -242,7 +242,7 @@ export function SmartDesignTaskList({
                     }}
                   >
                     <Users className="w-3 h-3 mr-1" />
-                    专家
+                    外部评审
                   </Button>
                   <Button
                     variant="ghost"
@@ -306,14 +306,14 @@ export function SmartDesignTaskList({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">自评进度</label>
+                  <label className="text-xs text-muted-foreground">内部审查</label>
                   <p className="text-sm">
                     <span className="text-emerald-600 font-medium">{detailTask.selfReviewPassed}</span>
                     <span className="text-muted-foreground"> / {detailTask.selfReviewTotal}</span>
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs text-muted-foreground">专家评审进度</label>
+                  <label className="text-xs text-muted-foreground">外部评审</label>
                   <p className="text-sm">
                     <span className="text-emerald-600 font-medium">{detailTask.expertReviewPassed}</span>
                     <span className="text-muted-foreground"> / {detailTask.expertReviewTotal}</span>
