@@ -695,9 +695,9 @@ export default function CaseReview() {
             <div className="flex-1 flex flex-col overflow-hidden">
               <ScrollArea className="flex-1 pr-4">
                 <div className="space-y-6 py-4">
-                  {/* 场景名称 - 可编辑文本域 */}
+                  {/* 场景描述 - 可编辑文本域 */}
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">场景名称</Label>
+                    <Label className="text-muted-foreground text-xs">场景描述</Label>
                     <Textarea
                       value={sidebarTestPoint.testPoint.name}
                       onChange={(e) => {
@@ -722,7 +722,7 @@ export default function CaseReview() {
                         } : null);
                       }}
                       className="min-h-[80px] text-sm"
-                      placeholder="请输入场景名称..."
+                      placeholder="请输入场景描述..."
                     />
                   </div>
                   

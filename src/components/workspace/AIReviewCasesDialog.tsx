@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, AlertCircle, XCircle, Check, X, FileText, Code, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle, AlertCircle, XCircle, Check, X, FileText, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CaseSourceInfo } from "./CaseSourceInfo";
@@ -306,55 +306,46 @@ export function AIReviewCasesDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Case Detail Dialog */}
+      {/* Case Detail Dialog - renamed to 场景详情 */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-6xl h-[80vh] flex flex-col">
+        <DialogContent className="max-w-5xl h-[70vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span>用例详情</span>
+                <span>场景详情</span>
                 {selectedCase && (
                   <Badge variant="outline" className="font-mono">
                     {selectedCase.code}
                   </Badge>
                 )}
               </div>
-              {selectedCase && (
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    selectedCase.status === "excellent" && "bg-green-50 text-green-600 border-green-200",
-                    selectedCase.status === "passed" && "bg-blue-50 text-blue-600 border-blue-200",
-                    selectedCase.status === "failed" && "bg-red-50 text-red-600 border-red-200"
-                  )}
-                >
-                  {selectedCase.statusLabel}
-                </Badge>
-              )}
             </DialogTitle>
           </DialogHeader>
 
           {selectedCase && (
             <>
               <div className="flex-1 grid grid-cols-2 gap-4 min-h-0 mt-4">
-                {/* Left: Case Content */}
+                {/* Left: Scenario Content */}
                 <div className="flex flex-col border rounded-lg overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b">
-                    <Code className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-sm">用例内容</span>
+                    <FileText className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm">场景信息</span>
                   </div>
                   <ScrollArea className="flex-1 p-4">
                     <div className="space-y-4">
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">用例名称</h4>
-                        <p className="text-sm font-medium">{selectedCase.name}</p>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-2">场景描述</h4>
+                        <Textarea
+                          value={selectedCase.scenario || selectedCase.name}
+                          readOnly
+                          className="min-h-[120px] text-sm resize-none bg-muted/30"
+                        />
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">AI评审结果</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-2">智能评分</h4>
                         <Badge
                           variant="outline"
                           className={cn(
-                            "mb-2",
                             selectedCase.status === "excellent" && "bg-green-50 text-green-600 border-green-200",
                             selectedCase.status === "passed" && "bg-blue-50 text-blue-600 border-blue-200",
                             selectedCase.status === "failed" && "bg-red-50 text-red-600 border-red-200"
@@ -363,23 +354,23 @@ export function AIReviewCasesDialog({
                           {selectedCase.statusLabel}
                         </Badge>
                         {selectedCase.reason && (
-                          <p className="text-sm text-muted-foreground">{selectedCase.reason}</p>
+                          <p className="text-sm text-muted-foreground mt-2">{selectedCase.reason}</p>
                         )}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">用例描述</h4>
-                        <Textarea
-                          value={getMockBddContent(selectedCase)}
-                          readOnly
-                          className="min-h-[200px] font-mono text-sm resize-none bg-muted/30"
-                        />
                       </div>
                     </div>
                   </ScrollArea>
                 </div>
 
-                {/* Right: Case Source */}
-                <CaseSourceInfo caseId={selectedCase.id} className="flex-1" />
+                {/* Right: Scenario Source */}
+                <div className="flex flex-col border rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b">
+                    <FileText className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm">场景来源</span>
+                  </div>
+                  <ScrollArea className="flex-1">
+                    <CaseSourceInfo caseId={selectedCase.id} showHeader={false} className="border-0" />
+                  </ScrollArea>
+                </div>
               </div>
 
               {/* Bottom Navigation */}
