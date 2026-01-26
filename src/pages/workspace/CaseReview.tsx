@@ -393,10 +393,10 @@ export default function CaseReview() {
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">来源</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
-                  <div className="col-span-2 px-3 py-2 text-center">审查记录</div>
+                  <div className="col-span-1 px-3 py-2 text-center">审查记录</div>
                 </div>
               </div>
               
@@ -446,7 +446,7 @@ export default function CaseReview() {
                         </span>
                       </div>
                       {/* 审查结果 - 下拉菜单 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                      <div className="col-span-2 px-3 py-3 border-r border-border flex items-center justify-center">
                         <div className="flex items-center gap-1">
                           {/* 智能审查结果差异提示 */}
                           {tp.aiSuggestion && tp.aiSuggestion !== tp.reviewResult && (
@@ -535,7 +535,7 @@ export default function CaseReview() {
                         )}
                       </div>
                       {/* 审查记录 - 显示最新记录，hover显示完整历史 */}
-                      <div className="col-span-2 px-2 py-1 flex items-center group relative">
+                      <div className="col-span-1 px-2 py-1 flex items-center group relative">
                         <span className="text-xs text-muted-foreground truncate">
                           {tp.reviewHistory && tp.reviewHistory.length > 0 
                             ? `${tp.reviewHistory[tp.reviewHistory.length - 1].timestamp} ${tp.reviewHistory[tp.reviewHistory.length - 1].action}`
