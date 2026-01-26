@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { toast } from "sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // 分类选项
 const categoryOptions = [
@@ -63,6 +69,7 @@ interface TestPoint {
   source: string;
   caseCount: number;
   reviewResult: ReviewResult;
+  aiSuggestion?: ReviewResult; // 智能审查建议结果
   category?: string;
   solution?: string;
   reviewHistory: ReviewHistoryItem[];
@@ -132,6 +139,15 @@ export default function CaseReview() {
   const [isSmartReviewing, setIsSmartReviewing] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<Map<string, ReviewResult>>(new Map());
+
+  // 统计数据计算
+  const statistics = {
+    totalScenarios: dimensions.reduce((sum, dim) => sum + dim.testPoints.length, 0),
+    totalCases: dimensions.reduce((sum, dim) => sum + dim.testPoints.reduce((s, tp) => s + tp.caseCount, 0), 0),
+    adopted: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "adopted").length, 0),
+    needsImprovement: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "needsImprovement").length, 0),
+    needsDiscard: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "needsDiscard").length, 0),
+  };
   
   // 侧边栏状态
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -247,6 +263,7 @@ export default function CaseReview() {
           return { 
             ...tp, 
             reviewResult: suggestion,
+            aiSuggestion: suggestion, // 保存智能审查结果
             reviewHistory: [...(tp.reviewHistory || []), newHistory]
           };
         }
@@ -288,6 +305,30 @@ export default function CaseReview() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground">账户开户-案例审查</h1>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      <div className="flex items-center gap-6 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">总场景:</span>
+          <span className="text-sm font-medium">{statistics.totalScenarios}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">总案例:</span>
+          <span className="text-sm font-medium">{statistics.totalCases}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">采纳:</span>
+          <span className="text-sm font-medium text-green-600">{statistics.adopted}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">需完善:</span>
+          <span className="text-sm font-medium text-amber-600">{statistics.needsImprovement}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">丢弃:</span>
+          <span className="text-sm font-medium text-red-600">{statistics.needsDiscard}</span>
         </div>
       </div>
 
@@ -406,33 +447,57 @@ export default function CaseReview() {
                       </div>
                       {/* 审查结果 - 下拉菜单 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className={cn("h-7 px-2 gap-1", resultConfig.className)}
-                            >
-                              {resultConfig.label}
-                              <ChevronDown className="w-3 h-3" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="center">
-                            {(["adopted", "needsImprovement", "needsDiscard"] as ReviewResult[]).map((result) => {
-                              const config = reviewResultConfig[result];
-                              return (
-                                <DropdownMenuItem
-                                  key={result}
-                                  className={cn("gap-2", config.className)}
-                                  onClick={() => handleReviewResultChange(dimension.id, tp.id, result)}
-                                >
-                                  {tp.reviewResult === result && <Check className="w-3 h-3" />}
-                                  <span className={tp.reviewResult !== result ? "ml-5" : ""}>{config.label}</span>
-                                </DropdownMenuItem>
-                              );
-                            })}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex items-center gap-1">
+                          {/* 智能审查结果差异提示 */}
+                          {tp.aiSuggestion && tp.aiSuggestion !== tp.reviewResult && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="w-3.5 h-3.5 text-amber-500 cursor-help flex-shrink-0" />
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="max-w-[250px]">
+                                  <p className="text-xs">
+                                    智能审查结果已被人工修改：
+                                    <span className={cn("font-medium", reviewResultConfig[tp.aiSuggestion].className)}>
+                                      {reviewResultConfig[tp.aiSuggestion].label}
+                                    </span>
+                                    {" → "}
+                                    <span className={cn("font-medium", resultConfig.className)}>
+                                      {resultConfig.label}
+                                    </span>
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={cn("h-7 px-2 gap-1", resultConfig.className)}
+                              >
+                                {resultConfig.label}
+                                <ChevronDown className="w-3 h-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center">
+                              {(["adopted", "needsImprovement", "needsDiscard"] as ReviewResult[]).map((result) => {
+                                const config = reviewResultConfig[result];
+                                return (
+                                  <DropdownMenuItem
+                                    key={result}
+                                    className={cn("gap-2", config.className)}
+                                    onClick={() => handleReviewResultChange(dimension.id, tp.id, result)}
+                                  >
+                                    {tp.reviewResult === result && <Check className="w-3 h-3" />}
+                                    <span className={tp.reviewResult !== result ? "ml-5" : ""}>{config.label}</span>
+                                  </DropdownMenuItem>
+                                );
+                              })}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                       {/* 分类 - 采纳时显示-，否则下拉选择 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
