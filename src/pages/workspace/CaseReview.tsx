@@ -339,21 +339,21 @@ export default function CaseReview() {
               <div className="bg-[hsl(200,70%,50%)] text-white">
                 {/* First row - group headers */}
                 <div className="grid grid-cols-12 text-sm">
-                  <div className="col-span-5 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                  <div className="col-span-4 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     场景基本信息
                   </div>
-                  <div className="col-span-7 px-3 py-2 text-center font-medium">
+                  <div className="col-span-8 px-3 py-2 text-center font-medium">
                     用户审查
                   </div>
                 </div>
                 {/* Second row - column headers */}
                 <div className="grid grid-cols-12 text-sm bg-[hsl(200,65%,55%)]">
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景来源</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">来源</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
                   <div className="col-span-3 px-3 py-2 text-center">审查记录</div>
                 </div>
@@ -373,13 +373,24 @@ export default function CaseReview() {
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
                         <span className="font-mono text-xs">{tp.code}</span>
                       </div>
-                      {/* 场景描述 - 不可点击 */}
-                      <div className="col-span-2 px-3 py-3 border-r border-border flex items-center">
-                        <span className="truncate text-foreground">{tp.name}</span>
+                      {/* 场景描述 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center">
+                        <span className="truncate text-foreground text-xs">{tp.name}</span>
                       </div>
-                      {/* 场景来源 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center text-muted-foreground">
-                        {tp.source}
+                      {/* 场景来源 - Badge显示 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-[10px] px-1.5",
+                            tp.source === "UserStory" && "bg-amber-500/10 text-amber-600 border-amber-200",
+                            tp.source === "FSD" && "bg-blue-500/10 text-blue-600 border-blue-200",
+                            tp.source === "TSD" && "bg-emerald-500/10 text-emerald-600 border-emerald-200",
+                            tp.source === "PRD" && "bg-purple-500/10 text-purple-600 border-purple-200"
+                          )}
+                        >
+                          {tp.source}
+                        </Badge>
                       </div>
                       {/* 对应案例数 - 可点击打开侧边栏 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
@@ -420,32 +431,40 @@ export default function CaseReview() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      {/* 分类 - 下拉选择 */}
-                      <div className="col-span-1 px-1 py-1 border-r border-border flex items-center">
-                        <Select
-                          value={tp.category || ""}
-                          onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "category", value)}
-                        >
-                          <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
-                            <SelectValue placeholder="选择..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categoryOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value} className="text-xs">
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      {/* 分类 - 采纳时显示-，否则下拉选择 */}
+                      <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
+                        {tp.reviewResult === "adopted" ? (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        ) : (
+                          <Select
+                            value={tp.category || ""}
+                            onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "category", value)}
+                          >
+                            <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
+                              <SelectValue placeholder="请选择分类..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categoryOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value} className="text-xs">
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
-                      {/* 处理方案 - 可编辑 */}
-                      <div className="col-span-2 px-2 py-1 border-r border-border flex items-center">
-                        <Input
-                          className="h-8 text-xs border-0 bg-transparent focus-visible:ring-1"
-                          placeholder="请输入处理方案..."
-                          value={tp.solution || ""}
-                          onChange={(e) => handleFieldChange(dimension.id, tp.id, "solution", e.target.value)}
-                        />
+                      {/* 处理方案 - 采纳时显示-，否则可编辑 */}
+                      <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
+                        {tp.reviewResult === "adopted" ? (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        ) : (
+                          <Input
+                            className="h-8 text-xs border-0 bg-transparent focus-visible:ring-1"
+                            placeholder="请输入处理方案..."
+                            value={tp.solution || ""}
+                            onChange={(e) => handleFieldChange(dimension.id, tp.id, "solution", e.target.value)}
+                          />
+                        )}
                       </div>
                       {/* 审查记录 - 显示最新记录，hover显示完整历史 */}
                       <div className="col-span-3 px-2 py-1 flex items-center group relative">
