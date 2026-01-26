@@ -79,26 +79,26 @@ const mockDimensions: TestDimension[] = [
     id: "dim-1",
     name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "需求文档", caseCount: 12, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-15 10:30", action: "将状态改为采纳" }] },
-      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "用例库", caseCount: 18, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-15 11:20", action: "将状态改为采纳" }] },
-      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "需求文档", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", reviewHistory: [{ timestamp: "2024-01-15 14:00", action: "将状态改为需完善" }] },
-      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "安全规范", caseCount: 5, reviewResult: "needsDiscard", category: "重复", reviewHistory: [{ timestamp: "2024-01-15 14:30", action: "将状态改为丢弃" }] },
+      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory", caseCount: 12, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
+      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
+      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
+      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", category: "重复", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
     ],
   },
   {
     id: "dim-2",
     name: "02-业务功能维度",
     testPoints: [
-      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "需求文档", caseCount: 22, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-16 09:00", action: "将状态改为采纳" }] },
-      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "用例库", caseCount: 15, reviewResult: "pending", reviewHistory: [] },
+      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "UserStory", caseCount: 22, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-06 09:00", action: "状态修改为采纳" }] },
+      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "FSD", caseCount: 15, reviewResult: "pending", reviewHistory: [] },
     ],
   },
   {
     id: "dim-3",
     name: "03-业务要素维度",
     testPoints: [
-      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "需求文档", caseCount: 14, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-16 10:15", action: "将状态改为采纳" }] },
-      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "用例库", caseCount: 10, reviewResult: "pending", reviewHistory: [] },
+      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "TSD", caseCount: 14, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-06 10:15", action: "状态修改为采纳" }] },
+      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", reviewHistory: [] },
     ],
   },
 ];
@@ -338,24 +338,24 @@ export default function CaseReview() {
               {/* Table Header */}
               <div className="bg-[hsl(200,70%,50%)] text-white">
                 {/* First row - group headers */}
-                <div className="grid grid-cols-11 text-sm">
+                <div className="grid grid-cols-12 text-sm">
                   <div className="col-span-5 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     场景基本信息
                   </div>
-                  <div className="col-span-6 px-3 py-2 text-center font-medium">
+                  <div className="col-span-7 px-3 py-2 text-center font-medium">
                     用户审查
                   </div>
                 </div>
                 {/* Second row - column headers */}
-                <div className="grid grid-cols-11 text-sm bg-[hsl(200,65%,55%)]">
+                <div className="grid grid-cols-12 text-sm bg-[hsl(200,65%,55%)]">
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景来源</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">对应案例数</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
-                  <div className="col-span-1 px-3 py-2 text-center">审查记录</div>
+                  <div className="col-span-3 px-3 py-2 text-center">审查记录</div>
                 </div>
               </div>
               
@@ -367,7 +367,7 @@ export default function CaseReview() {
                   return (
                     <div
                       key={tp.id}
-                      className="grid grid-cols-11 text-sm hover:bg-muted/30 transition-colors"
+                      className="grid grid-cols-12 text-sm hover:bg-muted/30 transition-colors"
                     >
                       {/* 编号 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
@@ -421,13 +421,13 @@ export default function CaseReview() {
                         </DropdownMenu>
                       </div>
                       {/* 分类 - 下拉选择 */}
-                      <div className="col-span-2 px-2 py-1 border-r border-border flex items-center">
+                      <div className="col-span-1 px-1 py-1 border-r border-border flex items-center">
                         <Select
                           value={tp.category || ""}
                           onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "category", value)}
                         >
                           <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
-                            <SelectValue placeholder="请选择分类..." />
+                            <SelectValue placeholder="选择..." />
                           </SelectTrigger>
                           <SelectContent>
                             {categoryOptions.map((option) => (
@@ -447,21 +447,33 @@ export default function CaseReview() {
                           onChange={(e) => handleFieldChange(dimension.id, tp.id, "solution", e.target.value)}
                         />
                       </div>
-                      {/* 审查记录 - 显示最新记录 */}
-                      <div className="col-span-1 px-2 py-1 flex items-center">
+                      {/* 审查记录 - 显示最新记录，hover显示完整历史 */}
+                      <div className="col-span-3 px-2 py-1 flex items-center group relative">
                         <span className="text-xs text-muted-foreground truncate">
                           {tp.reviewHistory && tp.reviewHistory.length > 0 
                             ? `${tp.reviewHistory[tp.reviewHistory.length - 1].timestamp} ${tp.reviewHistory[tp.reviewHistory.length - 1].action}`
                             : "-"
                           }
                         </span>
+                        {tp.reviewHistory && tp.reviewHistory.length > 0 && (
+                          <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-3 min-w-[280px] max-w-[400px]">
+                            <div className="text-xs font-medium mb-2 text-foreground">审查记录</div>
+                            <div className="space-y-1.5">
+                              {tp.reviewHistory.map((record, idx) => (
+                                <div key={idx} className="text-xs text-muted-foreground whitespace-normal">
+                                  {record.timestamp} {record.action}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
                 })}
                 
                 {dimension.testPoints.length === 0 && (
-                  <div className="col-span-11 px-3 py-6 text-center text-muted-foreground">
+                  <div className="col-span-12 px-3 py-6 text-center text-muted-foreground">
                     暂无数据
                   </div>
                 )}
