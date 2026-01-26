@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AIThinkingSidebar } from "@/components/workspace/AIThinkingSidebar";
+import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,16 +14,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 
 type BatchStatus = "generating" | "completed" | "failed";
 
@@ -99,34 +90,13 @@ const statusConfig: Record<BatchStatus, { label: string; icon: typeof Loader2; c
   },
 };
 
-// Mock BDD content for sidebar
-const getMockBddContent = () => {
-  return `Feature: 用户登录功能
-
-  Scenario: 用户使用有效的用户名和密码登录系统
-    Given 用户已经注册并拥有有效的账户
-    And 用户位于登录页面
-    When 用户输入正确的用户名 "testuser"
-    And 用户输入正确的密码 "Password123"
-    And 用户点击登录按钮
-    Then 系统应该验证用户凭证
-    And 用户应该被重定向到主页
-    And 系统应该显示欢迎消息
-
-  Examples:
-    | 用户名    | 密码        | 预期结果   |
-    | testuser  | Password123 | 登录成功   |
-    | admin     | Admin@456   | 登录成功   |
-    | user01    | User#789    | 登录成功   |`;
-};
-
 export default function GenerationRecords() {
   const navigate = useNavigate();
   const { workspaceId, recordId } = useParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<GenerationBatch | null>(null);
   const [caseDetailOpen, setCaseDetailOpen] = useState(false);
-  const [selectedCaseBatch, setSelectedCaseBatch] = useState<GenerationBatch | null>(null);
+  const [selectedCaseData, setSelectedCaseData] = useState<CaseDetailData | null>(null);
 
   const handleViewProgress = (batch: GenerationBatch) => {
     setSelectedBatch(batch);
@@ -134,7 +104,11 @@ export default function GenerationRecords() {
   };
 
   const handleViewCases = (batch: GenerationBatch) => {
-    setSelectedCaseBatch(batch);
+    setSelectedCaseData({
+      id: batch.id,
+      reviewResult: "pending",
+      caseCount: batch.totalCases,
+    });
     setCaseDetailOpen(true);
   };
 
@@ -258,54 +232,11 @@ export default function GenerationRecords() {
         batch={selectedBatch}
       />
 
-      {/* 案例详情侧边栏 */}
-      <Sheet open={caseDetailOpen} onOpenChange={setCaseDetailOpen}>
-        <SheetContent className="w-[520px] sm:max-w-[520px] flex flex-col">
-          <SheetHeader>
-            <SheetTitle>案例详情</SheetTitle>
-          </SheetHeader>
-          
-          {selectedCaseBatch && (
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <ScrollArea className="flex-1 pr-4">
-                <div className="space-y-6 py-4">
-                  {/* 批次信息 */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">批次编号</Label>
-                      <Badge variant="outline" className="text-xs font-mono">
-                        {selectedCaseBatch.batchCode}
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">用例数量</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {selectedCaseBatch.totalCases} 个
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  {/* 案例来源详情 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">案例来源</Label>
-                    <CaseSourceInfo caseId={selectedCaseBatch.id} showHeader={false} />
-                  </div>
-                  
-                  {/* BDD 完整内容 - 单一文本域展示 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">案例详情 (BDD)</Label>
-                    <Textarea
-                      className="min-h-[300px] font-mono text-xs bg-muted/30 resize-none"
-                      value={getMockBddContent()}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </ScrollArea>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
+      <CaseDetailSidebar
+        open={caseDetailOpen}
+        onOpenChange={setCaseDetailOpen}
+        caseData={selectedCaseData}
+      />
     </div>
   );
 }
