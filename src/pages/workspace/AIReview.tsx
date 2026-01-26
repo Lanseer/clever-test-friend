@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AIReviewSummarySidebar } from "@/components/workspace/AIReviewSummarySidebar";
 import { AIReviewCasesDialog } from "@/components/workspace/AIReviewCasesDialog";
-import { SmartReviewSelectDialog } from "@/components/workspace/SmartReviewSelectDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -169,7 +168,6 @@ export default function AIReview() {
   const [casesDialogOpen, setCasesDialogOpen] = useState(false);
   const [casesDialogType, setCasesDialogType] = useState<"excellent" | "passed" | "failed">("excellent");
   const [dialogCases, setDialogCases] = useState<any[]>([]);
-  const [selectDialogOpen, setSelectDialogOpen] = useState(false);
   const [failureDialogOpen, setFailureDialogOpen] = useState(false);
   const [failureRecord, setFailureRecord] = useState<AIReviewRecord | null>(null);
 
@@ -187,11 +185,7 @@ export default function AIReview() {
   };
 
   const handleNewSmartReview = () => {
-    setSelectDialogOpen(true);
-  };
-
-  const handleConfirmReview = (selectedCaseIds: string[]) => {
-    // Create a new review record
+    // Create a new review record directly
     const newRecord: AIReviewRecord = {
       id: `${records.length + 1}`,
       code: `AIR-${String(records.length + 1).padStart(3, "0")}`,
@@ -204,7 +198,7 @@ export default function AIReview() {
       }).replace(/\//g, "-"),
       endTime: null,
       progress: "in_progress",
-      totalCases: selectedCaseIds.length,
+      totalCases: Math.floor(Math.random() * 20) + 10, // Random number of cases
       excellentCases: 0,
       passedCases: 0,
       failedCases: 0,
@@ -212,7 +206,7 @@ export default function AIReview() {
     };
     
     setRecords([newRecord, ...records]);
-    toast.success("智能审查任务已开始！");
+    toast.success("智能审查任务已创建，智能审查进行中");
   };
 
   const handleViewFailure = (record: AIReviewRecord) => {
@@ -383,15 +377,7 @@ export default function AIReview() {
                         </>
                       )}
                       {record.progress === "completed" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 px-3 text-xs gap-1"
-                          onClick={() => handleOpenSummary(record)}
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          评审总结
-                        </Button>
+                        <span className="text-xs text-muted-foreground">已完成</span>
                       )}
                       {record.progress === "in_progress" && (
                         <span className="text-xs text-muted-foreground">审查中...</span>
@@ -428,12 +414,6 @@ export default function AIReview() {
         onCasesChange={setDialogCases}
       />
 
-      {/* Smart Review Select Dialog */}
-      <SmartReviewSelectDialog
-        open={selectDialogOpen}
-        onOpenChange={setSelectDialogOpen}
-        onConfirm={handleConfirmReview}
-      />
 
       {/* Failure Details Dialog */}
       <AlertDialog open={failureDialogOpen} onOpenChange={setFailureDialogOpen}>
