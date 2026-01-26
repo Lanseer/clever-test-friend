@@ -152,14 +152,14 @@ export function SmartDesignTaskCard({
         {/* Stats - Vertical layout */}
         <div className="flex gap-1.5 mb-1.5 text-[10px]">
           <div className="flex-1 text-center py-1 px-1 bg-sky-50/80 dark:bg-sky-900/30 rounded border border-sky-200/50">
-            <div className="text-muted-foreground leading-none">自评</div>
+            <div className="text-muted-foreground leading-none">内部</div>
             <div className="mt-0.5 leading-none">
               <span className="text-emerald-600 font-medium">{task.selfReviewPassed}</span>
               <span className="text-muted-foreground">/{task.selfReviewTotal}</span>
             </div>
           </div>
           <div className="flex-1 text-center py-1 px-1 bg-sky-50/80 dark:bg-sky-900/30 rounded border border-sky-200/50">
-            <div className="text-muted-foreground leading-none">专家</div>
+            <div className="text-muted-foreground leading-none">外部</div>
             <div className="mt-0.5 leading-none">
               <span className="text-emerald-600 font-medium">{task.expertReviewPassed}</span>
               <span className="text-muted-foreground">/{task.expertReviewTotal}</span>
@@ -179,7 +179,7 @@ export function SmartDesignTaskCard({
             }}
           >
             <ClipboardCheck className="w-2.5 h-2.5 mr-0.5" />
-            自评
+            内部
           </Button>
           <Button
             variant="ghost"
@@ -191,7 +191,7 @@ export function SmartDesignTaskCard({
             }}
           >
             <Users className="w-2.5 h-2.5 mr-0.5" />
-            专家
+            外部
           </Button>
           <Button
             variant="ghost"
@@ -250,14 +250,14 @@ export function SmartDesignTaskCard({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">自评进度</label>
+                <label className="text-xs text-muted-foreground">内部审查进度</label>
                 <p className="text-sm">
                   <span className="text-emerald-600 font-medium">{taskDetail.selfReviewPassed}</span>
                   <span className="text-muted-foreground"> / {taskDetail.selfReviewTotal}</span>
                 </p>
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">专家评审进度</label>
+                <label className="text-xs text-muted-foreground">外部评审进度</label>
                 <p className="text-sm">
                   <span className="text-emerald-600 font-medium">{taskDetail.expertReviewPassed}</span>
                   <span className="text-muted-foreground"> / {taskDetail.expertReviewTotal}</span>
