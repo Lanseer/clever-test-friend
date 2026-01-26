@@ -123,6 +123,9 @@ const generateMockCases = (count: number, type: "excellent" | "passed" | "failed
     failed: "不合格",
   };
   
+  const outlines = ["用户管理", "订单管理", "商品管理", "支付流程", "报表统计"];
+  const scenarios = ["用户登录验证", "订单创建流程", "商品上架审核", "支付成功回调", "数据导出功能"];
+  
   return Array.from({ length: count }, (_, i) => ({
     id: `${type}-${i + 1}`,
     code: `TC-${String(i + 1).padStart(3, "0")}`,
@@ -134,6 +137,8 @@ const generateMockCases = (count: number, type: "excellent" | "passed" | "failed
     batchCode: `B00${Math.floor(i / 3) + 1}`,
     nature: (i % 2 === 0 ? "positive" : "negative") as "positive" | "negative",
     createdAt: `2024-01-${15 - Math.floor(i / 2)} ${10 + i}:30`,
+    outline: outlines[i % outlines.length],
+    scenario: scenarios[i % scenarios.length],
   }));
 };
 

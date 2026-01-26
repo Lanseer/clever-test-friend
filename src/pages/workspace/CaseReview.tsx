@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Bot, Layers, Target, ChevronRight, ChevronDown, ThumbsUp, ThumbsDown, Eye, Tag } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Layers, Target, ChevronRight, ChevronDown, ThumbsUp, ThumbsDown, Eye, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -370,14 +370,6 @@ export default function CaseReview() {
           >
             <Sparkles className="w-4 h-4" />
             智能审查
-          </Button>
-          <Button 
-            variant="outline" 
-            className="gap-2"
-            onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/ai-assistant`)}
-          >
-            <Bot className="w-4 h-4" />
-            智能助手
           </Button>
         </div>
       </div>
