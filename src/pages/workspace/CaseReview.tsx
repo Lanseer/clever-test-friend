@@ -500,7 +500,7 @@ export default function CaseReview() {
                         </span>
                       </div>
                       
-                      {/* 操作按钮区域 - 只保留图标 */}
+                      {/* 操作按钮区域 - 只保留图标，始终可点击 */}
                       <div className="flex items-center gap-1 ml-8 flex-shrink-0">
                         <TooltipProvider>
                           <Tooltip>
@@ -508,12 +508,16 @@ export default function CaseReview() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                className={cn(
+                                  "h-7 w-7",
+                                  testPoint.adoptionStatus === "adopted" 
+                                    ? "text-green-600 bg-green-50" 
+                                    : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                                )}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleAdopt(dimension.id, testPoint.id);
                                 }}
-                                disabled={testPoint.adoptionStatus !== "pending"}
                               >
                                 <ThumbsUp className="w-4 h-4" />
                               </Button>
@@ -528,12 +532,16 @@ export default function CaseReview() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className={cn(
+                                  "h-7 w-7",
+                                  testPoint.adoptionStatus === "notAdopted" 
+                                    ? "text-red-600 bg-red-50" 
+                                    : "text-red-600 hover:text-red-700 hover:bg-red-50"
+                                )}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleOpenRejectDialog(dimension.id, testPoint.id);
                                 }}
-                                disabled={testPoint.adoptionStatus !== "pending"}
                               >
                                 <ThumbsDown className="w-4 h-4" />
                               </Button>
@@ -695,10 +703,35 @@ export default function CaseReview() {
             <div className="flex-1 flex flex-col overflow-hidden">
               <ScrollArea className="flex-1 pr-4">
                 <div className="space-y-6 py-4">
-                  {/* 场景名称 */}
+                  {/* 场景名称 - 可编辑文本域 */}
                   <div className="space-y-2">
                     <Label className="text-muted-foreground text-xs">场景名称</Label>
-                    <p className="text-sm text-foreground">{sidebarTestPoint.testPoint.name}</p>
+                    <Textarea
+                      value={sidebarTestPoint.testPoint.name}
+                      onChange={(e) => {
+                        const newName = e.target.value;
+                        setDimensions(prev => prev.map(dim => {
+                          if (dim.id === sidebarTestPoint.dimId) {
+                            return {
+                              ...dim,
+                              testPoints: dim.testPoints.map(tp => {
+                                if (tp.id === sidebarTestPoint.testPoint.id) {
+                                  return { ...tp, name: newName };
+                                }
+                                return tp;
+                              })
+                            };
+                          }
+                          return dim;
+                        }));
+                        setSidebarTestPoint(prev => prev ? {
+                          ...prev,
+                          testPoint: { ...prev.testPoint, name: newName }
+                        } : null);
+                      }}
+                      className="min-h-[80px] text-sm"
+                      placeholder="请输入场景名称..."
+                    />
                   </div>
                   
                   {/* 状态信息 */}
@@ -729,17 +762,25 @@ export default function CaseReview() {
                 <div className="flex items-center gap-2 w-full">
                   <Button
                     variant="outline"
-                    className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className={cn(
+                      "flex-1",
+                      sidebarTestPoint.testPoint.adoptionStatus === "notAdopted"
+                        ? "text-red-600 bg-red-50 border-red-200"
+                        : "text-red-600 hover:text-red-700 hover:bg-red-50"
+                    )}
                     onClick={handleSidebarReject}
-                    disabled={sidebarTestPoint.testPoint.adoptionStatus !== "pending"}
                   >
                     <ThumbsDown className="w-4 h-4 mr-2" />
                     不采纳
                   </Button>
                   <Button
-                    className="flex-1"
+                    className={cn(
+                      "flex-1",
+                      sidebarTestPoint.testPoint.adoptionStatus === "adopted"
+                        ? "bg-primary"
+                        : ""
+                    )}
                     onClick={handleSidebarAdopt}
-                    disabled={sidebarTestPoint.testPoint.adoptionStatus !== "pending"}
                   >
                     <ThumbsUp className="w-4 h-4 mr-2" />
                     采纳
