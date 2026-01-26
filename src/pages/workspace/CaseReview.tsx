@@ -29,6 +29,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -37,10 +44,26 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 import { toast } from "sonner";
 
+// 分类选项
+const categoryOptions = [
+  { value: "完善场景", label: "完善场景" },
+  { value: "完善信息", label: "完善信息" },
+  { value: "完善数据", label: "完善数据" },
+  { value: "重复", label: "重复" },
+  { value: "非本功能", label: "非本功能" },
+  { value: "其他", label: "其他" },
+];
+
 type ReviewResult = "adopted" | "needsImprovement" | "needsDiscard" | "pending";
+
+interface ReviewHistoryItem {
+  timestamp: string;
+  action: string;
+}
 
 interface TestPoint {
   id: string;
@@ -51,7 +74,7 @@ interface TestPoint {
   reviewResult: ReviewResult;
   category?: string;
   solution?: string;
-  remark?: string;
+  reviewHistory: ReviewHistoryItem[];
 }
 
 interface TestDimension {
@@ -65,26 +88,26 @@ const mockDimensions: TestDimension[] = [
     id: "dim-1",
     name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "需求文档", caseCount: 12, reviewResult: "adopted" },
-      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "用例库", caseCount: 18, reviewResult: "adopted" },
-      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "需求文档", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景/完善信息/完善数据" },
-      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "安全规范", caseCount: 5, reviewResult: "needsDiscard", category: "重复/非本功能/" },
+      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "需求文档", caseCount: 12, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-15 10:30", action: "将状态改为采纳" }] },
+      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "用例库", caseCount: 18, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-15 11:20", action: "将状态改为采纳" }] },
+      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "需求文档", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", reviewHistory: [{ timestamp: "2024-01-15 14:00", action: "将状态改为需完善" }] },
+      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "安全规范", caseCount: 5, reviewResult: "needsDiscard", category: "重复", reviewHistory: [{ timestamp: "2024-01-15 14:30", action: "将状态改为丢弃" }] },
     ],
   },
   {
     id: "dim-2",
     name: "02-业务功能维度",
     testPoints: [
-      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "需求文档", caseCount: 22, reviewResult: "adopted" },
-      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "用例库", caseCount: 15, reviewResult: "pending" },
+      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "需求文档", caseCount: 22, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-16 09:00", action: "将状态改为采纳" }] },
+      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "用例库", caseCount: 15, reviewResult: "pending", reviewHistory: [] },
     ],
   },
   {
     id: "dim-3",
     name: "03-业务要素维度",
     testPoints: [
-      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "需求文档", caseCount: 14, reviewResult: "adopted" },
-      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "用例库", caseCount: 10, reviewResult: "pending" },
+      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "需求文档", caseCount: 14, reviewResult: "adopted", reviewHistory: [{ timestamp: "2024-01-16 10:15", action: "将状态改为采纳" }] },
+      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "用例库", caseCount: 10, reviewResult: "pending", reviewHistory: [] },
     ],
   },
 ];
@@ -108,27 +131,25 @@ const reviewResultConfig: Record<ReviewResult, { label: string; className: strin
   },
 };
 
-// Mock BDD content for sidebar
-const mockBddContent = {
-  scenario: "用户使用有效的用户名和密码登录系统",
-  steps: [
-    { keyword: "Given", text: "用户已经注册并拥有有效的账户" },
-    { keyword: "And", text: "用户位于登录页面" },
-    { keyword: "When", text: "用户输入正确的用户名 \"testuser\"" },
-    { keyword: "And", text: "用户输入正确的密码 \"Password123\"" },
-    { keyword: "And", text: "用户点击登录按钮" },
-    { keyword: "Then", text: "系统应该验证用户凭证" },
-    { keyword: "And", text: "用户应该被重定向到主页" },
-    { keyword: "And", text: "系统应该显示欢迎消息" },
-  ],
-  dataExamples: {
-    headers: ["用户名", "密码", "预期结果"],
-    rows: [
-      ["testuser", "Password123", "登录成功"],
-      ["admin", "Admin@456", "登录成功"],
-      ["user01", "User#789", "登录成功"],
-    ],
-  },
+// Mock BDD content for sidebar - complete BDD text format
+const getMockBddContent = () => {
+  return `Feature: 用户登录功能
+
+  Scenario: 用户使用有效的用户名和密码登录系统
+    Given 用户已经注册并拥有有效的账户
+    And 用户位于登录页面
+    When 用户输入正确的用户名 "testuser"
+    And 用户输入正确的密码 "Password123"
+    And 用户点击登录按钮
+    Then 系统应该验证用户凭证
+    And 用户应该被重定向到主页
+    And 系统应该显示欢迎消息
+
+  Examples:
+    | 用户名    | 密码        | 预期结果   |
+    | testuser  | Password123 | 登录成功   |
+    | admin     | Admin@456   | 登录成功   |
+    | user01    | User#789    | 登录成功   |`;
 };
 
 export default function CaseReview() {
@@ -167,13 +188,25 @@ export default function CaseReview() {
   };
 
   const handleReviewResultChange = (dimId: string, tpId: string, result: ReviewResult) => {
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const actionLabel = reviewResultConfig[result].label;
+    
     setDimensions(prev => prev.map(dim => {
       if (dim.id === dimId) {
         return {
           ...dim,
           testPoints: dim.testPoints.map(tp => {
             if (tp.id === tpId) {
-              return { ...tp, reviewResult: result };
+              const newHistory: ReviewHistoryItem = {
+                timestamp,
+                action: `将状态改为${actionLabel}`
+              };
+              return { 
+                ...tp, 
+                reviewResult: result,
+                reviewHistory: [...tp.reviewHistory, newHistory]
+              };
             }
             return tp;
           })
@@ -184,7 +217,7 @@ export default function CaseReview() {
     toast.success("审查结果已更新");
   };
 
-  const handleFieldChange = (dimId: string, tpId: string, field: "category" | "solution" | "remark", value: string) => {
+  const handleFieldChange = (dimId: string, tpId: string, field: "category" | "solution", value: string) => {
     setDimensions(prev => prev.map(dim => {
       if (dim.id === dimId) {
         return {
@@ -336,7 +369,7 @@ export default function CaseReview() {
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
-                  <div className="col-span-1 px-3 py-2 text-center">备注</div>
+                  <div className="col-span-1 px-3 py-2 text-center">审查记录</div>
                 </div>
               </div>
               
@@ -401,14 +434,23 @@ export default function CaseReview() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      {/* 分类 - 可编辑 */}
+                      {/* 分类 - 下拉选择 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center">
-                        <Input
-                          className="h-8 text-xs border-0 bg-transparent focus-visible:ring-1"
-                          placeholder="请输入分类..."
+                        <Select
                           value={tp.category || ""}
-                          onChange={(e) => handleFieldChange(dimension.id, tp.id, "category", e.target.value)}
-                        />
+                          onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "category", value)}
+                        >
+                          <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
+                            <SelectValue placeholder="请选择分类..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categoryOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value} className="text-xs">
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       {/* 处理方案 - 可编辑 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center">
@@ -419,14 +461,14 @@ export default function CaseReview() {
                           onChange={(e) => handleFieldChange(dimension.id, tp.id, "solution", e.target.value)}
                         />
                       </div>
-                      {/* 备注 - 可编辑 */}
+                      {/* 审查记录 - 显示最新记录 */}
                       <div className="col-span-1 px-2 py-1 flex items-center">
-                        <Input
-                          className="h-8 text-xs border-0 bg-transparent focus-visible:ring-1"
-                          placeholder="备注..."
-                          value={tp.remark || ""}
-                          onChange={(e) => handleFieldChange(dimension.id, tp.id, "remark", e.target.value)}
-                        />
+                        <span className="text-xs text-muted-foreground truncate">
+                          {tp.reviewHistory.length > 0 
+                            ? `${tp.reviewHistory[tp.reviewHistory.length - 1].timestamp} ${tp.reviewHistory[tp.reviewHistory.length - 1].action}`
+                            : "-"
+                          }
+                        </span>
                       </div>
                     </div>
                   );
@@ -479,76 +521,39 @@ export default function CaseReview() {
             <div className="flex-1 flex flex-col overflow-hidden">
               <ScrollArea className="flex-1 pr-4">
                 <div className="space-y-6 py-4">
-                  {/* BDD Scenario */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">Scenario</Label>
-                    <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                      {mockBddContent.scenario}
-                    </div>
-                  </div>
-                  
-                  {/* BDD Steps */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">Steps</Label>
-                    <div className="p-3 rounded-lg bg-muted/50 space-y-2">
-                      {mockBddContent.steps.map((step, index) => (
-                        <div key={index} className="text-sm">
-                          <span className="font-semibold text-primary">{step.keyword}</span>{" "}
-                          <span>{step.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Data Examples */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">Data Examples</Label>
-                    <div className="rounded-lg border overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead className="bg-muted/50">
-                          <tr>
-                            {mockBddContent.dataExamples.headers.map((header, index) => (
-                              <th key={index} className="px-3 py-2 text-left font-medium text-muted-foreground">
-                                {header}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {mockBddContent.dataExamples.rows.map((row, rowIndex) => (
-                            <tr key={rowIndex} className="border-t">
-                              {row.map((cell, cellIndex) => (
-                                <td key={cellIndex} className="px-3 py-2">
-                                  {cell}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  
-                  {/* 场景来源详情 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">场景来源</Label>
-                    <CaseSourceInfo caseId={sidebarTestPoint.tp.id} showHeader={false} />
-                  </div>
-                  
-                  {/* 审查结果和对应案例数 */}
+                  {/* 审查结果和对应案例数 - 放在最上面 */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <Label className="text-muted-foreground text-xs">审查结果</Label>
-                      <p className={cn("text-sm font-medium", reviewResultConfig[sidebarTestPoint.tp.reviewResult].className)}>
+                      <Badge 
+                        variant="outline" 
+                        className={cn("text-xs", reviewResultConfig[sidebarTestPoint.tp.reviewResult].className)}
+                      >
                         {reviewResultConfig[sidebarTestPoint.tp.reviewResult].label}
-                      </p>
+                      </Badge>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-muted-foreground text-xs">对应案例数</Label>
-                      <p className="text-sm font-medium">
+                      <Badge variant="outline" className="text-xs">
                         {sidebarTestPoint.tp.caseCount}
-                      </p>
+                      </Badge>
                     </div>
+                  </div>
+                  
+                  {/* 案例来源详情 */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground text-xs">案例来源</Label>
+                    <CaseSourceInfo caseId={sidebarTestPoint.tp.id} showHeader={false} />
+                  </div>
+                  
+                  {/* BDD 完整内容 - 单一文本域展示 */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground text-xs">案例详情 (BDD)</Label>
+                    <Textarea
+                      className="min-h-[300px] font-mono text-xs bg-muted/30 resize-none"
+                      value={getMockBddContent()}
+                      readOnly
+                    />
                   </div>
                 </div>
               </ScrollArea>
