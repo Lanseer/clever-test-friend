@@ -35,17 +35,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
+import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { toast } from "sonner";
 
 // 分类选项
@@ -131,27 +122,6 @@ const reviewResultConfig: Record<ReviewResult, { label: string; className: strin
   },
 };
 
-// Mock BDD content for sidebar - complete BDD text format
-const getMockBddContent = () => {
-  return `Feature: 用户登录功能
-
-  Scenario: 用户使用有效的用户名和密码登录系统
-    Given 用户已经注册并拥有有效的账户
-    And 用户位于登录页面
-    When 用户输入正确的用户名 "testuser"
-    And 用户输入正确的密码 "Password123"
-    And 用户点击登录按钮
-    Then 系统应该验证用户凭证
-    And 用户应该被重定向到主页
-    And 系统应该显示欢迎消息
-
-  Examples:
-    | 用户名    | 密码        | 预期结果   |
-    | testuser  | Password123 | 登录成功   |
-    | admin     | Admin@456   | 登录成功   |
-    | user01    | User#789    | 登录成功   |`;
-};
-
 export default function CaseReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId } = useParams();
@@ -165,7 +135,7 @@ export default function CaseReview() {
   
   // 侧边栏状态
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarTestPoint, setSidebarTestPoint] = useState<{ dimId: string; tp: TestPoint } | null>(null);
+  const [sidebarCaseData, setSidebarCaseData] = useState<CaseDetailData | null>(null);
 
   // 过滤维度和测试点
   const filteredDimensions = dimensions
@@ -183,7 +153,11 @@ export default function CaseReview() {
     );
 
   const handleOpenSidebar = (dimId: string, tp: TestPoint) => {
-    setSidebarTestPoint({ dimId, tp });
+    setSidebarCaseData({
+      id: tp.id,
+      reviewResult: tp.reviewResult,
+      caseCount: tp.caseCount,
+    });
     setSidebarOpen(true);
   };
 
@@ -522,57 +496,11 @@ export default function CaseReview() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 案例详情侧边栏 */}
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent className="w-[520px] sm:max-w-[520px] flex flex-col">
-          <SheetHeader>
-            <SheetTitle>案例详情</SheetTitle>
-          </SheetHeader>
-          
-          {sidebarTestPoint && (
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <ScrollArea className="flex-1 pr-4">
-                <div className="space-y-6 py-4">
-                  {/* 审查结果和对应案例数 - 放在最上面 */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">审查结果</Label>
-                      <Badge 
-                        variant="outline" 
-                        className={cn("text-xs", reviewResultConfig[sidebarTestPoint.tp.reviewResult].className)}
-                      >
-                        {reviewResultConfig[sidebarTestPoint.tp.reviewResult].label}
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">对应案例数</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {sidebarTestPoint.tp.caseCount}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  {/* 案例来源详情 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">案例来源</Label>
-                    <CaseSourceInfo caseId={sidebarTestPoint.tp.id} showHeader={false} />
-                  </div>
-                  
-                  {/* BDD 完整内容 - 单一文本域展示 */}
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground text-xs">案例详情 (BDD)</Label>
-                    <Textarea
-                      className="min-h-[300px] font-mono text-xs bg-muted/30 resize-none"
-                      value={getMockBddContent()}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </ScrollArea>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
+      <CaseDetailSidebar
+        open={sidebarOpen}
+        onOpenChange={setSidebarOpen}
+        caseData={sidebarCaseData}
+      />
     </div>
   );
 }
