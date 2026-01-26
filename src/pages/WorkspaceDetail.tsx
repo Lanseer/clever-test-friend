@@ -48,7 +48,7 @@ export default function WorkspaceDetail() {
             <Route index element={<Navigate to="management/ai-cases" replace />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
-            <Route path="management/ai-cases/:recordId/generation-records" element={<GenerationRecords />} />
+            <Route path="management/ai-cases/:recordId/generation-records" element={<BatchCaseList />} />
             <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
@@ -86,7 +86,7 @@ export default function WorkspaceDetail() {
             <Route path="management/cases/:caseId" element={<TestCaseDetail />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
-            <Route path="management/ai-cases/:recordId/generation-records" element={<GenerationRecords />} />
+            <Route path="management/ai-cases/:recordId/generation-records" element={<BatchCaseList />} />
             <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
