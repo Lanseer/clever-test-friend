@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Clock, FileText, BookOpen, Layout, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Search, Clock, FileText, BookOpen, Layout, ChevronDown, ChevronUp, ChevronRight, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface BatchCase {
   id: string;
@@ -25,6 +31,18 @@ interface BatchCase {
   name: string;
   nature: "positive" | "negative";
   createdAt: string;
+}
+
+interface TestPoint {
+  id: string;
+  name: string;
+  cases: BatchCase[];
+}
+
+interface TestDimension {
+  id: string;
+  name: string;
+  testPoints: TestPoint[];
 }
 
 interface SourceDocument {
@@ -40,15 +58,46 @@ interface GenerationMeta {
   generatedAt: string;
 }
 
-const mockCases: BatchCase[] = [
-  { id: "1", code: "TC-001", name: "用户登录成功-正确用户名密码", nature: "positive", createdAt: "2024-01-15 10:30" },
-  { id: "2", code: "TC-002", name: "用户登录失败-密码错误", nature: "negative", createdAt: "2024-01-15 10:31" },
-  { id: "3", code: "TC-003", name: "用户登录失败-用户名不存在", nature: "negative", createdAt: "2024-01-15 10:32" },
-  { id: "4", code: "TC-004", name: "用户注册成功-填写完整信息", nature: "positive", createdAt: "2024-01-15 10:33" },
-  { id: "5", code: "TC-005", name: "用户注册失败-手机号已存在", nature: "negative", createdAt: "2024-01-15 10:34" },
-  { id: "6", code: "TC-006", name: "密码重置-发送验证码成功", nature: "positive", createdAt: "2024-01-15 10:35" },
-  { id: "7", code: "TC-007", name: "密码重置-验证码校验通过", nature: "positive", createdAt: "2024-01-15 10:36" },
-  { id: "8", code: "TC-008", name: "密码重置失败-验证码过期", nature: "negative", createdAt: "2024-01-15 10:37" },
+// Mock data organized by dimension hierarchy
+const mockDimensions: TestDimension[] = [
+  {
+    id: "dim-1",
+    name: "用户认证模块",
+    testPoints: [
+      {
+        id: "tp-1",
+        name: "用户登录",
+        cases: [
+          { id: "1", code: "TC-001", name: "用户登录成功-正确用户名密码", nature: "positive", createdAt: "2024-01-15 10:30" },
+          { id: "2", code: "TC-002", name: "用户登录失败-密码错误", nature: "negative", createdAt: "2024-01-15 10:31" },
+          { id: "3", code: "TC-003", name: "用户登录失败-用户名不存在", nature: "negative", createdAt: "2024-01-15 10:32" },
+        ],
+      },
+      {
+        id: "tp-2",
+        name: "用户注册",
+        cases: [
+          { id: "4", code: "TC-004", name: "用户注册成功-填写完整信息", nature: "positive", createdAt: "2024-01-15 10:33" },
+          { id: "5", code: "TC-005", name: "用户注册失败-手机号已存在", nature: "negative", createdAt: "2024-01-15 10:34" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "dim-2",
+    name: "密码管理模块",
+    testPoints: [
+      {
+        id: "tp-3",
+        name: "密码重置",
+        cases: [
+          { id: "6", code: "TC-006", name: "密码重置-发送验证码成功", nature: "positive", createdAt: "2024-01-15 10:35" },
+          { id: "7", code: "TC-007", name: "密码重置-验证码校验通过", nature: "positive", createdAt: "2024-01-15 10:36" },
+          { id: "8", code: "TC-008", name: "密码重置失败-验证码过期", nature: "negative", createdAt: "2024-01-15 10:37" },
+        ],
+      },
+    ],
+  },
 ];
 
 // Mock generation metadata
@@ -78,14 +127,34 @@ const docTypeConfig: Record<string, { label: string; className: string }> = {
 export default function BatchCaseList() {
   const navigate = useNavigate();
   const { workspaceId, batchId } = useParams();
-  const [searchQuery, setSearchQuery] = useState("");
   const [metaExpanded, setMetaExpanded] = useState(true);
-
-  const filteredCases = mockCases.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.code.toLowerCase().includes(searchQuery.toLowerCase())
+  const [expandedDimensions, setExpandedDimensions] = useState<Record<string, boolean>>(() => 
+    mockDimensions.reduce((acc, dim) => ({ ...acc, [dim.id]: true }), {})
   );
+  const [caseDialogOpen, setCaseDialogOpen] = useState(false);
+  const [selectedTestPoint, setSelectedTestPoint] = useState<TestPoint | null>(null);
+  const [caseSearchQuery, setCaseSearchQuery] = useState("");
+
+  const totalCases = mockDimensions.reduce(
+    (acc, dim) => acc + dim.testPoints.reduce((tpAcc, tp) => tpAcc + tp.cases.length, 0),
+    0
+  );
+
+  const toggleDimension = (dimId: string) => {
+    setExpandedDimensions(prev => ({ ...prev, [dimId]: !prev[dimId] }));
+  };
+
+  const handleViewCases = (testPoint: TestPoint) => {
+    setSelectedTestPoint(testPoint);
+    setCaseSearchQuery("");
+    setCaseDialogOpen(true);
+  };
+
+  const filteredCases = selectedTestPoint?.cases.filter(
+    (c) =>
+      c.name.toLowerCase().includes(caseSearchQuery.toLowerCase()) ||
+      c.code.toLowerCase().includes(caseSearchQuery.toLowerCase())
+  ) || [];
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -119,7 +188,7 @@ export default function BatchCaseList() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">生成用例列表</h1>
           <p className="text-muted-foreground mt-1">
-            批次 {batchId?.substring(0, 8)} · 共 {mockCases.length} 个用例
+            批次 {batchId?.substring(0, 8)} · 共 {totalCases} 个用例
           </p>
         </div>
       </div>
@@ -191,68 +260,132 @@ export default function BatchCaseList() {
         </Card>
       </Collapsible>
 
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="搜索用例编号或名称..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
-      {/* Case List */}
-      <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[80px_1fr_100px_150px] gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          <div>编号</div>
-          <div>用例名称</div>
-          <div>用例性质</div>
-          <div>创建时间</div>
-        </div>
-
-        <div className="divide-y">
-          {filteredCases.map((testCase, index) => {
-            const nature = natureConfig[testCase.nature];
-
-            return (
-              <div
-                key={testCase.id}
-                className="grid grid-cols-[80px_1fr_100px_150px] gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex items-center">
-                  <Badge variant="outline" className="font-mono text-xs">
-                    {testCase.code}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground">{testCase.name}</span>
-                </div>
-                <div className="flex items-center">
-                  <Badge variant="outline" className={nature.className}>
-                    {nature.label}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Clock className="w-3.5 h-3.5" />
-                  {testCase.createdAt}
-                </div>
+      {/* Dimension Hierarchy List */}
+      <div className="space-y-4">
+        {mockDimensions.map((dimension) => (
+          <div key={dimension.id} className="rounded-xl border bg-card overflow-hidden">
+            {/* Dimension Header */}
+            <button
+              className="w-full flex items-center justify-between px-6 py-4 bg-muted/30 hover:bg-muted/50 transition-colors"
+              onClick={() => toggleDimension(dimension.id)}
+            >
+              <div className="flex items-center gap-3">
+                <ChevronRight 
+                  className={`w-4 h-4 text-muted-foreground transition-transform ${
+                    expandedDimensions[dimension.id] ? "rotate-90" : ""
+                  }`} 
+                />
+                <span className="font-medium text-foreground">{dimension.name}</span>
+                <Badge variant="secondary" className="text-xs">
+                  {dimension.testPoints.reduce((acc, tp) => acc + tp.cases.length, 0)} 个用例
+                </Badge>
               </div>
-            );
-          })}
-        </div>
+            </button>
 
-        {filteredCases.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的用例</p>
+            {/* Test Points */}
+            {expandedDimensions[dimension.id] && (
+              <div className="divide-y">
+                {dimension.testPoints.map((testPoint) => (
+                  <div
+                    key={testPoint.id}
+                    className="flex items-center justify-between px-6 py-3 pl-14 hover:bg-muted/20 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-foreground">{testPoint.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({testPoint.cases.length} 个用例)
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-3 text-xs gap-1"
+                      onClick={() => handleViewCases(testPoint)}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      查看用例
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
+
+      {/* Case List Dialog */}
+      <Dialog open={caseDialogOpen} onOpenChange={setCaseDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              {selectedTestPoint?.name} - 用例列表
+            </DialogTitle>
+          </DialogHeader>
+
+          {/* Search */}
+          <div className="py-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="搜索用例编号或名称..."
+                value={caseSearchQuery}
+                onChange={(e) => setCaseSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Case List */}
+          <div className="flex-1 overflow-auto rounded-lg border">
+            <div className="grid grid-cols-[80px_1fr_100px_150px] gap-4 px-4 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b sticky top-0">
+              <div>编号</div>
+              <div>用例名称</div>
+              <div>用例性质</div>
+              <div>创建时间</div>
+            </div>
+
+            <div className="divide-y">
+              {filteredCases.map((testCase) => {
+                const nature = natureConfig[testCase.nature];
+
+                return (
+                  <div
+                    key={testCase.id}
+                    className="grid grid-cols-[80px_1fr_100px_150px] gap-4 px-4 py-3 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {testCase.code}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-foreground">{testCase.name}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Badge variant="outline" className={nature.className}>
+                        {nature.label}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Clock className="w-3.5 h-3.5" />
+                      {testCase.createdAt}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {filteredCases.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <Search className="w-12 h-12 mb-4 opacity-50" />
+                <p>未找到匹配的用例</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
