@@ -1,6 +1,8 @@
-import { Clock, FileText, Layers, CheckCircle, ThumbsUp, AlertTriangle, Trash2, Package } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { Clock, FileText, Layers, ThumbsUp, AlertTriangle, Trash2, Package, ClipboardList } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DeliverableReportDialog } from "./DeliverableReportDialog";
 
 export type RecordStatus = "draft" | "pending_review" | "reviewing" | "completed";
 
@@ -28,6 +30,15 @@ interface GenerationRecordsPanelProps {
 }
 
 export function GenerationRecordsPanel({ records, taskName = "任务", onRecordClick }: GenerationRecordsPanelProps) {
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<{ name: string; stats?: GenerationRecordItem['stats'] } | null>(null);
+
+  const handleOpenReport = (e: React.MouseEvent, versionName: string, stats?: GenerationRecordItem['stats']) => {
+    e.stopPropagation();
+    setSelectedDeliverable({ name: versionName, stats });
+    setReportDialogOpen(true);
+  };
+
   return (
     <div className="flex flex-col h-full bg-white/60 dark:bg-background/40 backdrop-blur-sm border-l border-sky-200/50 dark:border-sky-800/30">
       {/* Header */}
@@ -89,10 +100,21 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
                     </div>
                   </div>
 
-                  {/* Time Row */}
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    {record.createdAt}
+                  {/* Time and Report Row */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      {record.createdAt}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-[10px] text-primary hover:text-primary"
+                      onClick={(e) => handleOpenReport(e, versionName, record.stats)}
+                    >
+                      <ClipboardList className="w-3 h-3 mr-1" />
+                      审查报告
+                    </Button>
                   </div>
                 </div>
               );
@@ -100,6 +122,21 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
           )}
         </div>
       </ScrollArea>
+
+      {/* Report Dialog */}
+      {selectedDeliverable && (
+        <DeliverableReportDialog
+          open={reportDialogOpen}
+          onOpenChange={setReportDialogOpen}
+          deliverableName={selectedDeliverable.name}
+          stats={selectedDeliverable.stats ? {
+            totalScenarios: 45,
+            totalCases: selectedDeliverable.stats.adopted + selectedDeliverable.stats.needsImprovement + selectedDeliverable.stats.discarded,
+            adopted: selectedDeliverable.stats.adopted,
+            needsImprovement: selectedDeliverable.stats.needsImprovement,
+          } : undefined}
+        />
+      )}
     </div>
   );
 }
