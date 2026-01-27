@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { 
   Clock, FileText, MoreHorizontal, 
-  Pencil, Trash2, Info, Plus, Sparkles 
+  Pencil, Trash2, Info, Plus, Sparkles, MessageSquare 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface SmartDesignTask {
@@ -52,6 +57,20 @@ interface SmartDesignTaskListProps {
   onDelete?: (taskId: string) => void;
   onCreateTask: () => void;
 }
+
+interface ChatSession {
+  id: string;
+  name: string;
+  lastMessage: string;
+  timestamp: string;
+}
+
+// Mock chat sessions
+const mockChatSessions: ChatSession[] = [
+  { id: "session-1", name: "会话 1", lastMessage: "帮我生成用户登录模块的测试用例", timestamp: "10:30" },
+  { id: "session-2", name: "会话 2", lastMessage: "分析这个需求文档", timestamp: "昨天" },
+  { id: "session-3", name: "会话 3", lastMessage: "优化测试覆盖率", timestamp: "3天前" },
+];
 
 const testPhaseLabels: Record<string, string> = {
   unit: "单元测试",
@@ -196,8 +215,8 @@ export function SmartDesignTaskList({
                   {task.createdAt}
                 </div>
 
-                {/* Actions - Only Report Button */}
-                <div className="flex justify-end">
+                {/* Actions - Only Report Button - Centered */}
+                <div className="flex justify-center">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -216,6 +235,42 @@ export function SmartDesignTaskList({
           )}
         </div>
       </ScrollArea>
+
+      {/* Chat Sessions Entry */}
+      <div className="p-3 border-t border-sky-200/50 dark:border-sky-800/30">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2 text-sky-600 hover:text-sky-700 hover:bg-sky-50/50"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span className="text-sm">会话记录</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="right" align="end" className="w-64 p-2">
+            <div className="space-y-1">
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                历史会话
+              </div>
+              {mockChatSessions.map((session) => (
+                <div
+                  key={session.id}
+                  className="flex flex-col gap-0.5 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{session.name}</span>
+                    <span className="text-[10px] text-muted-foreground">{session.timestamp}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {session.lastMessage}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
 
       {/* Task Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
