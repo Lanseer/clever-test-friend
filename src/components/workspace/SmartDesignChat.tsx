@@ -19,7 +19,7 @@ interface UploadedFile {
   type: string;
 }
 
-interface Message {
+export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
@@ -42,6 +42,8 @@ interface SmartDesignChatProps {
   selectedTaskId: string | null;
   selectedTask: SmartDesignTask | null;
   records: GenerationRecordItem[];
+  messages: Message[];
+  onMessagesChange: (messages: Message[]) => void;
   onNoTaskPrompt: () => void;
   onGenerationComplete: (scenarioCount: number, caseCount: number) => void;
   onViewGenerationResult: () => void;
@@ -66,19 +68,13 @@ export function SmartDesignChat({
   selectedTaskId, 
   selectedTask,
   records,
+  messages,
+  onMessagesChange,
   onNoTaskPrompt, 
   onGenerationComplete,
   onViewGenerationResult,
   onStartReview,
 }: SmartDesignChatProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "init",
-      role: "assistant",
-      content: "你好！我是智能设计助手。请上传需求文档附件，我将帮你自动生成测试用例。\n\n你可以：\n• 上传文档后发送，开始生成用例\n• 询问如何优化测试覆盖率\n• 了解BDD用例设计规范",
-      timestamp: new Date(),
-    },
-  ]);
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -126,8 +122,8 @@ export function SmartDesignChat({
       return;
     }
 
-    setMessages((prev) => [
-      ...prev,
+    onMessagesChange([
+      ...messages,
       {
         id: Date.now().toString(),
         role: "user",
@@ -139,57 +135,58 @@ export function SmartDesignChat({
     setIsProcessing(true);
 
     // Simulate AI generation process
-    setMessages((prev) => [
-      ...prev,
+    const updatedMessages = [
+      ...messages,
+      {
+        id: Date.now().toString(),
+        role: "user" as const,
+        content: inputValue + (uploadedFiles.length > 0 ? `\n\n📎 附件: ${uploadedFiles.map(f => f.name).join(", ")}` : ""),
+        timestamp: new Date(),
+      },
       {
         id: (Date.now() + 1).toString(),
-        role: "assistant",
+        role: "assistant" as const,
         content: "正在分析您的需求...",
         timestamp: new Date(),
       },
-    ]);
+    ];
+    onMessagesChange(updatedMessages);
 
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    setMessages((prev) => {
-      const newMessages = [...prev];
-      newMessages[newMessages.length - 1] = {
-        ...newMessages[newMessages.length - 1],
-        content: uploadedFiles.length > 0 
-          ? `正在基于 ${uploadedFiles.length} 个附件生成测试用例...\n\n✅ 正在解析文档结构\n⏳ 识别功能模块...\n⏳ 生成BDD标准用例...`
-          : "正在生成测试用例...\n\n✅ 分析需求\n⏳ 生成用例...",
-      };
-      return newMessages;
-    });
+    const step1Messages = [...updatedMessages];
+    step1Messages[step1Messages.length - 1] = {
+      ...step1Messages[step1Messages.length - 1],
+      content: uploadedFiles.length > 0 
+        ? `正在基于 ${uploadedFiles.length} 个附件生成测试用例...\n\n✅ 正在解析文档结构\n⏳ 识别功能模块...\n⏳ 生成BDD标准用例...`
+        : "正在生成测试用例...\n\n✅ 分析需求\n⏳ 生成用例...",
+    };
+    onMessagesChange(step1Messages);
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    setMessages((prev) => {
-      const newMessages = [...prev];
-      newMessages[newMessages.length - 1] = {
-        ...newMessages[newMessages.length - 1],
-        content: uploadedFiles.length > 0 
-          ? `正在基于 ${uploadedFiles.length} 个附件生成测试用例...\n\n✅ 正在解析文档结构\n✅ 识别功能模块\n⏳ 生成BDD标准用例...`
-          : "正在生成测试用例...\n\n✅ 分析需求\n✅ 识别测试点\n⏳ 生成用例...",
-      };
-      return newMessages;
-    });
+    const step2Messages = [...step1Messages];
+    step2Messages[step2Messages.length - 1] = {
+      ...step2Messages[step2Messages.length - 1],
+      content: uploadedFiles.length > 0 
+        ? `正在基于 ${uploadedFiles.length} 个附件生成测试用例...\n\n✅ 正在解析文档结构\n✅ 识别功能模块\n⏳ 生成BDD标准用例...`
+        : "正在生成测试用例...\n\n✅ 分析需求\n✅ 识别测试点\n⏳ 生成用例...",
+    };
+    onMessagesChange(step2Messages);
 
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
     const scenarioCount = Math.floor(Math.random() * 10) + 5;
     const caseCount = Math.floor(Math.random() * 20) + 15;
     
-    setMessages((prev) => {
-      const newMessages = [...prev];
-      newMessages[newMessages.length - 1] = {
-        ...newMessages[newMessages.length - 1],
-        content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成`,
-        isGenerationComplete: true,
-        generationData: { scenarioCount, caseCount },
-      };
-      return newMessages;
-    });
+    const finalMessages = [...step2Messages];
+    finalMessages[finalMessages.length - 1] = {
+      ...finalMessages[finalMessages.length - 1],
+      content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成`,
+      isGenerationComplete: true,
+      generationData: { scenarioCount, caseCount },
+    };
+    onMessagesChange(finalMessages);
 
     setIsProcessing(false);
     setUploadedFiles([]);

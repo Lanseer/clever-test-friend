@@ -56,17 +56,19 @@ interface SmartDesignTaskListProps {
   onEdit?: (taskId: string) => void;
   onDelete?: (taskId: string) => void;
   onCreateTask: () => void;
+  activeChatSessionId?: string | null;
+  onSelectChatSession?: (sessionId: string) => void;
 }
 
-interface ChatSession {
+export interface ChatSession {
   id: string;
   name: string;
   lastMessage: string;
   timestamp: string;
 }
 
-// Mock chat sessions
-const mockChatSessions: ChatSession[] = [
+// Mock chat sessions - exported for use in parent
+export const mockChatSessions: ChatSession[] = [
   { id: "session-1", name: "会话 1", lastMessage: "帮我生成用户登录模块的测试用例", timestamp: "10:30" },
   { id: "session-2", name: "会话 2", lastMessage: "分析这个需求文档", timestamp: "昨天" },
   { id: "session-3", name: "会话 3", lastMessage: "优化测试覆盖率", timestamp: "3天前" },
@@ -94,6 +96,8 @@ export function SmartDesignTaskList({
   onEdit,
   onDelete,
   onCreateTask,
+  activeChatSessionId,
+  onSelectChatSession,
 }: SmartDesignTaskListProps) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailTask, setDetailTask] = useState<SmartDesignTask | null>(null);
@@ -256,7 +260,11 @@ export function SmartDesignTaskList({
               {mockChatSessions.map((session) => (
                 <div
                   key={session.id}
-                  className="flex flex-col gap-0.5 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
+                  className={cn(
+                    "flex flex-col gap-0.5 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors",
+                    activeChatSessionId === session.id && "bg-primary/10 border border-primary/20"
+                  )}
+                  onClick={() => onSelectChatSession?.(session.id)}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{session.name}</span>
