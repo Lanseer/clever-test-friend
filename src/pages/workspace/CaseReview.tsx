@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,6 +44,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 // 分类选项
 const categoryOptions = [
@@ -135,6 +140,13 @@ export default function CaseReview() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dimensions, setDimensions] = useState(mockDimensions);
   
+  // 筛选状态
+  const [filterResult, setFilterResult] = useState<string>("all");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  
+  // 维度折叠状态
+  const [collapsedDimensions, setCollapsedDimensions] = useState<Set<string>>(new Set());
+  
   // 智能审查状态
   const [isSmartReviewing, setIsSmartReviewing] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -153,14 +165,58 @@ export default function CaseReview() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCaseData, setSidebarCaseData] = useState<CaseDetailData | null>(null);
 
+  // 切换维度折叠状态
+  const toggleDimensionCollapse = (dimId: string) => {
+    setCollapsedDimensions(prev => {
+      const next = new Set(prev);
+      if (next.has(dimId)) {
+        next.delete(dimId);
+      } else {
+        next.add(dimId);
+      }
+      return next;
+    });
+  };
+
+  // 新增场景
+  const handleAddScenario = (dimId: string) => {
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    const dim = dimensions.find(d => d.id === dimId);
+    if (!dim) return;
+    
+    const newCode = `SC-${String(dim.testPoints.length + 1).padStart(3, '0')}`;
+    const newTestPoint: TestPoint = {
+      id: `tp-${Date.now()}`,
+      code: newCode,
+      name: "新场景",
+      source: "UserStory",
+      caseCount: 0,
+      reviewResult: "pending",
+      reviewHistory: [{ timestamp, action: "新增场景" }],
+    };
+    
+    setDimensions(prev => prev.map(d => {
+      if (d.id === dimId) {
+        return { ...d, testPoints: [...d.testPoints, newTestPoint] };
+      }
+      return d;
+    }));
+    toast.success("已新增场景");
+  };
+
   // 过滤维度和测试点
   const filteredDimensions = dimensions
     .map((dim) => ({
       ...dim,
-      testPoints: dim.testPoints.filter((tp) =>
-        tp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tp.code.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
+      testPoints: dim.testPoints.filter((tp) => {
+        const matchesSearch = tp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tp.code.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesResult = filterResult === "all" || tp.reviewResult === filterResult;
+        const matchesCategory = filterCategory === "all" || tp.category === filterCategory;
+        return matchesSearch && matchesResult && matchesCategory;
+      }),
     }))
     .filter(
       (dim) =>
@@ -334,14 +390,41 @@ export default function CaseReview() {
 
       {/* Search and Actions */}
       <div className="flex items-center justify-between mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="搜索编号或场景描述..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="搜索编号或场景描述..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={filterResult} onValueChange={setFilterResult}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="审查结果" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部结果</SelectItem>
+              <SelectItem value="adopted">采纳</SelectItem>
+              <SelectItem value="needsImprovement">需完善</SelectItem>
+              <SelectItem value="needsDiscard">丢弃</SelectItem>
+              <SelectItem value="pending">待审查</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="分类" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部分类</SelectItem>
+              {categoryOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center gap-2">
           <Button 
@@ -367,13 +450,22 @@ export default function CaseReview() {
 
       {/* Dimension Tables */}
       <div className="space-y-6">
-        {filteredDimensions.map((dimension) => (
-          <div key={dimension.id} className="overflow-hidden">
-            {/* Dimension Header */}
-            <div className="bg-[hsl(200,60%,94%)] border-l-4 border-l-[hsl(200,70%,50%)] px-4 py-3 font-medium text-foreground">
-              {dimension.name}
-            </div>
-            
+        {filteredDimensions.map((dimension) => {
+          const isCollapsed = collapsedDimensions.has(dimension.id);
+          
+          return (
+          <Collapsible key={dimension.id} open={!isCollapsed} onOpenChange={() => toggleDimensionCollapse(dimension.id)}>
+            <div className="overflow-hidden">
+              {/* Dimension Header */}
+              <CollapsibleTrigger asChild>
+                <div className="bg-[hsl(200,60%,94%)] border-l-4 border-l-[hsl(200,70%,50%)] px-4 py-3 font-medium text-foreground cursor-pointer hover:bg-[hsl(200,60%,90%)] transition-colors flex items-center gap-2">
+                  <ChevronRight className={cn("w-4 h-4 transition-transform", !isCollapsed && "rotate-90")} />
+                  {dimension.name}
+                  <span className="text-xs text-muted-foreground ml-2">({dimension.testPoints.length}个场景)</span>
+                </div>
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent>
             {/* Table */}
             <div className="border border-t-0 overflow-x-auto">
               {/* Table Header */}
@@ -564,10 +656,22 @@ export default function CaseReview() {
                     暂无数据
                   </div>
                 )}
+                
+                {/* 新增场景按钮 */}
+                <div 
+                  className="px-4 py-2 border-t border-dashed border-border hover:bg-muted/30 cursor-pointer transition-colors flex items-center justify-center gap-2 text-muted-foreground hover:text-primary"
+                  onClick={() => handleAddScenario(dimension.id)}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">新增场景</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+              </CollapsibleContent>
+            </div>
+          </Collapsible>
+        );
+        })}
       </div>
 
       {filteredDimensions.length === 0 && (

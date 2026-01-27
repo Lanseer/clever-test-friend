@@ -192,23 +192,8 @@ export default function AIGeneratedCases() {
 
   return (
     <div className="h-[calc(100vh)] -m-6 flex overflow-hidden relative">
-      {/* Enhanced Sky Blue Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-sky-200 via-blue-100 to-indigo-200 dark:from-sky-900/60 dark:via-blue-900/40 dark:to-indigo-900/50" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-100/40 via-transparent to-transparent" />
-      
-      {/* Animated Stars */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[8%] left-[12%] w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-lg shadow-white/50" />
-        <div className="absolute top-[15%] right-[20%] w-2 h-2 bg-sky-200 rounded-full animate-pulse shadow-lg shadow-sky-200/60" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute top-[5%] right-[45%] w-1 h-1 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-[25%] left-[5%] w-1 h-1 bg-cyan-200 rounded-full animate-pulse shadow-md shadow-cyan-200/40" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-[12%] left-[55%] w-1.5 h-1.5 bg-white/90 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
-        <div className="absolute top-[6%] right-[8%] w-2 h-2 bg-sky-100 rounded-full animate-pulse shadow-lg shadow-sky-100/50" style={{ animationDelay: '0.8s' }} />
-        <div className="absolute top-[20%] left-[30%] w-1 h-1 bg-indigo-200/80 rounded-full animate-pulse" style={{ animationDelay: '1.2s' }} />
-        <div className="absolute top-[30%] right-[60%] w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse" style={{ animationDelay: '0.7s' }} />
-        <div className="absolute top-[18%] right-[35%] w-1 h-1 bg-cyan-100 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-[35%] left-[20%] w-0.5 h-0.5 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.8s' }} />
-      </div>
+      {/* Clean Light Background */}
+      <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900" />
 
       {/* Left Panel - Task List */}
       <div className="w-72 flex-shrink-0 border-r border-sky-300/30 relative z-10">
