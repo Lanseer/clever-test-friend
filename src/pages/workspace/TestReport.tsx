@@ -187,31 +187,33 @@ function CaseReviewStatsCard({
             <TrendingUp className="w-4 h-4 text-blue-500" />
             <span className="text-sm font-medium">按生成记录采纳趋势</span>
           </div>
-          <ChartContainer config={chartConfig} className="h-[100px] w-full">
-            <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="recordName" 
-                tick={{ fontSize: 10 }} 
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis 
-                tick={{ fontSize: 10 }} 
-                axisLine={false}
-                tickLine={false}
-                width={30}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line 
-                type="monotone" 
-                dataKey="adopted" 
-                stroke="hsl(var(--chart-1))" 
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--chart-1))", strokeWidth: 2, r: 3 }}
-              />
-            </LineChart>
-          </ChartContainer>
+          <div className="h-[100px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="recordName" 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} 
+                  axisLine={false}
+                  tickLine={false}
+                  width={30}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="adopted" 
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* 问题分类汇总 */}
@@ -340,31 +342,33 @@ function ExternalReviewStatsCard({
             <TrendingUp className="w-4 h-4 text-purple-500" />
             <span className="text-sm font-medium">按发起记录通过趋势</span>
           </div>
-          <ChartContainer config={chartConfig} className="h-[100px] w-full">
-            <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="recordName" 
-                tick={{ fontSize: 10 }} 
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis 
-                tick={{ fontSize: 10 }} 
-                axisLine={false}
-                tickLine={false}
-                width={30}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line 
-                type="monotone" 
-                dataKey="passed" 
-                stroke="hsl(var(--chart-2))" 
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--chart-2))", strokeWidth: 2, r: 3 }}
-              />
-            </LineChart>
-          </ChartContainer>
+          <div className="h-[100px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="recordName" 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} 
+                  axisLine={false}
+                  tickLine={false}
+                  width={30}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="passed" 
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* 问题分类汇总 */}
