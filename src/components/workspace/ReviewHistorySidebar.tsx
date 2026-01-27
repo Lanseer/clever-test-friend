@@ -29,20 +29,15 @@ interface ReviewHistorySidebarProps {
 
 const mockHistoryRecords: ReviewHistoryRecord[] = [
   {
-    timestamp: "2026-01-06 13:25",
-    type: "status",
-    before: "采纳",
-    after: "需完善",
-  },
-  {
-    timestamp: "2026-01-05 15:30",
+    timestamp: "2026-01-06 14:30",
     type: "content",
     before: `Feature: 用户登录功能
 
-Scenario: 用户使用有效凭证登录
+Scenario: 用户使用凭证登录
   Given 用户在登录页面
   When 用户输入用户名
-  Then 用户登录成功`,
+  And 用户点击登录
+  Then 登录成功`,
     after: `Feature: 用户登录功能
 
 Scenario: 用户使用有效的用户名和密码登录系统
@@ -52,7 +47,14 @@ Scenario: 用户使用有效的用户名和密码登录系统
   And 用户输入正确的密码 "Password123"
   And 用户点击登录按钮
   Then 系统应该验证用户凭证
-  And 用户应该被重定向到主页`,
+  And 用户应该被重定向到主页
+  And 系统应该显示欢迎消息`,
+  },
+  {
+    timestamp: "2026-01-06 13:25",
+    type: "status",
+    before: "采纳",
+    after: "需完善",
   },
   {
     timestamp: "2026-01-05 10:40",
