@@ -527,9 +527,9 @@ export default function CaseReview() {
             {/* Table */}
             <div className="border border-t-0 overflow-x-auto">
               {/* Table Header */}
-              <div className="bg-[hsl(200,70%,50%)] text-white">
+              <div className="bg-[hsl(200,70%,50%)] text-white min-w-[1100px]">
                 {/* First row - group headers */}
-                <div className="grid grid-cols-13 text-sm">
+                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
                   <div className="col-span-6 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     场景基本信息
                   </div>
@@ -538,7 +538,7 @@ export default function CaseReview() {
                   </div>
                 </div>
                 {/* Second row - column headers */}
-                <div className="grid grid-cols-13 text-sm bg-[hsl(200,65%,55%)]">
+                <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">对比状态</div>
@@ -552,7 +552,7 @@ export default function CaseReview() {
               </div>
               
               {/* Table Body */}
-              <div className="divide-y divide-border bg-background">
+              <div className="divide-y divide-border bg-background min-w-[1100px]">
                 {dimension.testPoints.map((tp) => {
                   const resultConfig = reviewResultConfig[tp.reviewResult];
                   const comparisonConfig = comparisonStatusConfig[tp.comparisonStatus || "unchanged"];
@@ -560,7 +560,8 @@ export default function CaseReview() {
                   return (
                     <div
                       key={tp.id}
-                      className="grid grid-cols-13 text-sm hover:bg-muted/30 transition-colors"
+                      className="grid text-sm hover:bg-muted/30 transition-colors"
+                      style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}
                     >
                       {/* 编号 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
@@ -811,7 +812,7 @@ Scenario: 完善后的场景描述
       {/* Fixed Footer - Save as Deliverable (only when from chat) */}
       {isFromChat && (
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
-          <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-end">
+          <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-center">
             <Button onClick={handleSaveAsDeliverable} className="gap-2">
               <Save className="w-4 h-4" />
               保存为交付物
