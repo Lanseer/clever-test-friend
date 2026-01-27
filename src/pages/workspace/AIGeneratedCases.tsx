@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { SmartDesignChat } from "@/components/workspace/SmartDesignChat";
-import { SmartDesignTaskList } from "@/components/workspace/SmartDesignTaskList";
+import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
+import { SmartDesignTaskList, mockChatSessions } from "@/components/workspace/SmartDesignTaskList";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { GenerationRecordsPanel, GenerationRecordItem, RecordStatus } from "@/components/workspace/GenerationRecordsPanel";
 import { GenerationResultSidebar } from "@/components/workspace/GenerationResultSidebar";
@@ -105,6 +105,50 @@ export default function AIGeneratedCases() {
     caseCount: number;
     dimensions: Dimension[];
   } | null>(null);
+
+  // Chat session management
+  const [activeChatSessionId, setActiveChatSessionId] = useState<string | null>(null);
+  
+  const defaultMessages: Message[] = [
+    {
+      id: "init",
+      role: "assistant",
+      content: "你好！我是智能设计助手。请上传需求文档附件，我将帮你自动生成测试用例。\n\n你可以：\n• 上传文档后发送，开始生成用例\n• 询问如何优化测试覆盖率\n• 了解BDD用例设计规范",
+      timestamp: new Date(),
+    },
+  ];
+
+  // Mock messages for different sessions
+  const sessionMessagesMap: Record<string, Message[]> = {
+    "session-1": [
+      { id: "s1-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
+      { id: "s1-2", role: "user", content: "帮我生成用户登录模块的测试用例", timestamp: new Date() },
+      { id: "s1-3", role: "assistant", content: "生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成", timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24 } },
+    ],
+    "session-2": [
+      { id: "s2-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
+      { id: "s2-2", role: "user", content: "分析这个需求文档\n\n📎 附件: 需求规格说明书.pdf", timestamp: new Date() },
+      { id: "s2-3", role: "assistant", content: "正在分析您的需求文档...\n\n✅ 文档解析完成\n✅ 识别到 5 个功能模块", timestamp: new Date() },
+    ],
+    "session-3": [
+      { id: "s3-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
+      { id: "s3-2", role: "user", content: "优化测试覆盖率", timestamp: new Date() },
+      { id: "s3-3", role: "assistant", content: "根据您当前的测试用例，我建议关注以下几个方面来提高覆盖率：\n\n1. 边界值测试\n2. 异常场景处理\n3. 并发场景测试", timestamp: new Date() },
+    ],
+  };
+
+  const [chatMessages, setChatMessages] = useState<Message[]>(defaultMessages);
+
+  const handleSelectChatSession = (sessionId: string) => {
+    setActiveChatSessionId(sessionId);
+    // Load messages for the selected session
+    const sessionMessages = sessionMessagesMap[sessionId] || defaultMessages;
+    setChatMessages(sessionMessages);
+  };
+
+  const handleMessagesChange = (newMessages: Message[]) => {
+    setChatMessages(newMessages);
+  };
 
   const selectedTask = tasks.find(t => t.id === selectedTaskId) || null;
   const currentRecords = selectedTaskId ? recordsByTask[selectedTaskId] || [] : [];
@@ -242,6 +286,8 @@ export default function AIGeneratedCases() {
           onReport={handleReport}
           onDelete={handleDeleteTask}
           onCreateTask={() => setCreateDialogOpen(true)}
+          activeChatSessionId={activeChatSessionId}
+          onSelectChatSession={handleSelectChatSession}
         />
       </div>
 
@@ -251,6 +297,8 @@ export default function AIGeneratedCases() {
           selectedTaskId={selectedTaskId}
           selectedTask={selectedTask}
           records={currentRecords}
+          messages={chatMessages}
+          onMessagesChange={handleMessagesChange}
           onNoTaskPrompt={handleNoTaskPrompt}
           onGenerationComplete={handleGenerationComplete}
           onViewGenerationResult={handleViewGenerationResult}
