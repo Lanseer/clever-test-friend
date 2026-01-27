@@ -26,6 +26,7 @@ import TestReport from "./workspace/TestReport";
 import TestReportCases from "./workspace/TestReportCases";
 import TestReportSource from "./workspace/TestReportSource";
 import CaseTemplates from "./workspace/CaseTemplates";
+import DeliverableReport from "./workspace/DeliverableReport";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -64,6 +65,7 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/initiate-expert-review" element={<InitiateExpertReview />} />
             <Route path="management/ai-cases/:recordId/expert-case-review" element={<ExpertCaseReview />} />
             <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
+            <Route path="management/ai-cases/:recordId/deliverable-report" element={<DeliverableReport />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
             <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
@@ -108,6 +110,7 @@ export default function WorkspaceDetail() {
             <Route path="tags" element={<Tags />} />
             <Route path="templates" element={<CaseTemplates />} />
             <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
+            <Route path="management/ai-cases/:recordId/deliverable-report" element={<DeliverableReport />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
             <Route path="*" element={<Navigate to="dashboard" replace />} />
