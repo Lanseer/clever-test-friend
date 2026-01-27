@@ -1,9 +1,8 @@
-import { useState } from "react";
 import { Clock, FileText, Layers, ThumbsUp, AlertTriangle, Trash2, Package, ClipboardList, Download } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DeliverableReportDialog } from "./DeliverableReportDialog";
 import { toast } from "sonner";
 
 export type RecordStatus = "draft" | "pending_review" | "reviewing" | "completed";
@@ -32,13 +31,13 @@ interface GenerationRecordsPanelProps {
 }
 
 export function GenerationRecordsPanel({ records, taskName = "任务", onRecordClick }: GenerationRecordsPanelProps) {
-  const [reportDialogOpen, setReportDialogOpen] = useState(false);
-  const [selectedDeliverable, setSelectedDeliverable] = useState<{ name: string; stats?: GenerationRecordItem['stats'] } | null>(null);
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
 
-  const handleOpenReport = (e: React.MouseEvent, versionName: string, stats?: GenerationRecordItem['stats']) => {
+  const handleOpenReport = (e: React.MouseEvent, recordId: string, versionName: string) => {
     e.stopPropagation();
-    setSelectedDeliverable({ name: versionName, stats });
-    setReportDialogOpen(true);
+    const encodedName = encodeURIComponent(versionName);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/deliverable-report?name=${encodedName}`);
   };
 
   const handleDownload = (e: React.MouseEvent, versionName: string) => {
@@ -121,7 +120,7 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
                               variant="ghost"
                               size="icon"
                               className="h-6 w-6 text-primary hover:text-primary"
-                              onClick={(e) => handleOpenReport(e, versionName, record.stats)}
+                              onClick={(e) => handleOpenReport(e, record.id, versionName)}
                             >
                               <ClipboardList className="w-3.5 h-3.5" />
                             </Button>
@@ -154,21 +153,6 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
           )}
         </div>
       </ScrollArea>
-
-      {/* Report Dialog */}
-      {selectedDeliverable && (
-        <DeliverableReportDialog
-          open={reportDialogOpen}
-          onOpenChange={setReportDialogOpen}
-          deliverableName={selectedDeliverable.name}
-          stats={selectedDeliverable.stats ? {
-            totalScenarios: 45,
-            totalCases: selectedDeliverable.stats.adopted + selectedDeliverable.stats.needsImprovement + selectedDeliverable.stats.discarded,
-            adopted: selectedDeliverable.stats.adopted,
-            needsImprovement: selectedDeliverable.stats.needsImprovement,
-          } : undefined}
-        />
-      )}
     </div>
   );
 }
