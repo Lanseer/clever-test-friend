@@ -606,9 +606,9 @@ export default function CaseReview() {
                           </DropdownMenu>
                         </div>
                       </div>
-                      {/* 分类 - 采纳/已完善时显示-，否则下拉选择 */}
+                      {/* 分类 - 采纳时显示-，否则下拉选择 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
-                        {(tp.reviewResult === "adopted" || tp.reviewResult === "improved") ? (
+                        {tp.reviewResult === "adopted" ? (
                           <span className="text-xs text-muted-foreground">-</span>
                         ) : (
                           <Select
@@ -628,9 +628,9 @@ export default function CaseReview() {
                           </Select>
                         )}
                       </div>
-                      {/* 处理方案 - 采纳/已完善时显示-，否则可编辑 */}
+                      {/* 处理方案 - 采纳时显示-，否则可编辑 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
-                        {(tp.reviewResult === "adopted" || tp.reviewResult === "improved") ? (
+                        {tp.reviewResult === "adopted" ? (
                           <span className="text-xs text-muted-foreground">-</span>
                         ) : (
                           <Input
