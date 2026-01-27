@@ -205,13 +205,13 @@ export function SmartDesignChat({
 
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm">
-      {/* Header with task name and tags */}
-      <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex-shrink-0">
+      {/* Header with task name and tags - Centered */}
+      <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex-shrink-0 text-center">
         <h2 className="font-semibold text-base text-sky-900 dark:text-sky-100 truncate">
           {selectedTask?.name || "请选择任务"}
         </h2>
         {selectedTask && (
-          <div className="flex gap-2 mt-1.5">
+          <div className="flex gap-2 mt-1.5 justify-center">
             {selectedTask.testPhase && (
               <Badge variant="outline" className="text-xs bg-sky-50 text-sky-700 border-sky-200">
                 {testPhaseLabels[selectedTask.testPhase] || selectedTask.testPhase}
@@ -260,12 +260,12 @@ export function SmartDesignChat({
                       </span>
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="default"
                         className="h-7 text-xs gap-1"
                         onClick={onViewGenerationResult}
                       >
                         <Eye className="w-3 h-3" />
-                        查看
+                        开始审查
                       </Button>
                     </div>
                   </div>
@@ -344,7 +344,12 @@ export function SmartDesignChat({
                 附件
               </Button>
 
-              {/* Generation Record Selector */}
+              {/* Fixed BDD Template Badge */}
+              <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
+                BDD标准模板
+              </Badge>
+
+              {/* Deliverable Selector - moved after BDD badge */}
               {records.length > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -356,13 +361,13 @@ export function SmartDesignChat({
                     >
                       <FileText className="w-3.5 h-3.5" />
                       {selectedRecordForDropdown 
-                        ? `第 ${selectedRecordForDropdown.batchNumber} 次生成` 
-                        : "选择生成记录"
+                        ? selectedRecordForDropdown.deliverableName || `${selectedTask?.name || '任务'}_V0.${selectedRecordForDropdown.batchNumber}` 
+                        : "交付物"
                       }
                       <ChevronDown className="w-3 h-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuContent align="start" className="w-56">
                     <DropdownMenuItem onClick={() => setSelectedRecordId(null)}>
                       <span className="text-xs text-muted-foreground">不选择</span>
                     </DropdownMenuItem>
@@ -371,7 +376,7 @@ export function SmartDesignChat({
                         key={record.id}
                         onClick={() => setSelectedRecordId(record.id)}
                       >
-                        <span className="text-xs">第 {record.batchNumber} 次生成</span>
+                        <span className="text-xs">{record.deliverableName || `${selectedTask?.name || '任务'}_V0.${record.batchNumber}`}</span>
                         <Badge variant="outline" className="ml-auto text-[10px]">
                           {record.scenarioCount} 场景
                         </Badge>
@@ -380,11 +385,6 @@ export function SmartDesignChat({
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-
-              {/* Fixed BDD Template Badge */}
-              <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
-                BDD标准模板
-              </Badge>
               
               <div className="flex-1" />
             </div>

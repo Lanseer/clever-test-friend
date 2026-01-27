@@ -63,8 +63,8 @@ const mockTasks: SmartDesignTask[] = [
 
 const initialRecordsByTask: Record<string, GenerationRecordItem[]> = {
   "1": [
-    { id: "gen-1-1", batchNumber: 1, scenarioCount: 8, caseCount: 24, createdAt: "2024-01-15 10:30", status: "completed" },
-    { id: "gen-1-2", batchNumber: 2, scenarioCount: 12, caseCount: 36, createdAt: "2024-01-16 14:20", status: "reviewing" },
+    { id: "gen-1-1", batchNumber: 1, scenarioCount: 8, caseCount: 24, createdAt: "2024-01-15 10:30", status: "completed", taskName: "用户模块自动化测试用例", stats: { adopted: 5, improved: 2, needsImprovement: 1, discarded: 0 } },
+    { id: "gen-1-2", batchNumber: 2, scenarioCount: 12, caseCount: 36, createdAt: "2024-01-16 14:20", status: "reviewing", taskName: "用户模块自动化测试用例", stats: { adopted: 8, improved: 2, needsImprovement: 2, discarded: 0 } },
   ],
   "2": [],
 };
@@ -206,6 +206,8 @@ export default function AIGeneratedCases() {
         minute: "2-digit",
       }).replace(/\//g, "-"),
       status: "reviewing",
+      taskName: selectedTask?.name,
+      stats: { adopted: 0, improved: 0, needsImprovement: 0, discarded: 0 },
     };
 
     setRecordsByTask(prev => ({
@@ -254,10 +256,11 @@ export default function AIGeneratedCases() {
         />
       </div>
 
-      {/* Right Panel - Generation Records */}
+      {/* Right Panel - Deliverables */}
       <div className="w-72 flex-shrink-0 relative z-10">
         <GenerationRecordsPanel
           records={currentRecords}
+          taskName={selectedTask?.name}
           onRecordClick={handleRecordClick}
         />
       </div>
