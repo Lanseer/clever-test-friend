@@ -45,6 +45,7 @@ interface SmartDesignChatProps {
   onNoTaskPrompt: () => void;
   onGenerationComplete: (scenarioCount: number, caseCount: number) => void;
   onViewGenerationResult: () => void;
+  onStartReview: () => void;
 }
 
 const testPhaseLabels: Record<string, string> = {
@@ -68,6 +69,7 @@ export function SmartDesignChat({
   onNoTaskPrompt, 
   onGenerationComplete,
   onViewGenerationResult,
+  onStartReview,
 }: SmartDesignChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -251,12 +253,11 @@ export function SmartDesignChat({
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 
                 {/* Generation Complete Tag */}
-                {message.isGenerationComplete && message.generationData && (
+              {message.isGenerationComplete && message.generationData && (
                   <div className="mt-3 pt-3 border-t border-border/50">
                     <div className="flex items-center gap-3 flex-wrap">
                       <span className="text-sm">
-                        本次共生成 <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> 个场景，
-                        <span className="font-semibold text-primary">{message.generationData.caseCount}</span> 条用例
+                        案例已经生成完成，相较于V0.3版本场景总数增加 <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> 个，案例增加 <span className="font-semibold text-primary">{message.generationData.caseCount}</span> 条
                       </span>
                       <Button
                         size="sm"
@@ -264,7 +265,7 @@ export function SmartDesignChat({
                         className="h-7 text-xs gap-1"
                         onClick={() => {
                           onGenerationComplete(message.generationData!.scenarioCount, message.generationData!.caseCount);
-                          window.location.href = `/workspace/scb/management/ai-cases/1/case-review`;
+                          onStartReview?.();
                         }}
                       >
                         <Eye className="w-3 h-3" />
