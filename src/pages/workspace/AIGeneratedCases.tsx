@@ -253,6 +253,11 @@ export default function AIGeneratedCases() {
           onNoTaskPrompt={handleNoTaskPrompt}
           onGenerationComplete={handleGenerationComplete}
           onViewGenerationResult={handleViewGenerationResult}
+          onStartReview={() => {
+            if (selectedTaskId) {
+              navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review`);
+            }
+          }}
         />
       </div>
 
