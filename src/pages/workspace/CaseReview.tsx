@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
+import { ReviewHistorySidebar, ReviewHistoryData } from "@/components/workspace/ReviewHistorySidebar";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -60,7 +61,7 @@ const categoryOptions = [
   { value: "其他", label: "其他" },
 ];
 
-type ReviewResult = "adopted" | "needsImprovement" | "needsDiscard" | "pending";
+type ReviewResult = "adopted" | "needsImprovement" | "improved" | "needsDiscard" | "pending";
 
 interface ReviewHistoryItem {
   timestamp: string;
@@ -124,6 +125,10 @@ const reviewResultConfig: Record<ReviewResult, { label: string; className: strin
     label: "需完善",
     className: "text-amber-600",
   },
+  improved: {
+    label: "已完善",
+    className: "text-blue-600",
+  },
   needsDiscard: {
     label: "丢弃",
     className: "text-red-600",
@@ -158,12 +163,17 @@ export default function CaseReview() {
     totalCases: dimensions.reduce((sum, dim) => sum + dim.testPoints.reduce((s, tp) => s + tp.caseCount, 0), 0),
     adopted: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "adopted").length, 0),
     needsImprovement: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "needsImprovement").length, 0),
+    improved: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "improved").length, 0),
     needsDiscard: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "needsDiscard").length, 0),
   };
   
   // 侧边栏状态
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCaseData, setSidebarCaseData] = useState<CaseDetailData | null>(null);
+  
+  // 审查记录侧边栏状态
+  const [historySidebarOpen, setHistorySidebarOpen] = useState(false);
+  const [historyData, setHistoryData] = useState<ReviewHistoryData | null>(null);
 
   // 切换维度折叠状态
   const toggleDimensionCollapse = (dimId: string) => {
@@ -365,7 +375,7 @@ export default function CaseReview() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-6 gap-3 mb-6">
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">总场景</span>
           <span className="text-xl font-semibold">{statistics.totalScenarios}</span>
@@ -381,6 +391,10 @@ export default function CaseReview() {
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">需完善</span>
           <span className="text-xl font-semibold text-amber-600">{statistics.needsImprovement}</span>
+        </div>
+        <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+          <span className="text-xs text-muted-foreground mb-1">已完善</span>
+          <span className="text-xl font-semibold text-blue-600">{statistics.improved}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">丢弃</span>
@@ -408,6 +422,7 @@ export default function CaseReview() {
               <SelectItem value="all">全部结果</SelectItem>
               <SelectItem value="adopted">采纳</SelectItem>
               <SelectItem value="needsImprovement">需完善</SelectItem>
+              <SelectItem value="improved">已完善</SelectItem>
               <SelectItem value="needsDiscard">丢弃</SelectItem>
               <SelectItem value="pending">待审查</SelectItem>
             </SelectContent>
@@ -574,7 +589,7 @@ export default function CaseReview() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="center">
-                              {(["adopted", "needsImprovement", "needsDiscard"] as ReviewResult[]).map((result) => {
+                              {(["adopted", "needsImprovement", "improved", "needsDiscard"] as ReviewResult[]).map((result) => {
                                 const config = reviewResultConfig[result];
                                 return (
                                   <DropdownMenuItem
@@ -591,9 +606,9 @@ export default function CaseReview() {
                           </DropdownMenu>
                         </div>
                       </div>
-                      {/* 分类 - 采纳时显示-，否则下拉选择 */}
+                      {/* 分类 - 采纳/已完善时显示-，否则下拉选择 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
-                        {tp.reviewResult === "adopted" ? (
+                        {(tp.reviewResult === "adopted" || tp.reviewResult === "improved") ? (
                           <span className="text-xs text-muted-foreground">-</span>
                         ) : (
                           <Select
@@ -613,9 +628,9 @@ export default function CaseReview() {
                           </Select>
                         )}
                       </div>
-                      {/* 处理方案 - 采纳时显示-，否则可编辑 */}
+                      {/* 处理方案 - 采纳/已完善时显示-，否则可编辑 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
-                        {tp.reviewResult === "adopted" ? (
+                        {(tp.reviewResult === "adopted" || tp.reviewResult === "improved") ? (
                           <span className="text-xs text-muted-foreground">-</span>
                         ) : (
                           <Input
@@ -626,25 +641,29 @@ export default function CaseReview() {
                           />
                         )}
                       </div>
-                      {/* 审查记录 - 显示最新记录，hover显示完整历史 */}
-                      <div className="col-span-1 px-2 py-1 flex items-center group relative">
-                        <span className="text-xs text-muted-foreground truncate">
-                          {tp.reviewHistory && tp.reviewHistory.length > 0 
-                            ? `${tp.reviewHistory[tp.reviewHistory.length - 1].timestamp} ${tp.reviewHistory[tp.reviewHistory.length - 1].action}`
-                            : "-"
-                          }
-                        </span>
-                        {tp.reviewHistory && tp.reviewHistory.length > 0 && (
-                          <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-3 min-w-[280px] max-w-[400px]">
-                            <div className="text-xs font-medium mb-2 text-foreground">审查记录</div>
-                            <div className="space-y-1.5">
-                              {tp.reviewHistory.map((record, idx) => (
-                                <div key={idx} className="text-xs text-muted-foreground whitespace-normal">
-                                  {record.timestamp} {record.action}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                      {/* 审查记录 - 显示查看文字，点击打开侧边栏 */}
+                      <div className="col-span-1 px-2 py-1 flex items-center justify-center">
+                        {tp.reviewHistory && tp.reviewHistory.length > 0 ? (
+                          <span 
+                            className="text-xs text-primary hover:underline cursor-pointer"
+                            onClick={() => {
+                              setHistoryData({
+                                id: tp.id,
+                                scenarioName: tp.name,
+                                records: tp.reviewHistory.map((h, idx) => ({
+                                  timestamp: h.timestamp,
+                                  type: "status" as const,
+                                  before: idx === 0 ? "待审查" : tp.reviewHistory[idx - 1].action.replace("将状态改为", "").replace("状态修改为", ""),
+                                  after: h.action.replace("将状态改为", "").replace("状态修改为", ""),
+                                })),
+                              });
+                              setHistorySidebarOpen(true);
+                            }}
+                          >
+                            查看
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
                         )}
                       </div>
                     </div>
@@ -703,6 +722,12 @@ export default function CaseReview() {
         open={sidebarOpen}
         onOpenChange={setSidebarOpen}
         caseData={sidebarCaseData}
+      />
+
+      <ReviewHistorySidebar
+        open={historySidebarOpen}
+        onOpenChange={setHistorySidebarOpen}
+        historyData={historyData}
       />
     </div>
   );
