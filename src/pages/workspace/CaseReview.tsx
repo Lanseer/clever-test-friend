@@ -647,15 +647,38 @@ export default function CaseReview() {
                           <span 
                             className="text-xs text-primary hover:underline cursor-pointer"
                             onClick={() => {
+                              // 为每个案例生成包含内容修改示例的记录
+                              const contentModificationRecord = {
+                                timestamp: "2026-01-06 14:30",
+                                type: "content" as const,
+                                before: `Feature: ${tp.name}
+
+Scenario: 基础场景描述
+  Given 前置条件
+  When 执行操作
+  Then 预期结果`,
+                                after: `Feature: ${tp.name}
+
+Scenario: 完善后的场景描述
+  Given 用户已完成前置准备
+  And 系统处于正常状态
+  When 用户执行核心操作
+  And 系统处理请求
+  Then 系统应返回正确结果
+  And 用户应看到成功提示`,
+                              };
+                              
+                              const statusRecords = tp.reviewHistory.map((h, idx) => ({
+                                timestamp: h.timestamp,
+                                type: "status" as const,
+                                before: idx === 0 ? "待审查" : tp.reviewHistory[idx - 1].action.replace("将状态改为", "").replace("状态修改为", ""),
+                                after: h.action.replace("将状态改为", "").replace("状态修改为", ""),
+                              }));
+                              
                               setHistoryData({
                                 id: tp.id,
                                 scenarioName: tp.name,
-                                records: tp.reviewHistory.map((h, idx) => ({
-                                  timestamp: h.timestamp,
-                                  type: "status" as const,
-                                  before: idx === 0 ? "待审查" : tp.reviewHistory[idx - 1].action.replace("将状态改为", "").replace("状态修改为", ""),
-                                  after: h.action.replace("将状态改为", "").replace("状态修改为", ""),
-                                })),
+                                records: [contentModificationRecord, ...statusRecords],
                               });
                               setHistorySidebarOpen(true);
                             }}
