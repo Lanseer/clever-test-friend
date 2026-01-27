@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Clock, FileText, Layers, ThumbsUp, AlertTriangle, Trash2, Package, ClipboardList } from "lucide-react";
+import { Clock, FileText, Layers, ThumbsUp, AlertTriangle, Trash2, Package, ClipboardList, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DeliverableReportDialog } from "./DeliverableReportDialog";
+import { toast } from "sonner";
 
 export type RecordStatus = "draft" | "pending_review" | "reviewing" | "completed";
 
@@ -37,6 +39,11 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
     e.stopPropagation();
     setSelectedDeliverable({ name: versionName, stats });
     setReportDialogOpen(true);
+  };
+
+  const handleDownload = (e: React.MouseEvent, versionName: string) => {
+    e.stopPropagation();
+    toast.success(`${versionName} 下载已开始`);
   };
 
   return (
@@ -100,21 +107,46 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
                     </div>
                   </div>
 
-                  {/* Time and Report Row */}
+                  {/* Time and Actions Row */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                       <Clock className="w-3 h-3" />
                       {record.createdAt}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 px-2 text-[10px] text-primary hover:text-primary"
-                      onClick={(e) => handleOpenReport(e, versionName, record.stats)}
-                    >
-                      <ClipboardList className="w-3 h-3 mr-1" />
-                      审查报告
-                    </Button>
+                    <TooltipProvider>
+                      <div className="flex items-center gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-primary hover:text-primary"
+                              onClick={(e) => handleOpenReport(e, versionName, record.stats)}
+                            >
+                              <ClipboardList className="w-3.5 h-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <p>审查报告</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                              onClick={(e) => handleDownload(e, versionName)}
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <p>下载</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </TooltipProvider>
                   </div>
                 </div>
               );
