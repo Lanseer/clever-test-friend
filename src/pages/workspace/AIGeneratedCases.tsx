@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SmartDesignChat } from "@/components/workspace/SmartDesignChat";
 import { SmartDesignTaskList } from "@/components/workspace/SmartDesignTaskList";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
-import { ConfirmGenerationResultDialog } from "@/components/workspace/ConfirmGenerationResultDialog";
+import { GenerationRecordsPanel, GenerationRecordItem, RecordStatus } from "@/components/workspace/GenerationRecordsPanel";
+import { GenerationResultSidebar } from "@/components/workspace/GenerationResultSidebar";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -24,13 +25,15 @@ interface SmartDesignTask {
   expertReviewTotal: number;
   expertReviewPassed: number;
   createdAt: string;
+  testPhase?: string;
+  testCategory?: string;
 }
 
-interface GenerationRecord {
+interface Dimension {
   id: string;
-  count: number;
-  createdAt: string;
-  status: "pending_confirm" | "confirmed";
+  name: string;
+  caseCount: number;
+  testPoints: { id: string; name: string; caseCount: number }[];
 }
 
 const mockTasks: SmartDesignTask[] = [
@@ -42,6 +45,8 @@ const mockTasks: SmartDesignTask[] = [
     expertReviewTotal: 480,
     expertReviewPassed: 450,
     createdAt: "2024-01-15 10:30",
+    testPhase: "sit",
+    testCategory: "functional",
   },
   {
     id: "2",
@@ -51,15 +56,38 @@ const mockTasks: SmartDesignTask[] = [
     expertReviewTotal: 0,
     expertReviewPassed: 0,
     createdAt: "2024-01-15 14:20",
+    testPhase: "uat",
+    testCategory: "data",
   },
 ];
 
-const initialRecordsByTask: Record<string, GenerationRecord[]> = {
+const initialRecordsByTask: Record<string, GenerationRecordItem[]> = {
   "1": [
-    { id: "gen-1-1", count: 24, createdAt: "2024-01-15 10:30", status: "confirmed" },
+    { id: "gen-1-1", batchNumber: 1, scenarioCount: 8, caseCount: 24, createdAt: "2024-01-15 10:30", status: "completed" },
+    { id: "gen-1-2", batchNumber: 2, scenarioCount: 12, caseCount: 36, createdAt: "2024-01-16 14:20", status: "reviewing" },
   ],
   "2": [],
 };
+
+const mockDimensions: Dimension[] = [
+  {
+    id: "dim-1",
+    name: "用户认证模块",
+    caseCount: 5,
+    testPoints: [
+      { id: "tp-1", name: "用户登录", caseCount: 3 },
+      { id: "tp-2", name: "用户注册", caseCount: 2 },
+    ],
+  },
+  {
+    id: "dim-2",
+    name: "密码管理模块",
+    caseCount: 3,
+    testPoints: [
+      { id: "tp-3", name: "密码重置", caseCount: 3 },
+    ],
+  },
+];
 
 export default function AIGeneratedCases() {
   const navigate = useNavigate();
@@ -67,26 +95,22 @@ export default function AIGeneratedCases() {
   const { toast } = useToast();
   
   const [tasks, setTasks] = useState<SmartDesignTask[]>(mockTasks);
-  const [recordsByTask, setRecordsByTask] = useState<Record<string, GenerationRecord[]>>(initialRecordsByTask);
+  const [recordsByTask, setRecordsByTask] = useState<Record<string, GenerationRecordItem[]>>(initialRecordsByTask);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(mockTasks[0]?.id || null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [noTaskAlertOpen, setNoTaskAlertOpen] = useState(false);
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [pendingRecordId, setPendingRecordId] = useState<string | null>(null);
+  const [resultSidebarOpen, setResultSidebarOpen] = useState(false);
+  const [pendingGenerationData, setPendingGenerationData] = useState<{
+    scenarioCount: number;
+    caseCount: number;
+    dimensions: Dimension[];
+  } | null>(null);
 
   const selectedTask = tasks.find(t => t.id === selectedTaskId) || null;
   const currentRecords = selectedTaskId ? recordsByTask[selectedTaskId] || [] : [];
 
   const handleSelectTask = (taskId: string) => {
     setSelectedTaskId(taskId);
-  };
-
-  const handleSelfReview = (taskId: string) => {
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${taskId}`);
-  };
-
-  const handleExpertReview = (taskId: string) => {
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${taskId}/expert-review`);
   };
 
   const handleReport = (taskId: string) => {
@@ -117,6 +141,8 @@ export default function AIGeneratedCases() {
         hour: "2-digit",
         minute: "2-digit",
       }).replace(/\//g, "-"),
+      testPhase: data.testPhase,
+      testCategory: data.testCategory,
     };
     setTasks([newTask, ...tasks]);
     setRecordsByTask({ ...recordsByTask, [newTask.id]: [] });
@@ -141,12 +167,37 @@ export default function AIGeneratedCases() {
     });
   };
 
-  const handleGenerationComplete = () => {
-    if (!selectedTaskId) return;
+  const handleGenerationComplete = (scenarioCount: number, caseCount: number) => {
+    // Store pending generation data for the sidebar
+    setPendingGenerationData({
+      scenarioCount,
+      caseCount,
+      dimensions: mockDimensions,
+    });
+  };
+
+  const handleViewGenerationResult = () => {
+    setResultSidebarOpen(true);
+  };
+
+  const handleAbandonGeneration = () => {
+    setPendingGenerationData(null);
+    setResultSidebarOpen(false);
+    toast({
+      title: "已放弃",
+      description: "本次生成数据已放弃",
+    });
+  };
+
+  const handleStartReview = () => {
+    if (!selectedTaskId || !pendingGenerationData) return;
     
-    const newRecord: GenerationRecord = {
+    const existingRecords = recordsByTask[selectedTaskId] || [];
+    const newRecord: GenerationRecordItem = {
       id: `gen-${Date.now()}`,
-      count: Math.floor(Math.random() * 20) + 15,
+      batchNumber: existingRecords.length + 1,
+      scenarioCount: pendingGenerationData.scenarioCount,
+      caseCount: pendingGenerationData.caseCount,
       createdAt: new Date().toLocaleString("zh-CN", {
         year: "numeric",
         month: "2-digit",
@@ -154,40 +205,24 @@ export default function AIGeneratedCases() {
         hour: "2-digit",
         minute: "2-digit",
       }).replace(/\//g, "-"),
-      status: "pending_confirm",
+      status: "reviewing",
     };
 
     setRecordsByTask(prev => ({
       ...prev,
-      [selectedTaskId]: [newRecord, ...(prev[selectedTaskId] || [])],
-    }));
-  };
-
-  const handleConfirmResult = (recordId: string) => {
-    setPendingRecordId(recordId);
-    setConfirmDialogOpen(true);
-  };
-
-  const handleConfirmGeneration = () => {
-    if (!selectedTaskId || !pendingRecordId) return;
-    
-    setRecordsByTask(prev => ({
-      ...prev,
-      [selectedTaskId]: (prev[selectedTaskId] || []).map(r => 
-        r.id === pendingRecordId ? { ...r, status: "confirmed" as const } : r
-      ),
+      [selectedTaskId]: [...(prev[selectedTaskId] || []), newRecord],
     }));
     
-    setPendingRecordId(null);
-    toast({
-      title: "确认成功",
-      description: "本次生成用例已确认，可以进行评审",
-    });
+    setPendingGenerationData(null);
+    setResultSidebarOpen(false);
+    
+    // Navigate to case review page
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}`);
   };
 
-  const handleViewCases = (recordId: string) => {
-    // Navigate to the GenerationRecords page for this task
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/generation-records`);
+  const handleRecordClick = (recordId: string) => {
+    // Navigate to case review page for this record
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}`);
   };
 
   return (
@@ -195,30 +230,35 @@ export default function AIGeneratedCases() {
       {/* Clean Light Background */}
       <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900" />
 
-      {/* Left Panel - Task List */}
-      <div className="w-72 flex-shrink-0 border-r border-sky-300/30 relative z-10">
+      {/* Left Panel - Task List (Narrower) */}
+      <div className="w-56 flex-shrink-0 border-r border-sky-300/30 relative z-10">
         <SmartDesignTaskList
           tasks={tasks}
           selectedTaskId={selectedTaskId}
           onSelectTask={handleSelectTask}
-          onSelfReview={handleSelfReview}
-          onExpertReview={handleExpertReview}
           onReport={handleReport}
           onDelete={handleDeleteTask}
           onCreateTask={() => setCreateDialogOpen(true)}
         />
       </div>
 
-      {/* Right Panel - Chat Area */}
+      {/* Middle Panel - Chat Area */}
       <div className="flex-1 relative z-10">
         <SmartDesignChat
           selectedTaskId={selectedTaskId}
-          selectedTaskName={selectedTask?.name || null}
+          selectedTask={selectedTask}
           records={currentRecords}
           onNoTaskPrompt={handleNoTaskPrompt}
           onGenerationComplete={handleGenerationComplete}
-          onConfirmResult={handleConfirmResult}
-          onViewCases={handleViewCases}
+          onViewGenerationResult={handleViewGenerationResult}
+        />
+      </div>
+
+      {/* Right Panel - Generation Records */}
+      <div className="w-72 flex-shrink-0 relative z-10">
+        <GenerationRecordsPanel
+          records={currentRecords}
+          onRecordClick={handleRecordClick}
         />
       </div>
 
@@ -253,11 +293,18 @@ export default function AIGeneratedCases() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <ConfirmGenerationResultDialog
-        open={confirmDialogOpen}
-        onOpenChange={setConfirmDialogOpen}
-        onConfirm={handleConfirmGeneration}
-      />
+      {/* Generation Result Sidebar */}
+      {pendingGenerationData && (
+        <GenerationResultSidebar
+          open={resultSidebarOpen}
+          onOpenChange={setResultSidebarOpen}
+          totalScenarios={pendingGenerationData.scenarioCount}
+          totalCases={pendingGenerationData.caseCount}
+          dimensions={pendingGenerationData.dimensions}
+          onAbandon={handleAbandonGeneration}
+          onStartReview={handleStartReview}
+        />
+      )}
     </div>
   );
 }

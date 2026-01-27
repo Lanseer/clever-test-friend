@@ -1,10 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, Check, Paperclip } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { GenerationRecordsPopover } from "./GenerationRecordsPopover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { GenerationRecordItem } from "./GenerationRecordsPanel";
 
 interface UploadedFile {
   id: string;
@@ -18,33 +24,50 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  isGenerationComplete?: boolean;
+  generationData?: {
+    scenarioCount: number;
+    caseCount: number;
+  };
 }
 
-interface GenerationRecord {
+interface SmartDesignTask {
   id: string;
-  count: number;
-  createdAt: string;
-  status: "pending_confirm" | "confirmed";
+  name: string;
+  testPhase?: string;
+  testCategory?: string;
 }
 
 interface SmartDesignChatProps {
   selectedTaskId: string | null;
-  selectedTaskName: string | null;
-  records: GenerationRecord[];
+  selectedTask: SmartDesignTask | null;
+  records: GenerationRecordItem[];
   onNoTaskPrompt: () => void;
-  onGenerationComplete: () => void;
-  onConfirmResult: (recordId: string) => void;
-  onViewCases: (recordId: string) => void;
+  onGenerationComplete: (scenarioCount: number, caseCount: number) => void;
+  onViewGenerationResult: () => void;
 }
+
+const testPhaseLabels: Record<string, string> = {
+  unit: "单元测试",
+  integration: "集成测试",
+  sit: "SIT测试",
+  uat: "UAT测试",
+  production: "生产验证",
+};
+
+const testCategoryLabels: Record<string, string> = {
+  functional: "功能测试",
+  data: "数据测试",
+  special: "专项测试",
+};
 
 export function SmartDesignChat({ 
   selectedTaskId, 
-  selectedTaskName,
+  selectedTask,
   records,
   onNoTaskPrompt, 
   onGenerationComplete,
-  onConfirmResult,
-  onViewCases,
+  onViewGenerationResult,
 }: SmartDesignChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -57,8 +80,7 @@ export function SmartDesignChat({
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [showConfirmTag, setShowConfirmTag] = useState(false);
-  const [lastGeneratedCount, setLastGeneratedCount] = useState(0);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -85,7 +107,6 @@ export function SmartDesignChat({
 
     setUploadedFiles((prev) => [...prev, ...newFiles]);
     
-    // Reset input to allow re-uploading the same file
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -98,7 +119,6 @@ export function SmartDesignChat({
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isProcessing) return;
 
-    // Check if there's no selected task
     if (!selectedTaskId) {
       onNoTaskPrompt();
       return;
@@ -155,21 +175,23 @@ export function SmartDesignChat({
 
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
+    const scenarioCount = Math.floor(Math.random() * 10) + 5;
     const caseCount = Math.floor(Math.random() * 20) + 15;
-    setLastGeneratedCount(caseCount);
+    
     setMessages((prev) => {
       const newMessages = [...prev];
       newMessages[newMessages.length - 1] = {
         ...newMessages[newMessages.length - 1],
         content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成`,
+        isGenerationComplete: true,
+        generationData: { scenarioCount, caseCount },
       };
       return newMessages;
     });
 
     setIsProcessing(false);
     setUploadedFiles([]);
-    setShowConfirmTag(true);
-    onGenerationComplete();
+    onGenerationComplete(scenarioCount, caseCount);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -179,19 +201,29 @@ export function SmartDesignChat({
     }
   };
 
+  const selectedRecordForDropdown = records.find(r => r.id === selectedRecordId);
+
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm">
-      {/* Header with centered task name and records button */}
-      <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex items-center justify-between flex-shrink-0">
-        <div className="w-24" /> {/* Spacer for centering */}
-        <h2 className="font-semibold text-base text-sky-900 dark:text-sky-100 truncate max-w-[60%]">
-          {selectedTaskName || "请选择任务"}
+      {/* Header with task name and tags */}
+      <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex-shrink-0">
+        <h2 className="font-semibold text-base text-sky-900 dark:text-sky-100 truncate">
+          {selectedTask?.name || "请选择任务"}
         </h2>
-        <GenerationRecordsPopover
-          records={records}
-          onConfirmResult={onConfirmResult}
-          onViewCases={onViewCases}
-        />
+        {selectedTask && (
+          <div className="flex gap-2 mt-1.5">
+            {selectedTask.testPhase && (
+              <Badge variant="outline" className="text-xs bg-sky-50 text-sky-700 border-sky-200">
+                {testPhaseLabels[selectedTask.testPhase] || selectedTask.testPhase}
+              </Badge>
+            )}
+            {selectedTask.testCategory && (
+              <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                {testCategoryLabels[selectedTask.testCategory] || selectedTask.testCategory}
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Chat Messages */}
@@ -217,6 +249,27 @@ export function SmartDesignChat({
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                
+                {/* Generation Complete Tag */}
+                {message.isGenerationComplete && message.generationData && (
+                  <div className="mt-3 pt-3 border-t border-border/50">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="text-sm">
+                        本次共生成 <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> 个场景，
+                        <span className="font-semibold text-primary">{message.generationData.caseCount}</span> 条用例
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs gap-1"
+                        onClick={onViewGenerationResult}
+                      >
+                        <Eye className="w-3 h-3" />
+                        查看
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
               {message.role === "user" && (
                 <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
@@ -225,36 +278,6 @@ export function SmartDesignChat({
               )}
             </div>
           ))}
-          
-          {/* Confirm Tag after generation */}
-          {showConfirmTag && (
-            <div className="flex justify-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
-                <Bot className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-3 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-amber-800 dark:text-amber-200">
-                    本次共生成 <span className="font-semibold">{lastGeneratedCount}</span> 条用例
-                  </span>
-                  <Button
-                    size="sm"
-                    className="h-7 text-xs bg-amber-500 hover:bg-amber-600 text-white"
-                    onClick={() => {
-                      const pendingRecord = records.find(r => r.status === "pending_confirm");
-                      if (pendingRecord) {
-                        onConfirmResult(pendingRecord.id);
-                      }
-                      setShowConfirmTag(false);
-                    }}
-                  >
-                    <Check className="w-3 h-3 mr-1" />
-                    确认结果
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
           
           <div ref={messagesEndRef} />
         </div>
@@ -320,6 +343,43 @@ export function SmartDesignChat({
                 <Paperclip className="w-3.5 h-3.5" />
                 附件
               </Button>
+
+              {/* Generation Record Selector */}
+              {records.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs gap-1 bg-background/80 border-border/50"
+                      disabled={isProcessing}
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      {selectedRecordForDropdown 
+                        ? `第 ${selectedRecordForDropdown.batchNumber} 次生成` 
+                        : "选择生成记录"
+                      }
+                      <ChevronDown className="w-3 h-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    <DropdownMenuItem onClick={() => setSelectedRecordId(null)}>
+                      <span className="text-xs text-muted-foreground">不选择</span>
+                    </DropdownMenuItem>
+                    {records.map((record) => (
+                      <DropdownMenuItem
+                        key={record.id}
+                        onClick={() => setSelectedRecordId(record.id)}
+                      >
+                        <span className="text-xs">第 {record.batchNumber} 次生成</span>
+                        <Badge variant="outline" className="ml-auto text-[10px]">
+                          {record.scenarioCount} 场景
+                        </Badge>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               {/* Fixed BDD Template Badge */}
               <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">

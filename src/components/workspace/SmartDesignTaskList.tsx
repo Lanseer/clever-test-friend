@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { 
-  Clock, ClipboardCheck, Users, FileText, MoreHorizontal, 
-  Pencil, Trash2, Info, Plus, Sparkles, ChevronRight 
+  Clock, FileText, MoreHorizontal, 
+  Pencil, Trash2, Info, Plus, Sparkles 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,8 +47,6 @@ interface SmartDesignTaskListProps {
   tasks: SmartDesignTask[];
   selectedTaskId: string | null;
   onSelectTask: (taskId: string) => void;
-  onSelfReview: (taskId: string) => void;
-  onExpertReview: (taskId: string) => void;
   onReport: (taskId: string) => void;
   onEdit?: (taskId: string) => void;
   onDelete?: (taskId: string) => void;
@@ -73,8 +71,6 @@ export function SmartDesignTaskList({
   tasks,
   selectedTaskId,
   onSelectTask,
-  onSelfReview,
-  onExpertReview,
   onReport,
   onEdit,
   onDelete,
@@ -200,60 +196,19 @@ export function SmartDesignTaskList({
                   {task.createdAt}
                 </div>
 
-                {/* Stats */}
-                <div className="flex gap-2 mb-2">
-                  <div className="flex-1 text-center py-1.5 px-2 bg-sky-50/80 dark:bg-sky-900/30 rounded border border-sky-200/50">
-                    <div className="text-[10px] text-muted-foreground">内部审查</div>
-                    <div className="text-xs font-medium">
-                      <span className="text-emerald-600">{task.selfReviewPassed}</span>
-                      <span className="text-muted-foreground">/{task.selfReviewTotal}</span>
-                    </div>
-                  </div>
-                  <div className="flex-1 text-center py-1.5 px-2 bg-sky-50/80 dark:bg-sky-900/30 rounded border border-sky-200/50">
-                    <div className="text-[10px] text-muted-foreground">外部评审</div>
-                    <div className="text-xs font-medium">
-                      <span className="text-emerald-600">{task.expertReviewPassed}</span>
-                      <span className="text-muted-foreground">/{task.expertReviewTotal}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-1">
+                {/* Actions - Only Report Button */}
+                <div className="flex justify-end">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 h-6 text-[11px] px-2 hover:bg-sky-100/50"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelfReview(task.id);
-                    }}
-                  >
-                    <ClipboardCheck className="w-3 h-3 mr-1" />
-                    内部审查
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 h-6 text-[11px] px-2 hover:bg-sky-100/50"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onExpertReview(task.id);
-                    }}
-                  >
-                    <Users className="w-3 h-3 mr-1" />
-                    外部评审
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 hover:bg-sky-100/50"
+                    className="h-6 text-[11px] px-2 hover:bg-sky-100/50 gap-1"
                     onClick={(e) => {
                       e.stopPropagation();
                       onReport(task.id);
                     }}
                   >
                     <FileText className="w-3 h-3" />
+                    评审报告
                   </Button>
                 </div>
               </div>
