@@ -262,7 +262,10 @@ export function SmartDesignChat({
                         size="sm"
                         variant="default"
                         className="h-7 text-xs gap-1"
-                        onClick={onViewGenerationResult}
+                        onClick={() => {
+                          onGenerationComplete(message.generationData!.scenarioCount, message.generationData!.caseCount);
+                          window.location.href = `/workspace/scb/management/ai-cases/1/case-review`;
+                        }}
                       >
                         <Eye className="w-3 h-3" />
                         开始审查

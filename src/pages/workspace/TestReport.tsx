@@ -101,13 +101,13 @@ const externalReviewTotal: ExternalReviewStats = {
   rejected: 18 
 };
 
-// 按生成记录维度的采纳数量趋势数据
+// 按交付物版本的采纳数量趋势数据
 const adoptionTrendData = [
-  { recordName: "记录1", adopted: 24 },
-  { recordName: "记录2", adopted: 32 },
-  { recordName: "记录3", adopted: 28 },
-  { recordName: "记录4", adopted: 38 },
-  { recordName: "记录5", adopted: 16 },
+  { recordName: "V0.1", adopted: 24 },
+  { recordName: "V0.2", adopted: 32 },
+  { recordName: "V0.3", adopted: 28 },
+  { recordName: "V0.4", adopted: 38 },
+  { recordName: "V0.5", adopted: 16 },
 ];
 
 // 按发起记录维度的通过数量趋势数据
@@ -185,7 +185,7 @@ function CaseReviewStatsCard({
         <div className="pt-3 border-t">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-blue-500" />
-            <span className="text-sm font-medium">按生成记录采纳趋势</span>
+            <span className="text-sm font-medium">按交付物版本采纳趋势</span>
           </div>
           <div className="h-[100px] w-full">
             <ResponsiveContainer width="100%" height="100%">

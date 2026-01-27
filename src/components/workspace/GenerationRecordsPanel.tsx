@@ -1,4 +1,4 @@
-import { Clock, FileText, Layers, CheckCircle, ThumbsUp, Pencil, AlertTriangle, Trash2, Package } from "lucide-react";
+import { Clock, FileText, Layers, CheckCircle, ThumbsUp, AlertTriangle, Trash2, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -79,15 +79,11 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
                       <ThumbsUp className="w-3 h-3" />
                       <span>采纳: {stats.adopted}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-blue-600">
-                      <Pencil className="w-3 h-3" />
-                      <span>已完善: {stats.improved}</span>
-                    </div>
                     <div className="flex items-center gap-1 text-amber-600">
                       <AlertTriangle className="w-3 h-3" />
                       <span>需完善: {stats.needsImprovement}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-gray-500">
+                    <div className="flex items-center gap-1 text-red-500">
                       <Trash2 className="w-3 h-3" />
                       <span>丢弃: {stats.discarded}</span>
                     </div>
