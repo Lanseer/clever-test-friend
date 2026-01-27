@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus, RefreshCw, Download, FileDown } from "lucide-react";
+import { ChevronRight, FileText, Users, UserCheck, AlertTriangle, Trash2, Target, TrendingUp, Layers, Search, Plus, RefreshCw, Download, FileDown, ClipboardList, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,16 +10,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
-
-// 统计数据接口
-interface ReviewStats {
-  total: number;
-  adopted: number;
-  rejected: number;
-  pending: number;
-}
-
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from "recharts";
 // 问题分类数据
 interface IssueCategory {
   name: string;
@@ -80,9 +71,53 @@ const mockCases = [
   { id: "TC-005", name: "验证码过期场景", dimension: "用户登录模块", nature: "负向" },
 ];
 
-// 汇总统计
-const selfReviewTotal: ReviewStats = { total: 165, adopted: 138, rejected: 17, pending: 10 };
-const expertReviewTotal: ReviewStats = { total: 138, adopted: 120, rejected: 10, pending: 8 };
+// 汇总统计 - 案例审查汇总数据
+interface CaseReviewStats {
+  totalScenarios: number;
+  totalCases: number;
+  adopted: number;
+  needsImprovement: number;
+}
+
+// 汇总统计 - 外部评审汇总数据
+interface ExternalReviewStats {
+  totalScenarios: number;
+  totalCases: number;
+  passed: number;
+  rejected: number;
+}
+
+const caseReviewTotal: CaseReviewStats = { 
+  totalScenarios: 45, 
+  totalCases: 165, 
+  adopted: 138, 
+  needsImprovement: 27 
+};
+
+const externalReviewTotal: ExternalReviewStats = { 
+  totalScenarios: 40, 
+  totalCases: 138, 
+  passed: 120, 
+  rejected: 18 
+};
+
+// 按生成记录维度的采纳数量趋势数据
+const adoptionTrendData = [
+  { recordName: "记录1", adopted: 24 },
+  { recordName: "记录2", adopted: 32 },
+  { recordName: "记录3", adopted: 28 },
+  { recordName: "记录4", adopted: 38 },
+  { recordName: "记录5", adopted: 16 },
+];
+
+// 按发起记录维度的通过数量趋势数据
+const passTrendData = [
+  { recordName: "评审1", passed: 20 },
+  { recordName: "评审2", passed: 28 },
+  { recordName: "评审3", passed: 32 },
+  { recordName: "评审4", passed: 25 },
+  { recordName: "评审5", passed: 15 },
+];
 
 // 覆盖率数据
 const coverageData = {
@@ -90,58 +125,52 @@ const coverageData = {
   uncoveredCount: 200,
 };
 
-// 统计卡片组件
-function StatsCard({ 
-  title, 
-  icon: Icon, 
+// 案例审查汇总卡片组件
+function CaseReviewStatsCard({ 
   stats, 
-  colorScheme,
+  trendData,
   issues,
   onIssueClick,
   onExportIssues
 }: { 
-  title: string; 
-  icon: typeof Users; 
-  stats: ReviewStats;
-  colorScheme: "blue" | "purple";
+  stats: CaseReviewStats;
+  trendData: typeof adoptionTrendData;
   issues: IssueCategory[];
   onIssueClick: (category: string) => void;
   onExportIssues: () => void;
 }) {
-  const adoptedPercentage = stats.total > 0 ? (stats.adopted / stats.total) * 100 : 0;
+  const adoptedPercentage = stats.totalCases > 0 ? (stats.adopted / stats.totalCases) * 100 : 0;
   
   const chartConfig = {
     count: { label: "数量" },
+    adopted: { label: "采纳数", color: "hsl(var(--chart-1))" },
   };
 
   return (
     <Card className="flex-1">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Icon className={cn(
-            "w-4 h-4",
-            colorScheme === "blue" ? "text-blue-500" : "text-purple-500"
-          )} />
-          {title}
+          <ClipboardList className="w-4 h-4 text-blue-500" />
+          案例审查汇总
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">{stats.total}</div>
-            <div className="text-xs text-muted-foreground">总用例</div>
+            <div className="text-2xl font-bold text-foreground">{stats.totalScenarios}</div>
+            <div className="text-xs text-muted-foreground">总场景</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-foreground">{stats.totalCases}</div>
+            <div className="text-xs text-muted-foreground">总案例</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">{stats.adopted}</div>
-            <div className="text-xs text-muted-foreground">已采纳</div>
+            <div className="text-xs text-muted-foreground">采纳</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-red-500">{stats.rejected}</div>
-            <div className="text-xs text-muted-foreground">不采纳</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-amber-500">{stats.pending}</div>
-            <div className="text-xs text-muted-foreground">待评审</div>
+            <div className="text-2xl font-bold text-amber-500">{stats.needsImprovement}</div>
+            <div className="text-xs text-muted-foreground">需完善</div>
           </div>
         </div>
         <div className="space-y-1">
@@ -150,6 +179,192 @@ function StatsCard({
             <span>{adoptedPercentage.toFixed(1)}%</span>
           </div>
           <Progress value={adoptedPercentage} className="h-2" />
+        </div>
+
+        {/* 采纳数量趋势图 */}
+        <div className="pt-3 border-t">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-4 h-4 text-blue-500" />
+            <span className="text-sm font-medium">按生成记录采纳趋势</span>
+          </div>
+          <ChartContainer config={chartConfig} className="h-[100px] w-full">
+            <LineChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="recordName" 
+                tick={{ fontSize: 10 }} 
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fontSize: 10 }} 
+                axisLine={false}
+                tickLine={false}
+                width={30}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line 
+                type="monotone" 
+                dataKey="adopted" 
+                stroke="hsl(var(--chart-1))" 
+                strokeWidth={2}
+                dot={{ fill: "hsl(var(--chart-1))", strokeWidth: 2, r: 3 }}
+              />
+            </LineChart>
+          </ChartContainer>
+        </div>
+
+        {/* 问题分类汇总 */}
+        <div className="pt-3 border-t">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medium">问题分类汇总</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground"
+              onClick={onExportIssues}
+            >
+              <FileDown className="w-3.5 h-3.5 mr-1" />
+              导出问题清单
+            </Button>
+          </div>
+          <div className="flex items-center gap-4">
+            <ChartContainer config={chartConfig} className="h-[80px] w-[80px]">
+              <PieChart>
+                <Pie
+                  data={issues}
+                  dataKey="count"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={20}
+                  outerRadius={35}
+                >
+                  {issues.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ChartContainer>
+            <div className="flex-1 space-y-2">
+              {issues.map((issue) => (
+                <div key={issue.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2.5 h-2.5 rounded-full" 
+                      style={{ backgroundColor: issue.color }}
+                    />
+                    <span className="text-xs text-muted-foreground">{issue.name}</span>
+                  </div>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="h-auto p-0 text-xs font-medium"
+                    onClick={() => onIssueClick(issue.name)}
+                  >
+                    {issue.count}条
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 外部评审汇总卡片组件
+function ExternalReviewStatsCard({ 
+  stats, 
+  trendData,
+  issues,
+  onIssueClick,
+  onExportIssues
+}: { 
+  stats: ExternalReviewStats;
+  trendData: typeof passTrendData;
+  issues: IssueCategory[];
+  onIssueClick: (category: string) => void;
+  onExportIssues: () => void;
+}) {
+  const passPercentage = stats.totalCases > 0 ? (stats.passed / stats.totalCases) * 100 : 0;
+  
+  const chartConfig = {
+    count: { label: "数量" },
+    passed: { label: "通过数", color: "hsl(var(--chart-2))" },
+  };
+
+  return (
+    <Card className="flex-1">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <ExternalLink className="w-4 h-4 text-purple-500" />
+          外部评审汇总
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-foreground">{stats.totalScenarios}</div>
+            <div className="text-xs text-muted-foreground">总场景</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-foreground">{stats.totalCases}</div>
+            <div className="text-xs text-muted-foreground">总案例</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">{stats.passed}</div>
+            <div className="text-xs text-muted-foreground">通过</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-red-500">{stats.rejected}</div>
+            <div className="text-xs text-muted-foreground">不通过</div>
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>通过率</span>
+            <span>{passPercentage.toFixed(1)}%</span>
+          </div>
+          <Progress value={passPercentage} className="h-2" />
+        </div>
+
+        {/* 通过数量趋势图 */}
+        <div className="pt-3 border-t">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-4 h-4 text-purple-500" />
+            <span className="text-sm font-medium">按发起记录通过趋势</span>
+          </div>
+          <ChartContainer config={chartConfig} className="h-[100px] w-full">
+            <LineChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="recordName" 
+                tick={{ fontSize: 10 }} 
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fontSize: 10 }} 
+                axisLine={false}
+                tickLine={false}
+                width={30}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line 
+                type="monotone" 
+                dataKey="passed" 
+                stroke="hsl(var(--chart-2))" 
+                strokeWidth={2}
+                dot={{ fill: "hsl(var(--chart-2))", strokeWidth: 2, r: 3 }}
+              />
+            </LineChart>
+          </ChartContainer>
         </div>
 
         {/* 问题分类汇总 */}
@@ -508,20 +723,16 @@ export default function TestReport() {
 
       {/* 评审汇总卡片 */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <StatsCard 
-          title="用例自评汇总" 
-          icon={UserCheck} 
-          stats={selfReviewTotal} 
-          colorScheme="blue"
+        <CaseReviewStatsCard 
+          stats={caseReviewTotal} 
+          trendData={adoptionTrendData}
           issues={selfReviewIssues}
           onIssueClick={handleIssueClick}
           onExportIssues={handleExportSelfReviewIssues}
         />
-        <StatsCard 
-          title="专家评审汇总" 
-          icon={Users} 
-          stats={expertReviewTotal} 
-          colorScheme="purple"
+        <ExternalReviewStatsCard 
+          stats={externalReviewTotal} 
+          trendData={passTrendData}
           issues={expertReviewIssues}
           onIssueClick={handleIssueClick}
           onExportIssues={handleExportExpertReviewIssues}
