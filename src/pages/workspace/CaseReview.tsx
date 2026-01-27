@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus } from "lucide-react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,7 @@ const categoryOptions = [
 ];
 
 type ReviewResult = "adopted" | "needsImprovement" | "improved" | "needsDiscard" | "pending";
+type ComparisonStatus = "new" | "updated" | "deleted" | "unchanged";
 
 interface ReviewHistoryItem {
   timestamp: string;
@@ -79,6 +80,7 @@ interface TestPoint {
   category?: string;
   solution?: string;
   reviewHistory: ReviewHistoryItem[];
+  comparisonStatus?: ComparisonStatus; // 对比状态
 }
 
 interface TestDimension {
@@ -92,29 +94,52 @@ const mockDimensions: TestDimension[] = [
     id: "dim-1",
     name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory", caseCount: 12, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
-      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
-      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
-      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
+      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
+      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", comparisonStatus: "new", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
+      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
+      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", comparisonStatus: "deleted", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
     ],
   },
   {
     id: "dim-2",
     name: "02-业务功能维度",
     testPoints: [
-      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "UserStory", caseCount: 22, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-06 09:00", action: "状态修改为采纳" }] },
-      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "FSD", caseCount: 15, reviewResult: "pending", reviewHistory: [] },
+      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-06 09:00", action: "状态修改为采纳" }] },
+      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
     ],
   },
   {
     id: "dim-3",
     name: "03-业务要素维度",
     testPoints: [
-      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "TSD", caseCount: 14, reviewResult: "adopted", reviewHistory: [{ timestamp: "2026-01-06 10:15", action: "状态修改为采纳" }] },
-      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", reviewHistory: [] },
+      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-06 10:15", action: "状态修改为采纳" }] },
+      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
     ],
   },
 ];
+
+const comparisonStatusConfig: Record<ComparisonStatus, { label: string; className: string; scenarioClassName: string }> = {
+  new: {
+    label: "新增",
+    className: "bg-green-500/10 text-green-600 border-green-200",
+    scenarioClassName: "text-green-600",
+  },
+  updated: {
+    label: "更新",
+    className: "bg-blue-500/10 text-blue-600 border-blue-200",
+    scenarioClassName: "text-blue-600",
+  },
+  deleted: {
+    label: "删除",
+    className: "bg-red-500/10 text-red-600 border-red-200",
+    scenarioClassName: "text-red-500 line-through",
+  },
+  unchanged: {
+    label: "-",
+    className: "text-muted-foreground",
+    scenarioClassName: "text-foreground",
+  },
+};
 
 const reviewResultConfig: Record<ReviewResult, { label: string; className: string }> = {
   adopted: {
@@ -142,6 +167,14 @@ const reviewResultConfig: Record<ReviewResult, { label: string; className: strin
 export default function CaseReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId } = useParams();
+  const [searchParams] = useSearchParams();
+  
+  // 检测来源
+  const source = searchParams.get("source"); // "chat" 或 "deliverable"
+  const deliverableName = searchParams.get("deliverable") ? decodeURIComponent(searchParams.get("deliverable")!) : null;
+  const isFromChat = source === "chat";
+  const isFromDeliverable = source === "deliverable" && deliverableName;
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [dimensions, setDimensions] = useState(mockDimensions);
   
@@ -156,6 +189,11 @@ export default function CaseReview() {
   const [isSmartReviewing, setIsSmartReviewing] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<Map<string, ReviewResult>>(new Map());
+  
+  // 保存交付物处理
+  const handleSaveAsDeliverable = () => {
+    toast.success("已成功保存，版本为用户模块_V0.6");
+  };
 
   // 统计数据计算
   const statistics = {
@@ -341,7 +379,7 @@ export default function CaseReview() {
   };
 
   return (
-    <div className="max-w-full mx-auto">
+    <div className={cn("max-w-full mx-auto", isFromChat && "pb-20")}>
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
@@ -370,7 +408,12 @@ export default function CaseReview() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">账户开户-案例审查</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            账户开户-案例审查
+            {isFromDeliverable && deliverableName && (
+              <span className="text-primary ml-2">- {deliverableName}</span>
+            )}
+          </h1>
         </div>
       </div>
 
@@ -486,8 +529,8 @@ export default function CaseReview() {
               {/* Table Header */}
               <div className="bg-[hsl(200,70%,50%)] text-white">
                 {/* First row - group headers */}
-                <div className="grid grid-cols-12 text-sm">
-                  <div className="col-span-5 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                <div className="grid grid-cols-13 text-sm">
+                  <div className="col-span-6 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     场景基本信息
                   </div>
                   <div className="col-span-7 px-3 py-2 text-center font-medium">
@@ -495,9 +538,10 @@ export default function CaseReview() {
                   </div>
                 </div>
                 {/* Second row - column headers */}
-                <div className="grid grid-cols-12 text-sm bg-[hsl(200,65%,55%)]">
+                <div className="grid grid-cols-13 text-sm bg-[hsl(200,65%,55%)]">
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">对比状态</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">来源</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
@@ -511,22 +555,33 @@ export default function CaseReview() {
               <div className="divide-y divide-border bg-background">
                 {dimension.testPoints.map((tp) => {
                   const resultConfig = reviewResultConfig[tp.reviewResult];
+                  const comparisonConfig = comparisonStatusConfig[tp.comparisonStatus || "unchanged"];
                   
                   return (
                     <div
                       key={tp.id}
-                      className="grid grid-cols-12 text-sm hover:bg-muted/30 transition-colors"
+                      className="grid grid-cols-13 text-sm hover:bg-muted/30 transition-colors"
                     >
                       {/* 编号 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
                         <span className="font-mono text-xs">{tp.code}</span>
                       </div>
-                      {/* 场景描述 - hover显示完整内容 */}
+                      {/* 场景描述 - hover显示完整内容，根据对比状态显示颜色 */}
                       <div className="col-span-2 px-3 py-3 border-r border-border flex items-center group relative">
-                        <span className="truncate text-foreground text-xs">{tp.name}</span>
+                        <span className={cn("truncate text-xs", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-2 min-w-[200px] max-w-[300px]">
-                          <span className="text-xs text-foreground whitespace-normal">{tp.name}</span>
+                          <span className={cn("text-xs whitespace-normal", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         </div>
+                      </div>
+                      {/* 对比状态 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        {tp.comparisonStatus && tp.comparisonStatus !== "unchanged" ? (
+                          <Badge variant="outline" className={cn("text-[10px] px-1.5", comparisonConfig.className)}>
+                            {comparisonConfig.label}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
                       </div>
                       {/* 场景来源 - Badge显示 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
@@ -752,6 +807,18 @@ Scenario: 完善后的场景描述
         onOpenChange={setHistorySidebarOpen}
         historyData={historyData}
       />
+
+      {/* Fixed Footer - Save as Deliverable (only when from chat) */}
+      {isFromChat && (
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
+          <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-end">
+            <Button onClick={handleSaveAsDeliverable} className="gap-2">
+              <Save className="w-4 h-4" />
+              保存为交付物
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

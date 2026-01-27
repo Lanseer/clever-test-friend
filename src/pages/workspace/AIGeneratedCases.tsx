@@ -222,9 +222,10 @@ export default function AIGeneratedCases() {
     navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}`);
   };
 
-  const handleRecordClick = (recordId: string) => {
-    // Navigate to case review page for this record
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}`);
+  const handleRecordClick = (recordId: string, deliverableName?: string) => {
+    // Navigate to case review page for this record with deliverable info
+    const encodedName = encodeURIComponent(deliverableName || '');
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=deliverable&deliverable=${encodedName}`);
   };
 
   return (
@@ -255,7 +256,7 @@ export default function AIGeneratedCases() {
           onViewGenerationResult={handleViewGenerationResult}
           onStartReview={() => {
             if (selectedTaskId) {
-              navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review`);
+              navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=chat`);
             }
           }}
         />

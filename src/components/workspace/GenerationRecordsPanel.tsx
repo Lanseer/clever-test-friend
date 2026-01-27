@@ -24,7 +24,7 @@ export interface GenerationRecordItem {
 interface GenerationRecordsPanelProps {
   records: GenerationRecordItem[];
   taskName?: string;
-  onRecordClick: (recordId: string) => void;
+  onRecordClick: (recordId: string, deliverableName?: string) => void;
 }
 
 export function GenerationRecordsPanel({ records, taskName = "任务", onRecordClick }: GenerationRecordsPanelProps) {
@@ -54,7 +54,7 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
                 <div
                   key={record.id}
                   className="p-3 rounded-lg border border-sky-200/60 bg-white/80 dark:bg-card/40 hover:border-sky-300 hover:bg-white transition-all cursor-pointer"
-                  onClick={() => onRecordClick(record.id)}
+                  onClick={() => onRecordClick(record.id, versionName)}
                 >
                   {/* Title Row - Deliverable Name */}
                   <div className="font-medium text-sm text-sky-700 dark:text-sky-300 mb-2 truncate">
