@@ -304,7 +304,13 @@ export default function AIGeneratedCases() {
           onViewGenerationResult={handleViewGenerationResult}
           onStartReview={() => {
             if (selectedTaskId) {
-              navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=chat`);
+              // 获取当前最新版本作为对比基准
+              const existingRecords = recordsByTask[selectedTaskId] || [];
+              const latestVersion = existingRecords.length > 0 
+                ? `${selectedTask?.name || '任务'}_V0.${existingRecords.length}`
+                : null;
+              const baseVersionParam = latestVersion ? `&baseVersion=${encodeURIComponent(latestVersion)}` : '';
+              navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=chat${baseVersionParam}`);
             }
           }}
         />

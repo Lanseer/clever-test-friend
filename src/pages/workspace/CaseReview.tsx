@@ -172,6 +172,7 @@ export default function CaseReview() {
   // 检测来源
   const source = searchParams.get("source"); // "chat" 或 "deliverable"
   const deliverableName = searchParams.get("deliverable") ? decodeURIComponent(searchParams.get("deliverable")!) : null;
+  const baseVersion = searchParams.get("baseVersion") ? decodeURIComponent(searchParams.get("baseVersion")!) : null;
   const isFromChat = source === "chat";
   const isFromDeliverable = source === "deliverable" && deliverableName;
   
@@ -408,10 +409,15 @@ export default function CaseReview() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            账户开户-案例审查
+          <h1 className="text-2xl font-bold text-foreground flex items-baseline gap-2">
+            <span>账户开户-案例审查</span>
             {isFromDeliverable && deliverableName && (
-              <span className="text-primary ml-2">- {deliverableName}</span>
+              <span className="text-primary">- {deliverableName}</span>
+            )}
+            {isFromChat && baseVersion && (
+              <span className="text-sm font-normal text-muted-foreground">
+                （对比状态基于{baseVersion}版本）
+              </span>
             )}
           </h1>
         </div>
