@@ -150,7 +150,7 @@ export function CaseDetailSidebar({
                 onClick={handleSaveDraft}
                 disabled={!isEdited}
               >
-                暂存
+                保存
               </Button>
             </div>
           </div>
