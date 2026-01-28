@@ -94,9 +94,9 @@ const mockDimensions: TestDimension[] = [
     id: "dim-1",
     name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
+      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
       { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", comparisonStatus: "new", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
-      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
+      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD, PRD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
       { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", comparisonStatus: "deleted", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
     ],
   },
@@ -590,20 +590,25 @@ export default function CaseReview() {
                           <span className="text-xs text-muted-foreground">-</span>
                         )}
                       </div>
-                      {/* 场景来源 - Badge显示 */}
+                      {/* 场景来源 - 纯文字显示，支持多个类型 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        <Badge 
-                          variant="outline" 
-                          className={cn(
-                            "text-[10px] px-1.5",
-                            tp.source === "UserStory" && "bg-amber-500/10 text-amber-600 border-amber-200",
-                            tp.source === "FSD" && "bg-blue-500/10 text-blue-600 border-blue-200",
-                            tp.source === "TSD" && "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-                            tp.source === "PRD" && "bg-purple-500/10 text-purple-600 border-purple-200"
-                          )}
-                        >
-                          {tp.source}
-                        </Badge>
+                        <span className="text-[10px]">
+                          {tp.source.split(",").map((s, idx, arr) => {
+                            const source = s.trim();
+                            const colorClass = 
+                              source === "UserStory" ? "text-amber-600" :
+                              source === "FSD" ? "text-blue-600" :
+                              source === "TSD" ? "text-emerald-600" :
+                              source === "PRD" ? "text-purple-600" :
+                              "text-foreground";
+                            return (
+                              <span key={idx}>
+                                <span className={colorClass}>{source}</span>
+                                {idx < arr.length - 1 && <span className="text-muted-foreground">, </span>}
+                              </span>
+                            );
+                          })}
+                        </span>
                       </div>
                       {/* 对应案例数 - 可点击打开侧边栏 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
