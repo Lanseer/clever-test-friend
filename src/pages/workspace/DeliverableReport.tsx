@@ -72,11 +72,25 @@ export default function DeliverableReport() {
   };
 
   const handleIssueClick = (category: string) => {
-    toast.info(`查看${category}详情`);
+    // 映射问题分类到分类下拉框的值
+    const categoryMap: Record<string, string> = {
+      "场景问题": "完善场景",
+      "信息问题": "完善信息",
+      "数据问题": "完善数据",
+    };
+    const filterValue = categoryMap[category] || category;
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review?filterCategory=${encodeURIComponent(filterValue)}`);
   };
 
   const handleReasonClick = (reason: string) => {
-    toast.info(`查看${reason}详情`);
+    // 映射丢弃原因到分类下拉框的值
+    const reasonMap: Record<string, string> = {
+      "场景重复": "重复",
+      "场景与需求不符": "非本功能",
+      "场景与功能不符": "非本功能",
+    };
+    const filterValue = reasonMap[reason] || reason;
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review?filterResult=needsDiscard&filterCategory=${encodeURIComponent(filterValue)}`);
   };
 
   const handleDownload = () => {
