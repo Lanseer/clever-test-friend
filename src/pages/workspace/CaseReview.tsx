@@ -179,9 +179,13 @@ export default function CaseReview() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dimensions, setDimensions] = useState(mockDimensions);
   
-  // 筛选状态
-  const [filterResult, setFilterResult] = useState<string>("all");
-  const [filterCategory, setFilterCategory] = useState<string>("all");
+  // 从URL获取筛选参数
+  const urlFilterResult = searchParams.get("filterResult");
+  const urlFilterCategory = searchParams.get("filterCategory");
+  
+  // 筛选状态 - 初始化时读取URL参数
+  const [filterResult, setFilterResult] = useState<string>(urlFilterResult || "all");
+  const [filterCategory, setFilterCategory] = useState<string>(urlFilterCategory ? decodeURIComponent(urlFilterCategory) : "all");
   
   // 维度折叠状态
   const [collapsedDimensions, setCollapsedDimensions] = useState<Set<string>>(new Set());
