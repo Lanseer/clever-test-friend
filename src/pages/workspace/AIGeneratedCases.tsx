@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
 import { SmartDesignTaskList, mockChatSessions } from "@/components/workspace/SmartDesignTaskList";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
-import { GenerationRecordsPanel, GenerationRecordItem, RecordStatus } from "@/components/workspace/GenerationRecordsPanel";
-import { GenerationResultSidebar } from "@/components/workspace/GenerationResultSidebar";
+import { GenerationRecordItem, RecordStatus } from "@/components/workspace/GenerationRecordsPanel";
+import { GeneratedFilesPanel } from "@/components/workspace/GeneratedFilesPanel";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -34,6 +34,14 @@ interface Dimension {
   name: string;
   caseCount: number;
   testPoints: { id: string; name: string; caseCount: number }[];
+}
+
+interface GeneratedFile {
+  id: string;
+  name: string;
+  scenarioCount: number;
+  caseCount: number;
+  createdAt: string;
 }
 
 const mockTasks: SmartDesignTask[] = [
@@ -89,6 +97,12 @@ const mockDimensions: Dimension[] = [
   },
 ];
 
+// Mock generated files
+const mockGeneratedFiles: GeneratedFile[] = [
+  { id: "file-1", name: "2026-01-23生成案例_V0.1", scenarioCount: 8, caseCount: 24, createdAt: "2026-01-23T10:30:00Z" },
+  { id: "file-2", name: "2026-01-24生成案例_V0.2", scenarioCount: 12, caseCount: 36, createdAt: "2026-01-24T14:20:00Z" },
+];
+
 export default function AIGeneratedCases() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
@@ -99,12 +113,11 @@ export default function AIGeneratedCases() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(mockTasks[0]?.id || null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [noTaskAlertOpen, setNoTaskAlertOpen] = useState(false);
-  const [resultSidebarOpen, setResultSidebarOpen] = useState(false);
-  const [pendingGenerationData, setPendingGenerationData] = useState<{
-    scenarioCount: number;
-    caseCount: number;
-    dimensions: Dimension[];
-  } | null>(null);
+  
+  // Generated files state
+  const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>(mockGeneratedFiles);
+  const [selectedFile, setSelectedFile] = useState<GeneratedFile | null>(null);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
 
   // Chat session management
   const [activeChatSessionId, setActiveChatSessionId] = useState<string | null>(null);
@@ -123,7 +136,7 @@ export default function AIGeneratedCases() {
     "session-1": [
       { id: "s1-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
       { id: "s1-2", role: "user", content: "帮我生成用户登录模块的测试用例", timestamp: new Date() },
-      { id: "s1-3", role: "assistant", content: "生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成", timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24 } },
+      { id: "s1-3", role: "assistant", content: "生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成", timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24, fileName: "2026-01-23生成案例_V0.1" } },
     ],
     "session-2": [
       { id: "s2-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
@@ -144,6 +157,13 @@ export default function AIGeneratedCases() {
     // Load messages for the selected session
     const sessionMessages = sessionMessagesMap[sessionId] || defaultMessages;
     setChatMessages(sessionMessages);
+  };
+
+  const handleNewSession = () => {
+    setActiveChatSessionId(null);
+    setChatMessages(defaultMessages);
+    setRightPanelOpen(false);
+    setSelectedFile(null);
   };
 
   const handleMessagesChange = (newMessages: Message[]) => {
@@ -212,64 +232,34 @@ export default function AIGeneratedCases() {
   };
 
   const handleGenerationComplete = (scenarioCount: number, caseCount: number) => {
-    // Store pending generation data for the sidebar
-    setPendingGenerationData({
+    // Add new generated file
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const version = `V0.${generatedFiles.length + 1}`;
+    const newFile: GeneratedFile = {
+      id: `file-${Date.now()}`,
+      name: `${dateStr}生成案例_${version}`,
       scenarioCount,
       caseCount,
-      dimensions: mockDimensions,
-    });
+      createdAt: now.toISOString(),
+    };
+    setGeneratedFiles([...generatedFiles, newFile]);
   };
 
-  const handleViewGenerationResult = () => {
-    setResultSidebarOpen(true);
+  const handleFileClick = (file: GeneratedFile) => {
+    setSelectedFile(file);
+    setRightPanelOpen(true);
   };
 
-  const handleAbandonGeneration = () => {
-    setPendingGenerationData(null);
-    setResultSidebarOpen(false);
-    toast({
-      title: "已放弃",
-      description: "本次生成数据已放弃",
-    });
-  };
-
-  const handleStartReview = () => {
-    if (!selectedTaskId || !pendingGenerationData) return;
+  const handleStartReviewFromPanel = () => {
+    if (!selectedTaskId) return;
     
     const existingRecords = recordsByTask[selectedTaskId] || [];
-    const newRecord: GenerationRecordItem = {
-      id: `gen-${Date.now()}`,
-      batchNumber: existingRecords.length + 1,
-      scenarioCount: pendingGenerationData.scenarioCount,
-      caseCount: pendingGenerationData.caseCount,
-      createdAt: new Date().toLocaleString("zh-CN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).replace(/\//g, "-"),
-      status: "reviewing",
-      taskName: selectedTask?.name,
-      stats: { adopted: 0, improved: 0, needsImprovement: 0, discarded: 0 },
-    };
-
-    setRecordsByTask(prev => ({
-      ...prev,
-      [selectedTaskId]: [...(prev[selectedTaskId] || []), newRecord],
-    }));
-    
-    setPendingGenerationData(null);
-    setResultSidebarOpen(false);
-    
-    // Navigate to case review page
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}`);
-  };
-
-  const handleRecordClick = (recordId: string, deliverableName?: string) => {
-    // Navigate to case review page for this record with deliverable info
-    const encodedName = encodeURIComponent(deliverableName || '');
-    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=deliverable&deliverable=${encodedName}`);
+    const latestVersion = existingRecords.length > 0 
+      ? `${selectedTask?.name || '任务'}_V0.${existingRecords.length}`
+      : null;
+    const baseVersionParam = latestVersion ? `&baseVersion=${encodeURIComponent(latestVersion)}` : '';
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=chat${baseVersionParam}`);
   };
 
   return (
@@ -277,7 +267,7 @@ export default function AIGeneratedCases() {
       {/* Clean Light Background */}
       <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900" />
 
-      {/* Left Panel - Task List (Narrower) */}
+      {/* Left Panel - Sessions List */}
       <div className="w-56 flex-shrink-0 border-r border-sky-300/30 relative z-10">
         <SmartDesignTaskList
           tasks={tasks}
@@ -288,6 +278,7 @@ export default function AIGeneratedCases() {
           onCreateTask={() => setCreateDialogOpen(true)}
           activeChatSessionId={activeChatSessionId}
           onSelectChatSession={handleSelectChatSession}
+          onNewSession={handleNewSession}
         />
       </div>
 
@@ -301,10 +292,9 @@ export default function AIGeneratedCases() {
           onMessagesChange={handleMessagesChange}
           onNoTaskPrompt={handleNoTaskPrompt}
           onGenerationComplete={handleGenerationComplete}
-          onViewGenerationResult={handleViewGenerationResult}
+          onViewGenerationResult={() => {}}
           onStartReview={() => {
             if (selectedTaskId) {
-              // 获取当前最新版本作为对比基准
               const existingRecords = recordsByTask[selectedTaskId] || [];
               const latestVersion = existingRecords.length > 0 
                 ? `${selectedTask?.name || '任务'}_V0.${existingRecords.length}`
@@ -313,17 +303,23 @@ export default function AIGeneratedCases() {
               navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=chat${baseVersionParam}`);
             }
           }}
+          onFileClick={handleFileClick}
+          generatedFiles={generatedFiles}
         />
       </div>
 
-      {/* Right Panel - Deliverables */}
-      <div className="w-72 flex-shrink-0 relative z-10">
-        <GenerationRecordsPanel
-          records={currentRecords}
-          taskName={selectedTask?.name}
-          onRecordClick={handleRecordClick}
-        />
-      </div>
+      {/* Right Panel - Generated Files Detail (conditionally rendered) */}
+      {rightPanelOpen && selectedFile && (
+        <div className="w-80 flex-shrink-0 relative z-10">
+          <GeneratedFilesPanel
+            open={rightPanelOpen}
+            onOpenChange={setRightPanelOpen}
+            file={selectedFile}
+            dimensions={mockDimensions}
+            onStartReview={handleStartReviewFromPanel}
+          />
+        </div>
+      )}
 
       {/* Create Task Dialog */}
       <CreateSmartDesignTaskDialog
@@ -355,19 +351,6 @@ export default function AIGeneratedCases() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Generation Result Sidebar */}
-      {pendingGenerationData && (
-        <GenerationResultSidebar
-          open={resultSidebarOpen}
-          onOpenChange={setResultSidebarOpen}
-          totalScenarios={pendingGenerationData.scenarioCount}
-          totalCases={pendingGenerationData.caseCount}
-          dimensions={pendingGenerationData.dimensions}
-          onAbandon={handleAbandonGeneration}
-          onStartReview={handleStartReview}
-        />
-      )}
     </div>
   );
 }

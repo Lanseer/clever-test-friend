@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { GenerationRecordItem } from "./GenerationRecordsPanel";
 
 interface UploadedFile {
@@ -28,6 +33,7 @@ export interface Message {
   generationData?: {
     scenarioCount: number;
     caseCount: number;
+    fileName?: string;
   };
 }
 
@@ -36,6 +42,14 @@ interface SmartDesignTask {
   name: string;
   testPhase?: string;
   testCategory?: string;
+}
+
+interface GeneratedFile {
+  id: string;
+  name: string;
+  scenarioCount: number;
+  caseCount: number;
+  createdAt: string;
 }
 
 interface SmartDesignChatProps {
@@ -48,21 +62,9 @@ interface SmartDesignChatProps {
   onGenerationComplete: (scenarioCount: number, caseCount: number) => void;
   onViewGenerationResult: () => void;
   onStartReview: () => void;
+  onFileClick?: (file: GeneratedFile) => void;
+  generatedFiles?: GeneratedFile[];
 }
-
-const testPhaseLabels: Record<string, string> = {
-  unit: "单元测试",
-  integration: "集成测试",
-  sit: "SIT测试",
-  uat: "UAT测试",
-  production: "生产验证",
-};
-
-const testCategoryLabels: Record<string, string> = {
-  functional: "功能测试",
-  data: "数据测试",
-  special: "专项测试",
-};
 
 export function SmartDesignChat({ 
   selectedTaskId, 
@@ -74,6 +76,8 @@ export function SmartDesignChat({
   onGenerationComplete,
   onViewGenerationResult,
   onStartReview,
+  onFileClick,
+  generatedFiles = [],
 }: SmartDesignChatProps) {
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -112,6 +116,13 @@ export function SmartDesignChat({
 
   const handleRemoveFile = (fileId: string) => {
     setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+  };
+
+  const generateFileName = () => {
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const version = `V0.${generatedFiles.length + 1}`;
+    return `${dateStr}生成案例_${version}`;
   };
 
   const handleSendMessage = async () => {
@@ -178,13 +189,14 @@ export function SmartDesignChat({
 
     const scenarioCount = Math.floor(Math.random() * 10) + 5;
     const caseCount = Math.floor(Math.random() * 20) + 15;
+    const fileName = generateFileName();
     
     const finalMessages = [...step2Messages];
     finalMessages[finalMessages.length - 1] = {
       ...finalMessages[finalMessages.length - 1],
       content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成`,
       isGenerationComplete: true,
-      generationData: { scenarioCount, caseCount },
+      generationData: { scenarioCount, caseCount, fileName },
     };
     onMessagesChange(finalMessages);
 
@@ -203,30 +215,58 @@ export function SmartDesignChat({
   const selectedRecordForDropdown = records.find(r => r.id === selectedRecordId);
 
   return (
-    <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm">
-      {/* Header with task name and tags - Centered */}
-      <div className="px-4 py-3 border-b border-sky-200/50 dark:border-sky-800/30 flex-shrink-0 text-center">
-        <h2 className="font-semibold text-base text-sky-900 dark:text-sky-100 truncate">
-          {selectedTask?.name || "请选择任务"}
-        </h2>
-        {selectedTask && (
-          <div className="flex gap-2 mt-1.5 justify-center">
-            {selectedTask.testPhase && (
-              <Badge variant="outline" className="text-xs bg-sky-50 text-sky-700 border-sky-200">
-                {testPhaseLabels[selectedTask.testPhase] || selectedTask.testPhase}
-              </Badge>
-            )}
-            {selectedTask.testCategory && (
-              <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                {testCategoryLabels[selectedTask.testCategory] || selectedTask.testCategory}
-              </Badge>
-            )}
-          </div>
-        )}
+    <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm relative">
+      {/* Task Files Button - Fixed at top-right */}
+      <div className="absolute top-3 right-3 z-10">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5 bg-white/80 border-sky-200 hover:bg-sky-50/50 text-sky-700"
+            >
+              <FolderOpen className="w-4 h-4" />
+              任务文件
+              {generatedFiles.length > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                  {generatedFiles.length}
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 p-2">
+            <div className="space-y-1">
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-b mb-1">
+                生成的文件
+              </div>
+              {generatedFiles.length === 0 ? (
+                <div className="py-4 text-center text-sm text-muted-foreground">
+                  暂无生成文件
+                </div>
+              ) : (
+                generatedFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
+                    onClick={() => onFileClick?.(file)}
+                  >
+                    <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{file.name}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {file.scenarioCount} 场景 · {file.caseCount} 用例
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 pt-14">
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -249,26 +289,45 @@ export function SmartDesignChat({
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 
-                {/* Generation Complete Tag */}
-              {message.isGenerationComplete && message.generationData && (
-                  <div className="mt-3 pt-3 border-t border-border/50">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className="text-sm">
-                        案例已经生成完成，相较于V0.3版本场景总数增加 <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> 个，案例增加 <span className="font-semibold text-primary">{message.generationData.caseCount}</span> 条
-                      </span>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="h-7 text-xs gap-1"
-                        onClick={() => {
-                          onGenerationComplete(message.generationData!.scenarioCount, message.generationData!.caseCount);
-                          onStartReview?.();
-                        }}
-                      >
-                        <Eye className="w-3 h-3" />
-                        开始审查
-                      </Button>
+                {/* Generation Complete - Show file link and start review button */}
+                {message.isGenerationComplete && message.generationData && (
+                  <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
+                    <div className="text-sm">
+                      案例已经生成完成，相较于V0.3版本场景总数增加 <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> 个，案例增加 <span className="font-semibold text-primary">{message.generationData.caseCount}</span> 条
                     </div>
+                    
+                    {/* File Link */}
+                    <div 
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-50 border border-sky-200 cursor-pointer hover:bg-sky-100 transition-colors"
+                      onClick={() => {
+                        const file: GeneratedFile = {
+                          id: `file-${Date.now()}`,
+                          name: message.generationData!.fileName || generateFileName(),
+                          scenarioCount: message.generationData!.scenarioCount,
+                          caseCount: message.generationData!.caseCount,
+                          createdAt: new Date().toISOString(),
+                        };
+                        onFileClick?.(file);
+                      }}
+                    >
+                      <FileText className="w-4 h-4 text-sky-600" />
+                      <span className="text-sm font-medium text-sky-700">
+                        {message.generationData.fileName || generateFileName()}
+                      </span>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="default"
+                      className="h-7 text-xs gap-1"
+                      onClick={() => {
+                        onGenerationComplete(message.generationData!.scenarioCount, message.generationData!.caseCount);
+                        onStartReview?.();
+                      }}
+                    >
+                      <Eye className="w-3 h-3" />
+                      开始审查
+                    </Button>
                   </div>
                 )}
               </div>
@@ -350,7 +409,7 @@ export function SmartDesignChat({
                 BDD标准模板
               </Badge>
 
-              {/* Deliverable Selector - moved after BDD badge */}
+              {/* History Cases Selector - renamed from 交付物 */}
               {records.length > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -363,7 +422,7 @@ export function SmartDesignChat({
                       <FileText className="w-3.5 h-3.5" />
                       {selectedRecordForDropdown 
                         ? selectedRecordForDropdown.deliverableName || `${selectedTask?.name || '任务'}_V0.${selectedRecordForDropdown.batchNumber}` 
-                        : "交付物"
+                        : "历史案例"
                       }
                       <ChevronDown className="w-3 h-3" />
                     </Button>
