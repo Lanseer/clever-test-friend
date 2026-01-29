@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -314,7 +315,7 @@ export function SmartDesignChat({
                   generatedFiles.map((file) => (
                     <div
                       key={file.id}
-                      className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors group"
                       onClick={() => onFileClick?.(file)}
                     >
                       <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
@@ -324,6 +325,17 @@ export function SmartDesignChat({
                           {file.scenarioCount} 场景 · {file.caseCount} 用例
                         </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toast.success(`开始下载 ${file.name}`);
+                        }}
+                      >
+                        <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                      </Button>
                     </div>
                   ))
                 )}
