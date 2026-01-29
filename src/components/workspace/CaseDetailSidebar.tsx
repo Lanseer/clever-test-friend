@@ -19,6 +19,7 @@ export interface CaseDetailData {
   reviewResult?: string;
   caseCount?: number;
   bddContent?: string;
+  readOnly?: boolean;
 }
 
 interface CaseDetailSidebarProps {
@@ -67,14 +68,16 @@ export function CaseDetailSidebar({
 
   const reviewResult = caseData?.reviewResult || "pending";
   const resultConfig = reviewResultConfig[reviewResult] || reviewResultConfig.pending;
+  const isReadOnly = caseData?.readOnly ?? false;
 
   const handleContentChange = (value: string) => {
+    if (isReadOnly) return;
     setEditedContent(value);
     setIsEdited(true);
   };
 
   const handleSaveDraft = () => {
-    if (caseData && isEdited) {
+    if (caseData && isEdited && !isReadOnly) {
       onSaveDraft?.(caseData.id, editedContent);
       toast.success("修改内容已暂存");
       setIsEdited(false);
@@ -100,40 +103,47 @@ export function CaseDetailSidebar({
           <div className="flex-1 flex flex-col overflow-hidden">
             <ScrollArea className="flex-1 pr-4">
               <div className="space-y-6 py-4">
-                {/* BDD 完整内容 - 可编辑文本域 - 放在最上面 */}
+                {/* BDD 完整内容 - 文本域 */}
                 <div className="space-y-2">
                   <Label className="text-muted-foreground text-xs">案例详情 (BDD)</Label>
                   <Textarea
                     className={cn(
                       "min-h-[300px] font-mono text-xs resize-none",
-                      isEdited ? "bg-amber-50/50 border-amber-200" : "bg-muted/30"
+                      isReadOnly 
+                        ? "bg-muted/30 cursor-default" 
+                        : isEdited 
+                          ? "bg-amber-50/50 border-amber-200" 
+                          : "bg-muted/30"
                     )}
                     value={currentContent}
                     onChange={(e) => handleContentChange(e.target.value)}
+                    readOnly={isReadOnly}
                   />
-                  {isEdited && (
+                  {!isReadOnly && isEdited && (
                     <p className="text-xs text-amber-600">* 内容已修改，请点击暂存按钮保存</p>
                   )}
                 </div>
 
-                {/* 审查结果和对应案例数 */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs">审查结果</Label>
-                    <Badge 
-                      variant="outline" 
-                      className={cn("text-xs", resultConfig.className)}
-                    >
-                      {resultConfig.label}
-                    </Badge>
+                {/* 审查结果和对应案例数 - 仅在非只读模式显示 */}
+                {!isReadOnly && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">审查结果</Label>
+                      <Badge 
+                        variant="outline" 
+                        className={cn("text-xs", resultConfig.className)}
+                      >
+                        {resultConfig.label}
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">对应案例数</Label>
+                      <Badge variant="outline" className="text-xs">
+                        {caseData.caseCount ?? "-"}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs">对应案例数</Label>
-                    <Badge variant="outline" className="text-xs">
-                      {caseData.caseCount ?? "-"}
-                    </Badge>
-                  </div>
-                </div>
+                )}
                 
                 {/* 案例来源详情 */}
                 <div className="space-y-2">
@@ -143,16 +153,18 @@ export function CaseDetailSidebar({
               </div>
             </ScrollArea>
             
-            {/* 底部暂存按钮 */}
-            <div className="pt-4 border-t mt-2">
-              <Button 
-                className="w-full" 
-                onClick={handleSaveDraft}
-                disabled={!isEdited}
-              >
-                保存
-              </Button>
-            </div>
+            {/* 底部暂存按钮 - 仅在非只读模式显示 */}
+            {!isReadOnly && (
+              <div className="pt-4 border-t mt-2">
+                <Button 
+                  className="w-full" 
+                  onClick={handleSaveDraft}
+                  disabled={!isEdited}
+                >
+                  保存
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </SheetContent>

@@ -66,8 +66,7 @@ export function GeneratedFilesPanel({
   const handleViewCases = (testPoint: TestPoint) => {
     setSelectedCaseData({
       id: testPoint.id,
-      reviewResult: "pending",
-      caseCount: testPoint.caseCount,
+      readOnly: true,
     });
     setCaseDetailOpen(true);
   };
@@ -136,27 +135,24 @@ export function GeneratedFilesPanel({
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="border-t divide-y">
-                      {dimension.testPoints.map((tp) => (
-                        <div
-                          key={tp.id}
-                          className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/30 transition-colors"
-                        >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm truncate">{tp.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              ({tp.caseCount} 个用例)
-                            </span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs gap-1 flex-shrink-0"
-                            onClick={() => handleViewCases(tp)}
+                        {dimension.testPoints.map((tp) => (
+                          <div
+                            key={tp.id}
+                            className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/30 transition-colors"
                           >
-                            <Eye className="w-3.5 h-3.5" />
-                            查看用例
-                          </Button>
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm truncate">{tp.name}</span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs gap-1 flex-shrink-0 text-primary hover:text-primary"
+                              onClick={() => handleViewCases(tp)}
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              查看
+                            </Button>
                         </div>
                       ))}
                     </div>
