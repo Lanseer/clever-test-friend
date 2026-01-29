@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Star, CheckCircle, XCircle, Users, ArrowLeft, ArrowRight, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -311,9 +311,43 @@ export default function ExpertCaseReview() {
     );
   };
 
-  // Calculate remaining time (mock: 3 days 12 hours from now)
-  const remainingDays = 3;
-  const remainingHours = 12;
+  // Countdown timer state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 3,
+    hours: 12,
+    minutes: 45,
+    seconds: 30
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { days, hours, minutes, seconds } = prev;
+        
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours--;
+          minutes = 59;
+          seconds = 59;
+        } else if (days > 0) {
+          days--;
+          hours = 23;
+          minutes = 59;
+          seconds = 59;
+        }
+        
+        return { days, hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -331,11 +365,42 @@ export default function ExpertCaseReview() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-amber-500/10 text-amber-600 px-4 py-2 rounded-lg border border-amber-200">
-            <Clock className="w-5 h-5" />
-            <span className="font-medium">
-              距离评审结束还有 {remainingDays} 天 {remainingHours} 小时
-            </span>
+          
+          {/* Countdown Timer */}
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              <span>距离评审结束</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col items-center">
+                <div className="bg-primary text-primary-foreground font-mono text-xl font-bold px-3 py-2 rounded-lg min-w-[52px] text-center shadow-sm">
+                  {formatNumber(timeLeft.days)}
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">天</span>
+              </div>
+              <span className="text-xl font-bold text-muted-foreground pb-5">:</span>
+              <div className="flex flex-col items-center">
+                <div className="bg-primary text-primary-foreground font-mono text-xl font-bold px-3 py-2 rounded-lg min-w-[52px] text-center shadow-sm">
+                  {formatNumber(timeLeft.hours)}
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">时</span>
+              </div>
+              <span className="text-xl font-bold text-muted-foreground pb-5">:</span>
+              <div className="flex flex-col items-center">
+                <div className="bg-primary text-primary-foreground font-mono text-xl font-bold px-3 py-2 rounded-lg min-w-[52px] text-center shadow-sm">
+                  {formatNumber(timeLeft.minutes)}
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">分</span>
+              </div>
+              <span className="text-xl font-bold text-muted-foreground pb-5">:</span>
+              <div className="flex flex-col items-center">
+                <div className="bg-primary text-primary-foreground font-mono text-xl font-bold px-3 py-2 rounded-lg min-w-[52px] text-center shadow-sm">
+                  {formatNumber(timeLeft.seconds)}
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">秒</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
