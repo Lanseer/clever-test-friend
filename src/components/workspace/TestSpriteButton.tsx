@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { 
   Sparkles, 
@@ -58,6 +58,53 @@ export function TestSpriteButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"tasks" | "chat">("tasks");
   const [chatInput, setChatInput] = useState("");
+  
+  // Draggable state
+  const [position, setPosition] = useState({ x: 24, y: 24 }); // offset from bottom-right
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isOpen) return; // Don't drag when panel is open
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX + position.x,
+      y: e.clientY + position.y,
+    });
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    const newX = dragStart.x - e.clientX;
+    const newY = dragStart.y - e.clientY;
+    // Constrain to viewport
+    const maxX = window.innerWidth - 70;
+    const maxY = window.innerHeight - 70;
+    setPosition({
+      x: Math.max(10, Math.min(newX, maxX)),
+      y: Math.max(10, Math.min(newY, maxY)),
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Add/remove global mouse listeners
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragStart]);
+
   const [messages, setMessages] = useState<SpriteMessage[]>([
     {
       id: "init",
@@ -110,19 +157,26 @@ export function TestSpriteButton() {
 
   return (
     <>
-      {/* Floating Button with breathing animation */}
+      {/* Floating Button with breathing animation - Draggable */}
       <button
-        onClick={() => setIsOpen(true)}
+        ref={buttonRef}
+        onClick={() => !isDragging && setIsOpen(true)}
+        onMouseDown={handleMouseDown}
         className={cn(
-          "fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full",
+          "fixed z-50 w-14 h-14 rounded-full",
           "bg-gradient-to-br from-violet-500 to-purple-600 text-white",
           "shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40",
           "flex items-center justify-center",
-          "transition-all duration-300 hover:scale-110",
-          isOpen && "scale-0 opacity-0"
+          "transition-shadow duration-300 hover:scale-110",
+          isDragging && "cursor-grabbing scale-110",
+          !isDragging && !isOpen && "cursor-grab",
+          isOpen && "scale-0 opacity-0 pointer-events-none"
         )}
         style={{
-          animation: isOpen ? "none" : "breathe 2s ease-in-out infinite",
+          right: `${position.x}px`,
+          bottom: `${position.y}px`,
+          animation: isOpen || isDragging ? "none" : "breathe 2s ease-in-out infinite",
+          transition: isDragging ? "none" : "transform 0.3s, opacity 0.3s",
         }}
       >
         <Sparkles className="w-6 h-6" />
@@ -146,13 +200,17 @@ export function TestSpriteButton() {
         }
       `}</style>
 
-      {/* Expanded Panel */}
+      {/* Expanded Panel - follows button position */}
       <div
         className={cn(
-          "fixed bottom-6 right-6 z-50 w-80 bg-background border rounded-2xl shadow-2xl overflow-hidden",
+          "fixed z-50 w-80 bg-background border rounded-2xl shadow-2xl overflow-hidden",
           "transition-all duration-300 origin-bottom-right",
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"
         )}
+        style={{
+          right: `${position.x}px`,
+          bottom: `${position.y}px`,
+        }}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-violet-500 to-purple-600 text-white p-4">
