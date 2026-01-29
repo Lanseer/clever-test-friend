@@ -38,6 +38,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { ReviewHistorySidebar, ReviewHistoryData } from "@/components/workspace/ReviewHistorySidebar";
+import { SaveToTaskDialog } from "@/components/workspace/SaveToTaskDialog";
+import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -195,9 +197,30 @@ export default function CaseReview() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<Map<string, ReviewResult>>(new Map());
   
-  // 保存交付物处理
-  const handleSaveAsDeliverable = () => {
-    toast.success("已成功保存，版本为用户模块_V0.6");
+  // 保存任务选择弹窗
+  const [saveToTaskDialogOpen, setSaveToTaskDialogOpen] = useState(false);
+  const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
+  
+  // Mock task data for display
+  const mockTasksData = [
+    { id: "1", name: "用户登录模块测试", testPhase: "SIT测试", testCategory: "功能测试" },
+    { id: "2", name: "支付流程测试", testPhase: "UAT测试", testCategory: "功能测试" },
+  ];
+  
+  // 保存处理
+  const handleSave = () => {
+    setSaveToTaskDialogOpen(true);
+  };
+  
+  const handleSaveToTask = (taskId: string) => {
+    const task = mockTasksData.find(t => t.id === taskId);
+    toast.success(`已成功保存到测试任务：${task?.name || "未知任务"}`);
+  };
+  
+  const handleCreateTask = (data: { name: string; testPhase: string; testCategory: string; tags: string[] }) => {
+    toast.success(`任务 "${data.name}" 创建成功，请重新选择保存`);
+    setCreateTaskDialogOpen(false);
+    setSaveToTaskDialogOpen(true);
   };
 
   // 统计数据计算
@@ -824,13 +847,31 @@ Scenario: 完善后的场景描述
         historyData={historyData}
       />
 
-      {/* Fixed Footer - Save as Deliverable (only when from chat) */}
+      {/* Save to Task Dialog */}
+      <SaveToTaskDialog
+        open={saveToTaskDialogOpen}
+        onOpenChange={setSaveToTaskDialogOpen}
+        onConfirm={handleSaveToTask}
+        onCreateNew={() => {
+          setSaveToTaskDialogOpen(false);
+          setCreateTaskDialogOpen(true);
+        }}
+      />
+
+      {/* Create Task Dialog */}
+      <CreateSmartDesignTaskDialog
+        open={createTaskDialogOpen}
+        onOpenChange={setCreateTaskDialogOpen}
+        onConfirm={handleCreateTask}
+      />
+
+      {/* Fixed Footer - Save (only when from chat) */}
       {isFromChat && (
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
           <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-center">
-            <Button onClick={handleSaveAsDeliverable} className="gap-2">
+            <Button onClick={handleSave} className="gap-2">
               <Save className="w-4 h-4" />
-              保存为交付物
+              保存
             </Button>
           </div>
         </div>
