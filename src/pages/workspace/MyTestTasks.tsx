@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { FileText, ChevronRight, Plus, ArrowLeft, ClipboardList, Download, Calendar, Layers } from "lucide-react";
+import { FileText, ChevronRight, Plus, ArrowLeft, ClipboardList, Download, Calendar, Check, AlertCircle, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -21,8 +21,9 @@ interface GeneratedCaseFile {
   name: string;
   version: string;
   createdAt: string;
-  scenarioCount: number;
-  caseCount: number;
+  adoptedCount: number;
+  needsImprovementCount: number;
+  discardedCount: number;
 }
 
 const mockTasks: TestTask[] = [
@@ -35,20 +36,20 @@ const mockTasks: TestTask[] = [
 
 const mockGeneratedCaseFiles: Record<string, GeneratedCaseFile[]> = {
   "1": [
-    { id: "f1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", createdAt: "2026-01-23 14:30", scenarioCount: 12, caseCount: 45 },
-    { id: "f2", name: "2026-01-22用户登录模块测试案例", version: "V0.9", createdAt: "2026-01-22 10:15", scenarioCount: 10, caseCount: 38 },
+    { id: "f1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", createdAt: "2026-01-23 14:30", adoptedCount: 32, needsImprovementCount: 8, discardedCount: 5 },
+    { id: "f2", name: "2026-01-22用户登录模块测试案例", version: "V0.9", createdAt: "2026-01-22 10:15", adoptedCount: 28, needsImprovementCount: 6, discardedCount: 4 },
   ],
   "2": [
-    { id: "f3", name: "2026-01-22支付流程测试案例", version: "V1.2", createdAt: "2026-01-22 16:45", scenarioCount: 8, caseCount: 32 },
+    { id: "f3", name: "2026-01-22支付流程测试案例", version: "V1.2", createdAt: "2026-01-22 16:45", adoptedCount: 24, needsImprovementCount: 5, discardedCount: 3 },
   ],
   "3": [
-    { id: "f4", name: "2026-01-21订单管理测试案例", version: "V0.8", createdAt: "2026-01-21 09:20", scenarioCount: 15, caseCount: 52 },
+    { id: "f4", name: "2026-01-21订单管理测试案例", version: "V0.8", createdAt: "2026-01-21 09:20", adoptedCount: 38, needsImprovementCount: 10, discardedCount: 4 },
   ],
   "4": [
-    { id: "f5", name: "2026-01-20商品搜索测试案例", version: "V1.0", createdAt: "2026-01-20 11:00", scenarioCount: 6, caseCount: 24 },
+    { id: "f5", name: "2026-01-20商品搜索测试案例", version: "V1.0", createdAt: "2026-01-20 11:00", adoptedCount: 18, needsImprovementCount: 4, discardedCount: 2 },
   ],
   "5": [
-    { id: "f6", name: "2026-01-20购物车功能测试案例", version: "V1.1", createdAt: "2026-01-20 15:30", scenarioCount: 9, caseCount: 36 },
+    { id: "f6", name: "2026-01-20购物车功能测试案例", version: "V1.1", createdAt: "2026-01-20 15:30", adoptedCount: 28, needsImprovementCount: 6, discardedCount: 2 },
   ],
 };
 
@@ -139,10 +140,10 @@ export default function MyTestTasks() {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-medium truncate">{task.name}</h3>
                         <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5">
+                          <Badge className="text-[10px] px-1.5 py-0 h-5 bg-blue-100 text-blue-700 border-blue-200">
                             {task.testPhase}
                           </Badge>
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">
+                          <Badge className="text-[10px] px-1.5 py-0 h-5 bg-amber-100 text-amber-700 border-amber-200">
                             {task.testCategory}
                           </Badge>
                         </div>
@@ -166,14 +167,7 @@ export default function MyTestTasks() {
         {/* Right Panel - Test Case Versions */}
         <div className="flex-1 flex flex-col bg-background/50">
           <div className="p-4 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-medium">{selectedTask?.name || "测试案例"}</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  共 {generatedFiles.length} 个版本
-                </p>
-              </div>
-            </div>
+            <h2 className="text-lg font-medium">{selectedTask?.name || "测试案例"}</h2>
           </div>
           
           <ScrollArea className="flex-1">
@@ -200,26 +194,32 @@ export default function MyTestTasks() {
                           
                           {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h3 className="text-sm font-medium truncate">{file.name}</h3>
-                              <Badge className="bg-sky-100 text-sky-700 border-sky-200 text-[10px]">
-                                {file.version}
-                              </Badge>
-                            </div>
+                            <h3 className="text-sm font-medium truncate">{file.name}_{file.version}</h3>
                             <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
                                 {file.createdAt}
                               </span>
-                              <span className="flex items-center gap-1">
-                                <Layers className="w-3 h-3" />
-                                {file.scenarioCount} 场景 · {file.caseCount} 用例
+                            </div>
+                            {/* Stats */}
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="flex items-center gap-1 text-xs text-green-600">
+                                <Check className="w-3 h-3" />
+                                采纳 {file.adoptedCount}
+                              </span>
+                              <span className="flex items-center gap-1 text-xs text-amber-600">
+                                <AlertCircle className="w-3 h-3" />
+                                需完善 {file.needsImprovementCount}
+                              </span>
+                              <span className="flex items-center gap-1 text-xs text-red-600">
+                                <Trash2 className="w-3 h-3" />
+                                丢弃 {file.discardedCount}
                               </span>
                             </div>
                           </div>
                           
-                          {/* Actions */}
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {/* Actions - Always visible */}
+                          <div className="flex items-center gap-1">
                             <Button
                               variant="ghost"
                               size="icon"
