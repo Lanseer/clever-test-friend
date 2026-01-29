@@ -5,6 +5,7 @@ import { SmartDesignTaskList, mockChatSessions } from "@/components/workspace/Sm
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { GenerationRecordItem, RecordStatus } from "@/components/workspace/GenerationRecordsPanel";
 import { GeneratedFilesPanel } from "@/components/workspace/GeneratedFilesPanel";
+import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -320,6 +321,9 @@ export default function AIGeneratedCases() {
           />
         </div>
       )}
+
+      {/* Floating Test Sprite Button */}
+      <TestSpriteButton />
 
       {/* Create Task Dialog */}
       <CreateSmartDesignTaskDialog
