@@ -3,18 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { 
   Sparkles, 
   X, 
-  ListTodo, 
-  FileBarChart, 
   Clock, 
   CheckCircle2, 
   AlertCircle,
   ChevronRight,
-  Bot,
-  Send
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
@@ -46,21 +41,13 @@ const mockQuickTasks: QuickTask[] = [
   { id: "4", name: "商品搜索测试", status: "completed" },
 ];
 
-interface SpriteMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
-
 export function TestSpriteButton() {
   const { workspaceId } = useParams();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"tasks" | "chat">("tasks");
-  const [chatInput, setChatInput] = useState("");
   
-  // Draggable state
-  const [position, setPosition] = useState({ x: 24, y: 24 }); // offset from bottom-right
+  // Draggable state - default to bottom-left
+  const [position, setPosition] = useState({ x: 24, y: 24 }); // offset from bottom-left
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -69,7 +56,7 @@ export function TestSpriteButton() {
     if (isOpen) return; // Don't drag when panel is open
     setIsDragging(true);
     setDragStart({
-      x: e.clientX + position.x,
+      x: e.clientX - position.x,
       y: e.clientY + position.y,
     });
     e.preventDefault();
@@ -77,7 +64,7 @@ export function TestSpriteButton() {
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
-    const newX = dragStart.x - e.clientX;
+    const newX = e.clientX - dragStart.x;
     const newY = dragStart.y - e.clientY;
     // Constrain to viewport
     const maxX = window.innerWidth - 70;
@@ -105,28 +92,6 @@ export function TestSpriteButton() {
     };
   }, [isDragging, dragStart]);
 
-  const [messages, setMessages] = useState<SpriteMessage[]>([
-    {
-      id: "init",
-      role: "assistant",
-      content: "你好！我是测试精灵，可以帮你管理测试任务、查看任务状态、生成报告等。有什么需要帮助的吗？",
-    },
-  ]);
-
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
-    
-    setMessages(prev => [
-      ...prev,
-      { id: Date.now().toString(), role: "user", content: chatInput },
-      { 
-        id: (Date.now() + 1).toString(), 
-        role: "assistant", 
-        content: "好的，我来帮你处理这个请求。你可以点击上方的「任务管理」查看所有测试任务，或者直接告诉我你想做什么。" 
-      },
-    ]);
-    setChatInput("");
-  };
 
   const handleNavigateToTask = (taskId: string) => {
     navigate(`/workspace/${workspaceId}/management/ai-cases`);
@@ -173,7 +138,7 @@ export function TestSpriteButton() {
           isOpen && "scale-0 opacity-0 pointer-events-none"
         )}
         style={{
-          right: `${position.x}px`,
+          left: `${position.x}px`,
           bottom: `${position.y}px`,
           animation: isOpen || isDragging ? "none" : "breathe 2s ease-in-out infinite",
           transition: isDragging ? "none" : "transform 0.3s, opacity 0.3s",
@@ -204,11 +169,11 @@ export function TestSpriteButton() {
       <div
         className={cn(
           "fixed z-50 w-80 bg-background border rounded-2xl shadow-2xl overflow-hidden",
-          "transition-all duration-300 origin-bottom-right",
+          "transition-all duration-300 origin-bottom-left",
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"
         )}
         style={{
-          right: `${position.x}px`,
+          left: `${position.x}px`,
           bottom: `${position.y}px`,
         }}
       >
@@ -219,10 +184,7 @@ export function TestSpriteButton() {
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <div>
-                <h3 className="font-semibold text-sm">测试精灵</h3>
-                <p className="text-[10px] text-white/70">智能测试助手</p>
-              </div>
+              <h3 className="font-semibold text-sm">测试精灵</h3>
             </div>
             <Button
               variant="ghost"
@@ -251,147 +213,53 @@ export function TestSpriteButton() {
           </div>
         </div>
 
-        {/* Tab Switch */}
-        <div className="flex border-b">
-          <button
-            className={cn(
-              "flex-1 py-2 text-xs font-medium transition-colors",
-              activeTab === "tasks" 
-                ? "text-primary border-b-2 border-primary" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            onClick={() => setActiveTab("tasks")}
-          >
-            <ListTodo className="w-3.5 h-3.5 inline-block mr-1" />
-            任务管理
-          </button>
-          <button
-            className={cn(
-              "flex-1 py-2 text-xs font-medium transition-colors",
-              activeTab === "chat" 
-                ? "text-primary border-b-2 border-primary" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            onClick={() => setActiveTab("chat")}
-          >
-            <Bot className="w-3.5 h-3.5 inline-block mr-1" />
-            对话
-          </button>
-        </div>
-
         {/* Content */}
         <div className="h-64">
-          {activeTab === "tasks" ? (
-            <ScrollArea className="h-full">
-              <div className="p-3 space-y-2">
-                {/* Quick Actions */}
-                <div className="flex gap-2 mb-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 text-xs gap-1"
-                    onClick={() => {
-                      navigate(`/workspace/${workspaceId}/management/ai-cases`);
-                      setIsOpen(false);
-                    }}
-                  >
-                    <ListTodo className="w-3.5 h-3.5" />
-                    全部任务
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 text-xs gap-1"
-                    onClick={() => {
-                      navigate(`/workspace/${workspaceId}/management/test-report`);
-                      setIsOpen(false);
-                    }}
-                  >
-                    <FileBarChart className="w-3.5 h-3.5" />
-                    测试报告
-                  </Button>
-                </div>
-
-                {/* Recent Tasks */}
-                <div className="text-xs text-muted-foreground mb-2">近期任务</div>
-                {mockQuickTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="p-2.5 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors group"
-                    onClick={() => handleNavigateToTask(task.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        {getStatusIcon(task.status)}
-                        <span className="text-sm truncate">{task.name}</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    {task.status === "in_progress" && task.progress !== undefined && (
-                      <div className="mt-2">
-                        <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
-                          <span>{getStatusText(task.status)}</span>
-                          <span>{task.progress}%</span>
-                        </div>
-                        <div className="h-1 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all"
-                            style={{ width: `${task.progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    {task.status === "completed" && (
-                      <Badge variant="outline" className="mt-1.5 text-[10px] bg-green-50 text-green-600 border-green-200">
-                        已完成
-                      </Badge>
-                    )}
-                    {task.status === "pending" && (
-                      <Badge variant="outline" className="mt-1.5 text-[10px]">
-                        待处理
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          ) : (
-            <div className="flex flex-col h-full">
-              <ScrollArea className="flex-1 p-3">
-                <div className="space-y-3">
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={cn(
-                        "text-xs p-2.5 rounded-lg max-w-[90%]",
-                        msg.role === "user" 
-                          ? "ml-auto bg-primary text-primary-foreground" 
-                          : "bg-muted"
-                      )}
-                    >
-                      {msg.content}
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-              <div className="p-2 border-t flex gap-2">
-                <Input
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="输入问题..."
-                  className="h-8 text-xs"
-                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                />
-                <Button 
-                  size="icon" 
-                  className="h-8 w-8 bg-gradient-to-r from-violet-500 to-purple-600"
-                  onClick={handleSendMessage}
+          <ScrollArea className="h-full">
+            <div className="p-3 space-y-2">
+              {/* To-do Items */}
+              <div className="text-xs text-muted-foreground mb-2">待办事项</div>
+              {mockQuickTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="p-2.5 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors group"
+                  onClick={() => handleNavigateToTask(task.id)}
                 >
-                  <Send className="w-3.5 h-3.5" />
-                </Button>
-              </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {getStatusIcon(task.status)}
+                      <span className="text-sm truncate">{task.name}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  {task.status === "in_progress" && task.progress !== undefined && (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                        <span>{getStatusText(task.status)}</span>
+                        <span>{task.progress}%</span>
+                      </div>
+                      <div className="h-1 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all"
+                          style={{ width: `${task.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {task.status === "completed" && (
+                    <Badge variant="outline" className="mt-1.5 text-[10px] bg-green-50 text-green-600 border-green-200">
+                      已完成
+                    </Badge>
+                  )}
+                  {task.status === "pending" && (
+                    <Badge variant="outline" className="mt-1.5 text-[10px]">
+                      待处理
+                    </Badge>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+          </ScrollArea>
         </div>
       </div>
     </>
