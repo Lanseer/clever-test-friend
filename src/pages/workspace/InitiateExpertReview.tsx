@@ -340,9 +340,9 @@ export default function InitiateExpertReview() {
           /* Step 1: Select Cases */
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="text-base">选择要评审的用例</Label>
+              <Label className="text-base">选择要评审的场景</Label>
               <span className="text-sm text-muted-foreground">
-                已选择 {selectedCount} / {allCases.length} 个用例
+                已选择 {selectedCount} / {allCases.length} 个场景
               </span>
             </div>
             <div className="border rounded-lg overflow-hidden">
@@ -392,30 +392,15 @@ export default function InitiateExpertReview() {
                             {dimStats.selected}/{dimStats.all}
                           </span>
                         </div>
-                        {/* Test Points */}
+                        {/* Test Points (Scenarios) */}
                         {isDimExpanded && dim.testPoints.map((tp) => {
                           const tpStats = getPointStats(tp);
-                          const isPointExpanded = expandedPoints.has(tp.id);
                           return (
                             <div key={tp.id}>
-                              {/* Test Point Header */}
                               <div
                                 className="flex items-center gap-2 px-4 py-2.5 pl-10 hover:bg-muted/20 cursor-pointer"
-                                onClick={() => togglePoint(tp.id)}
+                                onClick={() => handlePointToggle(tp.id, !tpStats.allSelected)}
                               >
-                                <button
-                                  className="p-0.5 hover:bg-muted rounded"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    togglePoint(tp.id);
-                                  }}
-                                >
-                                  {isPointExpanded ? (
-                                    <ChevronDown className="w-3.5 h-3.5" />
-                                  ) : (
-                                    <ChevronRight className="w-3.5 h-3.5" />
-                                  )}
-                                </button>
                                 <Checkbox
                                   checked={tpStats.allSelected}
                                   onCheckedChange={(checked) => handlePointToggle(tp.id, !!checked)}
@@ -425,27 +410,9 @@ export default function InitiateExpertReview() {
                                 />
                                 <span className="text-sm">{tp.name}</span>
                                 <span className="text-xs text-muted-foreground ml-auto">
-                                  {tpStats.selected}/{tpStats.all}
+                                  {tpStats.selected}/{tpStats.all} 个用例
                                 </span>
                               </div>
-                              {/* Cases */}
-                              {isPointExpanded && tp.cases.map((caseItem) => (
-                                <div
-                                  key={caseItem.id}
-                                  className="flex items-center gap-3 px-4 py-2.5 pl-16 hover:bg-muted/10 cursor-pointer"
-                                  onClick={() => handleCaseToggle(caseItem.id)}
-                                >
-                                  <Checkbox
-                                    checked={caseItem.selected}
-                                    onCheckedChange={() => handleCaseToggle(caseItem.id)}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                  <span className="text-xs text-muted-foreground font-mono">
-                                    {caseItem.code}
-                                  </span>
-                                  <span className="text-sm">{caseItem.name}</span>
-                                </div>
-                              ))}
                             </div>
                           );
                         })}
