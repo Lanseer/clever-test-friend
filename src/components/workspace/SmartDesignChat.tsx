@@ -216,57 +216,8 @@ export function SmartDesignChat({
 
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm relative">
-      {/* Task Files Button - Fixed at top-right */}
-      <div className="absolute top-3 right-3 z-10">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1.5 bg-white/80 border-sky-200 hover:bg-sky-50/50 text-sky-700"
-            >
-              <FolderOpen className="w-4 h-4" />
-              任务文件
-              {generatedFiles.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
-                  {generatedFiles.length}
-                </Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-72 p-2">
-            <div className="space-y-1">
-              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-b mb-1">
-                生成的文件
-              </div>
-              {generatedFiles.length === 0 ? (
-                <div className="py-4 text-center text-sm text-muted-foreground">
-                  暂无生成文件
-                </div>
-              ) : (
-                generatedFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
-                    onClick={() => onFileClick?.(file)}
-                  >
-                    <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{file.name}</div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {file.scenarioCount} 场景 · {file.caseCount} 用例
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-4 pt-14">
+      <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -289,7 +240,7 @@ export function SmartDesignChat({
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 
-                {/* Generation Complete - Show file link and start review button */}
+                {/* Generation Complete - Show file link only */}
                 {message.isGenerationComplete && message.generationData && (
                   <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
                     <div className="text-sm">
@@ -315,19 +266,6 @@ export function SmartDesignChat({
                         {message.generationData.fileName || generateFileName()}
                       </span>
                     </div>
-
-                    <Button
-                      size="sm"
-                      variant="default"
-                      className="h-7 text-xs gap-1"
-                      onClick={() => {
-                        onGenerationComplete(message.generationData!.scenarioCount, message.generationData!.caseCount);
-                        onStartReview?.();
-                      }}
-                    >
-                      <Eye className="w-3 h-3" />
-                      开始审查
-                    </Button>
                   </div>
                 )}
               </div>
@@ -345,6 +283,55 @@ export function SmartDesignChat({
 
       {/* Input Area with embedded controls */}
       <div className="p-3 flex-shrink-0">
+        {/* Task Files Button - positioned right above the chat input */}
+        <div className="flex justify-end mb-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 bg-white/80 border-sky-200 hover:bg-sky-50/50 text-sky-700"
+              >
+                <FolderOpen className="w-4 h-4" />
+                任务文件
+                {generatedFiles.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                    {generatedFiles.length}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-72 p-2">
+              <div className="space-y-1">
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-b mb-1">
+                  生成的文件
+                </div>
+                {generatedFiles.length === 0 ? (
+                  <div className="py-4 text-center text-sm text-muted-foreground">
+                    暂无生成文件
+                  </div>
+                ) : (
+                  generatedFiles.map((file) => (
+                    <div
+                      key={file.id}
+                      className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
+                      onClick={() => onFileClick?.(file)}
+                    >
+                      <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{file.name}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {file.scenarioCount} 场景 · {file.caseCount} 用例
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg overflow-hidden relative">
           {/* Uploaded Files - displayed above textarea */}
           {uploadedFiles.length > 0 && (
