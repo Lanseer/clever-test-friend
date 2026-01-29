@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { FileText, ChevronRight, Plus, ArrowLeft, ClipboardList, Download, Calendar, Check, AlertCircle, Trash2 } from "lucide-react";
+import { FileText, ChevronRight, Plus, ArrowLeft, ClipboardList, Calendar, Check, AlertCircle, Trash2, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -83,9 +83,9 @@ export default function MyTestTasks() {
     toast.success(`任务 "${data.name}" 创建成功`);
   };
 
-  const handleDownload = (e: React.MouseEvent, fileName: string) => {
+  const handleOpenExpertReview = (e: React.MouseEvent, fileId: string) => {
     e.stopPropagation();
-    toast.success(`开始下载 ${fileName}`);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/expert-review`);
   };
 
   return (
@@ -225,8 +225,18 @@ export default function MyTestTasks() {
                               size="icon"
                               className="h-8 w-8 text-muted-foreground hover:text-primary"
                               onClick={handleOpenReport}
+                              title="审查报告"
                             >
                               <ClipboardList className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-primary"
+                              onClick={(e) => handleOpenExpertReview(e, file.id)}
+                              title="外部评审"
+                            >
+                              <UserCheck className="w-4 h-4" />
                             </Button>
                             <ChevronRight className="w-5 h-5 text-muted-foreground" />
                           </div>
