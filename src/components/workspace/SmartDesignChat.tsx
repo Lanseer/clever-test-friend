@@ -283,7 +283,7 @@ export function SmartDesignChat({
 
       {/* Input Area with embedded controls */}
       <div className="p-3 flex-shrink-0">
-        {/* Task Files Button - positioned right above the chat input */}
+        {/* Test Cases Button - positioned right above the chat input */}
         <div className="flex justify-end mb-2">
           <Popover>
             <PopoverTrigger asChild>
@@ -293,7 +293,7 @@ export function SmartDesignChat({
                 className="h-8 gap-1.5 bg-white/80 border-sky-200 hover:bg-sky-50/50 text-sky-700"
               >
                 <FolderOpen className="w-4 h-4" />
-                任务文件
+                测试案例
                 {generatedFiles.length > 0 && (
                   <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
                     {generatedFiles.length}
@@ -304,11 +304,11 @@ export function SmartDesignChat({
             <PopoverContent align="end" className="w-72 p-2">
               <div className="space-y-1">
                 <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-b mb-1">
-                  生成的文件
+                  测试案例列表
                 </div>
                 {generatedFiles.length === 0 ? (
                   <div className="py-4 text-center text-sm text-muted-foreground">
-                    暂无生成文件
+                    暂无测试案例
                   </div>
                 ) : (
                   generatedFiles.map((file) => (

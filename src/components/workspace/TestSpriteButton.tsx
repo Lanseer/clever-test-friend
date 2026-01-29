@@ -4,41 +4,34 @@ import {
   Sparkles, 
   X, 
   Clock, 
-  CheckCircle2, 
   AlertCircle,
   ChevronRight,
+  ListTodo,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 interface TaskSummary {
   total: number;
-  inProgress: number;
-  completed: number;
-  pending: number;
 }
 
 interface QuickTask {
   id: string;
+  taskId: string;
   name: string;
-  status: "pending" | "in_progress" | "completed";
-  progress?: number;
+  status: "pending" | "in_progress";
 }
 
 const mockTaskSummary: TaskSummary = {
   total: 12,
-  inProgress: 3,
-  completed: 7,
-  pending: 2,
 };
 
 const mockQuickTasks: QuickTask[] = [
-  { id: "1", name: "用户登录模块测试", status: "in_progress", progress: 65 },
-  { id: "2", name: "支付流程测试", status: "in_progress", progress: 30 },
-  { id: "3", name: "订单管理测试", status: "pending" },
-  { id: "4", name: "商品搜索测试", status: "completed" },
+  { id: "1", taskId: "1", name: "用户登录模块测试 - TC-003", status: "in_progress" },
+  { id: "2", taskId: "2", name: "支付流程测试 - TC-007", status: "in_progress" },
+  { id: "3", taskId: "3", name: "订单管理测试 - TC-009", status: "pending" },
+  { id: "4", taskId: "5", name: "购物车功能测试 - TC-014", status: "pending" },
 ];
 
 export function TestSpriteButton() {
@@ -47,13 +40,13 @@ export function TestSpriteButton() {
   const [isOpen, setIsOpen] = useState(false);
   
   // Draggable state - default to bottom-left
-  const [position, setPosition] = useState({ x: 24, y: 24 }); // offset from bottom-left
+  const [position, setPosition] = useState({ x: 24, y: 24 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (isOpen) return; // Don't drag when panel is open
+    if (isOpen) return;
     setIsDragging(true);
     setDragStart({
       x: e.clientX - position.x,
@@ -66,7 +59,6 @@ export function TestSpriteButton() {
     if (!isDragging) return;
     const newX = e.clientX - dragStart.x;
     const newY = dragStart.y - e.clientY;
-    // Constrain to viewport
     const maxX = window.innerWidth - 70;
     const maxY = window.innerHeight - 70;
     setPosition({
@@ -79,7 +71,6 @@ export function TestSpriteButton() {
     setIsDragging(false);
   };
 
-  // Add/remove global mouse listeners
   useEffect(() => {
     if (isDragging) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -92,16 +83,18 @@ export function TestSpriteButton() {
     };
   }, [isDragging, dragStart]);
 
+  const handleNavigateToTasks = () => {
+    navigate(`/workspace/${workspaceId}/management/my-test-tasks`);
+    setIsOpen(false);
+  };
 
   const handleNavigateToTask = (taskId: string) => {
-    navigate(`/workspace/${workspaceId}/management/ai-cases`);
+    navigate(`/workspace/${workspaceId}/management/my-test-tasks?taskId=${taskId}`);
     setIsOpen(false);
   };
 
   const getStatusIcon = (status: QuickTask["status"]) => {
     switch (status) {
-      case "completed":
-        return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
       case "in_progress":
         return <Clock className="w-3.5 h-3.5 text-amber-500" />;
       case "pending":
@@ -109,20 +102,8 @@ export function TestSpriteButton() {
     }
   };
 
-  const getStatusText = (status: QuickTask["status"]) => {
-    switch (status) {
-      case "completed":
-        return "已完成";
-      case "in_progress":
-        return "进行中";
-      case "pending":
-        return "待处理";
-    }
-  };
-
   return (
     <>
-      {/* Floating Button with breathing animation - Draggable */}
       <button
         ref={buttonRef}
         onClick={() => !isDragging && setIsOpen(true)}
@@ -145,13 +126,11 @@ export function TestSpriteButton() {
         }}
       >
         <Sparkles className="w-6 h-6" />
-        {/* Task count badge */}
         <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center">
-          {mockTaskSummary.inProgress}
+          {mockQuickTasks.length}
         </span>
       </button>
 
-      {/* Global styles for breathing animation */}
       <style>{`
         @keyframes breathe {
           0%, 100% {
@@ -165,7 +144,6 @@ export function TestSpriteButton() {
         }
       `}</style>
 
-      {/* Expanded Panel - follows button position */}
       <div
         className={cn(
           "fixed z-50 w-80 bg-background border rounded-2xl shadow-2xl overflow-hidden",
@@ -177,7 +155,6 @@ export function TestSpriteButton() {
           bottom: `${position.y}px`,
         }}
       >
-        {/* Header */}
         <div className="bg-gradient-to-r from-violet-500 to-purple-600 text-white p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -196,34 +173,30 @@ export function TestSpriteButton() {
             </Button>
           </div>
 
-          {/* Task Summary Stats */}
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            <div className="bg-white/10 rounded-lg px-2 py-1.5 text-center">
-              <div className="text-lg font-bold">{mockTaskSummary.total}</div>
-              <div className="text-[10px] text-white/70">总任务</div>
+          <div 
+            className="mt-3 bg-white/10 rounded-lg px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-white/20 transition-colors"
+            onClick={handleNavigateToTasks}
+          >
+            <div className="flex items-center gap-2">
+              <ListTodo className="w-4 h-4" />
+              <span className="text-sm">总任务</span>
             </div>
-            <div className="bg-white/10 rounded-lg px-2 py-1.5 text-center">
-              <div className="text-lg font-bold text-amber-300">{mockTaskSummary.inProgress}</div>
-              <div className="text-[10px] text-white/70">进行中</div>
-            </div>
-            <div className="bg-white/10 rounded-lg px-2 py-1.5 text-center">
-              <div className="text-lg font-bold text-green-300">{mockTaskSummary.completed}</div>
-              <div className="text-[10px] text-white/70">已完成</div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-bold">{mockTaskSummary.total}</span>
+              <ChevronRight className="w-4 h-4 opacity-60" />
             </div>
           </div>
         </div>
 
-        {/* Content */}
         <div className="h-64">
           <ScrollArea className="h-full">
             <div className="p-3 space-y-2">
-              {/* To-do Items */}
               <div className="text-xs text-muted-foreground mb-2">待办事项</div>
               {mockQuickTasks.map((task) => (
                 <div
                   key={task.id}
                   className="p-2.5 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors group"
-                  onClick={() => handleNavigateToTask(task.id)}
+                  onClick={() => handleNavigateToTask(task.taskId)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -232,30 +205,6 @@ export function TestSpriteButton() {
                     </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  {task.status === "in_progress" && task.progress !== undefined && (
-                    <div className="mt-2">
-                      <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
-                        <span>{getStatusText(task.status)}</span>
-                        <span>{task.progress}%</span>
-                      </div>
-                      <div className="h-1 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all"
-                          style={{ width: `${task.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  {task.status === "completed" && (
-                    <Badge variant="outline" className="mt-1.5 text-[10px] bg-green-50 text-green-600 border-green-200">
-                      已完成
-                    </Badge>
-                  )}
-                  {task.status === "pending" && (
-                    <Badge variant="outline" className="mt-1.5 text-[10px]">
-                      待处理
-                    </Badge>
-                  )}
                 </div>
               ))}
             </div>
