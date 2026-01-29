@@ -224,9 +224,9 @@ export default function MyTestTasks() {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-muted-foreground hover:text-primary"
-                              onClick={(e) => handleDownload(e, file.name)}
+                              onClick={handleOpenReport}
                             >
-                              <Download className="w-4 h-4" />
+                              <ClipboardList className="w-4 h-4" />
                             </Button>
                             <ChevronRight className="w-5 h-5 text-muted-foreground" />
                           </div>
