@@ -182,12 +182,9 @@ export default function ExpertReviewDetail() {
 
       {/* Cases Table */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[100px_100px_1fr_80px_140px_120px_100px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          <div>批次编号</div>
-          <div>用例编号</div>
-          <div>用例名称</div>
-          <div>性质</div>
-          <div>创建时间</div>
+        <div className="grid grid-cols-[100px_1fr_120px_100px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+          <div>编号</div>
+          <div>场景</div>
           <div>专家意见</div>
           <div>操作</div>
         </div>
@@ -195,21 +192,14 @@ export default function ExpertReviewDetail() {
         <div className="divide-y">
           {cases.map((caseItem, index) => {
             const opinion = opinionConfig[caseItem.opinion];
-            const nature = natureConfig[caseItem.nature];
             const OpinionIcon = opinion.icon;
-            const NatureIcon = nature.icon;
 
             return (
               <div
                 key={caseItem.id}
-                className="grid grid-cols-[100px_100px_1fr_80px_140px_120px_100px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
+                className="grid grid-cols-[100px_1fr_120px_100px] gap-2 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex items-center">
-                  <Badge variant="outline" className="font-mono text-xs">
-                    {caseItem.batchCode}
-                  </Badge>
-                </div>
                 <div className="flex items-center">
                   <Badge variant="outline" className="font-mono text-xs bg-blue-500/10 text-blue-600 border-blue-200">
                     {caseItem.caseCode}
@@ -217,19 +207,6 @@ export default function ExpertReviewDetail() {
                 </div>
                 <div className="flex items-center">
                   <span className="font-medium truncate">{caseItem.name}</span>
-                </div>
-                <div className="flex items-center">
-                  <Badge
-                    variant="outline"
-                    className={cn("text-xs gap-1", nature.className)}
-                  >
-                    <NatureIcon className="w-3 h-3" />
-                    {nature.label}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Clock className="w-3.5 h-3.5" />
-                  {caseItem.createdAt}
                 </div>
                 <div className="flex items-center">
                   <Badge

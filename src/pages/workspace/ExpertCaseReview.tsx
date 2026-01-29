@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Star, CheckCircle, XCircle, Users, ArrowLeft, ArrowRight, X } from "lucide-react";
+import { Star, CheckCircle, XCircle, Users, ArrowLeft, ArrowRight, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -311,19 +311,31 @@ export default function ExpertCaseReview() {
     );
   };
 
+  // Calculate remaining time (mock: 3 days 12 hours from now)
+  const remainingDays = 3;
+  const remainingHours = 12;
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border rounded-lg p-6 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-full">
-            <Users className="w-8 h-8 text-primary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary/10 rounded-full">
+              <Users className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">欢迎参与专家评审</h1>
+              <p className="text-muted-foreground mt-1">
+                感谢各位专家的参与，请根据您的专业知识对以下测试用例进行评审。您的意见对我们非常重要。
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">欢迎参与专家评审</h1>
-            <p className="text-muted-foreground mt-1">
-              感谢各位专家的参与，请根据您的专业知识对以下测试用例进行评审。您的意见对我们非常重要。
-            </p>
+          <div className="flex items-center gap-2 bg-amber-500/10 text-amber-600 px-4 py-2 rounded-lg border border-amber-200">
+            <Clock className="w-5 h-5" />
+            <span className="font-medium">
+              距离评审结束还有 {remainingDays} 天 {remainingHours} 小时
+            </span>
           </div>
         </div>
       </div>
@@ -368,10 +380,9 @@ export default function ExpertCaseReview() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">用例编号</TableHead>
-              <TableHead>用例名称</TableHead>
-              <TableHead className="w-[80px]">性质</TableHead>
-              <TableHead className="w-[100px]">智能评分</TableHead>
+              <TableHead className="w-[100px]">编号</TableHead>
+              <TableHead>场景</TableHead>
+              <TableHead className="w-[120px]">智能审查结果</TableHead>
               <TableHead className="w-[100px]">专家意见</TableHead>
               <TableHead className="w-[150px] text-center">操作</TableHead>
             </TableRow>
@@ -381,7 +392,6 @@ export default function ExpertCaseReview() {
               <TableRow key={caseItem.id}>
                 <TableCell className="font-mono text-xs">{caseItem.code}</TableCell>
                 <TableCell>{caseItem.name}</TableCell>
-                <TableCell>{renderNature(caseItem.nature)}</TableCell>
                 <TableCell>{renderAIScore(caseItem.aiScore, caseItem.aiScoreSummary)}</TableCell>
                 <TableCell>{renderExpertOpinion(caseItem.expertOpinion)}</TableCell>
                 <TableCell>
