@@ -3,8 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { 
   Sparkles, 
   X, 
-  Clock, 
-  AlertCircle,
   ChevronRight,
   ListTodo,
 } from "lucide-react";
@@ -16,22 +14,25 @@ interface TaskSummary {
   total: number;
 }
 
-interface QuickTask {
+interface GeneratedCase {
   id: string;
   taskId: string;
   name: string;
-  status: "pending" | "in_progress";
+  version: string;
+  progress: number; // 0-100
+  reviewedCount: number;
+  totalCount: number;
 }
 
 const mockTaskSummary: TaskSummary = {
   total: 12,
 };
 
-const mockQuickTasks: QuickTask[] = [
-  { id: "1", taskId: "1", name: "用户登录模块测试 - TC-003", status: "in_progress" },
-  { id: "2", taskId: "2", name: "支付流程测试 - TC-007", status: "in_progress" },
-  { id: "3", taskId: "3", name: "订单管理测试 - TC-009", status: "pending" },
-  { id: "4", taskId: "5", name: "购物车功能测试 - TC-014", status: "pending" },
+const mockGeneratedCases: GeneratedCase[] = [
+  { id: "1", taskId: "1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", progress: 75, reviewedCount: 18, totalCount: 24 },
+  { id: "2", taskId: "2", name: "2026-01-22支付流程测试案例", version: "V1.2", progress: 30, reviewedCount: 5, totalCount: 18 },
+  { id: "3", taskId: "3", name: "2026-01-21订单管理测试案例", version: "V0.8", progress: 0, reviewedCount: 0, totalCount: 32 },
+  { id: "4", taskId: "5", name: "2026-01-20购物车功能测试案例", version: "V1.1", progress: 60, reviewedCount: 12, totalCount: 20 },
 ];
 
 export function TestSpriteButton() {
@@ -93,13 +94,10 @@ export function TestSpriteButton() {
     setIsOpen(false);
   };
 
-  const getStatusIcon = (status: QuickTask["status"]) => {
-    switch (status) {
-      case "in_progress":
-        return <Clock className="w-3.5 h-3.5 text-amber-500" />;
-      case "pending":
-        return <AlertCircle className="w-3.5 h-3.5 text-muted-foreground" />;
-    }
+  const getProgressColor = (progress: number) => {
+    if (progress >= 80) return "bg-green-500";
+    if (progress >= 40) return "bg-amber-500";
+    return "bg-muted-foreground";
   };
 
   return (
@@ -127,7 +125,7 @@ export function TestSpriteButton() {
       >
         <Sparkles className="w-6 h-6" />
         <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center">
-          {mockQuickTasks.length}
+          {mockGeneratedCases.length}
         </span>
       </button>
 
@@ -192,18 +190,26 @@ export function TestSpriteButton() {
           <ScrollArea className="h-full">
             <div className="p-3 space-y-2">
               <div className="text-xs text-muted-foreground mb-2">待办事项</div>
-              {mockQuickTasks.map((task) => (
+              {mockGeneratedCases.map((caseItem) => (
                 <div
-                  key={task.id}
+                  key={caseItem.id}
                   className="p-2.5 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors group"
-                  onClick={() => handleNavigateToTask(task.taskId)}
+                  onClick={() => handleNavigateToTask(caseItem.taskId)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      {getStatusIcon(task.status)}
-                      <span className="text-sm truncate">{task.name}</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm truncate flex-1">{caseItem.name}_{caseItem.version}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={cn("h-full rounded-full transition-all", getProgressColor(caseItem.progress))}
+                        style={{ width: `${caseItem.progress}%` }}
+                      />
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {caseItem.reviewedCount}/{caseItem.totalCount}
+                    </span>
                   </div>
                 </div>
               ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { FileText, CheckCircle2, Clock, AlertCircle, ChevronRight } from "lucide-react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { FileText, ChevronRight, Plus, ArrowLeft, ClipboardList } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,13 +10,20 @@ import { cn } from "@/lib/utils";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 import { toast } from "sonner";
+import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 
 interface TestTask {
   id: string;
   name: string;
-  status: "pending" | "in_progress" | "completed";
-  caseCount: number;
-  reviewedCount: number;
+  testPhase: string;
+  testCategory: string;
+}
+
+interface GeneratedCaseFile {
+  id: string;
+  name: string;
+  version: string;
+  createdAt: string;
 }
 
 interface TestCase {
@@ -30,12 +37,31 @@ interface TestCase {
 }
 
 const mockTasks: TestTask[] = [
-  { id: "1", name: "用户登录模块测试", status: "in_progress", caseCount: 24, reviewedCount: 15 },
-  { id: "2", name: "支付流程测试", status: "in_progress", caseCount: 18, reviewedCount: 5 },
-  { id: "3", name: "订单管理测试", status: "pending", caseCount: 32, reviewedCount: 0 },
-  { id: "4", name: "商品搜索测试", status: "completed", caseCount: 16, reviewedCount: 16 },
-  { id: "5", name: "购物车功能测试", status: "in_progress", caseCount: 20, reviewedCount: 12 },
+  { id: "1", name: "用户登录模块测试", testPhase: "SIT测试", testCategory: "功能测试" },
+  { id: "2", name: "支付流程测试", testPhase: "UAT测试", testCategory: "功能测试" },
+  { id: "3", name: "订单管理测试", testPhase: "集成测试", testCategory: "数据测试" },
+  { id: "4", name: "商品搜索测试", testPhase: "SIT测试", testCategory: "功能测试" },
+  { id: "5", name: "购物车功能测试", testPhase: "UAT测试", testCategory: "专项测试" },
 ];
+
+const mockGeneratedCaseFiles: Record<string, GeneratedCaseFile[]> = {
+  "1": [
+    { id: "f1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", createdAt: "2026-01-23 14:30" },
+    { id: "f2", name: "2026-01-22用户登录模块测试案例", version: "V0.9", createdAt: "2026-01-22 10:15" },
+  ],
+  "2": [
+    { id: "f3", name: "2026-01-22支付流程测试案例", version: "V1.2", createdAt: "2026-01-22 16:45" },
+  ],
+  "3": [
+    { id: "f4", name: "2026-01-21订单管理测试案例", version: "V0.8", createdAt: "2026-01-21 09:20" },
+  ],
+  "4": [
+    { id: "f5", name: "2026-01-20商品搜索测试案例", version: "V1.0", createdAt: "2026-01-20 11:00" },
+  ],
+  "5": [
+    { id: "f6", name: "2026-01-20购物车功能测试案例", version: "V1.1", createdAt: "2026-01-20 15:30" },
+  ],
+};
 
 const getMockBddContent = (caseName: string) => {
   return `Feature: ${caseName}
@@ -88,15 +114,19 @@ const reviewResultConfig: Record<string, { label: string; className: string }> =
 
 export default function MyTestTasks() {
   const { workspaceId } = useParams();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialTaskId = searchParams.get("taskId") || mockTasks[0]?.id;
   
   const [selectedTaskId, setSelectedTaskId] = useState<string>(initialTaskId);
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [editedContent, setEditedContent] = useState<string>("");
   const [isEdited, setIsEdited] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const selectedTask = mockTasks.find(t => t.id === selectedTaskId);
+  const generatedFiles = mockGeneratedCaseFiles[selectedTaskId] || [];
   const cases = mockCases[selectedTaskId] || [];
   const selectedCase = cases.find(c => c.id === selectedCaseId);
 
@@ -107,15 +137,17 @@ export default function MyTestTasks() {
     }
   }, [selectedCaseId]);
 
-  const getStatusIcon = (status: TestTask["status"]) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-      case "in_progress":
-        return <Clock className="w-4 h-4 text-amber-500" />;
-      case "pending":
-        return <AlertCircle className="w-4 h-4 text-muted-foreground" />;
-    }
+  const handleBack = () => {
+    navigate(`/workspace/${workspaceId}/management/ai-cases`);
+  };
+
+  const handleOpenReport = (e: React.MouseEvent, fileId?: string) => {
+    e.stopPropagation();
+    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/deliverable-report?name=${encodeURIComponent(selectedTask?.name || "任务")}`);
+  };
+
+  const handleCreateTask = (data: { name: string; testPhase: string; testCategory: string; tags: string[] }) => {
+    toast.success(`任务 "${data.name}" 创建成功`);
   };
 
   const getCaseStatusBadge = (status: TestCase["status"]) => {
@@ -160,17 +192,37 @@ export default function MyTestTasks() {
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
-      <div className="p-4 border-b">
-        <h1 className="text-xl font-semibold">我的测试任务</h1>
-        <p className="text-sm text-muted-foreground mt-1">管理和审查您的测试任务与案例</p>
+      <div className="p-4 border-b flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={handleBack}>
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <div>
+          <h1 className="text-xl font-semibold">我的测试任务</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">管理和审查您的测试任务与案例</p>
+        </div>
       </div>
+
+      <CreateSmartDesignTaskDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onConfirm={handleCreateTask}
+      />
 
       <ResizablePanelGroup direction="horizontal" className="flex-1">
         {/* Left Panel - Task List */}
         <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
           <div className="h-full border-r bg-muted/30">
-            <div className="p-3 border-b">
+            <div className="p-3 border-b flex items-center justify-between">
               <h2 className="text-sm font-medium text-muted-foreground">任务列表</h2>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 px-2"
+                onClick={() => setCreateDialogOpen(true)}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                新建
+              </Button>
             </div>
             <ScrollArea className="h-[calc(100%-3rem)]">
               <div className="p-2 space-y-1">
@@ -185,28 +237,25 @@ export default function MyTestTasks() {
                     )}
                     onClick={() => {
                       setSelectedTaskId(task.id);
+                      setSelectedFileId(null);
                       setSelectedCaseId(null);
                     }}
                   >
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(task.status)}
+                    <div className="flex items-center gap-2 mb-2">
                       <span className="text-sm font-medium truncate flex-1">{task.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 flex-shrink-0"
+                        onClick={(e) => handleOpenReport(e)}
+                      >
+                        <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+                      </Button>
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{task.caseCount} 用例</span>
-                      <span>·</span>
-                      <span>已审查 {task.reviewedCount}</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Badge variant="outline" className="text-xs px-1.5 py-0">{task.testPhase}</Badge>
+                      <Badge variant="outline" className="text-xs px-1.5 py-0">{task.testCategory}</Badge>
                     </div>
-                    {task.status === "in_progress" && (
-                      <div className="mt-2">
-                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full"
-                            style={{ width: `${(task.reviewedCount / task.caseCount) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -216,50 +265,58 @@ export default function MyTestTasks() {
 
         <ResizableHandle withHandle />
 
-        {/* Middle Panel - Test Cases */}
+        {/* Middle Panel - Generated Case Files */}
         <ResizablePanel defaultSize={30} minSize={20}>
           <div className="h-full border-r">
             <div className="p-3 border-b flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-medium">{selectedTask?.name || "测试案例"}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {cases.length} 个测试案例
+                  {generatedFiles.length} 个测试案例文件
                 </p>
               </div>
             </div>
             <ScrollArea className="h-[calc(100%-3.5rem)]">
               <div className="p-2 space-y-1">
-                {cases.length === 0 ? (
+                {generatedFiles.length === 0 ? (
                   <div className="py-8 text-center text-sm text-muted-foreground">
                     暂无测试案例
                   </div>
                 ) : (
-                  cases.map((testCase) => (
+                  generatedFiles.map((file) => (
                     <div
-                      key={testCase.id}
+                      key={file.id}
                       className={cn(
                         "p-3 rounded-lg cursor-pointer transition-colors group",
-                        selectedCaseId === testCase.id
+                        selectedFileId === file.id
                           ? "bg-primary/10 border border-primary/30"
                           : "hover:bg-muted border border-transparent"
                       )}
-                      onClick={() => setSelectedCaseId(testCase.id)}
+                      onClick={() => {
+                        setSelectedFileId(file.id);
+                        // Auto select first case when file is selected
+                        if (cases.length > 0) {
+                          setSelectedCaseId(cases[0].id);
+                        }
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                          <span className="text-xs text-muted-foreground">{testCase.code}</span>
-                          <span className="text-sm font-medium truncate">{testCase.name}</span>
+                          <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                          <span className="text-sm font-medium truncate">{file.name}_{file.version}</span>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                          onClick={(e) => handleOpenReport(e, file.id)}
+                        >
+                          <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+                        </Button>
                       </div>
-                      <p className="mt-1.5 text-xs text-muted-foreground truncate pl-6">
-                        {testCase.scenario}
+                      <p className="mt-1.5 text-xs text-muted-foreground pl-6">
+                        {file.createdAt}
                       </p>
-                      <div className="mt-2 flex items-center gap-2 pl-6">
-                        {getCaseStatusBadge(testCase.status)}
-                        {getPriorityBadge(testCase.priority)}
-                      </div>
                     </div>
                   ))
                 )}
