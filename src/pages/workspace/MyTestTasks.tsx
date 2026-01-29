@@ -71,7 +71,7 @@ export default function MyTestTasks() {
 
   const handleOpenReport = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/deliverable-report?name=${encodeURIComponent(selectedTask?.name || "任务")}`);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/report`);
   };
 
   const handleOpenCaseReview = (fileId: string) => {
