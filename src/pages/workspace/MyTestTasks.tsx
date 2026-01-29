@@ -85,7 +85,7 @@ export default function MyTestTasks() {
 
   const handleOpenExpertReview = (e: React.MouseEvent, fileId: string) => {
     e.stopPropagation();
-    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/expert-review`);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/expert-review-records`);
   };
 
   return (
