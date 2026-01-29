@@ -61,16 +61,7 @@ export function TestSpriteButton() {
     return () => clearTimeout(timer);
   }, [bubbleDismissed]);
 
-  // Auto-hide bubble after some time
-  useEffect(() => {
-    if (showBubble) {
-      const timer = setTimeout(() => {
-        setShowBubble(false);
-      }, 15000); // Hide after 15 seconds
-
-      return () => clearTimeout(timer);
-    }
-  }, [showBubble]);
+  // Removed auto-hide - bubble only closes on user interaction
 
   const handleDismissBubble = (e: React.MouseEvent) => {
     e.stopPropagation();
