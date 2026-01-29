@@ -212,9 +212,16 @@ export default function CaseReview() {
     setSaveToTaskDialogOpen(true);
   };
   
-  const handleSaveToTask = (taskId: string) => {
+  const handleSaveToTask = (taskId: string, caseName: string) => {
     const task = mockTasksData.find(t => t.id === taskId);
-    toast.success(`已成功保存到测试任务：${task?.name || "未知任务"}`);
+    toast.success(`"${caseName}" 已成功保存到测试任务：${task?.name || "未知任务"}`);
+  };
+  
+  // Generate default case name
+  const generateDefaultCaseName = () => {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    return `${dateStr}用户模块测试案例_V1.0`;
   };
   
   const handleCreateTask = (data: { name: string; testPhase: string; testCategory: string; tags: string[] }) => {
@@ -856,6 +863,7 @@ Scenario: 完善后的场景描述
           setSaveToTaskDialogOpen(false);
           setCreateTaskDialogOpen(true);
         }}
+        defaultCaseName={generateDefaultCaseName()}
       />
 
       {/* Create Task Dialog */}
