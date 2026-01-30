@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,12 +11,7 @@ interface Message {
   content: string;
 }
 
-interface CaseReviewChatPanelProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export function CaseReviewChatPanel({ open, onClose }: CaseReviewChatPanelProps) {
+export function CaseReviewChatPanel() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -56,21 +51,11 @@ export function CaseReviewChatPanel({ open, onClose }: CaseReviewChatPanelProps)
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-1/5 min-w-[280px] max-w-[360px] bg-background border-r shadow-xl z-50 flex flex-col">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
+      <div className="flex items-center px-4 py-3 border-b bg-background">
         <span className="font-medium text-sm">智能助手</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" />
-        </Button>
       </div>
 
       {/* Messages */}

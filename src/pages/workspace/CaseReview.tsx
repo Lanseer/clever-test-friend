@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp } from "lucide-react";
 import { CaseReviewChatPanel } from "@/components/workspace/CaseReviewChatPanel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -380,8 +380,6 @@ export default function CaseReview() {
   const [referenceSidebarOpen, setReferenceSidebarOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<ReferenceMaterial | null>(null);
   
-  // 对话面板状态
-  const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
   const handleOpenMaterial = (material: ReferenceMaterial) => {
     setSelectedMaterial(material);
@@ -554,7 +552,14 @@ export default function CaseReview() {
   };
 
   return (
-    <div className={cn("max-w-full mx-auto", isFromChat && "pb-20")}>
+    <div className="flex min-h-screen">
+      {/* Left Chat Panel - 20% width */}
+      <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0">
+        <CaseReviewChatPanel />
+      </div>
+      
+      {/* Main Content - 80% width */}
+      <div className={cn("flex-1 p-6", isFromChat && "pb-20")}>
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
@@ -1052,26 +1057,9 @@ Scenario: 完善后的场景描述
         onConfirm={handleCreateTask}
       />
 
-      {/* Chat Panel */}
-      <CaseReviewChatPanel 
-        open={chatPanelOpen} 
-        onClose={() => setChatPanelOpen(false)} 
-      />
-
-      {/* Fixed Chat Button - Bottom Left */}
-      {!chatPanelOpen && (
-        <Button
-          onClick={() => setChatPanelOpen(true)}
-          className="fixed left-6 bottom-6 z-40 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
-          size="icon"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
-      )}
-
       {/* Fixed Footer - Save (only when from chat) */}
       {isFromChat && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
+        <div className="fixed bottom-0 left-[20%] right-0 bg-background border-t shadow-lg z-50">
           <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-center">
             <Button onClick={handleSave} className="gap-2">
               <Save className="w-4 h-4" />
@@ -1080,6 +1068,7 @@ Scenario: 完善后的场景描述
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
