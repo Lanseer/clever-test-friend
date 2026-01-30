@@ -53,6 +53,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // 参考资料 Mock 数据
 const mockReferenceMaterials: ReferenceMaterial[] = [
@@ -587,8 +592,8 @@ export default function CaseReview() {
           </h1>
           
           {/* Reference Materials */}
-          <Collapsible open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
-            <CollapsibleTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1 cursor-pointer">
+          <Popover open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
+            <PopoverTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1 cursor-pointer">
               <FileText className="w-4 h-4" />
               <span>基于 {mockReferenceMaterials.length} 条资料作为参考</span>
               {referenceMaterialsOpen ? (
@@ -596,14 +601,17 @@ export default function CaseReview() {
               ) : (
                 <ChevronDown className="w-4 h-4" />
               )}
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="mt-3 bg-muted/30 rounded-lg p-4 space-y-2">
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-[480px] p-0">
+              <div className="bg-card rounded-lg p-3 space-y-1 max-h-[400px] overflow-y-auto">
                 {mockReferenceMaterials.map((material, index) => (
                   <div
                     key={material.id}
                     className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer group"
-                    onClick={() => handleOpenMaterial(material)}
+                    onClick={() => {
+                      handleOpenMaterial(material);
+                      setReferenceMaterialsOpen(false);
+                    }}
                   >
                     <span className="text-muted-foreground text-sm">{index + 1}.</span>
                     <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1">
@@ -613,8 +621,8 @@ export default function CaseReview() {
                   </div>
                 ))}
               </div>
-            </CollapsibleContent>
-          </Collapsible>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
