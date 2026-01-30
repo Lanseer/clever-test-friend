@@ -554,27 +554,27 @@ export default function CaseReview() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Left Chat Panel or Icon */}
-      {chatPanelOpen ? (
+    <div className="flex h-screen overflow-hidden relative">
+      {/* Left Chat Panel - only when open */}
+      {chatPanelOpen && (
         <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0 h-full">
           <CaseReviewChatPanel onClose={() => setChatPanelOpen(false)} />
-        </div>
-      ) : (
-        <div className="flex-shrink-0 h-full border-r bg-muted/20 flex items-center justify-center px-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 rounded-full hover:bg-primary/10"
-            onClick={() => setChatPanelOpen(true)}
-          >
-            <MessageCircle className="h-6 w-6 text-primary" />
-          </Button>
         </div>
       )}
       
       {/* Main Content */}
       <div className={cn("flex-1 p-6 overflow-y-auto", isFromChat && "pb-20")}>
+
+      {/* Floating Chat Button - bottom left */}
+      {!chatPanelOpen && (
+        <Button
+          onClick={() => setChatPanelOpen(true)}
+          className="fixed left-6 bottom-6 z-40 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+          size="icon"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
+      )}
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
