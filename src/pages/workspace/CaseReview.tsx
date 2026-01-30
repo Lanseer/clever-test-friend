@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle } from "lucide-react";
+import { CaseReviewChatPanel } from "@/components/workspace/CaseReviewChatPanel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -378,6 +379,9 @@ export default function CaseReview() {
   const [referenceMaterialsOpen, setReferenceMaterialsOpen] = useState(false);
   const [referenceSidebarOpen, setReferenceSidebarOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<ReferenceMaterial | null>(null);
+  
+  // 对话面板状态
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
   const handleOpenMaterial = (material: ReferenceMaterial) => {
     setSelectedMaterial(material);
@@ -1047,6 +1051,23 @@ Scenario: 完善后的场景描述
         onOpenChange={setCreateTaskDialogOpen}
         onConfirm={handleCreateTask}
       />
+
+      {/* Chat Panel */}
+      <CaseReviewChatPanel 
+        open={chatPanelOpen} 
+        onClose={() => setChatPanelOpen(false)} 
+      />
+
+      {/* Fixed Chat Button - Bottom Left */}
+      {!chatPanelOpen && (
+        <Button
+          onClick={() => setChatPanelOpen(true)}
+          className="fixed left-6 bottom-6 z-40 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+          size="icon"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
+      )}
 
       {/* Fixed Footer - Save (only when from chat) */}
       {isFromChat && (
