@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { ReviewHistorySidebar, ReviewHistoryData } from "@/components/workspace/ReviewHistorySidebar";
+import { ReferenceMaterialsSidebar, ReferenceMaterial } from "@/components/workspace/ReferenceMaterialsSidebar";
 import { SaveToTaskDialog } from "@/components/workspace/SaveToTaskDialog";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { toast } from "sonner";
@@ -52,6 +53,126 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+
+// 参考资料 Mock 数据
+const mockReferenceMaterials: ReferenceMaterial[] = [
+  {
+    id: "ref-1",
+    name: "用户登录功能规格说明书 v2.1",
+    type: "基线文档",
+    content: `1. 功能概述
+用户登录功能是系统的核心入口，负责验证用户身份并建立会话。
+
+2. 功能需求
+2.1 账号密码登录
+- 用户输入账号（手机号/邮箱/用户名）和密码
+- 系统验证账号密码是否匹配
+- 登录成功后跳转至首页
+
+2.2 验证码登录
+- 用户输入手机号，获取短信验证码
+- 系统验证验证码有效性
+- 登录成功后跳转至首页
+
+3. 安全要求
+- 密码需进行加密传输
+- 连续5次登录失败需锁定账号30分钟
+- 验证码有效期为5分钟`,
+  },
+  {
+    id: "ref-2",
+    name: "GB/T 25000.51-2016 软件测试规范",
+    type: "行业标准",
+    content: `1. 范围
+本标准规定了软件测试的基本要求、测试类型、测试过程和测试文档要求。
+
+2. 术语和定义
+2.1 测试用例：为特定目标而编制的一组测试输入、执行条件和预期结果
+2.2 测试覆盖：测试所覆盖的软件需求或代码的程度
+
+3. 测试类型
+3.1 功能测试
+3.2 性能测试
+3.3 安全测试
+3.4 兼容性测试
+
+4. 测试用例设计方法
+4.1 等价类划分法
+4.2 边界值分析法
+4.3 决策表法
+4.4 状态转换法`,
+  },
+  {
+    id: "ref-3",
+    name: "账户开户业务需求文档 PRD v1.5",
+    type: "需求文档",
+    content: `1. 业务背景
+为提升用户开户体验，需要优化现有开户流程。
+
+2. 业务流程
+2.1 身份验证
+- 用户填写基本信息
+- 上传身份证正反面
+- 人脸识别验证
+
+2.2 账户信息填写
+- 设置交易密码
+- 绑定银行卡
+- 签署协议
+
+2.3 审核流程
+- 系统自动审核
+- 人工复核（必要时）
+
+3. 业务规则
+- 同一身份证只能开设一个账户
+- 年龄需满18周岁
+- 银行卡需为本人名下`,
+  },
+  {
+    id: "ref-4",
+    name: "自动化测试规范 v3.0",
+    type: "测试规范",
+    content: `1. 测试框架选型
+推荐使用 Selenium/Playwright 进行UI自动化测试
+
+2. 用例编写规范
+2.1 用例命名：test_模块_功能_场景
+2.2 断言要求：每个用例至少包含一个断言
+2.3 数据隔离：测试数据需独立，避免相互影响
+
+3. 执行策略
+3.1 冒烟测试：每次提交触发
+3.2 回归测试：每日定时执行
+3.3 全量测试：发版前执行`,
+  },
+  {
+    id: "ref-5",
+    name: "用户服务接口文档 API v2.0",
+    type: "接口文档",
+    content: `1. 登录接口
+POST /api/v1/auth/login
+请求参数：
+- username: 用户名
+- password: 密码（MD5加密）
+
+响应：
+{
+  "code": 200,
+  "data": {
+    "token": "xxx",
+    "userId": "123"
+  }
+}
+
+2. 注册接口
+POST /api/v1/auth/register
+请求参数：
+- phone: 手机号
+- password: 密码
+- verifyCode: 验证码`,
+  },
+];
 
 // 分类选项
 const categoryOptions = [
@@ -247,6 +368,16 @@ export default function CaseReview() {
   // 审查记录侧边栏状态
   const [historySidebarOpen, setHistorySidebarOpen] = useState(false);
   const [historyData, setHistoryData] = useState<ReviewHistoryData | null>(null);
+  
+  // 参考资料侧边栏状态
+  const [referenceMaterialsOpen, setReferenceMaterialsOpen] = useState(false);
+  const [referenceSidebarOpen, setReferenceSidebarOpen] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState<ReferenceMaterial | null>(null);
+  
+  const handleOpenMaterial = (material: ReferenceMaterial) => {
+    setSelectedMaterial(material);
+    setReferenceSidebarOpen(true);
+  };
 
   // 切换维度折叠状态
   const toggleDimensionCollapse = (dimId: string) => {
@@ -454,6 +585,36 @@ export default function CaseReview() {
               </span>
             )}
           </h1>
+          
+          {/* Reference Materials */}
+          <Collapsible open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
+            <CollapsibleTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1 cursor-pointer">
+              <FileText className="w-4 h-4" />
+              <span>基于 {mockReferenceMaterials.length} 条资料作为参考</span>
+              {referenceMaterialsOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-3 bg-muted/30 rounded-lg p-4 space-y-2">
+                {mockReferenceMaterials.map((material, index) => (
+                  <div
+                    key={material.id}
+                    className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer group"
+                    onClick={() => handleOpenMaterial(material)}
+                  >
+                    <span className="text-muted-foreground text-sm">{index + 1}.</span>
+                    <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1">
+                      {material.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{material.type}</span>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </div>
 
@@ -852,6 +1013,12 @@ Scenario: 完善后的场景描述
         open={historySidebarOpen}
         onOpenChange={setHistorySidebarOpen}
         historyData={historyData}
+      />
+
+      <ReferenceMaterialsSidebar
+        open={referenceSidebarOpen}
+        onOpenChange={setReferenceSidebarOpen}
+        material={selectedMaterial}
       />
 
       {/* Save to Task Dialog */}
