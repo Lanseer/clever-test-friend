@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download, Lightbulb, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { GenerationRecordItem } from "./GenerationRecordsPanel";
 
 interface UploadedFile {
@@ -84,6 +89,16 @@ export function SmartDesignChat({
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
+  const [promptLibrary, setPromptLibrary] = useState<string[]>([
+    "生成用户登录模块的完整测试用例，包括正向和负向场景",
+    "基于BDD格式生成支付流程的端到端测试用例",
+    "生成边界值和等价类测试用例",
+    "生成接口自动化测试用例",
+    "补充异常处理和错误码验证测试用例",
+  ]);
+  const [isAddingPrompt, setIsAddingPrompt] = useState(false);
+  const [newPromptValue, setNewPromptValue] = useState("");
+  const [promptPopoverOpen, setPromptPopoverOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,6 +139,24 @@ export function SmartDesignChat({
     const dateStr = now.toISOString().split('T')[0];
     const version = `V0.${generatedFiles.length + 1}`;
     return `${dateStr}生成案例_${version}`;
+  };
+
+  const handleAddPrompt = () => {
+    if (!newPromptValue.trim()) return;
+    setPromptLibrary(prev => [...prev, newPromptValue.trim()]);
+    setNewPromptValue("");
+    setIsAddingPrompt(false);
+    toast.success("提示词已保存");
+  };
+
+  const handleSelectPrompt = (prompt: string) => {
+    setInputValue(prompt);
+    setPromptPopoverOpen(false);
+  };
+
+  const truncateText = (text: string, maxLength: number = 20) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
   };
 
   const handleSendMessage = async () => {
@@ -284,8 +317,92 @@ export function SmartDesignChat({
 
       {/* Input Area with embedded controls */}
       <div className="p-3 flex-shrink-0">
-        {/* Test Cases Button - positioned right above the chat input */}
-        <div className="flex justify-end mb-2">
+        {/* Prompt Library and Test Cases Buttons - positioned right above the chat input */}
+        <div className="flex justify-end gap-2 mb-2">
+          {/* Prompt Library Button */}
+          <Popover open={promptPopoverOpen} onOpenChange={setPromptPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 bg-white/80 border-amber-200 hover:bg-amber-50/50 text-amber-700"
+              >
+                <Lightbulb className="w-4 h-4" />
+                提示词库
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-2 py-1.5 border-b">
+                  <span className="text-xs font-medium text-muted-foreground">提示词库</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs gap-1"
+                    onClick={() => setIsAddingPrompt(true)}
+                  >
+                    <Plus className="w-3 h-3" />
+                    新增
+                  </Button>
+                </div>
+                
+                {isAddingPrompt && (
+                  <div className="p-2 space-y-2 border rounded-lg bg-muted/30">
+                    <Textarea
+                      value={newPromptValue}
+                      onChange={(e) => setNewPromptValue(e.target.value)}
+                      placeholder="输入新的提示词..."
+                      className="min-h-[60px] text-sm resize-none"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => {
+                          setIsAddingPrompt(false);
+                          setNewPromptValue("");
+                        }}
+                      >
+                        取消
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 px-3 text-xs"
+                        onClick={handleAddPrompt}
+                        disabled={!newPromptValue.trim()}
+                      >
+                        保存
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                <ScrollArea className="max-h-[200px]">
+                  <div className="flex flex-wrap gap-1.5 p-1">
+                    {promptLibrary.map((prompt, index) => (
+                      <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                          <Badge
+                            variant="secondary"
+                            className="cursor-pointer hover:bg-primary/20 transition-colors text-xs py-1 px-2"
+                            onClick={() => handleSelectPrompt(prompt)}
+                          >
+                            {truncateText(prompt, 20)}
+                          </Badge>
+                        </TooltipTrigger>
+                        {prompt.length > 20 && (
+                          <TooltipContent side="bottom" className="max-w-[300px]">
+                            <p className="text-xs">{prompt}</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            </PopoverContent>
+          </Popover>
           <Popover>
             <PopoverTrigger asChild>
               <Button
