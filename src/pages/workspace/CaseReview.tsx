@@ -552,14 +552,14 @@ export default function CaseReview() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Left Chat Panel - 20% width */}
-      <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0">
+      <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0 h-full">
         <CaseReviewChatPanel />
       </div>
       
       {/* Main Content - 80% width */}
-      <div className={cn("flex-1 p-6", isFromChat && "pb-20")}>
+      <div className={cn("flex-1 p-6 overflow-y-auto", isFromChat && "pb-20")}>
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
