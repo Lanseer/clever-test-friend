@@ -69,9 +69,9 @@ export default function MyTestTasks() {
     navigate(`/workspace/${workspaceId}/management/ai-cases`);
   };
 
-  const handleOpenTaskReport = (e: React.MouseEvent) => {
+  const handleOpenTaskReport = (e: React.MouseEvent, taskId: string) => {
     e.stopPropagation();
-    navigate(`/workspace/${workspaceId}/report`);
+    navigate(`/workspace/${workspaceId}/management/ai-cases/${taskId}/report`);
   };
 
   const handleOpenDeliverableReport = (e: React.MouseEvent, fileName: string) => {
@@ -157,7 +157,7 @@ export default function MyTestTasks() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-primary"
-                        onClick={handleOpenTaskReport}
+                        onClick={(e) => handleOpenTaskReport(e, task.id)}
                         title="审查报告"
                       >
                         <ClipboardList className="w-4 h-4" />
