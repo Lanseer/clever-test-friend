@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { FileText, ChevronRight, Plus, ArrowLeft, ClipboardList, Calendar, Check, AlertCircle, Trash2, UserCheck } from "lucide-react";
+import { FileText, Plus, ArrowLeft, ClipboardList } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -8,22 +8,13 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { Card, CardContent } from "@/components/ui/card";
+import { CaseFileCard, CaseFileData, ReviewStatus } from "@/components/workspace/CaseFileCard";
 
 interface TestTask {
   id: string;
   name: string;
   testPhase: string;
   testCategory: string;
-}
-
-interface GeneratedCaseFile {
-  id: string;
-  name: string;
-  version: string;
-  createdAt: string;
-  adoptedCount: number;
-  needsImprovementCount: number;
-  discardedCount: number;
 }
 
 const mockTasks: TestTask[] = [
@@ -34,22 +25,90 @@ const mockTasks: TestTask[] = [
   { id: "5", name: "购物车功能测试", testPhase: "UAT测试", testCategory: "专项测试" },
 ];
 
-const mockGeneratedCaseFiles: Record<string, GeneratedCaseFile[]> = {
+const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
   "1": [
-    { id: "f1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", createdAt: "2026-01-23 14:30", adoptedCount: 32, needsImprovementCount: 8, discardedCount: 5 },
-    { id: "f2", name: "2026-01-22用户登录模块测试案例", version: "V0.9", createdAt: "2026-01-22 10:15", adoptedCount: 28, needsImprovementCount: 6, discardedCount: 4 },
+    { 
+      id: "f1", 
+      name: "2026-01-23用户登录模块测试案例", 
+      version: "V1.0", 
+      createdAt: "2026-01-23 14:30", 
+      adoptedCount: 32, 
+      needsImprovementCount: 8, 
+      discardedCount: 5,
+      status: "completed",
+      statusTags: ["审查完成", "已发布"],
+      remark: "已完成全部场景审查，可交付",
+      externalReview: { total: 3, completed: 2, inProgress: 1 }
+    },
+    { 
+      id: "f2", 
+      name: "2026-01-22用户登录模块测试案例", 
+      version: "V0.9", 
+      createdAt: "2026-01-22 10:15", 
+      adoptedCount: 28, 
+      needsImprovementCount: 6, 
+      discardedCount: 4,
+      status: "reviewing",
+      statusTags: ["审查中"],
+      externalReview: { total: 1, completed: 0, inProgress: 1 }
+    },
   ],
   "2": [
-    { id: "f3", name: "2026-01-22支付流程测试案例", version: "V1.2", createdAt: "2026-01-22 16:45", adoptedCount: 24, needsImprovementCount: 5, discardedCount: 3 },
+    { 
+      id: "f3", 
+      name: "2026-01-22支付流程测试案例", 
+      version: "V1.2", 
+      createdAt: "2026-01-22 16:45", 
+      adoptedCount: 24, 
+      needsImprovementCount: 5, 
+      discardedCount: 3,
+      status: "reviewing",
+      statusTags: ["审查中", "优先级高"],
+      remark: "支付核心流程需重点关注",
+      externalReview: { total: 2, completed: 1, inProgress: 1 }
+    },
   ],
   "3": [
-    { id: "f4", name: "2026-01-21订单管理测试案例", version: "V0.8", createdAt: "2026-01-21 09:20", adoptedCount: 38, needsImprovementCount: 10, discardedCount: 4 },
+    { 
+      id: "f4", 
+      name: "2026-01-21订单管理测试案例", 
+      version: "V0.8", 
+      createdAt: "2026-01-21 09:20", 
+      adoptedCount: 38, 
+      needsImprovementCount: 10, 
+      discardedCount: 4,
+      status: "pending",
+      externalReview: { total: 0, completed: 0, inProgress: 0 }
+    },
   ],
   "4": [
-    { id: "f5", name: "2026-01-20商品搜索测试案例", version: "V1.0", createdAt: "2026-01-20 11:00", adoptedCount: 18, needsImprovementCount: 4, discardedCount: 2 },
+    { 
+      id: "f5", 
+      name: "2026-01-20商品搜索测试案例", 
+      version: "V1.0", 
+      createdAt: "2026-01-20 11:00", 
+      adoptedCount: 18, 
+      needsImprovementCount: 4, 
+      discardedCount: 2,
+      status: "completed",
+      statusTags: ["审查完成"],
+      externalReview: { total: 1, completed: 1, inProgress: 0 }
+    },
   ],
   "5": [
-    { id: "f6", name: "2026-01-20购物车功能测试案例", version: "V1.1", createdAt: "2026-01-20 15:30", adoptedCount: 28, needsImprovementCount: 6, discardedCount: 2 },
+    { 
+      id: "f6", 
+      name: "2026-01-20购物车功能测试案例", 
+      version: "V1.1", 
+      createdAt: "2026-01-20 15:30", 
+      adoptedCount: 28, 
+      needsImprovementCount: 6, 
+      discardedCount: 2,
+      status: "reviewing",
+      statusTags: ["审查中"],
+      remark: "购物车边界条件需补充",
+      externalReview: { total: 2, completed: 2, inProgress: 0 }
+    },
   ],
 };
 
@@ -61,9 +120,10 @@ export default function MyTestTasks() {
   
   const [selectedTaskId, setSelectedTaskId] = useState<string>(initialTaskId);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [caseFiles, setCaseFiles] = useState(mockGeneratedCaseFiles);
 
   const selectedTask = mockTasks.find(t => t.id === selectedTaskId);
-  const generatedFiles = mockGeneratedCaseFiles[selectedTaskId] || [];
+  const generatedFiles = caseFiles[selectedTaskId] || [];
 
   const handleBack = () => {
     navigate(`/workspace/${workspaceId}/management/ai-cases`);
@@ -80,7 +140,6 @@ export default function MyTestTasks() {
   };
 
   const handleOpenCaseReview = (fileId: string) => {
-    // Navigate to the case review page with dimension hierarchy view
     navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/case-review`);
   };
 
@@ -91,6 +150,42 @@ export default function MyTestTasks() {
   const handleOpenExpertReview = (e: React.MouseEvent, fileId: string) => {
     e.stopPropagation();
     navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/expert-review-records`);
+  };
+
+  const handleStatusChange = (fileId: string, status: ReviewStatus) => {
+    setCaseFiles(prev => {
+      const updated = { ...prev };
+      for (const taskId in updated) {
+        updated[taskId] = updated[taskId].map(f => 
+          f.id === fileId ? { ...f, status } : f
+        );
+      }
+      return updated;
+    });
+  };
+
+  const handleTagsChange = (fileId: string, tags: string[]) => {
+    setCaseFiles(prev => {
+      const updated = { ...prev };
+      for (const taskId in updated) {
+        updated[taskId] = updated[taskId].map(f => 
+          f.id === fileId ? { ...f, statusTags: tags } : f
+        );
+      }
+      return updated;
+    });
+  };
+
+  const handleRemarkChange = (fileId: string, remark: string) => {
+    setCaseFiles(prev => {
+      const updated = { ...prev };
+      for (const taskId in updated) {
+        updated[taskId] = updated[taskId].map(f => 
+          f.id === fileId ? { ...f, remark } : f
+        );
+      }
+      return updated;
+    });
   };
 
   return (
@@ -186,69 +281,16 @@ export default function MyTestTasks() {
               ) : (
                 <div className="grid gap-3">
                   {generatedFiles.map((file) => (
-                    <Card
+                    <CaseFileCard
                       key={file.id}
-                      className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/30"
-                      onClick={() => handleOpenCaseReview(file.id)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-4">
-                          {/* Icon */}
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-sky-500/20">
-                            <FileText className="w-6 h-6 text-white" />
-                          </div>
-                          
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-medium truncate">{file.name}_{file.version}</h3>
-                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {file.createdAt}
-                              </span>
-                            </div>
-                            {/* Stats */}
-                            <div className="flex items-center gap-3 mt-2">
-                              <span className="flex items-center gap-1 text-xs text-green-600">
-                                <Check className="w-3 h-3" />
-                                采纳 {file.adoptedCount}
-                              </span>
-                              <span className="flex items-center gap-1 text-xs text-amber-600">
-                                <AlertCircle className="w-3 h-3" />
-                                需完善 {file.needsImprovementCount}
-                              </span>
-                              <span className="flex items-center gap-1 text-xs text-red-600">
-                                <Trash2 className="w-3 h-3" />
-                                丢弃 {file.discardedCount}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Actions - Always visible */}
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-primary"
-                              onClick={(e) => handleOpenDeliverableReport(e, `${file.name}_${file.version}`)}
-                              title="审查报告"
-                            >
-                              <ClipboardList className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-primary"
-                              onClick={(e) => handleOpenExpertReview(e, file.id)}
-                              title="外部评审"
-                            >
-                              <UserCheck className="w-4 h-4" />
-                            </Button>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                      file={file}
+                      onCardClick={handleOpenCaseReview}
+                      onReportClick={handleOpenDeliverableReport}
+                      onExpertReviewClick={handleOpenExpertReview}
+                      onStatusChange={handleStatusChange}
+                      onTagsChange={handleTagsChange}
+                      onRemarkChange={handleRemarkChange}
+                    />
                   ))}
                 </div>
               )}
