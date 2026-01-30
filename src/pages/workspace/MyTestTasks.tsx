@@ -69,10 +69,14 @@ export default function MyTestTasks() {
     navigate(`/workspace/${workspaceId}/management/ai-cases`);
   };
 
-  const handleOpenReport = (e: React.MouseEvent, fileName?: string) => {
+  const handleOpenTaskReport = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const name = fileName || selectedTask?.name || "交付物";
-    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/deliverable-report?name=${encodeURIComponent(name)}`);
+    navigate(`/workspace/${workspaceId}/report`);
+  };
+
+  const handleOpenDeliverableReport = (e: React.MouseEvent, fileName: string) => {
+    e.stopPropagation();
+    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/deliverable-report?name=${encodeURIComponent(fileName)}`);
   };
 
   const handleOpenCaseReview = (fileId: string) => {
@@ -153,7 +157,7 @@ export default function MyTestTasks() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-primary"
-                        onClick={(e) => handleOpenReport(e)}
+                        onClick={handleOpenTaskReport}
                         title="审查报告"
                       >
                         <ClipboardList className="w-4 h-4" />
@@ -226,7 +230,7 @@ export default function MyTestTasks() {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-muted-foreground hover:text-primary"
-                              onClick={(e) => handleOpenReport(e, `${file.name}_${file.version}`)}
+                              onClick={(e) => handleOpenDeliverableReport(e, `${file.name}_${file.version}`)}
                               title="审查报告"
                             >
                               <ClipboardList className="w-4 h-4" />
