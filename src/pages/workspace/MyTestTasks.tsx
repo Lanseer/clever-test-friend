@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { CaseFileCard, CaseFileData, ReviewStatus } from "@/components/workspace/CaseFileCard";
+import { CaseFileCard, CaseFileData } from "@/components/workspace/CaseFileCard";
 
 interface TestTask {
   id: string;
@@ -35,9 +35,7 @@ const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
       adoptedCount: 32, 
       needsImprovementCount: 8, 
       discardedCount: 5,
-      status: "completed",
-      statusTags: ["审查完成", "已发布"],
-      remark: "已完成全部场景审查，可交付",
+      statusTag: "审查完成",
       externalReview: { total: 3, completed: 2, inProgress: 1 }
     },
     { 
@@ -48,8 +46,7 @@ const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
       adoptedCount: 28, 
       needsImprovementCount: 6, 
       discardedCount: 4,
-      status: "reviewing",
-      statusTags: ["审查中"],
+      statusTag: "审查中",
       externalReview: { total: 1, completed: 0, inProgress: 1 }
     },
   ],
@@ -62,9 +59,7 @@ const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
       adoptedCount: 24, 
       needsImprovementCount: 5, 
       discardedCount: 3,
-      status: "reviewing",
-      statusTags: ["审查中", "优先级高"],
-      remark: "支付核心流程需重点关注",
+      statusTag: "审查中",
       externalReview: { total: 2, completed: 1, inProgress: 1 }
     },
   ],
@@ -77,7 +72,6 @@ const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
       adoptedCount: 38, 
       needsImprovementCount: 10, 
       discardedCount: 4,
-      status: "pending",
       externalReview: { total: 0, completed: 0, inProgress: 0 }
     },
   ],
@@ -90,8 +84,7 @@ const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
       adoptedCount: 18, 
       needsImprovementCount: 4, 
       discardedCount: 2,
-      status: "completed",
-      statusTags: ["审查完成"],
+      statusTag: "审查完成",
       externalReview: { total: 1, completed: 1, inProgress: 0 }
     },
   ],
@@ -104,9 +97,7 @@ const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
       adoptedCount: 28, 
       needsImprovementCount: 6, 
       discardedCount: 2,
-      status: "reviewing",
-      statusTags: ["审查中"],
-      remark: "购物车边界条件需补充",
+      statusTag: "审查中",
       externalReview: { total: 2, completed: 2, inProgress: 0 }
     },
   ],
@@ -152,36 +143,12 @@ export default function MyTestTasks() {
     navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/expert-review-records`);
   };
 
-  const handleStatusChange = (fileId: string, status: ReviewStatus) => {
+  const handleTagChange = (fileId: string, tag: string | undefined) => {
     setCaseFiles(prev => {
       const updated = { ...prev };
       for (const taskId in updated) {
         updated[taskId] = updated[taskId].map(f => 
-          f.id === fileId ? { ...f, status } : f
-        );
-      }
-      return updated;
-    });
-  };
-
-  const handleTagsChange = (fileId: string, tags: string[]) => {
-    setCaseFiles(prev => {
-      const updated = { ...prev };
-      for (const taskId in updated) {
-        updated[taskId] = updated[taskId].map(f => 
-          f.id === fileId ? { ...f, statusTags: tags } : f
-        );
-      }
-      return updated;
-    });
-  };
-
-  const handleRemarkChange = (fileId: string, remark: string) => {
-    setCaseFiles(prev => {
-      const updated = { ...prev };
-      for (const taskId in updated) {
-        updated[taskId] = updated[taskId].map(f => 
-          f.id === fileId ? { ...f, remark } : f
+          f.id === fileId ? { ...f, statusTag: tag } : f
         );
       }
       return updated;
@@ -287,9 +254,7 @@ export default function MyTestTasks() {
                       onCardClick={handleOpenCaseReview}
                       onReportClick={handleOpenDeliverableReport}
                       onExpertReviewClick={handleOpenExpertReview}
-                      onStatusChange={handleStatusChange}
-                      onTagsChange={handleTagsChange}
-                      onRemarkChange={handleRemarkChange}
+                      onTagChange={handleTagChange}
                     />
                   ))}
                 </div>
