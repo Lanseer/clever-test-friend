@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle } from "lucide-react";
 import { CaseReviewChatPanel } from "@/components/workspace/CaseReviewChatPanel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -380,6 +380,8 @@ export default function CaseReview() {
   const [referenceSidebarOpen, setReferenceSidebarOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<ReferenceMaterial | null>(null);
   
+  // 对话面板状态
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
   const handleOpenMaterial = (material: ReferenceMaterial) => {
     setSelectedMaterial(material);
@@ -553,12 +555,25 @@ export default function CaseReview() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Left Chat Panel - 20% width */}
-      <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0 h-full">
-        <CaseReviewChatPanel />
-      </div>
+      {/* Left Chat Panel or Icon */}
+      {chatPanelOpen ? (
+        <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0 h-full">
+          <CaseReviewChatPanel onClose={() => setChatPanelOpen(false)} />
+        </div>
+      ) : (
+        <div className="flex-shrink-0 h-full border-r bg-muted/20 flex items-center justify-center px-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 rounded-full hover:bg-primary/10"
+            onClick={() => setChatPanelOpen(true)}
+          >
+            <MessageCircle className="h-6 w-6 text-primary" />
+          </Button>
+        </div>
+      )}
       
-      {/* Main Content - 80% width */}
+      {/* Main Content */}
       <div className={cn("flex-1 p-6 overflow-y-auto", isFromChat && "pb-20")}>
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
