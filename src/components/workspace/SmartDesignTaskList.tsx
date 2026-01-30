@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { 
-  Clock, MessageSquare, Plus, TestTube2
+  Clock, MessageSquare, Plus, FlaskConical
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -57,7 +57,7 @@ export function SmartDesignTaskList({
       <div className="px-4 py-4 border-b border-sky-200/50 dark:border-sky-800/30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <TestTube2 className="w-5 h-5 text-white" />
+            <FlaskConical className="w-5 h-5 text-white" />
           </div>
           <span className="font-semibold text-base text-sky-800 dark:text-sky-200">
             TestHand
