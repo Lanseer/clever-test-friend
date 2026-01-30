@@ -158,7 +158,7 @@ export default function MyTestTasks() {
                         size="icon"
                         className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-primary"
                         onClick={(e) => handleOpenTaskReport(e, task.id)}
-                        title="审查报告"
+                        title="评审报告"
                       >
                         <ClipboardList className="w-4 h-4" />
                       </Button>
