@@ -167,7 +167,7 @@ export function TestSpriteButton() {
               </div>
               <div>
                 <span className="text-sm font-semibold text-foreground">早上好！👋</span>
-                <div className="text-xs text-muted-foreground">测试精灵为您总结</div>
+                <div className="text-xs text-muted-foreground">小亮为您总结</div>
               </div>
             </div>
 
@@ -280,7 +280,7 @@ export function TestSpriteButton() {
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <h3 className="font-semibold text-sm">测试精灵</h3>
+              <h3 className="font-semibold text-sm">小亮</h3>
             </div>
             <Button
               variant="ghost"
