@@ -269,7 +269,7 @@ export default function DeliverableReport() {
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">补充用例</span>
+                  <span className="text-sm text-muted-foreground">补充案例</span>
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                     {totalSupplement}条
                   </Badge>
@@ -281,7 +281,7 @@ export default function DeliverableReport() {
             <div className="pt-3 border-t">
               <div className="flex items-center gap-2 mb-3">
                 <Plus className="w-4 h-4 text-blue-500" />
-                <span className="text-sm font-medium">补充用例分类</span>
+                <span className="text-sm font-medium">补充案例分类</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {coverageSupplements.map((item) => {

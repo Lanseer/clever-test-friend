@@ -90,11 +90,11 @@ export function SmartDesignChat({
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [promptLibrary, setPromptLibrary] = useState<string[]>([
-    "生成用户登录模块的完整测试用例，包括正向和负向场景",
-    "基于BDD格式生成支付流程的端到端测试用例",
-    "生成边界值和等价类测试用例",
-    "生成接口自动化测试用例",
-    "补充异常处理和错误码验证测试用例",
+    "生成用户登录模块的完整测试案例，包括正向和负向场景",
+    "基于BDD格式生成支付流程的端到端测试案例",
+    "生成边界值和等价类测试案例",
+    "生成接口自动化测试案例",
+    "补充异常处理和错误码验证测试案例",
   ]);
   const [isAddingPrompt, setIsAddingPrompt] = useState(false);
   const [newPromptValue, setNewPromptValue] = useState("");
@@ -203,8 +203,8 @@ export function SmartDesignChat({
     step1Messages[step1Messages.length - 1] = {
       ...step1Messages[step1Messages.length - 1],
       content: uploadedFiles.length > 0 
-        ? `正在基于 ${uploadedFiles.length} 个附件生成测试用例...\n\n✅ 正在解析文档结构\n⏳ 识别功能模块...\n⏳ 生成BDD标准用例...`
-        : "正在生成测试用例...\n\n✅ 分析需求\n⏳ 生成用例...",
+        ? `正在基于 ${uploadedFiles.length} 个附件生成测试案例...\n\n✅ 正在解析文档结构\n⏳ 识别功能模块...\n⏳ 生成BDD标准案例...`
+        : "正在生成测试案例...\n\n✅ 分析需求\n⏳ 生成案例...",
     };
     onMessagesChange(step1Messages);
 
@@ -214,8 +214,8 @@ export function SmartDesignChat({
     step2Messages[step2Messages.length - 1] = {
       ...step2Messages[step2Messages.length - 1],
       content: uploadedFiles.length > 0 
-        ? `正在基于 ${uploadedFiles.length} 个附件生成测试用例...\n\n✅ 正在解析文档结构\n✅ 识别功能模块\n⏳ 生成BDD标准用例...`
-        : "正在生成测试用例...\n\n✅ 分析需求\n✅ 识别测试点\n⏳ 生成用例...",
+        ? `正在基于 ${uploadedFiles.length} 个附件生成测试案例...\n\n✅ 正在解析文档结构\n✅ 识别功能模块\n⏳ 生成BDD标准案例...`
+        : "正在生成测试案例...\n\n✅ 分析需求\n✅ 识别测试点\n⏳ 生成案例...",
     };
     onMessagesChange(step2Messages);
 
@@ -228,7 +228,7 @@ export function SmartDesignChat({
     const finalMessages = [...step2Messages];
     finalMessages[finalMessages.length - 1] = {
       ...finalMessages[finalMessages.length - 1],
-      content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成`,
+      content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD案例生成完成`,
       isGenerationComplete: true,
       generationData: { scenarioCount, caseCount, fileName },
     };
@@ -439,7 +439,7 @@ export function SmartDesignChat({
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{file.name}</div>
                         <div className="text-[10px] text-muted-foreground">
-                          {file.scenarioCount} 场景 · {file.caseCount} 用例
+                          {file.scenarioCount} 场景 · {file.caseCount} 案例
                         </div>
                       </div>
                       <Button
@@ -490,7 +490,7 @@ export function SmartDesignChat({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="输入您的需求，例如：帮我生成用户登录模块的测试用例..."
+            placeholder="输入您的需求，例如：帮我生成用户登录模块的测试案例..."
             disabled={isProcessing}
             className="min-h-[80px] max-h-[120px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pb-12 pr-12"
           />

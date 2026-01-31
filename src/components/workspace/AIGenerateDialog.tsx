@@ -234,7 +234,7 @@ export function AIGenerateDialog({
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>
-            {isRegenerate ? "再次生成用例" : "新增任务"}
+            {isRegenerate ? "再次生成案例" : "新增任务"}
           </DialogTitle>
         </DialogHeader>
 
@@ -436,9 +436,9 @@ export function AIGenerateDialog({
                 )}
               </div>
 
-              {/* 初始化用例方式 */}
+              {/* 初始化案例方式 */}
               <div className="space-y-3">
-                <Label>初始化用例方式</Label>
+                <Label>初始化案例方式</Label>
                 {isRegenerate ? (
                   <Input value="智能生成" disabled className="bg-muted" />
                 ) : (
@@ -464,7 +464,7 @@ export function AIGenerateDialog({
                 )}
               </div>
 
-              {/* 选择用例模板 - 智能生成时显示，本地上传时隐藏 */}
+              {/* 选择案例模板 - 智能生成时显示，本地上传时隐藏 */}
               {initMethod === "smart" && (
                 <div className="space-y-2">
                   <Label>案例模板</Label>
@@ -531,7 +531,7 @@ export function AIGenerateDialog({
                   <Textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="请输入提示词，用于指导AI生成测试用例（可选）"
+                    placeholder="请输入提示词，用于指导AI生成测试案例（可选）"
                     className="min-h-[80px]"
                   />
                 </div>

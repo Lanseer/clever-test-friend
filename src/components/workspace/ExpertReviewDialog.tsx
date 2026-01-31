@@ -167,9 +167,9 @@ export function ExpertReviewDialog({
           {/* Cases Selection */}
           <div className="flex-1 overflow-hidden flex flex-col space-y-2">
             <div className="flex items-center justify-between">
-              <Label>评审用例</Label>
+              <Label>评审案例</Label>
               <span className="text-sm text-muted-foreground">
-                已选择 {cases.filter((c) => c.selected).length} / {cases.length} 个用例
+                已选择 {cases.filter((c) => c.selected).length} / {cases.length} 个案例
               </span>
             </div>
             <div className="border rounded-lg overflow-hidden flex-1">

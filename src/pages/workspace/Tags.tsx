@@ -217,7 +217,7 @@ export default function Tags() {
           <DialogHeader>
             <DialogTitle>新建标签</DialogTitle>
             <DialogDescription>
-              创建一个新的标签用于分类测试用例
+              创建一个新的标签用于分类测试案例
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">

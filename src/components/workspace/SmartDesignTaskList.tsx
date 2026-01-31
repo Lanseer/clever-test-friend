@@ -41,7 +41,7 @@ export interface ChatSession {
 
 // Mock chat sessions - exported for use in parent
 export const mockChatSessions: ChatSession[] = [
-  { id: "session-1", name: "用户登录模块测试", lastMessage: "帮我生成用户登录模块的测试用例", timestamp: "10:30" },
+  { id: "session-1", name: "用户登录模块测试", lastMessage: "帮我生成用户登录模块的测试案例", timestamp: "10:30" },
   { id: "session-2", name: "订单支付流程分析", lastMessage: "分析这个需求文档", timestamp: "昨天" },
   { id: "session-3", name: "接口覆盖率优化", lastMessage: "优化测试覆盖率", timestamp: "3天前" },
 ];

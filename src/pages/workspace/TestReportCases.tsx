@@ -34,7 +34,7 @@ interface TestCase {
   bddContent: string;
 }
 
-// Mock数据 - 模拟大量用例
+// Mock数据 - 模拟大量案例
 const generateMockCases = (testPointId: string): TestCase[] => {
   const statuses: ReviewStatus[] = ["adopted", "rejected", "pending"];
   const cases: TestCase[] = [];
@@ -43,7 +43,7 @@ const generateMockCases = (testPointId: string): TestCase[] => {
     cases.push({
       id: `${testPointId}-case-${i}`,
       code: `TC-${testPointId.split("-").pop()}-${String(i).padStart(3, "0")}`,
-      name: `测试用例${i}: ${["登录验证", "密码校验", "权限检查", "数据校验", "流程测试", "边界测试", "异常处理", "并发测试"][i % 8]}场景${Math.ceil(i / 8)}`,
+      name: `测试案例${i}: ${["登录验证", "密码校验", "权限检查", "数据校验", "流程测试", "边界测试", "异常处理", "并发测试"][i % 8]}场景${Math.ceil(i / 8)}`,
       selfReviewStatus: statuses[i % 3],
       expertReviewStatus: statuses[(i + 1) % 3],
       createdAt: `2024-01-${String(15 - (i % 10)).padStart(2, "0")} ${10 + (i % 12)}:${String((i * 7) % 60).padStart(2, "0")}`,
@@ -97,7 +97,7 @@ export default function TestReportCases() {
   const info = testPointId ? testPointInfo[testPointId] : null;
   const allCases = testPointId ? generateMockCases(testPointId) : [];
   
-  // 过滤用例
+  // 过滤案例
   const filteredCases = allCases.filter((c) => {
     const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.code.toLowerCase().includes(searchQuery.toLowerCase());
@@ -133,7 +133,7 @@ export default function TestReportCases() {
           onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
           className="hover:text-foreground transition-colors"
         >
-          智能用例设计
+          智能案例设计
         </button>
         <ChevronRight className="w-4 h-4" />
         <button 
@@ -143,17 +143,17 @@ export default function TestReportCases() {
           评审报告
         </button>
         <ChevronRight className="w-4 h-4" />
-        <span className="text-foreground">{info?.name || "测试点用例"}</span>
+        <span className="text-foreground">{info?.name || "测试点案例"}</span>
       </div>
 
       {/* 页面标题 */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <TestTube className="w-6 h-6 text-primary" />
-          {info?.name || "测试点用例"}
+          {info?.name || "测试点案例"}
         </h1>
         <p className="text-muted-foreground mt-1">
-          {info?.dimensionName} · 共 {allCases.length} 个用例
+          {info?.dimensionName} · 共 {allCases.length} 个案例
         </p>
       </div>
 
@@ -162,7 +162,7 @@ export default function TestReportCases() {
         <Card>
           <CardContent className="pt-4 pb-3 text-center">
             <div className="text-2xl font-bold text-foreground">{stats.total}</div>
-            <div className="text-xs text-muted-foreground">总用例</div>
+            <div className="text-xs text-muted-foreground">总案例</div>
           </CardContent>
         </Card>
         <Card>
@@ -190,7 +190,7 @@ export default function TestReportCases() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜索用例编号或名称..."
+            placeholder="搜索案例编号或名称..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -226,11 +226,11 @@ export default function TestReportCases() {
         </div>
       </div>
 
-      {/* 用例列表 */}
+      {/* 案例列表 */}
       <div className="rounded-xl border bg-card overflow-hidden mb-4">
         <div className="grid grid-cols-[100px_1fr_120px_100px_100px_150px] gap-3 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>编号</div>
-          <div>用例名称</div>
+          <div>案例名称</div>
           <div>创建时间</div>
           <div>自评状态</div>
           <div>专家状态</div>
@@ -273,7 +273,7 @@ export default function TestReportCases() {
         {paginatedCases.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的用例</p>
+            <p>未找到匹配的案例</p>
           </div>
         )}
       </div>

@@ -209,7 +209,7 @@ export function SmartReviewSelectDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            选择审查用例
+            选择审查案例
           </DialogTitle>
         </DialogHeader>
 
@@ -232,7 +232,7 @@ export function SmartReviewSelectDialog({
             <span className="text-sm font-medium">全选</span>
           </div>
           <span className="text-sm text-muted-foreground">
-            已选择 {selectedCount}/{totalCount} 个用例
+            已选择 {selectedCount}/{totalCount} 个案例
           </span>
         </div>
 

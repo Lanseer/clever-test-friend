@@ -122,7 +122,7 @@ export default function GenerationRecords() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             >
-              智能用例设计
+              智能案例设计
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -155,7 +155,7 @@ export default function GenerationRecords() {
           <div>批次编号</div>
           <div>生成时间</div>
           <div>状态</div>
-          <div>用例数量</div>
+          <div>案例数量</div>
           <div>操作</div>
         </div>
 
@@ -216,7 +216,7 @@ export default function GenerationRecords() {
                       onClick={() => handleViewCases(batch)}
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      查看用例
+                      查看案例
                     </Button>
                   ) : null}
                 </div>

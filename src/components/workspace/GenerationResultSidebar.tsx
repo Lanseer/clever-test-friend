@@ -103,7 +103,7 @@ export function GenerationResultSidebar({
                 <Badge variant="secondary" className="font-medium">{totalScenarios}</Badge>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">总用例:</span>
+                <span className="text-sm text-muted-foreground">总案例:</span>
                 <Badge variant="secondary" className="font-medium">{totalCases}</Badge>
               </div>
             </div>
@@ -130,7 +130,7 @@ export function GenerationResultSidebar({
                           <span className="font-medium text-sm">{dimension.name}</span>
                         </div>
                         <Badge className="bg-primary/10 text-primary border-0">
-                          {dimension.caseCount} 个用例
+                          {dimension.caseCount} 个案例
                         </Badge>
                       </button>
                     </CollapsibleTrigger>
@@ -145,7 +145,7 @@ export function GenerationResultSidebar({
                               <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm truncate">{tp.name}</span>
                               <span className="text-xs text-muted-foreground">
-                                ({tp.caseCount} 个用例)
+                                ({tp.caseCount} 个案例)
                               </span>
                             </div>
                             <Button
@@ -155,7 +155,7 @@ export function GenerationResultSidebar({
                               onClick={() => handleViewCases(tp)}
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              查看用例
+                              查看案例
                             </Button>
                           </div>
                         ))}

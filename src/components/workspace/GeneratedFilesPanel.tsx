@@ -102,7 +102,7 @@ export function GeneratedFilesPanel({
               <Badge variant="secondary" className="font-medium">{file.scenarioCount}</Badge>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">用例:</span>
+              <span className="text-sm text-muted-foreground">案例:</span>
               <Badge variant="secondary" className="font-medium">{file.caseCount}</Badge>
             </div>
           </div>
@@ -129,7 +129,7 @@ export function GeneratedFilesPanel({
                         <span className="font-medium text-sm">{dimension.name}</span>
                       </div>
                       <Badge className="bg-primary/10 text-primary border-0">
-                        {dimension.caseCount} 个用例
+                        {dimension.caseCount} 个案例
                       </Badge>
                     </button>
                   </CollapsibleTrigger>
@@ -144,7 +144,7 @@ export function GeneratedFilesPanel({
                               <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm truncate">{tp.name}</span>
                               <span className="text-xs text-muted-foreground">
-                                ({tp.caseCount} 个用例)
+                                ({tp.caseCount} 个案例)
                               </span>
                             </div>
                             <Button

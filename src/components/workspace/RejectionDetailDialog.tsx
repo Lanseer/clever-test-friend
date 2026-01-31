@@ -45,16 +45,16 @@ function CaseDetailDialog({ open, onOpenChange, caseItem }: CaseDetailDialogProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>用例详情 - {caseItem.code}</DialogTitle>
+          <DialogTitle>案例详情 - {caseItem.code}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="flex-1">
           <div className="space-y-4 pr-4">
             <div>
-              <div className="text-sm text-muted-foreground mb-1">用例名称</div>
+              <div className="text-sm text-muted-foreground mb-1">案例名称</div>
               <div className="font-medium">{caseItem.name}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground mb-1">用例编号</div>
+              <div className="text-sm text-muted-foreground mb-1">案例编号</div>
               <div className="font-mono text-sm">{caseItem.code}</div>
             </div>
             <div>
@@ -104,7 +104,7 @@ export function RejectionDetailDialog({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>不采纳用例详情 - {recordName}</DialogTitle>
+            <DialogTitle>不采纳案例详情 - {recordName}</DialogTitle>
           </DialogHeader>
 
           <ScrollArea className="flex-1">

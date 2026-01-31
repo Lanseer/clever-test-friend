@@ -90,7 +90,7 @@ export default function ExpertReviewRecords() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             >
-              智能用例设计
+              智能案例设计
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -127,7 +127,7 @@ export default function ExpertReviewRecords() {
           <div>状态</div>
           <div>发起时间</div>
           <div>发起人</div>
-          <div>总用例数</div>
+          <div>总案例数</div>
           <div>通过</div>
           <div>拒绝</div>
           <div>待评审</div>

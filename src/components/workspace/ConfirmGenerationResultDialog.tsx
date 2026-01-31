@@ -295,7 +295,7 @@ export function ConfirmGenerationResultDialog({
             <span className="text-sm font-medium">全选</span>
           </div>
           <span className="text-sm text-muted-foreground">
-            已选择 {selectedCount}/{totalCases} 个用例
+            已选择 {selectedCount}/{totalCases} 个案例
           </span>
         </div>
 

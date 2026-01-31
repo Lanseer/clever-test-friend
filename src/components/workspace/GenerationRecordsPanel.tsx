@@ -86,7 +86,7 @@ export function GenerationRecordsPanel({ records, taskName = "任务", onRecordC
                     </div>
                     <div className="flex items-center gap-1">
                       <Layers className="w-3 h-3" />
-                      <span>用例: <span className="text-foreground font-medium">{record.caseCount}</span></span>
+                      <span>案例: <span className="text-foreground font-medium">{record.caseCount}</span></span>
                     </div>
                   </div>
 

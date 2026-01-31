@@ -97,7 +97,7 @@ export default function AIAssistant() {
   const [cases, setCases] = useState<TestCase[]>(mockPendingCases);
   const [messages, setMessages] = useState<Message[]>([]);
   const [thinkingSteps, setThinkingSteps] = useState<ThinkingStep[]>([
-    { id: "example", content: "好的，查找到108条用例的内容格式有问题，现在开始处理", status: "completed" },
+    { id: "example", content: "好的，查找到108条案例的内容格式有问题，现在开始处理", status: "completed" },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -115,7 +115,7 @@ export default function AIAssistant() {
         {
           id: "init",
           role: "assistant",
-          content: `检测到 ${modifiedCount} 条已修改用例，请问需要我帮你做什么调整？\n\n例如：\n• 查找有哪些用例描述格式有问题并帮我修改\n• 优化所有用例的场景描述\n• 检查并修正断言错误\n• 补充缺失的前置条件`,
+          content: `检测到 ${modifiedCount} 条已修改案例，请问需要我帮你做什么调整？\n\n例如：\n• 查找有哪些案例描述格式有问题并帮我修改\n• 优化所有案例的场景描述\n• 检查并修正断言错误\n• 补充缺失的前置条件`,
           timestamp: new Date(),
         },
       ]);
@@ -139,7 +139,7 @@ export default function AIAssistant() {
     // Step 2
     setThinkingSteps(prev => [
       { ...prev[0], status: "completed" },
-      { id: "2", content: "正在扫描待评审用例列表...", status: "processing" },
+      { id: "2", content: "正在扫描待评审案例列表...", status: "processing" },
     ]);
     await new Promise(resolve => setTimeout(resolve, 1200));
     
@@ -147,7 +147,7 @@ export default function AIAssistant() {
     setThinkingSteps(prev => [
       prev[0],
       { ...prev[1], status: "completed" },
-      { id: "3", content: "正在对用例场景描述进行优化修改...", status: "processing" },
+      { id: "3", content: "正在对案例场景描述进行优化修改...", status: "processing" },
     ]);
     await new Promise(resolve => setTimeout(resolve, 1800));
     
@@ -166,7 +166,7 @@ export default function AIAssistant() {
       prev[0],
       prev[1],
       { ...prev[2], status: "completed" },
-      { id: "4", content: `已处理 ${casesToProcess} 条用例`, status: "completed" },
+      { id: "4", content: `已处理 ${casesToProcess} 条案例`, status: "completed" },
     ]);
     
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -177,7 +177,7 @@ export default function AIAssistant() {
       {
         id: Date.now().toString(),
         role: "assistant",
-        content: `已完成处理！\n\n✅ 共处理了 ${casesToProcess} 条用例\n📝 优化了场景描述的表述\n🔍 检查了步骤完整性\n\n左侧用例列表已更新，已修改的用例标记为"已修改"状态。`,
+        content: `已完成处理！\n\n✅ 共处理了 ${casesToProcess} 条案例\n📝 优化了场景描述的表述\n🔍 检查了步骤完整性\n\n左侧案例列表已更新，已修改的案例标记为"已修改"状态。`,
         timestamp: new Date(),
       },
     ]);
@@ -239,7 +239,7 @@ export default function AIAssistant() {
               智能助手
             </h1>
             <p className="text-sm text-muted-foreground">
-              智能协助用例评审与优化
+              智能协助案例评审与优化
             </p>
           </div>
         </div>
@@ -256,7 +256,7 @@ export default function AIAssistant() {
           <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
             <h2 className="font-medium text-sm flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              已修改用例列表
+              已修改案例列表
             </h2>
             {unconfirmedCount > 0 && (
               <Button
@@ -398,7 +398,7 @@ export default function AIAssistant() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="输入您的指令，例如：查找有哪些用例描述格式有问题并帮我修改..."
+                  placeholder="输入您的指令，例如：查找有哪些案例描述格式有问题并帮我修改..."
                   disabled={isProcessing}
                   className="flex-1"
                 />
@@ -424,13 +424,13 @@ export default function AIAssistant() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
-              用例详情
+              案例详情
             </DialogTitle>
           </DialogHeader>
           {selectedCase && (
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-muted-foreground">用例名称</p>
+                <p className="text-sm text-muted-foreground">案例名称</p>
                 <p className="font-medium mt-1">{selectedCase.name}</p>
               </div>
               <div>
@@ -438,7 +438,7 @@ export default function AIAssistant() {
                 <p className="mt-1">{selectedCase.feature}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">用例内容</p>
+                <p className="text-sm text-muted-foreground">案例内容</p>
                 <pre className="mt-1 p-3 bg-muted rounded-lg text-sm whitespace-pre-wrap">
                   {selectedCase.content}
                 </pre>

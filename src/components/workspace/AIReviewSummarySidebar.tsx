@@ -43,19 +43,19 @@ export function AIReviewSummarySidebar({ open, onOpenChange, record }: AIReviewS
     setTimeout(() => {
       setSummary(`**AI智能生成评审总结**
 
-本次AI评审共涉及${record.totalCases}个测试用例，整体质量评估如下：
+本次AI评审共涉及${record.totalCases}个测试案例，整体质量评估如下：
 
 **评审结果概览**
-- 优秀用例: ${record.excellentCases}个 (${((record.excellentCases / record.totalCases) * 100).toFixed(1)}%)
-- 合格用例: ${record.passedCases}个 (${((record.passedCases / record.totalCases) * 100).toFixed(1)}%)
-- 不合格用例: ${record.failedCases}个 (${((record.failedCases / record.totalCases) * 100).toFixed(1)}%)
+- 优秀案例: ${record.excellentCases}个 (${((record.excellentCases / record.totalCases) * 100).toFixed(1)}%)
+- 合格案例: ${record.passedCases}个 (${((record.passedCases / record.totalCases) * 100).toFixed(1)}%)
+- 不合格案例: ${record.failedCases}个 (${((record.failedCases / record.totalCases) * 100).toFixed(1)}%)
 
 **质量分析**
-优秀用例场景设计完整，BDD描述规范，可直接采纳使用。合格用例基本满足测试需求，建议优化部分描述后采纳。不合格用例需要重新生成或人工修改。
+优秀案例场景设计完整，BDD描述规范，可直接采纳使用。合格案例基本满足测试需求，建议优化部分描述后采纳。不合格案例需要重新生成或人工修改。
 
 **优化建议**
 1. 补充边界条件测试场景
-2. 完善异常处理用例
+2. 完善异常处理案例
 3. 增加性能相关测试覆盖`);
       setIsGenerating(false);
       toast.success("AI评审总结生成成功");
@@ -115,7 +115,7 @@ export function AIReviewSummarySidebar({ open, onOpenChange, record }: AIReviewS
             <div className="grid grid-cols-4 gap-3">
               <div className="p-3 rounded-lg border bg-muted/30 text-center">
                 <div className="text-lg font-bold">{record.totalCases}</div>
-                <div className="text-xs text-muted-foreground">总用例</div>
+                <div className="text-xs text-muted-foreground">总案例</div>
               </div>
               <div className="p-3 rounded-lg border bg-green-50 text-center">
                 <div className="text-lg font-bold text-green-600 flex items-center justify-center gap-1">

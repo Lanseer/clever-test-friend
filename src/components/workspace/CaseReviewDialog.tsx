@@ -135,7 +135,7 @@ export function CaseReviewDialog({
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span>用例评审</span>
+                <span>案例评审</span>
                 <Badge variant="outline" className="font-mono">
                   {currentIndex + 1} / {cases.length}
                 </Badge>
@@ -164,21 +164,21 @@ export function CaseReviewDialog({
             <div className="flex flex-col border rounded-lg overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border-b">
                 <Code className="w-4 h-4 text-primary" />
-                <span className="font-medium text-sm">用例内容</span>
+                <span className="font-medium text-sm">案例内容</span>
               </div>
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">用例名称</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2">案例名称</h4>
                     <p className="text-sm font-medium">{currentCase.name}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">用例描述</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2">案例描述</h4>
                     <Textarea
                       value={editedContent}
                       onChange={(e) => setEditedContent(e.target.value)}
                       className="min-h-[300px] font-mono text-sm resize-none"
-                      placeholder="编辑用例内容..."
+                      placeholder="编辑案例内容..."
                     />
                   </div>
                 </div>
@@ -244,7 +244,7 @@ export function CaseReviewDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>选择不采纳原因</AlertDialogTitle>
             <AlertDialogDescription>
-              请选择一个标签来说明不采纳此用例的原因
+              请选择一个标签来说明不采纳此案例的原因
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-4 py-4">
@@ -302,7 +302,7 @@ export function CaseReviewDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>确认丢弃</AlertDialogTitle>
             <AlertDialogDescription>
-              确定要丢弃此用例吗？此操作不可撤销。
+              确定要丢弃此案例吗？此操作不可撤销。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

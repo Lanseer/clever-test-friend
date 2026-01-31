@@ -149,7 +149,7 @@ export default function ExpertReview() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             >
-              智能用例设计
+              智能案例设计
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -171,7 +171,7 @@ export default function ExpertReview() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-foreground">专家评审</h1>
           <p className="text-muted-foreground mt-1">
-            生成记录: AI-001 · 共 {totalStats.total} 个用例，{pendingCount} 个待评审
+            生成记录: AI-001 · 共 {totalStats.total} 个案例，{pendingCount} 个待评审
           </p>
         </div>
         <Button variant="outline" className="gap-2" onClick={handleNavigateToRecords}>
@@ -189,7 +189,7 @@ export default function ExpertReview() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜索用例..."
+            placeholder="搜索案例..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -201,7 +201,7 @@ export default function ExpertReview() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold">{totalStats.total}</div>
-          <div className="text-sm text-muted-foreground">总用例数</div>
+          <div className="text-sm text-muted-foreground">总案例数</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-green-600">{totalStats.passed}</div>
@@ -220,7 +220,7 @@ export default function ExpertReview() {
       {/* Hierarchical Case List */}
       <div className="rounded-xl border bg-card overflow-hidden">
         <div className="px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          测试用例
+          测试案例
         </div>
 
         <div className="divide-y">
@@ -288,7 +288,7 @@ export default function ExpertReview() {
         {filteredDimensions.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的测试用例</p>
+            <p>未找到匹配的测试案例</p>
           </div>
         )}
       </div>
