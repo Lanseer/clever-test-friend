@@ -7,6 +7,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { RoleProvider } from "@/contexts/RoleContext";
 import Login from "./pages/Login";
 import Workspaces from "./pages/Workspaces";
+import Users from "./pages/Users";
 import WorkspaceDetail from "./pages/WorkspaceDetail";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,14 @@ const App = () => (
               element={
                 <MainLayout>
                   <Workspaces />
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <MainLayout>
+                  <Users />
                 </MainLayout>
               }
             />
