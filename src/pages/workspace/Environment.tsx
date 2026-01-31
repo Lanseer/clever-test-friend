@@ -18,7 +18,9 @@ interface TestEnvironment {
   id: string;
   name: string;
   type: EnvType;
-  url: string;
+  host: string;
+  port: string;
+  username: string;
   status: "active" | "inactive";
   description: string;
 }
@@ -35,10 +37,10 @@ interface DatabaseConfig {
 }
 
 const mockEnvironments: TestEnvironment[] = [
-  { id: "1", name: "开发环境", type: "dev", url: "https://dev.example.com", status: "active", description: "用于日常开发测试" },
-  { id: "2", name: "测试环境", type: "test", url: "https://test.example.com", status: "active", description: "用于功能测试" },
-  { id: "3", name: "预发布环境", type: "staging", url: "https://staging.example.com", status: "active", description: "用于上线前验证" },
-  { id: "4", name: "生产环境", type: "prod", url: "https://prod.example.com", status: "inactive", description: "生产环境（只读）" },
+  { id: "1", name: "开发环境", type: "dev", host: "192.168.1.10", port: "8080", username: "dev_admin", status: "active", description: "用于日常开发测试" },
+  { id: "2", name: "测试环境", type: "test", host: "192.168.1.20", port: "8080", username: "test_user", status: "active", description: "用于功能测试" },
+  { id: "3", name: "预发布环境", type: "staging", host: "192.168.1.30", port: "443", username: "staging_admin", status: "active", description: "用于上线前验证" },
+  { id: "4", name: "生产环境", type: "prod", host: "10.0.0.100", port: "443", username: "prod_readonly", status: "inactive", description: "生产环境（只读）" },
 ];
 
 const mockDatabases: DatabaseConfig[] = [
@@ -61,6 +63,26 @@ const dbTypeLabels: Record<DbType, string> = {
   sqlserver: "SQL Server",
 };
 
+interface EnvFormState {
+  name: string;
+  type: EnvType;
+  host: string;
+  port: string;
+  username: string;
+  password: string;
+  description: string;
+}
+
+interface DbFormState {
+  name: string;
+  type: DbType;
+  host: string;
+  port: string;
+  database: string;
+  username: string;
+  password: string;
+}
+
 export default function Environment() {
   const [activeTab, setActiveTab] = useState("environment");
   const [environments, setEnvironments] = useState<TestEnvironment[]>(mockEnvironments);
@@ -69,41 +91,59 @@ export default function Environment() {
   // Environment dialog state
   const [envDialogOpen, setEnvDialogOpen] = useState(false);
   const [editingEnv, setEditingEnv] = useState<TestEnvironment | null>(null);
-  const [envForm, setEnvForm] = useState<{ name: string; type: EnvType; url: string; description: string }>({ 
-    name: "", type: "dev", url: "", description: "" 
+  const [envForm, setEnvForm] = useState<EnvFormState>({ 
+    name: "", type: "dev", host: "", port: "", username: "", password: "", description: "" 
   });
   
   // Database dialog state
   const [dbDialogOpen, setDbDialogOpen] = useState(false);
   const [editingDb, setEditingDb] = useState<DatabaseConfig | null>(null);
-  const [dbForm, setDbForm] = useState<{ name: string; type: DbType; host: string; port: string; database: string; username: string; password: string }>({ 
+  const [dbForm, setDbForm] = useState<DbFormState>({ 
     name: "", type: "mysql", host: "", port: "", database: "", username: "", password: "" 
   });
 
   // Environment handlers
   const handleAddEnv = () => {
     setEditingEnv(null);
-    setEnvForm({ name: "", type: "dev", url: "", description: "" });
+    setEnvForm({ name: "", type: "dev", host: "", port: "", username: "", password: "", description: "" });
     setEnvDialogOpen(true);
   };
 
   const handleEditEnv = (env: TestEnvironment) => {
     setEditingEnv(env);
-    setEnvForm({ name: env.name, type: env.type, url: env.url, description: env.description });
+    setEnvForm({ 
+      name: env.name, 
+      type: env.type, 
+      host: env.host, 
+      port: env.port, 
+      username: env.username, 
+      password: "", 
+      description: env.description 
+    });
     setEnvDialogOpen(true);
   };
 
   const handleSaveEnv = () => {
     if (editingEnv) {
       setEnvironments(environments.map(e => 
-        e.id === editingEnv.id ? { ...e, name: envForm.name, type: envForm.type, url: envForm.url, description: envForm.description } : e
+        e.id === editingEnv.id ? { 
+          ...e, 
+          name: envForm.name, 
+          type: envForm.type, 
+          host: envForm.host, 
+          port: envForm.port, 
+          username: envForm.username, 
+          description: envForm.description 
+        } : e
       ));
     } else {
       setEnvironments([...environments, {
         id: Date.now().toString(),
         name: envForm.name,
         type: envForm.type,
-        url: envForm.url,
+        host: envForm.host,
+        port: envForm.port,
+        username: envForm.username,
         description: envForm.description,
         status: "active"
       }]);
@@ -116,6 +156,12 @@ export default function Environment() {
   };
 
   const handleToggleEnvStatus = (id: string) => {
+    setEnvironments(environments.map(e => 
+      e.id === id ? { ...e, status: e.status === "active" ? "inactive" : "active" } : e
+    ));
+  };
+
+  const handleTestEnvConnection = (id: string) => {
     setEnvironments(environments.map(e => 
       e.id === id ? { ...e, status: e.status === "active" ? "inactive" : "active" } : e
     ));
@@ -201,7 +247,9 @@ export default function Environment() {
                   <TableRow>
                     <TableHead>环境名称</TableHead>
                     <TableHead>类型</TableHead>
-                    <TableHead>URL地址</TableHead>
+                    <TableHead>主机IP</TableHead>
+                    <TableHead>端口</TableHead>
+                    <TableHead>用户名</TableHead>
                     <TableHead>描述</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead className="text-right">操作</TableHead>
@@ -216,8 +264,10 @@ export default function Environment() {
                           {envTypeLabels[env.type]}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{env.url}</TableCell>
-                      <TableCell className="text-muted-foreground">{env.description}</TableCell>
+                      <TableCell className="text-muted-foreground">{env.host}</TableCell>
+                      <TableCell className="text-muted-foreground">{env.port}</TableCell>
+                      <TableCell className="text-muted-foreground">{env.username}</TableCell>
+                      <TableCell className="text-muted-foreground max-w-[150px] truncate">{env.description}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Switch 
@@ -231,6 +281,9 @@ export default function Environment() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleTestEnvConnection(env.id)} title="测试连接">
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEditEnv(env)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -326,38 +379,69 @@ export default function Environment() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingEnv ? "编辑环境" : "添加环境"}</DialogTitle>
-            <DialogDescription>配置测试环境信息</DialogDescription>
+            <DialogDescription>配置测试环境连接信息</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>环境名称</Label>
-              <Input 
-                value={envForm.name} 
-                onChange={(e) => setEnvForm({ ...envForm, name: e.target.value })}
-                placeholder="输入环境名称"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>环境名称</Label>
+                <Input 
+                  value={envForm.name} 
+                  onChange={(e) => setEnvForm({ ...envForm, name: e.target.value })}
+                  placeholder="输入环境名称"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>环境类型</Label>
+                <Select value={envForm.type} onValueChange={(v: EnvType) => setEnvForm({ ...envForm, type: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dev">开发环境</SelectItem>
+                    <SelectItem value="test">测试环境</SelectItem>
+                    <SelectItem value="staging">预发布环境</SelectItem>
+                    <SelectItem value="prod">生产环境</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>环境类型</Label>
-              <Select value={envForm.type} onValueChange={(v: EnvType) => setEnvForm({ ...envForm, type: v })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dev">开发环境</SelectItem>
-                  <SelectItem value="test">测试环境</SelectItem>
-                  <SelectItem value="staging">预发布环境</SelectItem>
-                  <SelectItem value="prod">生产环境</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>主机IP</Label>
+                <Input 
+                  value={envForm.host} 
+                  onChange={(e) => setEnvForm({ ...envForm, host: e.target.value })}
+                  placeholder="192.168.1.100"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>端口</Label>
+                <Input 
+                  value={envForm.port} 
+                  onChange={(e) => setEnvForm({ ...envForm, port: e.target.value })}
+                  placeholder="8080"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>URL地址</Label>
-              <Input 
-                value={envForm.url} 
-                onChange={(e) => setEnvForm({ ...envForm, url: e.target.value })}
-                placeholder="https://example.com"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>用户名</Label>
+                <Input 
+                  value={envForm.username} 
+                  onChange={(e) => setEnvForm({ ...envForm, username: e.target.value })}
+                  placeholder="admin"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>密码</Label>
+                <Input 
+                  type="password"
+                  value={envForm.password} 
+                  onChange={(e) => setEnvForm({ ...envForm, password: e.target.value })}
+                  placeholder="••••••••"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label>描述</Label>
