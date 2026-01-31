@@ -19,6 +19,7 @@ import ExpertReviewRecords from "./workspace/ExpertReviewRecords";
 import InitiateExpertReview from "./workspace/InitiateExpertReview";
 import ExpertCaseReview from "./workspace/ExpertCaseReview";
 import Tags from "./workspace/Tags";
+import TestOntology from "./workspace/TestOntology";
 import Dashboard from "./Index";
 import TestData from "./workspace/TestData";
 import TestDataCreate from "./workspace/TestDataCreate";
@@ -110,6 +111,7 @@ export default function WorkspaceDetail() {
             <Route path="data/create" element={<TestDataCreate />} />
             <Route path="data/:dataId/edit" element={<TestDataCreate />} />
             <Route path="tags" element={<Tags />} />
+            <Route path="ontology" element={<TestOntology />} />
             <Route path="templates" element={<CaseTemplates />} />
             <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
             <Route path="management/ai-cases/:recordId/deliverable-report" element={<DeliverableReport />} />
