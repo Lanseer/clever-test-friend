@@ -1,4 +1,4 @@
-import { FolderOpen, ChevronLeft, ChevronRight, Zap, User, LogOut, Settings } from "lucide-react";
+import { FolderOpen, ChevronLeft, ChevronRight, FlaskConical, User, LogOut, Settings, Users } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 
 const menuItems = [
   { title: "工作空间", url: "/workspaces", icon: FolderOpen },
+  { title: "用户管理", url: "/users", icon: Users },
 ];
 
 export function AppSidebar() {
@@ -40,12 +41,12 @@ export function AppSidebar() {
     >
       <SidebarHeader className="p-3 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center shadow-md">
-            <Zap className="w-4 h-4 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
+            <FlaskConical className="w-4 h-4 text-white" />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
-              <span className="font-semibold text-sidebar-foreground text-xs">SmartTest</span>
+              <span className="font-semibold text-sidebar-foreground text-xs">TestHand</span>
               <span className="text-[10px] text-sidebar-foreground/60">智能测试平台</span>
             </div>
           )}

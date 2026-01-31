@@ -70,6 +70,15 @@ const mockTasks: SmartDesignTask[] = [
   },
 ];
 
+const mockWorkspaces: Record<string, { name: string }> = {
+  "scb": { name: "SCB" },
+  "dbs": { name: "DBS" },
+  "cbs": { name: "CBS" },
+  "rnd": { name: "研发中心" },
+};
+
+const mockUserName = "Lanseer";
+
 const initialRecordsByTask: Record<string, GenerationRecordItem[]> = {
   "1": [
     { id: "gen-1-1", batchNumber: 1, scenarioCount: 8, caseCount: 24, createdAt: "2024-01-15 10:30", status: "completed", taskName: "用户模块自动化测试案例", stats: { adopted: 5, improved: 2, needsImprovement: 1, discarded: 0 } },
@@ -280,6 +289,8 @@ export default function AIGeneratedCases() {
           activeChatSessionId={activeChatSessionId}
           onSelectChatSession={handleSelectChatSession}
           onNewSession={handleNewSession}
+          workspaceName={workspaceId ? mockWorkspaces[workspaceId]?.name : "工作空间"}
+          userName={mockUserName}
         />
       </div>
 

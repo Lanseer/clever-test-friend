@@ -5,8 +5,7 @@ import {
   Network,
   FileCode,
   Server,
-  Tags,
-  Users
+  Tags
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -37,7 +36,6 @@ const adminMenuItems: MenuItem[] = [
   { title: "案例模板", url: "templates", icon: FileCode },
   { title: "环境", url: "environment", icon: Server },
   { title: "标签", url: "tags", icon: Tags },
-  { title: "用户管理", url: "users", icon: Users },
 ];
 
 interface WorkspaceSidebarProps {
