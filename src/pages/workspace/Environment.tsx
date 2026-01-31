@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -18,9 +19,9 @@ interface TestEnvironment {
   id: string;
   name: string;
   type: EnvType;
-  host: string;
-  port: string;
-  username: string;
+  url: string;
+  headers: string;
+  requestBody: string;
   status: "active" | "inactive";
   description: string;
 }
@@ -37,10 +38,10 @@ interface DatabaseConfig {
 }
 
 const mockEnvironments: TestEnvironment[] = [
-  { id: "1", name: "开发环境", type: "dev", host: "192.168.1.10", port: "8080", username: "dev_admin", status: "active", description: "用于日常开发测试" },
-  { id: "2", name: "测试环境", type: "test", host: "192.168.1.20", port: "8080", username: "test_user", status: "active", description: "用于功能测试" },
-  { id: "3", name: "预发布环境", type: "staging", host: "192.168.1.30", port: "443", username: "staging_admin", status: "active", description: "用于上线前验证" },
-  { id: "4", name: "生产环境", type: "prod", host: "10.0.0.100", port: "443", username: "prod_readonly", status: "inactive", description: "生产环境（只读）" },
+  { id: "1", name: "开发环境", type: "dev", url: "http://192.168.1.10:8080", headers: '{"Authorization": "Bearer token"}', requestBody: "", status: "active", description: "用于日常开发测试" },
+  { id: "2", name: "测试环境", type: "test", url: "http://192.168.1.20:8080", headers: '{"Content-Type": "application/json"}', requestBody: "", status: "active", description: "用于功能测试" },
+  { id: "3", name: "预发布环境", type: "staging", url: "https://staging.example.com", headers: "", requestBody: "", status: "active", description: "用于上线前验证" },
+  { id: "4", name: "生产环境", type: "prod", url: "https://api.example.com", headers: "", requestBody: "", status: "inactive", description: "生产环境（只读）" },
 ];
 
 const mockDatabases: DatabaseConfig[] = [
@@ -66,10 +67,9 @@ const dbTypeLabels: Record<DbType, string> = {
 interface EnvFormState {
   name: string;
   type: EnvType;
-  host: string;
-  port: string;
-  username: string;
-  password: string;
+  url: string;
+  headers: string;
+  requestBody: string;
   description: string;
 }
 
@@ -92,7 +92,7 @@ export default function Environment() {
   const [envDialogOpen, setEnvDialogOpen] = useState(false);
   const [editingEnv, setEditingEnv] = useState<TestEnvironment | null>(null);
   const [envForm, setEnvForm] = useState<EnvFormState>({ 
-    name: "", type: "dev", host: "", port: "", username: "", password: "", description: "" 
+    name: "", type: "dev", url: "", headers: "", requestBody: "", description: "" 
   });
   
   // Database dialog state
@@ -105,7 +105,7 @@ export default function Environment() {
   // Environment handlers
   const handleAddEnv = () => {
     setEditingEnv(null);
-    setEnvForm({ name: "", type: "dev", host: "", port: "", username: "", password: "", description: "" });
+    setEnvForm({ name: "", type: "dev", url: "", headers: "", requestBody: "", description: "" });
     setEnvDialogOpen(true);
   };
 
@@ -114,10 +114,9 @@ export default function Environment() {
     setEnvForm({ 
       name: env.name, 
       type: env.type, 
-      host: env.host, 
-      port: env.port, 
-      username: env.username, 
-      password: "", 
+      url: env.url, 
+      headers: env.headers, 
+      requestBody: env.requestBody, 
       description: env.description 
     });
     setEnvDialogOpen(true);
@@ -130,9 +129,9 @@ export default function Environment() {
           ...e, 
           name: envForm.name, 
           type: envForm.type, 
-          host: envForm.host, 
-          port: envForm.port, 
-          username: envForm.username, 
+          url: envForm.url, 
+          headers: envForm.headers, 
+          requestBody: envForm.requestBody, 
           description: envForm.description 
         } : e
       ));
@@ -141,9 +140,9 @@ export default function Environment() {
         id: Date.now().toString(),
         name: envForm.name,
         type: envForm.type,
-        host: envForm.host,
-        port: envForm.port,
-        username: envForm.username,
+        url: envForm.url,
+        headers: envForm.headers,
+        requestBody: envForm.requestBody,
         description: envForm.description,
         status: "active"
       }]);
@@ -247,9 +246,7 @@ export default function Environment() {
                   <TableRow>
                     <TableHead>环境名称</TableHead>
                     <TableHead>类型</TableHead>
-                    <TableHead>主机IP</TableHead>
-                    <TableHead>端口</TableHead>
-                    <TableHead>用户名</TableHead>
+                    <TableHead>环境地址</TableHead>
                     <TableHead>描述</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead className="text-right">操作</TableHead>
@@ -264,9 +261,7 @@ export default function Environment() {
                           {envTypeLabels[env.type]}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{env.host}</TableCell>
-                      <TableCell className="text-muted-foreground">{env.port}</TableCell>
-                      <TableCell className="text-muted-foreground">{env.username}</TableCell>
+                      <TableCell className="text-muted-foreground max-w-[200px] truncate">{env.url}</TableCell>
                       <TableCell className="text-muted-foreground max-w-[150px] truncate">{env.description}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -406,42 +401,33 @@ export default function Environment() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>主机IP</Label>
-                <Input 
-                  value={envForm.host} 
-                  onChange={(e) => setEnvForm({ ...envForm, host: e.target.value })}
-                  placeholder="192.168.1.100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>端口</Label>
-                <Input 
-                  value={envForm.port} 
-                  onChange={(e) => setEnvForm({ ...envForm, port: e.target.value })}
-                  placeholder="8080"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>环境地址</Label>
+              <Input 
+                value={envForm.url} 
+                onChange={(e) => setEnvForm({ ...envForm, url: e.target.value })}
+                placeholder="https://api.example.com"
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>用户名</Label>
-                <Input 
-                  value={envForm.username} 
-                  onChange={(e) => setEnvForm({ ...envForm, username: e.target.value })}
-                  placeholder="admin"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>密码</Label>
-                <Input 
-                  type="password"
-                  value={envForm.password} 
-                  onChange={(e) => setEnvForm({ ...envForm, password: e.target.value })}
-                  placeholder="••••••••"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>统一请求头 (JSON格式)</Label>
+              <Textarea 
+                value={envForm.headers} 
+                onChange={(e) => setEnvForm({ ...envForm, headers: e.target.value })}
+                placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
+                className="font-mono text-sm"
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>统一请求体 (JSON格式)</Label>
+              <Textarea 
+                value={envForm.requestBody} 
+                onChange={(e) => setEnvForm({ ...envForm, requestBody: e.target.value })}
+                placeholder='{"key": "value"}'
+                className="font-mono text-sm"
+                rows={3}
+              />
             </div>
             <div className="space-y-2">
               <Label>描述</Label>
