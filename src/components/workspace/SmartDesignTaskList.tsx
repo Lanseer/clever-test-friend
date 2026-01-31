@@ -99,9 +99,6 @@ export function SmartDesignTaskList({
                 <span className="text-sm font-medium truncate flex-1">{session.name}</span>
                 <span className="text-[10px] text-muted-foreground flex-shrink-0">{session.timestamp}</span>
               </div>
-              <span className="text-xs text-muted-foreground truncate ml-5">
-                {session.lastMessage}
-              </span>
             </div>
           ))}
         </div>
