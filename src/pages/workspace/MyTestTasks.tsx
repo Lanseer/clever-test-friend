@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { FileText, Plus, ArrowLeft, ClipboardList, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { FileText, Plus, ArrowLeft, ClipboardList, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -234,7 +234,7 @@ export default function MyTestTasks() {
                               size="icon"
                               className="h-7 w-7 text-muted-foreground hover:text-primary"
                             >
-                              <MoreVertical className="w-4 h-4" />
+                              <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-32">
