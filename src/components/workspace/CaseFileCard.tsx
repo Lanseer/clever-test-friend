@@ -35,7 +35,22 @@ interface CaseFileCardProps {
   onTagChange?: (fileId: string, tag: string | undefined) => void;
 }
 
-const defaultStatusTags = ["审查完成", "审查中", "待审查"];
+const defaultStatusTags = ["审查完成", "审查中", "待审查", "废弃"];
+
+const getTagColorClasses = (tag: string): string => {
+  switch (tag) {
+    case "审查完成":
+      return "bg-green-100 text-green-700 border-green-300";
+    case "审查中":
+      return "bg-blue-100 text-blue-700 border-blue-300";
+    case "待审查":
+      return "bg-amber-100 text-amber-700 border-amber-300";
+    case "废弃":
+      return "bg-gray-100 text-gray-500 border-gray-300";
+    default:
+      return "bg-primary/5 border-primary/20 text-primary";
+  }
+};
 
 export function CaseFileCard({
   file,
@@ -172,7 +187,10 @@ export function CaseFileCard({
           {currentTag && (
             <Badge
               variant="outline"
-              className="text-[10px] px-1.5 py-0.5 h-5 bg-primary/5 border-primary/20 text-primary cursor-pointer hover:bg-primary/10"
+              className={cn(
+                "text-[10px] px-1.5 py-0.5 h-5 cursor-pointer hover:opacity-80",
+                getTagColorClasses(currentTag)
+              )}
               onClick={(e) => {
                 e.stopPropagation();
                 handleRemoveTag();
