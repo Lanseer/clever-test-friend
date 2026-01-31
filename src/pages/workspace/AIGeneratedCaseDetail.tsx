@@ -57,7 +57,7 @@ const mockBatchRecords: BatchRecord[] = [
 const mockRecordInfo = {
   id: "1",
   code: "AI-001",
-  name: "用户模块自动化测试用例",
+  name: "用户模块自动化测试案例",
   createdAt: "2024-01-15 10:30",
 };
 
@@ -84,7 +84,7 @@ const mockRejectedCases = [
     code: "TC-003", 
     name: "多设备登录限制", 
     rejections: [
-      { expertName: "李专家", rejectTag: "与现有用例重复", rejectReason: "该用例与TC-089重复，建议合并", reviewTime: "2024-01-15 15:30" },
+      { expertName: "李专家", rejectTag: "与现有案例重复", rejectReason: "该案例与TC-089重复，建议合并", reviewTime: "2024-01-15 15:30" },
       { rejectTag: "不符合业务场景", rejectReason: "该场景已不在当前版本范围内", reviewTime: "2024-01-15 17:00" },
       { expertName: "张专家", rejectTag: "前置条件缺失", rejectReason: "需要明确多设备的定义", reviewTime: "2024-01-15 17:30" },
     ]
@@ -180,7 +180,7 @@ export default function AIGeneratedCaseDetail() {
       <div className="grid grid-cols-[120px_160px_80px_100px_100px_80px_1fr] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
         <div className="whitespace-nowrap">批次编号</div>
         <div className="whitespace-nowrap">生成时间</div>
-        <div className="whitespace-nowrap">总用例数</div>
+        <div className="whitespace-nowrap">总案例数</div>
         <div className="whitespace-nowrap">未评审</div>
         <div className="whitespace-nowrap">已采纳</div>
         <div className="whitespace-nowrap">不采纳</div>
@@ -313,7 +313,7 @@ export default function AIGeneratedCaseDetail() {
           )}
         >
           <ClipboardCheck className="w-5 h-5" />
-          用例自评
+          案例自评
         </button>
         <button
           onClick={() => setActiveTab("expert")}
@@ -333,7 +333,7 @@ export default function AIGeneratedCaseDetail() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold">{currentStats.total}</div>
-          <div className="text-sm text-muted-foreground">总用例数</div>
+          <div className="text-sm text-muted-foreground">总案例数</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-amber-600">{currentStats.pending}</div>

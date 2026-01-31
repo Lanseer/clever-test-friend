@@ -116,16 +116,16 @@ const mockTemplates: CaseTemplate[] = [
     type: "UI",
     modifier: "王五",
     updateTime: "2024-01-13 16:45",
-    format: `测试用例ID: [编号]
+    format: `测试案例ID: [编号]
 测试模块: [模块名称]
-测试标题: [用例标题]
+测试标题: [案例标题]
 前置条件: [测试前的准备工作]
 测试步骤:
   1. [步骤1]
   2. [步骤2]
 预期结果: [期望的系统行为]
 测试数据: [使用的测试数据]`,
-    example: `测试用例ID: UI-LOGIN-001
+    example: `测试案例ID: UI-LOGIN-001
 测试模块: 用户认证
 测试标题: 验证登录页面元素显示正确
 前置条件: 
@@ -287,8 +287,8 @@ export default function CaseTemplates() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">用例模板</h1>
-        <p className="text-muted-foreground mt-1">管理和查看测试用例的规范模板</p>
+        <h1 className="text-2xl font-bold text-foreground">案例模板</h1>
+        <p className="text-muted-foreground mt-1">管理和查看测试案例的规范模板</p>
       </div>
 
       <div className="flex items-center justify-between gap-4">

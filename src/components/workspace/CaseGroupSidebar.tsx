@@ -224,7 +224,7 @@ export function CaseGroupSidebar({
     <div className="w-64 border-r bg-card flex flex-col h-full">
       <div className="p-3 border-b space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-sm">用例分组</h3>
+          <h3 className="font-semibold text-sm">案例分组</h3>
           <Button
             variant="ghost"
             size="icon"
@@ -258,7 +258,7 @@ export function CaseGroupSidebar({
             onClick={() => onSelectGroup(null)}
           >
             <Folder className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1 text-sm">全部用例</span>
+            <span className="flex-1 text-sm">全部案例</span>
             <span
               className={cn(
                 "text-xs px-1.5 py-0.5 rounded",

@@ -48,7 +48,7 @@ interface GeneratedFile {
 const mockTasks: SmartDesignTask[] = [
   {
     id: "1",
-    name: "用户模块自动化测试用例",
+    name: "用户模块自动化测试案例",
     selfReviewTotal: 500,
     selfReviewPassed: 480,
     expertReviewTotal: 480,
@@ -59,7 +59,7 @@ const mockTasks: SmartDesignTask[] = [
   },
   {
     id: "2",
-    name: "支付接口测试用例生成",
+    name: "支付接口测试案例生成",
     selfReviewTotal: 0,
     selfReviewPassed: 0,
     expertReviewTotal: 0,
@@ -72,8 +72,8 @@ const mockTasks: SmartDesignTask[] = [
 
 const initialRecordsByTask: Record<string, GenerationRecordItem[]> = {
   "1": [
-    { id: "gen-1-1", batchNumber: 1, scenarioCount: 8, caseCount: 24, createdAt: "2024-01-15 10:30", status: "completed", taskName: "用户模块自动化测试用例", stats: { adopted: 5, improved: 2, needsImprovement: 1, discarded: 0 } },
-    { id: "gen-1-2", batchNumber: 2, scenarioCount: 12, caseCount: 36, createdAt: "2024-01-16 14:20", status: "reviewing", taskName: "用户模块自动化测试用例", stats: { adopted: 8, improved: 2, needsImprovement: 2, discarded: 0 } },
+    { id: "gen-1-1", batchNumber: 1, scenarioCount: 8, caseCount: 24, createdAt: "2024-01-15 10:30", status: "completed", taskName: "用户模块自动化测试案例", stats: { adopted: 5, improved: 2, needsImprovement: 1, discarded: 0 } },
+    { id: "gen-1-2", batchNumber: 2, scenarioCount: 12, caseCount: 36, createdAt: "2024-01-16 14:20", status: "reviewing", taskName: "用户模块自动化测试案例", stats: { adopted: 8, improved: 2, needsImprovement: 2, discarded: 0 } },
   ],
   "2": [],
 };
@@ -127,7 +127,7 @@ export default function AIGeneratedCases() {
     {
       id: "init",
       role: "assistant",
-      content: "你好！我是智能设计助手。请上传需求文档附件，我将帮你自动生成测试用例。\n\n你可以：\n• 上传文档后发送，开始生成用例\n• 询问如何优化测试覆盖率\n• 了解BDD用例设计规范",
+      content: "你好！我是智能设计助手。请上传需求文档附件，我将帮你自动生成测试案例。\n\n你可以：\n• 上传文档后发送，开始生成案例\n• 询问如何优化测试覆盖率\n• 了解BDD案例设计规范",
       timestamp: new Date(),
     },
   ];
@@ -136,8 +136,8 @@ export default function AIGeneratedCases() {
   const sessionMessagesMap: Record<string, Message[]> = {
     "session-1": [
       { id: "s1-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
-      { id: "s1-2", role: "user", content: "帮我生成用户登录模块的测试用例", timestamp: new Date() },
-      { id: "s1-3", role: "assistant", content: "生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD用例生成完成", timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24, fileName: "2026-01-23生成案例_V0.1" } },
+      { id: "s1-2", role: "user", content: "帮我生成用户登录模块的测试案例", timestamp: new Date() },
+      { id: "s1-3", role: "assistant", content: "生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD案例生成完成", timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24, fileName: "2026-01-23生成案例_V0.1" } },
     ],
     "session-2": [
       { id: "s2-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
@@ -147,7 +147,7 @@ export default function AIGeneratedCases() {
     "session-3": [
       { id: "s3-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
       { id: "s3-2", role: "user", content: "优化测试覆盖率", timestamp: new Date() },
-      { id: "s3-3", role: "assistant", content: "根据您当前的测试用例，我建议关注以下几个方面来提高覆盖率：\n\n1. 边界值测试\n2. 异常场景处理\n3. 并发场景测试", timestamp: new Date() },
+      { id: "s3-3", role: "assistant", content: "根据您当前的测试案例，我建议关注以下几个方面来提高覆盖率：\n\n1. 边界值测试\n2. 异常场景处理\n3. 并发场景测试", timestamp: new Date() },
     ],
   };
 

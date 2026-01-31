@@ -23,16 +23,16 @@ interface ReportSidebarProps {
   } | null;
 }
 
-const defaultSummary = `本次生成用例覆盖了用户登录、注册、密码重置等核心功能场景。
+const defaultSummary = `本次生成案例覆盖了用户登录、注册、密码重置等核心功能场景。
 
 **完整性评估**: 覆盖率约85%，主要覆盖了正向流程和常见异常场景。
 
-**质量评估**: 用例描述清晰，BDD格式规范，步骤可执行性强。
+**质量评估**: 案例描述清晰，BDD格式规范，步骤可执行性强。
 
-**缺失用例建议**: 
+**缺失案例建议**: 
 - 缺少并发登录限制场景
 - 缺少密码强度验证边界测试
-- 建议补充会话超时处理用例`;
+- 建议补充会话超时处理案例`;
 
 export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -47,18 +47,18 @@ export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarP
     setTimeout(() => {
       setSummary(`**AI智能生成报告总结**
 
-本次用例评审共涉及24个AI生成用例，最终采纳22个，采纳率91.7%。
+本次案例评审共涉及24个AI生成案例，最终采纳22个，采纳率91.7%。
 
 **质量分析**: 
-- 用例场景覆盖完整，涵盖正向流程和异常边界
+- 案例场景覆盖完整，涵盖正向流程和异常边界
 - BDD格式规范，可读性强
 - 测试步骤清晰明确，可执行性高
 
-**问题用例分析**: 
-- 2个不采纳用例主要问题：场景描述与实际需求不符
+**问题案例分析**: 
+- 2个不采纳案例主要问题：场景描述与实际需求不符
 
 **优化建议**: 
-- 建议补充并发场景测试用例
+- 建议补充并发场景测试案例
 - 增加性能边界值测试覆盖`);
       setIsGenerating(false);
       toast.success("AI报告总结生成成功");
@@ -148,11 +148,11 @@ export function ReportSidebar({ open, onOpenChange, type, data }: ReportSidebarP
                   <p className="text-sm">{data.report || "暂无报告内容"}</p>
                   <div className="pt-3 border-t space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">用例采纳</span>
+                      <span className="text-muted-foreground">案例采纳</span>
                       <span className="font-medium text-green-600">22 / 24 个</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">用例总结</span>
+                      <span className="text-muted-foreground">案例总结</span>
                       <span className="font-medium">覆盖登录、注册等核心场景</span>
                     </div>
                   </div>

@@ -89,12 +89,12 @@ const expertOpinionConfig: Record<ExpertOpinion, { label: string; className: str
 };
 
 const rejectionTags = [
-  "用例描述不清晰",
+  "案例描述不清晰",
   "测试步骤不完整",
   "预期结果不明确",
   "覆盖场景不足",
   "与需求不符",
-  "重复用例",
+  "重复案例",
   "其他问题",
 ];
 
@@ -105,7 +105,7 @@ const mockCases: ReviewCase[] = [
     name: "用户登录功能验证",
     nature: "positive",
     aiScore: "excellent",
-    aiScoreSummary: "用例覆盖全面，步骤清晰，预期结果明确，符合BDD规范",
+    aiScoreSummary: "案例覆盖全面，步骤清晰，预期结果明确，符合BDD规范",
     expertOpinion: "pending",
     bddContent: `Feature: 用户登录功能
 
@@ -130,7 +130,7 @@ Scenario: 用户使用正确的凭证登录
     name: "登录失败处理",
     nature: "negative",
     aiScore: "qualified",
-    aiScoreSummary: "用例基本完整，建议补充更多错误场景",
+    aiScoreSummary: "案例基本完整，建议补充更多错误场景",
     expertOpinion: "pending",
     bddContent: `Feature: 登录失败处理
 
@@ -220,7 +220,7 @@ export default function ExpertCaseReview() {
     setCases((prev) =>
       prev.map((c) => (c.id === caseId ? { ...c, expertOpinion: "passed" as ExpertOpinion } : c))
     );
-    toast.success("用例已通过");
+    toast.success("案例已通过");
   };
 
   const handleOpenRejectDialog = (caseId: string) => {
@@ -235,7 +235,7 @@ export default function ExpertCaseReview() {
       setCases((prev) =>
         prev.map((c) => (c.id === rejectingCaseId ? { ...c, expertOpinion: "rejected" as ExpertOpinion } : c))
       );
-      toast.success("用例已拒绝");
+      toast.success("案例已拒绝");
     }
     setRejectDialogOpen(false);
     setRejectingCaseId(null);
@@ -361,7 +361,7 @@ export default function ExpertCaseReview() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">欢迎参与专家评审</h1>
               <p className="text-muted-foreground mt-1">
-                感谢各位专家的参与，请根据您的专业知识对以下测试用例进行评审。您的意见对我们非常重要。
+                感谢各位专家的参与，请根据您的专业知识对以下测试案例进行评审。您的意见对我们非常重要。
               </p>
             </div>
           </div>
@@ -409,7 +409,7 @@ export default function ExpertCaseReview() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold">{cases.length}</div>
-          <div className="text-sm text-muted-foreground">总用例数</div>
+          <div className="text-sm text-muted-foreground">总案例数</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-green-600">{passedCount}</div>
@@ -506,7 +506,7 @@ export default function ExpertCaseReview() {
               {/* Left: Case Content */}
               <div className="flex flex-col overflow-hidden">
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-medium">用例内容</h3>
+                  <h3 className="font-medium">案例内容</h3>
                   {renderNature(currentBatchCase.nature)}
                   {renderAIScore(currentBatchCase.aiScore, currentBatchCase.aiScoreSummary)}
                 </div>
@@ -569,7 +569,7 @@ export default function ExpertCaseReview() {
       <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>拒绝用例</AlertDialogTitle>
+            <AlertDialogTitle>拒绝案例</AlertDialogTitle>
             <AlertDialogDescription>
               请选择拒绝原因并填写详细说明
             </AlertDialogDescription>

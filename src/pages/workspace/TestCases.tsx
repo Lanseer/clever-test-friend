@@ -287,12 +287,12 @@ export default function TestCases() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">测试用例</h1>
-              <p className="text-muted-foreground mt-1">管理和维护测试用例库</p>
+              <h1 className="text-2xl font-bold text-foreground">测试案例</h1>
+              <p className="text-muted-foreground mt-1">管理和维护测试案例库</p>
             </div>
             <Button className="gap-2">
               <Plus className="w-4 h-4" />
-              新建用例
+              新建案例
             </Button>
           </div>
 
@@ -300,7 +300,7 @@ export default function TestCases() {
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="搜索用例编号或名称..."
+                placeholder="搜索案例编号或名称..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -410,7 +410,7 @@ export default function TestCases() {
             {filteredCases.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <Search className="w-12 h-12 mb-4 opacity-50" />
-                <p>未找到匹配的测试用例</p>
+                <p>未找到匹配的测试案例</p>
               </div>
             )}
           </div>

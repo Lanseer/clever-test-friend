@@ -51,21 +51,21 @@ interface AIReviewCasesDialogProps {
 
 const typeConfig = {
   excellent: {
-    title: "优秀用例",
+    title: "优秀案例",
     icon: CheckCircle,
     bgColor: "bg-green-50",
     textColor: "text-green-600",
     borderColor: "border-green-200",
   },
   passed: {
-    title: "合格用例",
+    title: "合格案例",
     icon: AlertCircle,
     bgColor: "bg-blue-50",
     textColor: "text-blue-600",
     borderColor: "border-blue-200",
   },
   failed: {
-    title: "不合格用例",
+    title: "不合格案例",
     icon: XCircle,
     bgColor: "bg-red-50",
     textColor: "text-red-600",
@@ -125,7 +125,7 @@ export function AIReviewCasesDialog({
       c.id === caseId ? { ...c, adopted: true } : c
     );
     onCasesChange(updatedCases);
-    toast.success("用例已采纳");
+    toast.success("案例已采纳");
     setDetailOpen(false);
   };
 
@@ -134,7 +134,7 @@ export function AIReviewCasesDialog({
       c.id === caseId ? { ...c, adopted: false } : c
     );
     onCasesChange(updatedCases);
-    toast.success("用例不采纳");
+    toast.success("案例不采纳");
   };
 
   const handleRejectConfirm = () => {
@@ -150,7 +150,7 @@ export function AIReviewCasesDialog({
   const handleDiscard = (caseId: string) => {
     const updatedCases = cases.filter((c) => c.id !== caseId);
     onCasesChange(updatedCases);
-    toast.success("用例已丢弃");
+    toast.success("案例已丢弃");
     setShowDiscardDialog(false);
     setDetailOpen(false);
   };
@@ -158,7 +158,7 @@ export function AIReviewCasesDialog({
   const handleBatchAdopt = () => {
     const updatedCases = cases.map((c) => ({ ...c, adopted: true }));
     onCasesChange(updatedCases);
-    toast.success(`已批量采纳 ${cases.length} 个用例`);
+    toast.success(`已批量采纳 ${cases.length} 个案例`);
   };
 
   const handleCaseClick = (caseItem: ReviewCase, index: number) => {

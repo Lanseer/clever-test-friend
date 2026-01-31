@@ -34,7 +34,7 @@ interface MenuItem {
 const adminMenuItems: MenuItem[] = [
   { title: "数据监控", url: "dashboard", icon: LayoutDashboard },
   { title: "测试本体", url: "ontology", icon: Network },
-  { title: "用例模板", url: "templates", icon: FileCode },
+  { title: "案例模板", url: "templates", icon: FileCode },
   { title: "环境", url: "environment", icon: Server },
   { title: "标签", url: "tags", icon: Tags },
   { title: "用户管理", url: "users", icon: Users },

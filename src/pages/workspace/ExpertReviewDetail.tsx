@@ -152,14 +152,14 @@ export default function ExpertReviewDetail() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground">专家评审详情</h1>
-          <p className="text-muted-foreground mt-1">查看专家对用例的评审结果</p>
+          <p className="text-muted-foreground mt-1">查看专家对案例的评审结果</p>
         </div>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-card border rounded-xl p-4">
-          <div className="text-sm text-muted-foreground mb-1">总用例数</div>
+          <div className="text-sm text-muted-foreground mb-1">总案例数</div>
           <div className="text-2xl font-bold">{cases.length}</div>
         </div>
         <div className="bg-card border rounded-xl p-4">
@@ -249,11 +249,11 @@ export default function ExpertReviewDetail() {
             <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-muted-foreground">用例名称</Label>
+                  <Label className="text-muted-foreground">案例名称</Label>
                   <p className="mt-1 font-medium">{viewingCase.name}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">用例编号</Label>
+                  <Label className="text-muted-foreground">案例编号</Label>
                   <p className="mt-1 font-mono text-sm">{viewingCase.caseCode}</p>
                 </div>
               </div>

@@ -412,7 +412,7 @@ export default function TestReportSource() {
           onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
           className="hover:text-foreground transition-colors"
         >
-          智能用例设计
+          智能案例设计
         </button>
         <ChevronRight className="w-4 h-4" />
         <button 
