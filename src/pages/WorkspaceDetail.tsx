@@ -29,6 +29,7 @@ import TestReportSource from "./workspace/TestReportSource";
 import CaseTemplates from "./workspace/CaseTemplates";
 import DeliverableReport from "./workspace/DeliverableReport";
 import MyTestTasks from "./workspace/MyTestTasks";
+import Environment from "./workspace/Environment";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -113,6 +114,7 @@ export default function WorkspaceDetail() {
             <Route path="tags" element={<Tags />} />
             <Route path="ontology" element={<TestOntology />} />
             <Route path="templates" element={<CaseTemplates />} />
+            <Route path="environment" element={<Environment />} />
             <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
             <Route path="management/ai-cases/:recordId/deliverable-report" element={<DeliverableReport />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
