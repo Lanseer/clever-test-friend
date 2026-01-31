@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { FileText, Plus, ArrowLeft, ClipboardList } from "lucide-react";
+import { FileText, Plus, ArrowLeft, ClipboardList, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { CaseFileCard, CaseFileData } from "@/components/workspace/CaseFileCard";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface TestTask {
   id: string;
@@ -155,6 +156,16 @@ export default function MyTestTasks() {
     });
   };
 
+  const handleEditTask = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
+    toast.info(`编辑任务 ${taskId}`);
+  };
+
+  const handleDeleteTask = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
+    toast.info(`删除任务 ${taskId}`);
+  };
+
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
@@ -215,15 +226,41 @@ export default function MyTestTasks() {
                           </Badge>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-primary"
-                        onClick={(e) => handleOpenTaskReport(e, task.id)}
-                        title="评审报告"
-                      >
-                        <ClipboardList className="w-4 h-4" />
-                      </Button>
+                      <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-primary"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-32">
+                            <DropdownMenuItem onClick={(e) => handleEditTask(e, task.id)}>
+                              <Pencil className="w-4 h-4 mr-2" />
+                              编辑
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={(e) => handleDeleteTask(e, task.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              删除
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-primary"
+                          onClick={(e) => handleOpenTaskReport(e, task.id)}
+                          title="评审报告"
+                        >
+                          <ClipboardList className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
