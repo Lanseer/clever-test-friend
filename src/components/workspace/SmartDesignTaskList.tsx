@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { 
-  Clock, MessageSquare, Plus, FlaskConical
+  Clock, MessageSquare, Plus, FlaskConical, User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,6 +30,8 @@ interface SmartDesignTaskListProps {
   activeChatSessionId?: string | null;
   onSelectChatSession?: (sessionId: string) => void;
   onNewSession?: () => void;
+  workspaceName?: string;
+  userName?: string;
 }
 
 export interface ChatSession {
@@ -50,18 +52,25 @@ export function SmartDesignTaskList({
   activeChatSessionId,
   onSelectChatSession,
   onNewSession,
+  workspaceName = "SCB",
+  userName = "Lanseer",
 }: SmartDesignTaskListProps) {
   return (
     <div className="flex flex-col h-full bg-white/40 dark:bg-background/40 backdrop-blur-sm">
-      {/* Header - Product Logo and Name */}
+      {/* Header - User and Workspace Info */}
       <div className="px-4 py-4 border-b border-sky-200/50 dark:border-sky-800/30">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <FlaskConical className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
+            <User className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold text-base text-sky-800 dark:text-sky-200">
-            TestHand
-          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-sm text-foreground truncate">
+              {userName}
+            </span>
+            <span className="text-xs text-muted-foreground truncate">
+              {workspaceName}
+            </span>
+          </div>
         </div>
       </div>
 
