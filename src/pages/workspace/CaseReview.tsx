@@ -342,6 +342,23 @@ export default function CaseReview() {
   const handleSaveToTask = (taskId: string, caseName: string) => {
     const task = mockTasksData.find(t => t.id === taskId);
     toast.success(`"${caseName}" 已成功保存到测试任务：${task?.name || "未知任务"}`);
+    
+    // 计算待审查数量
+    const pendingCount = dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "pending").length, 0);
+    
+    // 构建审查总结数据并跳转回智能对话页面
+    const reviewSummary = {
+      caseName,
+      totalScenarios: statistics.totalScenarios,
+      adopted: statistics.adopted,
+      needsImprovement: statistics.needsImprovement,
+      improved: statistics.improved,
+      discarded: statistics.needsDiscard,
+      pending: pendingCount,
+    };
+    
+    // Navigate back to smart design page with review summary
+    navigate(`/workspace/${workspaceId}/management/ai-cases?reviewSummary=${encodeURIComponent(JSON.stringify(reviewSummary))}`);
   };
   
   // Generate default case name
