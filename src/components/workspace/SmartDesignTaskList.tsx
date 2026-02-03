@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  Clock, MessageSquare, Plus, FlaskConical, User
+  Clock, MessageSquare, Plus, FlaskConical, User, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -74,13 +74,16 @@ export function SmartDesignTaskList({
             <span className="font-medium text-sm text-foreground truncate">
               {userName}
             </span>
-            <span 
-              className="text-xs text-muted-foreground truncate cursor-pointer hover:text-primary transition-colors"
+            <div 
+              className="flex items-center gap-1 cursor-pointer group"
               onClick={handleWorkspaceClick}
               title="返回空间选择"
             >
-              {workspaceName}
-            </span>
+              <span className="text-xs text-primary truncate group-hover:underline">
+                {workspaceName}
+              </span>
+              <ChevronDown className="w-3 h-3 text-primary flex-shrink-0" />
+            </div>
           </div>
         </div>
       </div>
