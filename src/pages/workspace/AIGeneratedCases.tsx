@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
 import { SmartDesignTaskList, mockChatSessions } from "@/components/workspace/SmartDesignTaskList";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
@@ -116,6 +116,7 @@ const mockGeneratedFiles: GeneratedFile[] = [
 export default function AIGeneratedCases() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   
   const [tasks, setTasks] = useState<SmartDesignTask[]>(mockTasks);
@@ -161,6 +162,30 @@ export default function AIGeneratedCases() {
   };
 
   const [chatMessages, setChatMessages] = useState<Message[]>(defaultMessages);
+
+  // Handle review summary from URL
+  useEffect(() => {
+    const reviewSummaryParam = searchParams.get("reviewSummary");
+    if (reviewSummaryParam) {
+      try {
+        const summary = JSON.parse(decodeURIComponent(reviewSummaryParam));
+        // Build summary message
+        const summaryMessage: Message = {
+          id: `review-summary-${Date.now()}`,
+          role: "assistant",
+          content: `📋 **案例审查已完成**\n\n**${summary.caseName}** 本次审查了 ${summary.totalScenarios} 个场景：\n\n✅ 采纳：${summary.adopted} 个\n🔧 需完善：${summary.needsImprovement} 个\n✨ 已完善：${summary.improved} 个\n❌ 丢弃：${summary.discarded} 个\n⏳ 待审查：${summary.pending} 个\n\n案例已成功保存到测试任务中。`,
+          timestamp: new Date(),
+        };
+        setChatMessages(prev => [...prev, summaryMessage]);
+        
+        // Clear the URL parameter
+        searchParams.delete("reviewSummary");
+        setSearchParams(searchParams, { replace: true });
+      } catch (e) {
+        console.error("Failed to parse review summary:", e);
+      }
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSelectChatSession = (sessionId: string) => {
     setActiveChatSessionId(sessionId);
