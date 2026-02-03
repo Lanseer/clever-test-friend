@@ -82,7 +82,7 @@ export function SmartDesignTaskList({
               <span className="text-xs text-primary truncate group-hover:underline">
                 {workspaceName}
               </span>
-              <ChevronDown className="w-3 h-3 text-primary flex-shrink-0" />
+              <ChevronDown className="w-3 h-3 text-primary flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </div>
         </div>
