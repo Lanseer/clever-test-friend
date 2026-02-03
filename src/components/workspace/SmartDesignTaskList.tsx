@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Clock, MessageSquare, Plus, FlaskConical, User
 } from "lucide-react";
@@ -55,6 +56,12 @@ export function SmartDesignTaskList({
   workspaceName = "SCB",
   userName = "Lanseer",
 }: SmartDesignTaskListProps) {
+  const navigate = useNavigate();
+
+  const handleWorkspaceClick = () => {
+    navigate("/workspaces");
+  };
+
   return (
     <div className="flex flex-col h-full bg-white/40 dark:bg-background/40 backdrop-blur-sm">
       {/* Header - User and Workspace Info */}
@@ -67,7 +74,11 @@ export function SmartDesignTaskList({
             <span className="font-medium text-sm text-foreground truncate">
               {userName}
             </span>
-            <span className="text-xs text-muted-foreground truncate">
+            <span 
+              className="text-xs text-muted-foreground truncate cursor-pointer hover:text-primary transition-colors"
+              onClick={handleWorkspaceClick}
+              title="返回空间选择"
+            >
               {workspaceName}
             </span>
           </div>
