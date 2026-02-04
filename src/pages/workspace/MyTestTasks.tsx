@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { FileText, Plus, ArrowLeft, ClipboardList, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { FileText, Plus, ArrowLeft, ClipboardList, MoreHorizontal, Pencil, Trash2, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -166,6 +166,10 @@ export default function MyTestTasks() {
     toast.info(`删除任务 ${taskId}`);
   };
 
+  const handleInitiateExternalReview = () => {
+    navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/initiate-expert-review`);
+  };
+
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
@@ -271,8 +275,17 @@ export default function MyTestTasks() {
 
         {/* Right Panel - Test Case Versions */}
         <div className="flex-1 flex flex-col bg-background/50">
-          <div className="p-4 border-b">
+          <div className="p-4 border-b flex items-center justify-between">
             <h2 className="text-lg font-medium">{selectedTask?.name || "测试案例"}</h2>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1.5"
+              onClick={handleInitiateExternalReview}
+            >
+              <UserPlus className="w-4 h-4" />
+              发起外部评审
+            </Button>
           </div>
           
           <ScrollArea className="flex-1">
