@@ -19,104 +19,114 @@ interface TestTask {
   testCategory: string;
 }
 
-const mockTasks: TestTask[] = [
-  { id: "1", name: "用户登录模块测试", testPhase: "SIT测试", testCategory: "功能测试" },
-  { id: "2", name: "支付流程测试", testPhase: "UAT测试", testCategory: "功能测试" },
-  { id: "3", name: "订单管理测试", testPhase: "集成测试", testCategory: "数据测试" },
-  { id: "4", name: "商品搜索测试", testPhase: "SIT测试", testCategory: "功能测试" },
-  { id: "5", name: "购物车功能测试", testPhase: "UAT测试", testCategory: "专项测试" },
-];
+const useMockTasks = () => {
+  const { t } = useTranslation();
+  return [
+    { id: "1", name: t('mockData.tasks.userLogin'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "2", name: t('mockData.tasks.paymentFlow'), testPhase: t('myTasks.testPhase.uat'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "3", name: t('mockData.tasks.orderManagement'), testPhase: t('myTasks.testPhase.integration'), testCategory: t('myTasks.testCategory.data') },
+    { id: "4", name: t('mockData.tasks.productSearch'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "5", name: t('mockData.tasks.shoppingCart'), testPhase: t('myTasks.testPhase.uat'), testCategory: t('myTasks.testCategory.special') },
+  ];
+};
 
-const mockGeneratedCaseFiles: Record<string, CaseFileData[]> = {
-  "1": [
-    { 
-      id: "f1", 
-      name: "2026-01-23用户登录模块测试案例", 
-      version: "V1.0", 
-      createdAt: "2026-01-23 14:30", 
-      adoptedCount: 32, 
-      needsImprovementCount: 8, 
-      discardedCount: 5,
-      statusTag: "审查完成",
-      externalReview: { total: 3, completed: 2, inProgress: 1 }
-    },
-    { 
-      id: "f2", 
-      name: "2026-01-22用户登录模块测试案例", 
-      version: "V0.9", 
-      createdAt: "2026-01-22 10:15", 
-      adoptedCount: 28, 
-      needsImprovementCount: 6, 
-      discardedCount: 4,
-      statusTag: "审查中",
-      externalReview: { total: 1, completed: 0, inProgress: 1 }
-    },
-  ],
-  "2": [
-    { 
-      id: "f3", 
-      name: "2026-01-22支付流程测试案例", 
-      version: "V1.2", 
-      createdAt: "2026-01-22 16:45", 
-      adoptedCount: 24, 
-      needsImprovementCount: 5, 
-      discardedCount: 3,
-      statusTag: "审查中",
-      externalReview: { total: 2, completed: 1, inProgress: 1 }
-    },
-  ],
-  "3": [
-    { 
-      id: "f4", 
-      name: "2026-01-21订单管理测试案例", 
-      version: "V0.8", 
-      createdAt: "2026-01-21 09:20", 
-      adoptedCount: 38, 
-      needsImprovementCount: 10, 
-      discardedCount: 4,
-      externalReview: { total: 0, completed: 0, inProgress: 0 }
-    },
-  ],
-  "4": [
-    { 
-      id: "f5", 
-      name: "2026-01-20商品搜索测试案例", 
-      version: "V1.0", 
-      createdAt: "2026-01-20 11:00", 
-      adoptedCount: 18, 
-      needsImprovementCount: 4, 
-      discardedCount: 2,
-      statusTag: "审查完成",
-      externalReview: { total: 1, completed: 1, inProgress: 0 }
-    },
-  ],
-  "5": [
-    { 
-      id: "f6", 
-      name: "2026-01-20购物车功能测试案例", 
-      version: "V1.1", 
-      createdAt: "2026-01-20 15:30", 
-      adoptedCount: 28, 
-      needsImprovementCount: 6, 
-      discardedCount: 2,
-      statusTag: "审查中",
-      externalReview: { total: 2, completed: 2, inProgress: 0 }
-    },
-  ],
+const useMockCaseFiles = () => {
+  const { t } = useTranslation();
+  return {
+    "1": [
+      { 
+        id: "f1", 
+        name: `2026-01-23${t('mockData.tasks.userLogin')}${t('mockData.caseFiles.testCasesSuffix')}`, 
+        version: "V1.0", 
+        createdAt: "2026-01-23 14:30", 
+        adoptedCount: 32, 
+        needsImprovementCount: 8, 
+        discardedCount: 5,
+        statusTag: t('mockData.statusTags.reviewComplete'),
+        externalReview: { total: 3, completed: 2, inProgress: 1 }
+      },
+      { 
+        id: "f2", 
+        name: `2026-01-22${t('mockData.tasks.userLogin')}${t('mockData.caseFiles.testCasesSuffix')}`, 
+        version: "V0.9", 
+        createdAt: "2026-01-22 10:15", 
+        adoptedCount: 28, 
+        needsImprovementCount: 6, 
+        discardedCount: 4,
+        statusTag: t('mockData.statusTags.reviewing'),
+        externalReview: { total: 1, completed: 0, inProgress: 1 }
+      },
+    ],
+    "2": [
+      { 
+        id: "f3", 
+        name: `2026-01-22${t('mockData.tasks.paymentFlow')}${t('mockData.caseFiles.testCasesSuffix')}`, 
+        version: "V1.2", 
+        createdAt: "2026-01-22 16:45", 
+        adoptedCount: 24, 
+        needsImprovementCount: 5, 
+        discardedCount: 3,
+        statusTag: t('mockData.statusTags.reviewing'),
+        externalReview: { total: 2, completed: 1, inProgress: 1 }
+      },
+    ],
+    "3": [
+      { 
+        id: "f4", 
+        name: `2026-01-21${t('mockData.tasks.orderManagement')}${t('mockData.caseFiles.testCasesSuffix')}`, 
+        version: "V0.8", 
+        createdAt: "2026-01-21 09:20", 
+        adoptedCount: 38, 
+        needsImprovementCount: 10, 
+        discardedCount: 4,
+        externalReview: { total: 0, completed: 0, inProgress: 0 }
+      },
+    ],
+    "4": [
+      { 
+        id: "f5", 
+        name: `2026-01-20${t('mockData.tasks.productSearch')}${t('mockData.caseFiles.testCasesSuffix')}`, 
+        version: "V1.0", 
+        createdAt: "2026-01-20 11:00", 
+        adoptedCount: 18, 
+        needsImprovementCount: 4, 
+        discardedCount: 2,
+        statusTag: t('mockData.statusTags.reviewComplete'),
+        externalReview: { total: 1, completed: 1, inProgress: 0 }
+      },
+    ],
+    "5": [
+      { 
+        id: "f6", 
+        name: `2026-01-20${t('mockData.tasks.shoppingCart')}${t('mockData.caseFiles.testCasesSuffix')}`, 
+        version: "V1.1", 
+        createdAt: "2026-01-20 15:30", 
+        adoptedCount: 28, 
+        needsImprovementCount: 6, 
+        discardedCount: 2,
+        statusTag: t('mockData.statusTags.reviewing'),
+        externalReview: { total: 2, completed: 2, inProgress: 0 }
+      },
+    ],
+  } as Record<string, CaseFileData[]>;
 };
 
 export default function MyTestTasks() {
   const { workspaceId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const initialTaskId = searchParams.get("taskId") || mockTasks[0]?.id;
-   const { t } = useTranslation();
+  const { t } = useTranslation();
   
+  const mockTasks = useMockTasks();
+  const mockCaseFilesData = useMockCaseFiles();
+  
+  const initialTaskId = searchParams.get("taskId") || mockTasks[0]?.id || "1";
+   
   const [selectedTaskId, setSelectedTaskId] = useState<string>(initialTaskId);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [caseFiles, setCaseFiles] = useState(mockGeneratedCaseFiles);
+  const [caseFiles, setCaseFiles] = useState(mockCaseFilesData);
 
-  const selectedTask = mockTasks.find(t => t.id === selectedTaskId);
+  const selectedTask = mockTasks.find(task => task.id === selectedTaskId);
   const generatedFiles = caseFiles[selectedTaskId] || [];
 
   const handleBack = () => {

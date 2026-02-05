@@ -27,30 +27,31 @@ interface CoverageSupplement {
   icon: typeof Search;
 }
 
-// Mock data
-const selfReviewIssues: IssueCategory[] = [
-  { name: "场景问题", count: 10, color: "#f59e0b" },
-  { name: "信息问题", count: 20, color: "#3b82f6" },
-  { name: "数据问题", count: 30, color: "#ef4444" },
-];
-
-const discardReasons: DiscardReason[] = [
-  { name: "场景重复", count: 20, color: "#94a3b8" },
-  { name: "场景与需求不符", count: 10, color: "#f97316" },
-  { name: "场景与功能不符", count: 20, color: "#dc2626" },
-];
-
-const coverageSupplements: CoverageSupplement[] = [
-  { name: "隐藏需求挖掘补充", count: 100, icon: Search },
-  { name: "等价类补充", count: 120, icon: Layers },
-  { name: "边界值补充", count: 120, icon: Target },
-  { name: "流程补充", count: 12, icon: TrendingUp },
-  { name: "特殊场景补充", count: 20, icon: Plus },
-];
-
-const coverageData = {
-  totalCoverage: 80,
-  uncoveredCount: 200,
+const useMockData = () => {
+  const { t } = useTranslation();
+  return {
+    selfReviewIssues: [
+      { name: t('mockData.reports.scenarioIssue'), count: 10, color: "#f59e0b" },
+      { name: t('mockData.reports.infoIssue'), count: 20, color: "#3b82f6" },
+      { name: t('mockData.reports.dataIssue'), count: 30, color: "#ef4444" },
+    ] as IssueCategory[],
+    discardReasons: [
+      { name: t('mockData.reports.duplicateScenario'), count: 20, color: "#94a3b8" },
+      { name: t('mockData.reports.notMatchRequirement'), count: 10, color: "#f97316" },
+      { name: t('mockData.reports.notMatchFunction'), count: 20, color: "#dc2626" },
+    ] as DiscardReason[],
+    coverageSupplements: [
+      { name: t('mockData.reports.hiddenRequirement'), count: 100, icon: Search },
+      { name: t('mockData.reports.equivalence'), count: 120, icon: Layers },
+      { name: t('mockData.reports.boundary'), count: 120, icon: Target },
+      { name: t('mockData.reports.flowSupplement'), count: 12, icon: TrendingUp },
+      { name: t('mockData.reports.specialScenario'), count: 20, icon: Plus },
+    ] as CoverageSupplement[],
+    coverageData: {
+      totalCoverage: 80,
+      uncoveredCount: 200,
+    }
+  };
 };
 
 export default function DeliverableReport() {
@@ -58,6 +59,9 @@ export default function DeliverableReport() {
   const { workspaceId, recordId } = useParams();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+  
+  const { selfReviewIssues, discardReasons, coverageSupplements, coverageData } = useMockData();
+  
   const deliverableName = searchParams.get("name") || t('deliverableReport.title');
 
   const stats = { totalScenarios: 45, totalCases: 165, adopted: 138, needsImprovement: 27 };

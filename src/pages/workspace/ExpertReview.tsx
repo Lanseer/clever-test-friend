@@ -29,44 +29,47 @@ interface TestDimension {
   testPoints: TestPoint[];
 }
 
-const mockDimensions: TestDimension[] = [
-  {
-    id: "dim-1",
-    name: "用户管理",
-    description: "用户注册、登录、权限相关测试",
-    total: 45,
-    passed: 35,
-    testPoints: [
-      { id: "tp-1", name: "用户登录", total: 15, passed: 12 },
-      { id: "tp-2", name: "用户注册", total: 18, passed: 14 },
-      { id: "tp-3", name: "密码重置", total: 12, passed: 9 },
-    ],
-  },
-  {
-    id: "dim-2",
-    name: "订单管理",
-    description: "订单创建、支付、退款流程测试",
-    total: 62,
-    passed: 50,
-    testPoints: [
-      { id: "tp-4", name: "订单创建", total: 22, passed: 18 },
-      { id: "tp-5", name: "订单支付", total: 25, passed: 20 },
-      { id: "tp-6", name: "订单退款", total: 15, passed: 12 },
-    ],
-  },
-  {
-    id: "dim-3",
-    name: "商品管理",
-    description: "商品上架、编辑、库存管理测试",
-    total: 38,
-    passed: 30,
-    testPoints: [
-      { id: "tp-7", name: "商品上架", total: 14, passed: 11 },
-      { id: "tp-8", name: "商品编辑", total: 12, passed: 10 },
-      { id: "tp-9", name: "库存管理", total: 12, passed: 9 },
-    ],
-  },
-];
+const useMockDimensions = () => {
+  const { t } = useTranslation();
+  return [
+    {
+      id: "dim-1",
+      name: t('mockData.dimensions.userManagement'),
+      description: t('mockData.dimensions.userManagementDesc'),
+      total: 45,
+      passed: 35,
+      testPoints: [
+        { id: "tp-1", name: t('mockData.testPoints.userLogin'), total: 15, passed: 12 },
+        { id: "tp-2", name: t('mockData.testPoints.userRegister'), total: 18, passed: 14 },
+        { id: "tp-3", name: t('mockData.testPoints.passwordReset'), total: 12, passed: 9 },
+      ],
+    },
+    {
+      id: "dim-2",
+      name: t('mockData.dimensions.orderManagement'),
+      description: t('mockData.dimensions.orderManagementDesc'),
+      total: 62,
+      passed: 50,
+      testPoints: [
+        { id: "tp-4", name: t('mockData.testPoints.orderCreate'), total: 22, passed: 18 },
+        { id: "tp-5", name: t('mockData.testPoints.orderPayment'), total: 25, passed: 20 },
+        { id: "tp-6", name: t('mockData.testPoints.orderRefund'), total: 15, passed: 12 },
+      ],
+    },
+    {
+      id: "dim-3",
+      name: t('mockData.dimensions.productManagement'),
+      description: t('mockData.dimensions.productManagementDesc'),
+      total: 38,
+      passed: 30,
+      testPoints: [
+        { id: "tp-7", name: t('mockData.testPoints.productListing'), total: 14, passed: 11 },
+        { id: "tp-8", name: t('mockData.testPoints.productEdit'), total: 12, passed: 10 },
+        { id: "tp-9", name: t('mockData.testPoints.inventoryManagement'), total: 12, passed: 9 },
+      ],
+    },
+  ];
+};
 
 // 计算总统计
 const calculateTotalStats = (dimensions: TestDimension[]) => {
@@ -94,11 +97,13 @@ export default function ExpertReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
+  
+  const mockDimensions = useMockDimensions();
+  
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
     new Set(mockDimensions.map((d) => d.id))
   );
-   const { t } = useTranslation();
-  
 
   const totalStats = calculateTotalStats(mockDimensions);
   const pendingCount = totalStats.total - totalStats.passed;

@@ -43,11 +43,21 @@ export interface ChatSession {
   timestamp: string;
 }
 
-// Mock chat sessions - exported for use in parent
+// Mock chat sessions - use hook for translated data
+export const useMockChatSessions = () => {
+  const { t } = useTranslation();
+  return [
+    { id: "session-1", name: t('mockData.sessions.userLoginModule'), lastMessage: "", timestamp: "10:30" },
+    { id: "session-2", name: t('mockData.sessions.orderPaymentAnalysis'), lastMessage: "", timestamp: t('common.yesterday') },
+    { id: "session-3", name: t('mockData.sessions.apiCoverageOptimization'), lastMessage: "", timestamp: `3${t('common.daysAgo')}` },
+  ];
+};
+
+// Keep static export for backward compatibility
 export const mockChatSessions: ChatSession[] = [
-  { id: "session-1", name: "用户登录模块测试", lastMessage: "帮我生成用户登录模块的测试案例", timestamp: "10:30" },
-  { id: "session-2", name: "订单支付流程分析", lastMessage: "分析这个需求文档", timestamp: "昨天" },
-  { id: "session-3", name: "接口覆盖率优化", lastMessage: "优化测试覆盖率", timestamp: "3天前" },
+  { id: "session-1", name: "用户登录模块测试", lastMessage: "", timestamp: "10:30" },
+  { id: "session-2", name: "订单支付流程分析", lastMessage: "", timestamp: "昨天" },
+  { id: "session-3", name: "接口覆盖率优化", lastMessage: "", timestamp: "3天前" },
 ];
 
 export function SmartDesignTaskList({
@@ -58,7 +68,8 @@ export function SmartDesignTaskList({
   userName = "Lanseer",
 }: SmartDesignTaskListProps) {
   const navigate = useNavigate();
-   const { t } = useTranslation();
+  const { t } = useTranslation();
+  const chatSessions = useMockChatSessions();
 
   const handleWorkspaceClick = () => {
     navigate("/workspaces");
@@ -110,7 +121,7 @@ export function SmartDesignTaskList({
       {/* Session List */}
       <ScrollArea className="flex-1">
         <div className="px-2 space-y-1">
-          {mockChatSessions.map((session) => (
+          {chatSessions.map((session) => (
             <div
               key={session.id}
               className={cn(
