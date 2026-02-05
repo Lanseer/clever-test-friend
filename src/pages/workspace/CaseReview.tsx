@@ -181,25 +181,121 @@ POST /api/v1/auth/register
   },
 ];
 
-// 分类选项
-const categoryOptions = [
-  { value: "完善场景", label: "完善场景" },
-  { value: "完善信息", label: "完善信息" },
-  { value: "完善数据", label: "完善数据" },
-  { value: "重复", label: "重复" },
-  { value: "非本功能", label: "非本功能" },
-  { value: "其他", label: "其他" },
-];
+// 分类选项 - use hook for i18n
+const useCategoryOptions = () => {
+  const { t } = useTranslation();
+  return [
+    { value: "improveScenario", label: t('caseReview.categories.improveScenario') },
+    { value: "improveInfo", label: t('caseReview.categories.improveInfo') },
+    { value: "improveData", label: t('caseReview.categories.improveData') },
+    { value: "duplicate", label: t('caseReview.categories.duplicate') },
+    { value: "notThisFunction", label: t('caseReview.categories.notThisFunction') },
+    { value: "other", label: t('caseReview.categories.other') },
+  ];
+};
 
 // 场景分类选项
-const scenarioCategoryOptions = [
-  { value: "功能测试", label: "功能测试" },
-  { value: "边界测试", label: "边界测试" },
-  { value: "异常测试", label: "异常测试" },
-  { value: "性能测试", label: "性能测试" },
-  { value: "安全测试", label: "安全测试" },
-  { value: "兼容性测试", label: "兼容性测试" },
-];
+const useScenarioCategoryOptions = () => {
+  const { t } = useTranslation();
+  return [
+    { value: "functional", label: t('caseReview.scenarioCategories.functional') },
+    { value: "boundary", label: t('caseReview.scenarioCategories.boundary') },
+    { value: "exception", label: t('caseReview.scenarioCategories.exception') },
+    { value: "performance", label: t('caseReview.scenarioCategories.performance') },
+    { value: "security", label: t('caseReview.scenarioCategories.security') },
+    { value: "compatibility", label: t('caseReview.scenarioCategories.compatibility') },
+  ];
+};
+
+// Mock dimensions with i18n
+const useMockDimensions = (): TestDimension[] => {
+  const { t } = useTranslation();
+  return [
+    {
+      id: "dim-1",
+      name: `01-${t('mockData.dimensions.businessFlow')}`,
+      testPoints: [
+        { id: "tp-1", code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 12, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+        { id: "tp-2", code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 18, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+        { id: "tp-3", code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 8, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+        { id: "tp-4", code: "SC-004", name: t('mockData.testPoints.multiFactorAuth'), scenarioCategory: t('caseReview.scenarioCategories.security'), source: "PRD", caseCount: 5, reviewResult: "pending", comparisonStatus: "deleted", reviewHistory: [] },
+      ],
+    },
+    {
+      id: "dim-2",
+      name: `02-${t('mockData.dimensions.businessFunction')}`,
+      testPoints: [
+        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+      ],
+    },
+    {
+      id: "dim-3",
+      name: `03-${t('mockData.dimensions.businessElement')}`,
+      testPoints: [
+        { id: "tp-7", code: "SC-007", name: t('mockData.testPoints.productInfoValidation'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "TSD", caseCount: 14, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+        { id: "tp-8", code: "SC-008", name: t('mockData.testPoints.inventoryBoundary'), scenarioCategory: t('caseReview.scenarioCategories.boundary'), source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+      ],
+    },
+  ];
+};
+
+// Translated config hooks
+const useComparisonStatusConfig = () => {
+  const { t } = useTranslation();
+  return {
+    new: {
+      label: t('caseReview.new'),
+      className: "bg-green-500/10 text-green-600 border-green-200",
+      scenarioClassName: "text-green-600",
+    },
+    updated: {
+      label: t('caseReview.updated'),
+      className: "bg-blue-500/10 text-blue-600 border-blue-200",
+      scenarioClassName: "text-blue-600",
+    },
+    deleted: {
+      label: t('caseReview.deleted'),
+      className: "bg-red-500/10 text-red-600 border-red-200",
+      scenarioClassName: "text-red-500 line-through",
+    },
+    unchanged: {
+      label: t('caseReview.unchanged'),
+      className: "text-muted-foreground",
+      scenarioClassName: "text-foreground",
+    },
+  } as Record<ComparisonStatus, { label: string; className: string; scenarioClassName: string }>;
+};
+
+const useReviewResultConfig = () => {
+  const { t } = useTranslation();
+  return {
+    adopted: {
+      label: t('caseReview.adopted'),
+      className: "text-green-600",
+    },
+    needsImprovement: {
+      label: t('caseReview.needsImprovement'),
+      className: "text-amber-600",
+    },
+    improved: {
+      label: t('caseReview.improved'),
+      className: "text-blue-600",
+    },
+    needsDiscard: {
+      label: t('caseReview.discard'),
+      className: "text-red-600",
+    },
+    pending: {
+      label: t('caseReview.pendingReview'),
+      className: "text-muted-foreground",
+    },
+    focusReview: {
+      label: t('caseReview.focusReview'),
+      className: "text-amber-600",
+    },
+  } as Record<ReviewResult, { label: string; className: string }>;
+};
 
  type ReviewResult = "adopted" | "needsImprovement" | "improved" | "needsDiscard" | "pending" | "focusReview";
  type ComparisonStatus = "new" | "updated" | "deleted" | "unchanged";
@@ -230,89 +326,20 @@ interface TestDimension {
   testPoints: TestPoint[];
 }
 
-const mockDimensions: TestDimension[] = [
-  {
-    id: "dim-1",
-    name: "01-业务流程维度",
-    testPoints: [
-       { id: "tp-1", code: "SC-001", name: "用户登录成功场景", scenarioCategory: "功能测试", source: "UserStory, FSD", caseCount: 12, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-       { id: "tp-2", code: "SC-002", name: "用户注册完整流程", scenarioCategory: "功能测试", source: "FSD", caseCount: 18, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
-       { id: "tp-3", code: "SC-003", name: "密码重置异常处理", scenarioCategory: "异常测试", source: "TSD, PRD", caseCount: 8, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
-       { id: "tp-4", code: "SC-004", name: "多因素认证验证", scenarioCategory: "安全测试", source: "PRD", caseCount: 5, reviewResult: "pending", comparisonStatus: "deleted", reviewHistory: [] },
-    ],
-  },
-  {
-    id: "dim-2",
-    name: "02-业务功能维度",
-    testPoints: [
-       { id: "tp-5", code: "SC-005", name: "订单创建标准流程", scenarioCategory: "功能测试", source: "UserStory", caseCount: 22, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", scenarioCategory: "异常测试", source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
-    ],
-  },
-  {
-    id: "dim-3",
-    name: "03-业务要素维度",
-    testPoints: [
-       { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", scenarioCategory: "功能测试", source: "TSD", caseCount: 14, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
-      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", scenarioCategory: "边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-    ],
-  },
-];
-
-const comparisonStatusConfig: Record<ComparisonStatus, { label: string; className: string; scenarioClassName: string }> = {
-  new: {
-    label: "新增",
-    className: "bg-green-500/10 text-green-600 border-green-200",
-    scenarioClassName: "text-green-600",
-  },
-  updated: {
-    label: "更新",
-    className: "bg-blue-500/10 text-blue-600 border-blue-200",
-    scenarioClassName: "text-blue-600",
-  },
-  deleted: {
-    label: "删除",
-    className: "bg-red-500/10 text-red-600 border-red-200",
-    scenarioClassName: "text-red-500 line-through",
-  },
-  unchanged: {
-    label: "-",
-    className: "text-muted-foreground",
-    scenarioClassName: "text-foreground",
-  },
-};
-
-const reviewResultConfig: Record<ReviewResult, { label: string; className: string }> = {
-  adopted: {
-    label: "采纳",
-    className: "text-green-600",
-  },
-  needsImprovement: {
-    label: "需完善",
-    className: "text-amber-600",
-  },
-  improved: {
-    label: "已完善",
-    className: "text-blue-600",
-  },
-  needsDiscard: {
-    label: "丢弃",
-    className: "text-red-600",
-  },
-  pending: {
-    label: "待审查",
-    className: "text-muted-foreground",
-  },
- focusReview: {
-   label: "重点审查",
-   className: "text-amber-600",
- },
-};
+// Static configs removed - now using hooks above for i18n support
 
 export default function CaseReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId } = useParams();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
+  
+  // Get translated config and data from hooks
+  const categoryOptions = useCategoryOptions();
+  const scenarioCategoryOptions = useScenarioCategoryOptions();
+  const mockDimensions = useMockDimensions();
+  const comparisonStatusConfig = useComparisonStatusConfig();
+  const reviewResultConfig = useReviewResultConfig();
   
   // 检测来源
   const source = searchParams.get("source"); // "chat" 或 "deliverable"
@@ -344,10 +371,10 @@ export default function CaseReview() {
   const [saveToTaskDialogOpen, setSaveToTaskDialogOpen] = useState(false);
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   
-  // Mock task data for display
+  // Mock task data for display - use translated data
   const mockTasksData = [
-    { id: "1", name: "用户登录模块测试", testPhase: "SIT测试", testCategory: "功能测试" },
-    { id: "2", name: "支付流程测试", testPhase: "UAT测试", testCategory: "功能测试" },
+    { id: "1", name: t('mockData.tasks.userLogin'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "2", name: t('mockData.tasks.paymentFlow'), testPhase: t('myTasks.testPhase.uat'), testCategory: t('myTasks.testCategory.functional') },
   ];
   
   // 保存处理
@@ -417,8 +444,6 @@ export default function CaseReview() {
   
   // 对话面板状态
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
-  
-  const { t } = useTranslation();
   
   const handleOpenMaterial = (material: ReferenceMaterial) => {
     setSelectedMaterial(material);

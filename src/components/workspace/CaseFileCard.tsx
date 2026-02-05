@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface ExternalReviewStats {
   total: number;
@@ -35,21 +36,35 @@ interface CaseFileCardProps {
   onTagChange?: (fileId: string, tag: string | undefined) => void;
 }
 
-const defaultStatusTags = ["审查完成", "审查中", "待审查", "废弃"];
+const useDefaultStatusTags = () => {
+  const { t } = useTranslation();
+  return [
+    t('mockData.statusTags.reviewComplete'), 
+    t('mockData.statusTags.reviewing'), 
+    t('mockData.statusTags.pendingReview'), 
+    t('mockData.statusTags.discarded')
+  ];
+};
 
-const getTagColorClasses = (tag: string): string => {
-  switch (tag) {
-    case "审查完成":
+const useTagColorClasses = () => {
+  const { t } = useTranslation();
+  return (tag: string): string => {
+    const reviewComplete = t('mockData.statusTags.reviewComplete');
+    const reviewing = t('mockData.statusTags.reviewing');
+    const pendingReview = t('mockData.statusTags.pendingReview');
+    const discarded = t('mockData.statusTags.discarded');
+    
+    if (tag === reviewComplete || tag === "审查完成" || tag === "Review Complete") {
       return "bg-green-100 text-green-700 border-green-300";
-    case "审查中":
+    } else if (tag === reviewing || tag === "审查中" || tag === "Reviewing") {
       return "bg-blue-100 text-blue-700 border-blue-300";
-    case "待审查":
+    } else if (tag === pendingReview || tag === "待审查" || tag === "Pending Review") {
       return "bg-amber-100 text-amber-700 border-amber-300";
-    case "废弃":
+    } else if (tag === discarded || tag === "废弃" || tag === "Discarded") {
       return "bg-gray-100 text-gray-500 border-gray-300";
-    default:
-      return "bg-primary/5 border-primary/20 text-primary";
-  }
+    }
+    return "bg-primary/5 border-primary/20 text-primary";
+  };
 };
 
 export function CaseFileCard({
@@ -59,6 +74,10 @@ export function CaseFileCard({
   onExpertReviewClick,
   onTagChange,
 }: CaseFileCardProps) {
+  const { t } = useTranslation();
+  const defaultStatusTags = useDefaultStatusTags();
+  const getTagColorClasses = useTagColorClasses();
+  
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [currentTag, setCurrentTag] = useState<string | undefined>(file.statusTag);
@@ -69,7 +88,7 @@ export function CaseFileCard({
       onTagChange?.(file.id, newTag.trim());
       setNewTag("");
       setTagPopoverOpen(false);
-      toast.success(`标签 "${newTag.trim()}" 已添加`);
+      toast.success(`${t('mockData.caseFileCard.tagAdded')}: "${newTag.trim()}"`);
     }
   };
 
@@ -124,7 +143,7 @@ export function CaseFileCard({
                     <ClipboardList className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top"><p>审查报告</p></TooltipContent>
+                <TooltipContent side="top"><p>{t('mockData.caseFileCard.auditReport')}</p></TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -138,7 +157,7 @@ export function CaseFileCard({
                     <UserCheck className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top"><p>外部评审</p></TooltipContent>
+                <TooltipContent side="top"><p>{t('mockData.caseFileCard.externalReview')}</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
             <ChevronRight className="w-4 h-4 text-muted-foreground ml-1" />
@@ -151,15 +170,15 @@ export function CaseFileCard({
           <div className="flex items-center gap-3 text-xs">
             <span className="flex items-center gap-1 text-green-600">
               <Check className="w-3 h-3" />
-              <span className="text-muted-foreground">采纳</span> {file.adoptedCount}
+              <span className="text-muted-foreground">{t('mockData.caseFileCard.adopted')}</span> {file.adoptedCount}
             </span>
             <span className="flex items-center gap-1 text-amber-600">
               <AlertCircle className="w-3 h-3" />
-              <span className="text-muted-foreground">需完善</span> {file.needsImprovementCount}
+              <span className="text-muted-foreground">{t('mockData.caseFileCard.needsImprovement')}</span> {file.needsImprovementCount}
             </span>
             <span className="flex items-center gap-1 text-red-600">
               <Trash2 className="w-3 h-3" />
-              <span className="text-muted-foreground">丢弃</span> {file.discardedCount}
+              <span className="text-muted-foreground">{t('mockData.caseFileCard.discard')}</span> {file.discardedCount}
             </span>
           </div>
 
@@ -167,16 +186,16 @@ export function CaseFileCard({
           {externalReview.total > 0 && (
             <div className="flex items-center gap-2 text-xs border-l pl-3">
               <Users className="w-3.5 h-3.5 text-primary" />
-              <span className="text-muted-foreground">外部评审</span>
-              <span className="font-medium">{externalReview.total}次</span>
-              <span className="text-green-600">(完成{externalReview.completed}</span>
-              <span className="text-amber-600">进行中{externalReview.inProgress})</span>
+              <span className="text-muted-foreground">{t('mockData.caseFileCard.externalReviewStats')}</span>
+              <span className="font-medium">{externalReview.total}{t('common.times')}</span>
+              <span className="text-green-600">({t('common.completed')}{externalReview.completed}</span>
+              <span className="text-amber-600">{t('common.inProgress')}{externalReview.inProgress})</span>
             </div>
           )}
           {externalReview.total === 0 && (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Users className="w-3.5 h-3.5" />
-              <span>暂无外部评审</span>
+              <span>{t('mockData.caseFileCard.noExternalReview')}</span>
             </div>
           )}
         </div>
@@ -206,12 +225,12 @@ export function CaseFileCard({
               <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <Button variant="ghost" size="sm" className="h-5 px-1.5 text-[10px] text-muted-foreground hover:text-primary gap-1">
                   <Tag className="w-3 h-3" />
-                  添加标签
+                  {t('mockData.caseFileCard.addTag')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="start" className="w-60 p-3" onClick={(e) => e.stopPropagation()}>
                 <div className="space-y-3">
-                  <div className="text-xs font-medium text-muted-foreground">快捷标签</div>
+                  <div className="text-xs font-medium text-muted-foreground">{t('mockData.caseFileCard.quickTags')}</div>
                   <div className="flex flex-wrap gap-1.5">
                     {defaultStatusTags.map((tag) => (
                       <Badge
@@ -225,17 +244,17 @@ export function CaseFileCard({
                     ))}
                   </div>
                   <div className="border-t pt-3">
-                    <div className="text-xs font-medium text-muted-foreground mb-2">自定义标签</div>
+                    <div className="text-xs font-medium text-muted-foreground mb-2">{t('mockData.caseFileCard.customTag')}</div>
                     <div className="flex gap-2">
                       <Input
-                        placeholder="输入标签名称"
+                        placeholder={t('mockData.caseFileCard.enterTagName')}
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
                         className="h-7 text-xs"
                         onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
                       />
                       <Button size="sm" className="h-7 px-2" onClick={handleAddTag}>
-                        添加
+                        {t('common.add')}
                       </Button>
                     </div>
                   </div>

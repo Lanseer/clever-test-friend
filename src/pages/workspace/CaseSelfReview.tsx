@@ -26,65 +26,70 @@ interface GeneratedCase {
   createdAt: string;
 }
 
-// 测试点信息
-const testPointInfo: Record<string, { name: string; dimensionName: string }> = {
-  "tp-1": { name: "用户登录", dimensionName: "用户管理" },
-  "tp-2": { name: "用户注册", dimensionName: "用户管理" },
-  "tp-3": { name: "密码重置", dimensionName: "用户管理" },
-  "tp-4": { name: "订单创建", dimensionName: "订单管理" },
-  "tp-5": { name: "订单支付", dimensionName: "订单管理" },
+const useTestPointInfo = () => {
+  const { t } = useTranslation();
+  return {
+    "tp-1": { name: t('mockData.testPoints.userLogin'), dimensionName: t('mockData.dimensions.userManagement') },
+    "tp-2": { name: t('mockData.testPoints.userRegister'), dimensionName: t('mockData.dimensions.userManagement') },
+    "tp-3": { name: t('mockData.testPoints.passwordReset'), dimensionName: t('mockData.dimensions.userManagement') },
+    "tp-4": { name: t('mockData.testPoints.orderCreate'), dimensionName: t('mockData.dimensions.orderManagement') },
+    "tp-5": { name: t('mockData.testPoints.orderPayment'), dimensionName: t('mockData.dimensions.orderManagement') },
+  } as Record<string, { name: string; dimensionName: string }>;
 };
 
 // 根据测试点生成 mock 用例
-const generateMockCases = (testPointId: string): GeneratedCase[] => {
-  const info = testPointInfo[testPointId] || { name: "默认测试点", dimensionName: "默认维度" };
+const useGenerateMockCases = (testPointId: string) => {
+  const { t } = useTranslation();
+  const testPointInfo = useTestPointInfo();
+  const info = testPointInfo[testPointId] || { name: t('mockData.testPoints.userLogin'), dimensionName: t('mockData.dimensions.userManagement') };
+  
   return [
     {
       id: "1",
       batch: "Batch-001",
       code: "TC-001",
-      name: `${info.name}成功场景`,
-      nature: "positive",
+      name: `${info.name} - ${t('caseReview.adopted')}`,
+      nature: "positive" as CaseNature,
       createdAt: "2024-01-15 10:30",
     },
     {
       id: "2",
       batch: "Batch-001",
       code: "TC-002",
-      name: `${info.name}失败场景-参数错误`,
-      nature: "negative",
+      name: `${info.name} - ${t('caseReview.discard')}`,
+      nature: "negative" as CaseNature,
       createdAt: "2024-01-15 10:32",
     },
     {
       id: "3",
       batch: "Batch-001",
       code: "TC-003",
-      name: `${info.name}边界测试`,
-      nature: "positive",
+      name: `${info.name} - ${t('caseReview.scenarioCategories.boundary')}`,
+      nature: "positive" as CaseNature,
       createdAt: "2024-01-15 10:35",
     },
     {
       id: "4",
       batch: "Batch-002",
       code: "TC-004",
-      name: `${info.name}异常处理`,
-      nature: "negative",
+      name: `${info.name} - ${t('caseReview.scenarioCategories.exception')}`,
+      nature: "negative" as CaseNature,
       createdAt: "2024-01-15 10:38",
     },
     {
       id: "5",
       batch: "Batch-002",
       code: "TC-005",
-      name: `${info.name}并发测试`,
-      nature: "positive",
+      name: `${info.name} - Concurrent`,
+      nature: "positive" as CaseNature,
       createdAt: "2024-01-15 10:40",
     },
     {
       id: "6",
       batch: "Batch-002",
       code: "TC-006",
-      name: `${info.name}性能测试`,
-      nature: "positive",
+      name: `${info.name} - ${t('caseReview.scenarioCategories.performance')}`,
+      nature: "positive" as CaseNature,
       createdAt: "2024-01-15 10:42",
     },
   ];
@@ -94,10 +99,12 @@ export default function CaseSelfReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId, testPointId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [cases] = useState(() => generateMockCases(testPointId || "tp-1"));
-   const { t } = useTranslation();
+  const { t } = useTranslation();
+  
+  const testPointInfo = useTestPointInfo();
+  const cases = useGenerateMockCases(testPointId || "tp-1");
 
-  const info = testPointInfo[testPointId || "tp-1"] || { name: "测试点", dimensionName: "测试维度" };
+  const info = testPointInfo[testPointId || "tp-1"] || { name: t('mockData.testPoints.userLogin'), dimensionName: t('mockData.dimensions.userManagement') };
  
    const natureConfig: Record<CaseNature, { label: string; icon: typeof CheckCircle; className: string }> = {
      positive: {
