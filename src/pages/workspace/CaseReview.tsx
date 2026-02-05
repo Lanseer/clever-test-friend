@@ -200,8 +200,8 @@ const scenarioCategoryOptions = [
   { value: "兼容性测试", label: "兼容性测试" },
 ];
 
-type ReviewResult = "adopted" | "needsImprovement" | "improved" | "needsDiscard" | "pending";
-type ComparisonStatus = "new" | "updated" | "deleted" | "unchanged";
+ type ReviewResult = "adopted" | "needsImprovement" | "improved" | "needsDiscard" | "pending" | "focusReview";
+ type ComparisonStatus = "new" | "updated" | "deleted" | "unchanged";
 
 interface ReviewHistoryItem {
   timestamp: string;
@@ -234,17 +234,17 @@ const mockDimensions: TestDimension[] = [
     id: "dim-1",
     name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", scenarioCategory: "功能测试", source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
-      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", scenarioCategory: "功能测试", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", comparisonStatus: "new", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
-      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", scenarioCategory: "异常测试", source: "TSD, PRD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
-      { id: "tp-4", code: "SC-004", name: "多因素认证验证", scenarioCategory: "安全测试", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", comparisonStatus: "deleted", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
+       { id: "tp-1", code: "SC-001", name: "用户登录成功场景", scenarioCategory: "功能测试", source: "UserStory, FSD", caseCount: 12, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+       { id: "tp-2", code: "SC-002", name: "用户注册完整流程", scenarioCategory: "功能测试", source: "FSD", caseCount: 18, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+       { id: "tp-3", code: "SC-003", name: "密码重置异常处理", scenarioCategory: "异常测试", source: "TSD, PRD", caseCount: 8, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+       { id: "tp-4", code: "SC-004", name: "多因素认证验证", scenarioCategory: "安全测试", source: "PRD", caseCount: 5, reviewResult: "pending", comparisonStatus: "deleted", reviewHistory: [] },
     ],
   },
   {
     id: "dim-2",
     name: "02-业务功能维度",
     testPoints: [
-      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", scenarioCategory: "功能测试", source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-06 09:00", action: "状态修改为采纳" }] },
+       { id: "tp-5", code: "SC-005", name: "订单创建标准流程", scenarioCategory: "功能测试", source: "UserStory", caseCount: 22, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
       { id: "tp-6", code: "SC-006", name: "订单支付异常处理", scenarioCategory: "异常测试", source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
     ],
   },
@@ -252,7 +252,7 @@ const mockDimensions: TestDimension[] = [
     id: "dim-3",
     name: "03-业务要素维度",
     testPoints: [
-      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", scenarioCategory: "功能测试", source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-06 10:15", action: "状态修改为采纳" }] },
+       { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", scenarioCategory: "功能测试", source: "TSD", caseCount: 14, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
       { id: "tp-8", code: "SC-008", name: "库存数量边界测试", scenarioCategory: "边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
     ],
   },
@@ -302,6 +302,10 @@ const reviewResultConfig: Record<ReviewResult, { label: string; className: strin
     label: "待审查",
     className: "text-muted-foreground",
   },
+ focusReview: {
+   label: "重点审查",
+   className: "text-amber-600",
+ },
 };
 
 export default function CaseReview() {
@@ -393,6 +397,8 @@ export default function CaseReview() {
     needsImprovement: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "needsImprovement").length, 0),
     improved: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "improved").length, 0),
     needsDiscard: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "needsDiscard").length, 0),
+     focusReview: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "focusReview").length, 0),
+     pending: dimensions.reduce((sum, dim) => sum + dim.testPoints.filter(tp => tp.reviewResult === "pending").length, 0),
   };
   
   // 侧边栏状态
@@ -539,11 +545,27 @@ export default function CaseReview() {
     setTimeout(() => {
       // 生成AI建议
       const suggestions = new Map<string, ReviewResult>();
+       const focusReviewSuggestions = [
+         "非本需求，请详细查看本体来源",
+         "场景描述与需求文档不符，请核实",
+         "测试数据边界条件需要确认",
+         "与已有案例存在重复风险，请检查",
+         "业务逻辑复杂度较高，建议人工复核",
+       ];
+       
       dimensions.forEach(dim => {
-        dim.testPoints.forEach(tp => {
+         dim.testPoints.forEach((tp, index) => {
           // 模拟AI给出的建议
-          const randomResults: ReviewResult[] = ["adopted", "needsImprovement", "needsDiscard"];
-          const suggestion = randomResults[Math.floor(Math.random() * randomResults.length)];
+           // 部分变为重点审查，部分保持待审查或采纳
+           const randomValue = Math.random();
+           let suggestion: ReviewResult;
+           if (randomValue < 0.35) {
+             suggestion = "focusReview";
+           } else if (randomValue < 0.6) {
+             suggestion = "adopted";
+           } else {
+             suggestion = "pending"; // 保持待审查
+           }
           suggestions.set(tp.id, suggestion);
         });
       });
@@ -557,6 +579,14 @@ export default function CaseReview() {
     const now = new Date();
     const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     
+     const focusReviewSuggestions = [
+       "非本需求，请详细查看本体来源",
+       "场景描述与需求文档不符，请核实",
+       "测试数据边界条件需要确认",
+       "与已有案例存在重复风险，请检查",
+       "业务逻辑复杂度较高，建议人工复核",
+     ];
+     
     setDimensions(prev => prev.map(dim => ({
       ...dim,
       testPoints: dim.testPoints.map(tp => {
@@ -567,10 +597,15 @@ export default function CaseReview() {
             timestamp,
             action: `智能审查将状态改为${actionLabel}`
           };
+           // 如果是重点审查，添加审查建议到处理方案
+           const solutionSuggestion = suggestion === "focusReview" 
+             ? focusReviewSuggestions[Math.floor(Math.random() * focusReviewSuggestions.length)]
+             : tp.solution;
           return { 
             ...tp, 
             reviewResult: suggestion,
             aiSuggestion: suggestion, // 保存智能审查结果
+             solution: solutionSuggestion,
             reviewHistory: [...(tp.reviewHistory || []), newHistory]
           };
         }
@@ -679,7 +714,7 @@ export default function CaseReview() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-6 gap-3 mb-6">
+       <div className="grid grid-cols-8 gap-3 mb-6">
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">总场景</span>
           <span className="text-xl font-semibold">{statistics.totalScenarios}</span>
@@ -689,12 +724,20 @@ export default function CaseReview() {
           <span className="text-xl font-semibold">{statistics.totalCases}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+           <span className="text-xs text-muted-foreground mb-1">待审查</span>
+           <span className="text-xl font-semibold text-muted-foreground">{statistics.pending}</span>
+         </div>
+         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
+           <span className="text-xs text-muted-foreground mb-1">重点审查</span>
+           <span className="text-xl font-semibold text-amber-600">{statistics.focusReview}</span>
+         </div>
+         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">采纳</span>
           <span className="text-xl font-semibold text-green-600">{statistics.adopted}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">需完善</span>
-          <span className="text-xl font-semibold text-amber-600">{statistics.needsImprovement}</span>
+           <span className="text-xl font-semibold text-orange-600">{statistics.needsImprovement}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
           <span className="text-xs text-muted-foreground mb-1">已完善</span>
@@ -729,6 +772,7 @@ export default function CaseReview() {
               <SelectItem value="improved">已完善</SelectItem>
               <SelectItem value="needsDiscard">丢弃</SelectItem>
               <SelectItem value="pending">待审查</SelectItem>
+               <SelectItem value="focusReview">重点审查</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
@@ -827,7 +871,10 @@ export default function CaseReview() {
                     >
                       {/* 编号 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        <span className="font-mono text-xs">{tp.code}</span>
+                         <span className={cn(
+                           "font-mono text-xs",
+                           tp.reviewResult === "focusReview" && "text-amber-600 font-semibold"
+                         )}>{tp.code}</span>
                       </div>
                       {/* 场景描述 - hover显示完整内容，根据对比状态显示颜色 */}
                       <div className="col-span-2 px-3 py-3 border-r border-border flex items-center group relative">
@@ -918,7 +965,7 @@ export default function CaseReview() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="center">
-                              {(["adopted", "needsImprovement", "improved", "needsDiscard"] as ReviewResult[]).map((result) => {
+                               {(["adopted", "needsImprovement", "improved", "needsDiscard", "focusReview"] as ReviewResult[]).map((result) => {
                                 const config = reviewResultConfig[result];
                                 return (
                                   <DropdownMenuItem
@@ -937,7 +984,7 @@ export default function CaseReview() {
                       </div>
                       {/* 分类 - 采纳时显示-，否则下拉选择 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
-                        {tp.reviewResult === "adopted" ? (
+                         {tp.reviewResult === "adopted" || tp.reviewResult === "pending" ? (
                           <span className="text-xs text-muted-foreground">-</span>
                         ) : (
                           <Select
@@ -959,8 +1006,10 @@ export default function CaseReview() {
                       </div>
                       {/* 处理方案 - 采纳时显示-，否则可编辑 */}
                       <div className="col-span-2 px-2 py-1 border-r border-border flex items-center justify-center">
-                        {tp.reviewResult === "adopted" ? (
+                         {tp.reviewResult === "adopted" || tp.reviewResult === "pending" ? (
                           <span className="text-xs text-muted-foreground">-</span>
+                         ) : tp.reviewResult === "focusReview" && tp.solution ? (
+                           <span className="text-xs text-amber-600">{tp.solution}</span>
                         ) : (
                           <Input
                             className="h-8 text-xs border-0 bg-transparent focus-visible:ring-1"
