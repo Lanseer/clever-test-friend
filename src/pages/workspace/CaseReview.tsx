@@ -567,18 +567,18 @@ export default function CaseReview() {
 
   const handleSmartReview = () => {
     setIsSmartReviewing(true);
-    toast.info("智能审查进行中，请稍等...");
+    toast.info(t('caseReview.smartReviewInProgress'));
     
     // 模拟AI审查过程
     setTimeout(() => {
       // 生成AI建议
       const suggestions = new Map<string, ReviewResult>();
        const focusReviewSuggestions = [
-         "非本需求，请详细查看本体来源",
-         "场景描述与需求文档不符，请核实",
-         "测试数据边界条件需要确认",
-         "与已有案例存在重复风险，请检查",
-         "业务逻辑复杂度较高，建议人工复核",
+         t('caseReview.aiSuggestions.notMatchRequirement'),
+         t('caseReview.aiSuggestions.duplicateScenario'),
+         t('caseReview.aiSuggestions.missingBoundary'),
+         t('caseReview.aiSuggestions.notMatchRequirement'),
+         t('caseReview.aiSuggestions.duplicateScenario'),
        ];
        
       dimensions.forEach(dim => {
@@ -608,11 +608,11 @@ export default function CaseReview() {
     const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     
      const focusReviewSuggestions = [
-       "非本需求，请详细查看本体来源",
-       "场景描述与需求文档不符，请核实",
-       "测试数据边界条件需要确认",
-       "与已有案例存在重复风险，请检查",
-       "业务逻辑复杂度较高，建议人工复核",
+       t('caseReview.aiSuggestions.notMatchRequirement'),
+       t('caseReview.aiSuggestions.duplicateScenario'),
+       t('caseReview.aiSuggestions.missingBoundary'),
+       t('caseReview.aiSuggestions.notMatchRequirement'),
+       t('caseReview.aiSuggestions.duplicateScenario'),
      ];
      
     setDimensions(prev => prev.map(dim => ({
@@ -852,7 +852,7 @@ export default function CaseReview() {
                 <div className="bg-[hsl(200,60%,94%)] border-l-4 border-l-[hsl(200,70%,50%)] px-4 py-3 font-medium text-foreground cursor-pointer hover:bg-[hsl(200,60%,90%)] transition-colors flex items-center gap-2">
                   <ChevronRight className={cn("w-4 h-4 transition-transform", !isCollapsed && "rotate-90")} />
                   {dimension.name}
-                  <span className="text-xs text-muted-foreground ml-2">({dimension.testPoints.length}个场景)</span>
+                  <span className="text-xs text-muted-foreground ml-2">({dimension.testPoints.length}{t('caseReview.scenarioCountLabel')})</span>
                 </div>
               </CollapsibleTrigger>
               
@@ -864,24 +864,24 @@ export default function CaseReview() {
                 {/* First row - group headers */}
                 <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
                   <div className="col-span-7 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
-                    场景基本信息
+                    {t('caseReview.scenarioBasicInfo')}
                   </div>
                   <div className="col-span-7 px-3 py-2 text-center font-medium">
-                    用户审查
+                    {t('caseReview.userReview')}
                   </div>
                 </div>
                 {/* Second row - column headers */}
                 <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景分类</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">对比状态</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">来源</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">问题分类</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
-                  <div className="col-span-1 px-3 py-2 text-center">审查记录</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.code')}</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioName')}</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioCategory')}</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.comparisonStatus')}</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.source')}</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.caseCount')}</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.reviewResult')}</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.problemCategory')}</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.solution')}</div>
+                  <div className="col-span-1 px-3 py-2 text-center">{t('caseReview.reviewHistory')}</div>
                 </div>
               </div>
               

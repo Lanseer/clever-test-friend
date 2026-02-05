@@ -88,22 +88,23 @@ const initialRecordsByTask: Record<string, GenerationRecordItem[]> = {
   "2": [],
 };
 
-const mockDimensions: Dimension[] = [
+// Mock dimensions will be created inside component with translation
+const createMockDimensions = (t: (key: string) => string): Dimension[] => [
   {
     id: "dim-1",
-    name: "用户认证模块",
+    name: t('mockData.dimensions.userManagement'),
     caseCount: 5,
     testPoints: [
-      { id: "tp-1", name: "用户登录", caseCount: 3 },
-      { id: "tp-2", name: "用户注册", caseCount: 2 },
+      { id: "tp-1", name: t('mockData.testPoints.userLogin'), caseCount: 3 },
+      { id: "tp-2", name: t('mockData.testPoints.userRegister'), caseCount: 2 },
     ],
   },
   {
     id: "dim-2",
-    name: "密码管理模块",
+    name: t('mockData.dimensions.orderManagement'),
     caseCount: 3,
     testPoints: [
-      { id: "tp-3", name: "密码重置", caseCount: 3 },
+      { id: "tp-3", name: t('mockData.testPoints.passwordReset'), caseCount: 3 },
     ],
   },
 ];
@@ -135,11 +136,14 @@ export default function AIGeneratedCases() {
   // Chat session management
   const [activeChatSessionId, setActiveChatSessionId] = useState<string | null>(null);
   
+  // Translated mock dimensions
+  const mockDimensions = createMockDimensions(t);
+  
   const defaultMessages: Message[] = [
     {
       id: "init",
       role: "assistant",
-      content: "你好！我是智能设计助手。请上传需求文档附件，我将帮你自动生成测试案例。\n\n你可以：\n• 上传文档后发送，开始生成案例\n• 询问如何优化测试覆盖率\n• 了解BDD案例设计规范",
+      content: t('smartDesign.assistantGreeting'),
       timestamp: new Date(),
     },
   ];
@@ -147,19 +151,19 @@ export default function AIGeneratedCases() {
   // Mock messages for different sessions
   const sessionMessagesMap: Record<string, Message[]> = {
     "session-1": [
-      { id: "s1-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
-      { id: "s1-2", role: "user", content: "帮我生成用户登录模块的测试案例", timestamp: new Date() },
-      { id: "s1-3", role: "assistant", content: "生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD案例生成完成", timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24, fileName: "2026-01-23生成案例_V0.1" } },
+      { id: "s1-1", role: "assistant", content: t('smartDesign.assistantGreeting'), timestamp: new Date() },
+      { id: "s1-2", role: "user", content: t('smartDesign.inputPlaceholder'), timestamp: new Date() },
+      { id: "s1-3", role: "assistant", content: `${t('smartDesign.generationComplete')}\n\n✅ ${t('smartDesign.docParsed')}\n✅ ${t('smartDesign.modulesIdentified')}\n✅ ${t('smartDesign.bddGenerated')}`, timestamp: new Date(), isGenerationComplete: true, generationData: { scenarioCount: 8, caseCount: 24, fileName: "2026-01-23生成案例_V0.1" } },
     ],
     "session-2": [
-      { id: "s2-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
-      { id: "s2-2", role: "user", content: "分析这个需求文档\n\n📎 附件: 需求规格说明书.pdf", timestamp: new Date() },
-      { id: "s2-3", role: "assistant", content: "正在分析您的需求文档...\n\n✅ 文档解析完成\n✅ 识别到 5 个功能模块", timestamp: new Date() },
+      { id: "s2-1", role: "assistant", content: t('smartDesign.assistantGreeting'), timestamp: new Date() },
+      { id: "s2-2", role: "user", content: `${t('smartDesign.analyzing')}\n\n📎 ${t('smartDesign.attachment')}: 需求规格说明书.pdf`, timestamp: new Date() },
+      { id: "s2-3", role: "assistant", content: `${t('smartDesign.analyzing')}\n\n✅ ${t('smartDesign.docParsed')}\n✅ ${t('smartDesign.modulesIdentified')}`, timestamp: new Date() },
     ],
     "session-3": [
-      { id: "s3-1", role: "assistant", content: "你好！我是智能设计助手。", timestamp: new Date() },
-      { id: "s3-2", role: "user", content: "优化测试覆盖率", timestamp: new Date() },
-      { id: "s3-3", role: "assistant", content: "根据您当前的测试案例，我建议关注以下几个方面来提高覆盖率：\n\n1. 边界值测试\n2. 异常场景处理\n3. 并发场景测试", timestamp: new Date() },
+      { id: "s3-1", role: "assistant", content: t('smartDesign.assistantGreeting'), timestamp: new Date() },
+      { id: "s3-2", role: "user", content: t('smartDesign.inputPlaceholder'), timestamp: new Date() },
+      { id: "s3-3", role: "assistant", content: t('smartDesign.generating'), timestamp: new Date() },
     ],
   };
 
@@ -175,7 +179,7 @@ export default function AIGeneratedCases() {
         const summaryMessage: Message = {
           id: `review-summary-${Date.now()}`,
           role: "assistant",
-          content: `📋 **案例审查已完成**\n\n**${summary.caseName}** 本次审查了 ${summary.totalScenarios} 个场景：\n\n✅ 采纳：${summary.adopted} 个\n🔧 需完善：${summary.needsImprovement} 个\n✨ 已完善：${summary.improved} 个\n❌ 丢弃：${summary.discarded} 个\n⏳ 待审查：${summary.pending} 个\n\n案例已成功保存到测试任务中。`,
+          content: `📋 **${t('caseReview.title')}**\n\n**${summary.caseName}** ${t('caseReview.totalScenarios')}: ${summary.totalScenarios}\n\n✅ ${t('caseReview.adopted')}: ${summary.adopted}\n🔧 ${t('caseReview.needsImprovement')}: ${summary.needsImprovement}\n✨ ${t('caseReview.improved')}: ${summary.improved}\n❌ ${t('caseReview.discard')}: ${summary.discarded}\n⏳ ${t('caseReview.pendingReview')}: ${summary.pending}\n\n${t('caseReview.savedToTask')}`,
           timestamp: new Date(),
         };
         setChatMessages(prev => [...prev, summaryMessage]);
@@ -293,7 +297,7 @@ export default function AIGeneratedCases() {
     
     const existingRecords = recordsByTask[selectedTaskId] || [];
     const latestVersion = existingRecords.length > 0 
-      ? `${selectedTask?.name || '任务'}_V0.${existingRecords.length}`
+      ? `${selectedTask?.name || t('myTasks.taskList')}_V0.${existingRecords.length}`
       : null;
     const baseVersionParam = latestVersion ? `&baseVersion=${encodeURIComponent(latestVersion)}` : '';
     navigate(`/workspace/${workspaceId}/management/ai-cases/${selectedTaskId}/case-review?source=chat${baseVersionParam}`);
