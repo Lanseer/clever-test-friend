@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
@@ -69,13 +70,14 @@ export function ReviewHistorySidebar({
   onOpenChange, 
   historyData 
 }: ReviewHistorySidebarProps) {
+  const { t } = useTranslation();
   const records = historyData?.records?.length ? historyData.records : mockHistoryRecords;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[560px] sm:max-w-[560px] flex flex-col">
         <SheetHeader>
-          <SheetTitle>审查记录详情</SheetTitle>
+          <SheetTitle>{t('reviewHistory.title')}</SheetTitle>
           {historyData && (
             <p className="text-sm text-muted-foreground">{historyData.scenarioName}</p>
           )}
@@ -110,7 +112,7 @@ export function ReviewHistorySidebar({
                             : "bg-purple-500/10 text-purple-600 border-purple-200"
                         )}
                       >
-                        {record.type === "status" ? "状态修改" : "内容修改"}
+                        {record.type === "status" ? t('reviewHistory.statusChange') : t('reviewHistory.contentChange')}
                       </Badge>
                     </div>
                     
@@ -118,7 +120,7 @@ export function ReviewHistorySidebar({
                     <div className="grid grid-cols-2 gap-3">
                       {/* Before */}
                       <div className="space-y-1.5">
-                        <span className="text-xs font-medium text-muted-foreground">修改前</span>
+                        <span className="text-xs font-medium text-muted-foreground">{t('reviewHistory.before')}</span>
                         {record.type === "status" ? (
                           <div className="px-3 py-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-md">
                             <span className="text-sm text-red-600 dark:text-red-400">{record.before}</span>
@@ -132,7 +134,7 @@ export function ReviewHistorySidebar({
                       
                       {/* After */}
                       <div className="space-y-1.5">
-                        <span className="text-xs font-medium text-muted-foreground">修改后</span>
+                        <span className="text-xs font-medium text-muted-foreground">{t('reviewHistory.after')}</span>
                         {record.type === "status" ? (
                           <div className="px-3 py-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-md">
                             <span className="text-sm text-green-600 dark:text-green-400">{record.after}</span>

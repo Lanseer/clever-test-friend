@@ -31,7 +31,10 @@
     "yesterday": "昨天",
     "daysAgo": "天前",
     "times": "次",
-    "inProgress": "进行中"
+    "inProgress": "进行中",
+    "scenarios": "场景",
+    "cases": "案例",
+    "items": "条"
   },
   "auth": {
     "login": "登录",
@@ -55,6 +58,14 @@
     "collapse": "收起",
     "tester": "测试人员"
   },
+  "workspaceMenu": {
+    "dashboard": "数据监控",
+    "ontology": "测试本体",
+    "templates": "案例模板",
+    "environment": "环境",
+    "tags": "标签",
+    "testWorkbench": "测试工作台"
+  },
   "workspaces": {
     "title": "工作空间",
     "subtitle": "管理您的测试项目空间",
@@ -74,6 +85,25 @@
   "language": {
     "zh": "中文",
     "en": "English"
+  },
+  "xiaoLiang": {
+    "name": "小亮",
+    "goodMorning": "早上好！👋",
+    "summary": "小亮为您总结",
+    "yesterdayDone": "昨天完成",
+    "todayTodo": "今日待办",
+    "viewAllTasks": "查看全部任务",
+    "totalTasks": "总任务",
+    "todoItems": "待办事项",
+    "yesterdayItems": {
+      "completedCases": "完成了「用户登录模块」18个用例审查",
+      "initiatedReview": "发起了「支付流程」专家评审"
+    },
+    "todoItemsList": {
+      "pendingCases": "还有 6 个用例待审查",
+      "notStarted": "「订单管理测试案例」尚未开始审查",
+      "reviewDeadline": "专家评审将在 3 天后截止"
+    }
   },
   "smartDesign": {
     "title": "智能设计",
@@ -100,7 +130,21 @@
     "createTask": "创建任务",
     "promptSaved": "提示词已保存",
     "startDownload": "开始下载",
-    "enterNewPrompt": "输入新的提示词..."
+    "enterNewPrompt": "输入新的提示词...",
+    "attachment": "附件",
+    "bddTemplate": "BDD标准模板",
+    "historyCases": "历史案例",
+    "noSelect": "不选择",
+    "inputPlaceholder": "输入您的需求，例如：帮我生成用户登录模块的测试案例...",
+    "generationCompleteMsg": "案例已经生成完成，相较于V0.3版本场景总数增加",
+    "casesGenerated": "条"
+  },
+  "generatedFiles": {
+    "scenariosLabel": "场景:",
+    "casesLabel": "案例:",
+    "casesCount": "个案例",
+    "view": "查看",
+    "startReview": "开始审查"
   },
   "caseReview": {
     "title": "案例审查",
@@ -114,6 +158,7 @@
     "source": "来源",
     "caseCount": "案例数",
     "comparison": "对比",
+    "comparisonStatus": "对比状态",
     "reviewResult": "审查结果",
     "problemCategory": "问题分类",
     "solution": "处理方案",
@@ -137,7 +182,6 @@
     "smartReviewComplete": "智能审查完成",
     "scenarioAdded": "已新增场景",
     "savedToTask": "已成功保存到测试任务",
-    "reviewSummaryComplete": "案例审查已完成",
     "saveToTask": "保存到任务",
     "selectReviewResult": "选择审查结果",
     "selectCategory": "选择分类",
@@ -146,6 +190,14 @@
     "allResults": "全部结果",
     "allCategories": "全部分类",
     "noMatchingCases": "未找到匹配的测试案例",
+    "resultUpdated": "审查结果已更新",
+    "smartReviewInProgress": "智能审查进行中，请稍等...",
+    "smartReviewApplied": "智能审查结果已应用",
+    "comparedToBase": "（对比状态基于{version}版本）",
+    "scenarioBasicInfo": "场景基本信息",
+    "userReview": "用户审查",
+    "code": "编号",
+    "scenarioCountLabel": "个场景",
     "categories": {
       "improveScenario": "完善场景",
       "improveInfo": "完善信息",
@@ -167,6 +219,31 @@
       "duplicateScenario": "场景重复，建议合并处理",
       "missingBoundary": "缺少边界值测试，建议补充"
     }
+  },
+  "caseDetail": {
+    "title": "案例详情",
+    "bddContent": "案例详情 (BDD)",
+    "reviewResult": "审查结果",
+    "caseCount": "对应案例数",
+    "caseSource": "案例来源",
+    "contentModified": "* 内容已修改，请点击暂存按钮保存",
+    "draftSaved": "修改内容已暂存"
+  },
+  "reviewHistory": {
+    "title": "审查记录详情",
+    "statusChange": "状态修改",
+    "contentChange": "内容修改",
+    "before": "修改前",
+    "after": "修改后"
+  },
+  "saveToTask": {
+    "title": "保存到测试任务",
+    "caseName": "案例名称",
+    "enterCaseName": "请输入案例名称",
+    "selectTask": "请选择要保存到的测试任务",
+    "noTasks": "暂无测试任务，请先新建测试任务",
+    "newTask": "新建任务",
+    "confirmSave": "确认保存"
   },
   "myTasks": {
     "title": "我的测试任务",
@@ -233,7 +310,13 @@
     "downloadReport": "下载报告",
     "exportSuccess": "导出成功",
     "downloadStarted": "报告下载已开始",
-    "items": "条"
+    "items": "条",
+    "updatedAt": "更新于",
+    "caseId": "用例编号",
+    "caseName": "用例名称",
+    "belongDimension": "所属维度",
+    "nature": "性质",
+    "relatedCases": "相关用例"
   },
   "deliverableReport": {
     "title": "审查报告"
@@ -246,6 +329,13 @@
     "viewDetails": "查看详情",
     "totalCases": "总案例数",
     "pendingReview": "待评审"
+  },
+  "referenceMaterials": {
+    "baselineDoc": "基线文档",
+    "industryStandard": "行业标准",
+    "requirementDoc": "需求文档",
+    "testSpec": "测试规范",
+    "apiDoc": "接口文档"
   },
   "mockData": {
     "tasks": {

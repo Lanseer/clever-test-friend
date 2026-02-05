@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
@@ -29,12 +30,15 @@ interface CaseDetailSidebarProps {
   onSaveDraft?: (id: string, content: string) => void;
 }
 
-const reviewResultConfig: Record<string, { label: string; className: string }> = {
-  pending: { label: "待审查", className: "bg-gray-100 text-gray-600 border-gray-200" },
-  adopted: { label: "采纳", className: "bg-green-500/10 text-green-600 border-green-200" },
-  needsImprovement: { label: "需完善", className: "bg-amber-500/10 text-amber-600 border-amber-200" },
-  improved: { label: "已完善", className: "bg-blue-500/10 text-blue-600 border-blue-200" },
-  needsDiscard: { label: "丢弃", className: "bg-red-500/10 text-red-600 border-red-200" },
+const useReviewResultConfig = () => {
+  const { t } = useTranslation();
+  return {
+    pending: { label: t('caseReview.pendingReview'), className: "bg-gray-100 text-gray-600 border-gray-200" },
+    adopted: { label: t('caseReview.adopted'), className: "bg-green-500/10 text-green-600 border-green-200" },
+    needsImprovement: { label: t('caseReview.needsImprovement'), className: "bg-amber-500/10 text-amber-600 border-amber-200" },
+    improved: { label: t('caseReview.improved'), className: "bg-blue-500/10 text-blue-600 border-blue-200" },
+    needsDiscard: { label: t('caseReview.discard'), className: "bg-red-500/10 text-red-600 border-red-200" },
+  } as Record<string, { label: string; className: string }>;
 };
 
 const getMockBddContent = () => {
@@ -63,8 +67,11 @@ export function CaseDetailSidebar({
   caseData,
   onSaveDraft
 }: CaseDetailSidebarProps) {
+  const { t } = useTranslation();
   const [editedContent, setEditedContent] = useState<string>("");
   const [isEdited, setIsEdited] = useState(false);
+  
+  const reviewResultConfig = useReviewResultConfig();
 
   const reviewResult = caseData?.reviewResult || "pending";
   const resultConfig = reviewResultConfig[reviewResult] || reviewResultConfig.pending;
@@ -79,7 +86,7 @@ export function CaseDetailSidebar({
   const handleSaveDraft = () => {
     if (caseData && isEdited && !isReadOnly) {
       onSaveDraft?.(caseData.id, editedContent);
-      toast.success("修改内容已暂存");
+      toast.success(t('caseDetail.draftSaved'));
       setIsEdited(false);
     }
   };
@@ -96,7 +103,7 @@ export function CaseDetailSidebar({
     }}>
       <SheetContent className="w-[520px] sm:max-w-[520px] flex flex-col">
         <SheetHeader>
-          <SheetTitle>案例详情</SheetTitle>
+          <SheetTitle>{t('caseDetail.title')}</SheetTitle>
         </SheetHeader>
         
         {caseData && (
@@ -105,7 +112,7 @@ export function CaseDetailSidebar({
               <div className="space-y-6 py-4">
                 {/* BDD 完整内容 - 文本域 */}
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground text-xs">案例详情 (BDD)</Label>
+                  <Label className="text-muted-foreground text-xs">{t('caseDetail.bddContent')}</Label>
                   <Textarea
                     className={cn(
                       "min-h-[300px] font-mono text-xs resize-none",
@@ -120,7 +127,7 @@ export function CaseDetailSidebar({
                     readOnly={isReadOnly}
                   />
                   {!isReadOnly && isEdited && (
-                    <p className="text-xs text-amber-600">* 内容已修改，请点击暂存按钮保存</p>
+                    <p className="text-xs text-amber-600">{t('caseDetail.contentModified')}</p>
                   )}
                 </div>
 
@@ -128,7 +135,7 @@ export function CaseDetailSidebar({
                 {!isReadOnly && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">审查结果</Label>
+                      <Label className="text-muted-foreground text-xs">{t('caseDetail.reviewResult')}</Label>
                       <Badge 
                         variant="outline" 
                         className={cn("text-xs", resultConfig.className)}
@@ -137,7 +144,7 @@ export function CaseDetailSidebar({
                       </Badge>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">对应案例数</Label>
+                      <Label className="text-muted-foreground text-xs">{t('caseDetail.caseCount')}</Label>
                       <Badge variant="outline" className="text-xs">
                         {caseData.caseCount ?? "-"}
                       </Badge>
@@ -147,7 +154,7 @@ export function CaseDetailSidebar({
                 
                 {/* 案例来源详情 */}
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground text-xs">案例来源</Label>
+                  <Label className="text-muted-foreground text-xs">{t('caseDetail.caseSource')}</Label>
                   <CaseSourceInfo caseId={caseData.id} showHeader={false} />
                 </div>
               </div>
@@ -161,7 +168,7 @@ export function CaseDetailSidebar({
                   onClick={handleSaveDraft}
                   disabled={!isEdited}
                 >
-                  保存
+                  {t('common.save')}
                 </Button>
               </div>
             )}

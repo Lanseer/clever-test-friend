@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronRight, FileText, Eye, X } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,6 +48,7 @@ export function GeneratedFilesPanel({
   dimensions,
   onStartReview,
 }: GeneratedFilesPanelProps) {
+  const { t } = useTranslation();
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
     new Set(dimensions.map(d => d.id))
   );
@@ -98,11 +100,11 @@ export function GeneratedFilesPanel({
         <div className="px-4 py-3 border-b bg-muted/30">
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">场景:</span>
+              <span className="text-sm text-muted-foreground">{t('generatedFiles.scenariosLabel')}</span>
               <Badge variant="secondary" className="font-medium">{file.scenarioCount}</Badge>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">案例:</span>
+              <span className="text-sm text-muted-foreground">{t('generatedFiles.casesLabel')}</span>
               <Badge variant="secondary" className="font-medium">{file.caseCount}</Badge>
             </div>
           </div>
@@ -129,7 +131,7 @@ export function GeneratedFilesPanel({
                         <span className="font-medium text-sm">{dimension.name}</span>
                       </div>
                       <Badge className="bg-primary/10 text-primary border-0">
-                        {dimension.caseCount} 个案例
+                        {dimension.caseCount} {t('generatedFiles.casesCount')}
                       </Badge>
                     </button>
                   </CollapsibleTrigger>
@@ -140,11 +142,11 @@ export function GeneratedFilesPanel({
                             key={tp.id}
                             className="px-4 py-2.5 flex items-center justify-between hover:bg-muted/30 transition-colors"
                           >
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
                               <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm truncate">{tp.name}</span>
                               <span className="text-xs text-muted-foreground">
-                                ({tp.caseCount} 个案例)
+                                ({tp.caseCount} {t('generatedFiles.casesCount')})
                               </span>
                             </div>
                             <Button
@@ -154,7 +156,7 @@ export function GeneratedFilesPanel({
                               onClick={() => handleViewCases(tp)}
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              查看
+                              {t('generatedFiles.view')}
                             </Button>
                         </div>
                       ))}
@@ -173,7 +175,7 @@ export function GeneratedFilesPanel({
               className="w-full bg-gradient-to-r from-primary to-primary/80"
               onClick={onStartReview}
             >
-              开始审查
+              {t('generatedFiles.startReview')}
             </Button>
           </div>
         )}

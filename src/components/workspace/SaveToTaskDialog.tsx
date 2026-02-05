@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import {
   Dialog,
@@ -29,14 +30,6 @@ interface SaveToTaskDialogProps {
   defaultCaseName?: string;
 }
 
-const mockTasks: TestTask[] = [
-  { id: "1", name: "用户登录模块测试", testPhase: "SIT测试", testCategory: "功能测试" },
-  { id: "2", name: "支付流程测试", testPhase: "UAT测试", testCategory: "功能测试" },
-  { id: "3", name: "订单管理测试", testPhase: "集成测试", testCategory: "数据测试" },
-  { id: "4", name: "商品搜索测试", testPhase: "SIT测试", testCategory: "功能测试" },
-  { id: "5", name: "购物车功能测试", testPhase: "UAT测试", testCategory: "专项测试" },
-];
-
 // Generate default case name with current date
 const generateDefaultCaseName = () => {
   const now = new Date();
@@ -51,8 +44,18 @@ export function SaveToTaskDialog({
   onCreateNew,
   defaultCaseName,
 }: SaveToTaskDialogProps) {
+  const { t } = useTranslation();
   const [selectedTaskId, setSelectedTaskId] = useState<string>("");
   const [caseName, setCaseName] = useState<string>("");
+
+  // Translated mock tasks
+  const mockTasks: TestTask[] = [
+    { id: "1", name: t('mockData.tasks.userLogin'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "2", name: t('mockData.tasks.paymentFlow'), testPhase: t('myTasks.testPhase.uat'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "3", name: t('mockData.tasks.orderManagement'), testPhase: t('myTasks.testPhase.integration'), testCategory: t('myTasks.testCategory.data') },
+    { id: "4", name: t('mockData.tasks.productSearch'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
+    { id: "5", name: t('mockData.tasks.shoppingCart'), testPhase: t('myTasks.testPhase.uat'), testCategory: t('myTasks.testCategory.special') },
+  ];
 
   // Reset state when dialog opens
   useEffect(() => {
@@ -82,18 +85,18 @@ export function SaveToTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>保存到测试任务</DialogTitle>
+          <DialogTitle>{t('saveToTask.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="py-4 space-y-4">
           {/* Case Name Input */}
           <div className="space-y-2">
-            <Label htmlFor="caseName">案例名称</Label>
+            <Label htmlFor="caseName">{t('saveToTask.caseName')}</Label>
             <Input
               id="caseName"
               value={caseName}
               onChange={(e) => setCaseName(e.target.value)}
-              placeholder="请输入案例名称"
+              placeholder={t('saveToTask.enterCaseName')}
             />
           </div>
 
@@ -101,7 +104,7 @@ export function SaveToTaskDialog({
             <>
               <div className="space-y-2">
                 <Label className="text-sm text-muted-foreground">
-                  请选择要保存到的测试任务
+                  {t('saveToTask.selectTask')}
                 </Label>
                 <ScrollArea className="h-[240px] pr-4">
                   <RadioGroup
@@ -145,11 +148,11 @@ export function SaveToTaskDialog({
           ) : (
             <div className="py-8 text-center">
               <p className="text-muted-foreground mb-4">
-                暂无测试任务，请先新建测试任务
+                {t('saveToTask.noTasks')}
               </p>
               <Button onClick={handleCreateNew} className="gap-2">
                 <Plus className="w-4 h-4" />
-                新建测试任务
+                {t('saveToTask.newTask')}
               </Button>
             </div>
           )}
@@ -163,14 +166,14 @@ export function SaveToTaskDialog({
               className="gap-2"
             >
               <Plus className="w-4 h-4" />
-              新建任务
+              {t('saveToTask.newTask')}
             </Button>
             <div className="flex-1" />
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              取消
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleConfirm} disabled={!selectedTaskId || !caseName.trim()}>
-              确认保存
+              {t('saveToTask.confirmSave')}
             </Button>
           </DialogFooter>
         )}
