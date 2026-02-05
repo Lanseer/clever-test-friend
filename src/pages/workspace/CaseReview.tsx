@@ -190,6 +190,16 @@ const categoryOptions = [
   { value: "其他", label: "其他" },
 ];
 
+// 场景分类选项
+const scenarioCategoryOptions = [
+  { value: "功能测试", label: "功能测试" },
+  { value: "边界测试", label: "边界测试" },
+  { value: "异常测试", label: "异常测试" },
+  { value: "性能测试", label: "性能测试" },
+  { value: "安全测试", label: "安全测试" },
+  { value: "兼容性测试", label: "兼容性测试" },
+];
+
 type ReviewResult = "adopted" | "needsImprovement" | "improved" | "needsDiscard" | "pending";
 type ComparisonStatus = "new" | "updated" | "deleted" | "unchanged";
 
@@ -202,6 +212,7 @@ interface TestPoint {
   id: string;
   code: string;
   name: string;
+  scenarioCategory?: string;
   source: string;
   caseCount: number;
   reviewResult: ReviewResult;
@@ -223,26 +234,26 @@ const mockDimensions: TestDimension[] = [
     id: "dim-1",
     name: "01-业务流程维度",
     testPoints: [
-      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
-      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", comparisonStatus: "new", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
-      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", source: "TSD, PRD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
-      { id: "tp-4", code: "SC-004", name: "多因素认证验证", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", comparisonStatus: "deleted", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
+      { id: "tp-1", code: "SC-001", name: "用户登录成功场景", scenarioCategory: "功能测试", source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }] },
+      { id: "tp-2", code: "SC-002", name: "用户注册完整流程", scenarioCategory: "功能测试", source: "FSD", caseCount: 18, reviewResult: "needsImprovement", aiSuggestion: "adopted", category: "完善场景", comparisonStatus: "new", reviewHistory: [{ timestamp: "2026-01-05 11:20", action: "状态修改为采纳" }] },
+      { id: "tp-3", code: "SC-003", name: "密码重置异常处理", scenarioCategory: "异常测试", source: "TSD, PRD", caseCount: 8, reviewResult: "needsImprovement", category: "完善场景", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-05 10:40", action: "状态修改为采纳" }, { timestamp: "2026-01-06 13:25", action: "状态修改为需完善" }] },
+      { id: "tp-4", code: "SC-004", name: "多因素认证验证", scenarioCategory: "安全测试", source: "PRD", caseCount: 5, reviewResult: "needsDiscard", aiSuggestion: "adopted", category: "重复", comparisonStatus: "deleted", reviewHistory: [{ timestamp: "2026-01-05 14:30", action: "状态修改为丢弃" }] },
     ],
   },
   {
     id: "dim-2",
     name: "02-业务功能维度",
     testPoints: [
-      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-06 09:00", action: "状态修改为采纳" }] },
-      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+      { id: "tp-5", code: "SC-005", name: "订单创建标准流程", scenarioCategory: "功能测试", source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [{ timestamp: "2026-01-06 09:00", action: "状态修改为采纳" }] },
+      { id: "tp-6", code: "SC-006", name: "订单支付异常处理", scenarioCategory: "异常测试", source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
     ],
   },
   {
     id: "dim-3",
     name: "03-业务要素维度",
     testPoints: [
-      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-06 10:15", action: "状态修改为采纳" }] },
-      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+      { id: "tp-7", code: "SC-007", name: "商品信息完整性校验", scenarioCategory: "功能测试", source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [{ timestamp: "2026-01-06 10:15", action: "状态修改为采纳" }] },
+      { id: "tp-8", code: "SC-008", name: "库存数量边界测试", scenarioCategory: "边界测试", source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
     ],
   },
 ];
@@ -503,7 +514,7 @@ export default function CaseReview() {
     toast.success("审查结果已更新");
   };
 
-  const handleFieldChange = (dimId: string, tpId: string, field: "category" | "solution", value: string) => {
+  const handleFieldChange = (dimId: string, tpId: string, field: "category" | "solution" | "scenarioCategory", value: string) => {
     setDimensions(prev => prev.map(dim => {
       if (dim.id === dimId) {
         return {
@@ -777,10 +788,10 @@ export default function CaseReview() {
             {/* Table */}
             <div className="border border-t-0 overflow-x-auto">
               {/* Table Header */}
-              <div className="bg-[hsl(200,70%,50%)] text-white min-w-[1100px]">
+              <div className="bg-[hsl(200,70%,50%)] text-white min-w-[1200px]">
                 {/* First row - group headers */}
-                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
-                  <div className="col-span-6 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
+                  <div className="col-span-7 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     场景基本信息
                   </div>
                   <div className="col-span-7 px-3 py-2 text-center font-medium">
@@ -788,21 +799,22 @@ export default function CaseReview() {
                   </div>
                 </div>
                 {/* Second row - column headers */}
-                <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
+                <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">编号</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景描述</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">场景分类</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">对比状态</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">来源</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">案例数</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">审查结果</div>
-                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">分类</div>
+                  <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">问题分类</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">处理方案</div>
                   <div className="col-span-1 px-3 py-2 text-center">审查记录</div>
                 </div>
               </div>
               
               {/* Table Body */}
-              <div className="divide-y divide-border bg-background min-w-[1100px]">
+              <div className="divide-y divide-border bg-background min-w-[1200px]">
                 {dimension.testPoints.map((tp) => {
                   const resultConfig = reviewResultConfig[tp.reviewResult];
                   const comparisonConfig = comparisonStatusConfig[tp.comparisonStatus || "unchanged"];
@@ -811,7 +823,7 @@ export default function CaseReview() {
                     <div
                       key={tp.id}
                       className="grid text-sm hover:bg-muted/30 transition-colors"
-                      style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}
+                      style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}
                     >
                       {/* 编号 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
@@ -823,6 +835,24 @@ export default function CaseReview() {
                         <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-2 min-w-[200px] max-w-[300px]">
                           <span className={cn("text-xs whitespace-normal", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         </div>
+                      </div>
+                      {/* 场景分类 */}
+                      <div className="col-span-1 px-2 py-1 border-r border-border flex items-center justify-center">
+                        <Select
+                          value={tp.scenarioCategory || ""}
+                          onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "scenarioCategory", value)}
+                        >
+                          <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
+                            <SelectValue placeholder="请选择..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {scenarioCategoryOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value} className="text-xs">
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       {/* 对比状态 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
