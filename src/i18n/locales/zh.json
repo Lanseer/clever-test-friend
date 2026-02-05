@@ -36,6 +36,26 @@
     "cases": "案例",
     "items": "条"
   },
+  "createTask": {
+    "title": "新增智能设计任务",
+    "taskName": "任务名称",
+    "enterTaskName": "请输入任务名称",
+    "testActivity": "测试活动",
+    "caseDesign": "测试案例设计",
+    "testPhase": "测试阶段",
+    "selectTestPhase": "请选择测试阶段",
+    "testCategory": "测试大类",
+    "selectTestCategory": "请选择测试大类",
+    "selectTags": "选择标签（可选）",
+    "tags": {
+      "smoke": "冒烟测试",
+      "regression": "回归测试",
+      "functional": "功能测试",
+      "api": "接口测试",
+      "performance": "性能测试",
+      "security": "安全测试"
+    }
+  },
   "auth": {
     "login": "登录",
     "logout": "退出登录",
