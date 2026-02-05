@@ -1,4 +1,5 @@
 import { FolderOpen, ChevronLeft, ChevronRight, FlaskConical, User, LogOut, Settings, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -21,15 +22,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-const menuItems = [
-  { title: "工作空间", url: "/workspaces", icon: FolderOpen },
-  { title: "用户管理", url: "/users", icon: Users },
-];
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const { t } = useTranslation();
+
+  const menuItems = [
+    { title: t('sidebar.workspaces'), url: "/workspaces", icon: FolderOpen },
+    { title: t('sidebar.userManagement'), url: "/users", icon: Users },
+  ];
 
   return (
     <Sidebar
@@ -46,8 +49,8 @@ export function AppSidebar() {
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
-              <span className="font-semibold text-sidebar-foreground text-xs">TestHand</span>
-              <span className="text-[10px] text-sidebar-foreground/60">智能测试平台</span>
+              <span className="font-semibold text-sidebar-foreground text-xs">{t('brand.name')}</span>
+              <span className="text-[10px] text-sidebar-foreground/60">{t('brand.slogan')}</span>
             </div>
           )}
         </div>
@@ -97,7 +100,7 @@ export function AppSidebar() {
               {!isCollapsed && (
                 <div className="ml-2 text-left">
                   <p className="text-xs font-medium">Lanseer</p>
-                  <p className="text-[10px] text-sidebar-foreground/50">测试人员</p>
+                  <p className="text-[10px] text-sidebar-foreground/50">{t('sidebar.tester')}</p>
                 </div>
               )}
             </Button>
@@ -105,15 +108,18 @@ export function AppSidebar() {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem>
               <Settings className="w-4 h-4 mr-2" />
-              账户设置
+              {t('sidebar.accountSettings')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive">
               <LogOut className="w-4 h-4 mr-2" />
-              退出登录
+              {t('auth.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Language Switcher */}
+        {!isCollapsed && <LanguageSwitcher />}
 
         {/* Collapse Button */}
         <Button
@@ -127,7 +133,7 @@ export function AppSidebar() {
           ) : (
             <>
               <ChevronLeft className="w-4 h-4 mr-1" />
-              <span className="text-xs">收起</span>
+              <span className="text-xs">{t('sidebar.collapse')}</span>
             </>
           )}
         </Button>

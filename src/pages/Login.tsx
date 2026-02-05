@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FlaskConical, Eye, EyeOff } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +28,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
+      {/* Language Switcher - Top Right */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher variant="login" />
+      </div>
+
       {/* Tech Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
         {/* Grid Pattern */}
@@ -84,38 +92,34 @@ export default function Login() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 mb-4 shadow-lg shadow-blue-500/30">
               <FlaskConical className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-1">TestHand</h1>
-            <p className="text-blue-200/80 text-sm">智能测试平台</p>
+            <h1 className="text-2xl font-bold text-white mb-1">{t('brand.name')}</h1>
+            <p className="text-blue-200/80 text-sm">{t('brand.slogan')}</p>
           </div>
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-blue-100/90 text-sm">
-                用户名
-              </Label>
+              <Label htmlFor="username" className="text-blue-100/90 text-sm">{t('auth.username')}</Label>
               <Input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="请输入用户名"
+                placeholder={t('auth.enterUsername')}
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-blue-400 focus:ring-blue-400/20 h-11"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-blue-100/90 text-sm">
-                密码
-              </Label>
+              <Label htmlFor="password" className="text-blue-100/90 text-sm">{t('auth.password')}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="请输入密码"
+                  placeholder={t('auth.enterPassword')}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-blue-400 focus:ring-blue-400/20 h-11 pr-10"
                   required
                 />
@@ -137,10 +141,10 @@ export default function Login() {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  登录中...
+                  {t('auth.loggingIn')}
                 </div>
               ) : (
-                "登录"
+                t('auth.login')
               )}
             </Button>
           </form>
@@ -148,18 +152,18 @@ export default function Login() {
           {/* Footer Links */}
           <div className="flex items-center justify-center gap-4 mt-6 text-sm">
             <button className="text-blue-200/70 hover:text-blue-100 transition-colors">
-              忘记密码
+              {t('auth.forgotPassword')}
             </button>
             <span className="text-white/30">|</span>
             <button className="text-blue-200/70 hover:text-blue-100 transition-colors">
-              重置密码
+              {t('auth.resetPassword')}
             </button>
           </div>
         </div>
 
         {/* Copyright */}
         <p className="text-center text-blue-200/40 text-xs mt-6">
-          © 2024 TestHand. All rights reserved.
+          © 2024 {t('brand.name')}. All rights reserved.
         </p>
       </div>
     </div>
