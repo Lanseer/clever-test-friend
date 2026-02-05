@@ -61,12 +61,18 @@ import {
 } from "@/components/ui/popover";
  import { useTranslation } from "react-i18next";
 
-// 参考资料 Mock 数据
-const mockReferenceMaterials: ReferenceMaterial[] = [
+// 参考资料 Mock 数据 - with typeKey for i18n
+interface ReferenceMaterialWithKey extends Omit<ReferenceMaterial, 'type'> {
+  type: ReferenceMaterial['type'];
+  typeKey: string;
+}
+
+const mockReferenceMaterials: ReferenceMaterialWithKey[] = [
   {
     id: "ref-1",
     name: "用户登录功能规格说明书 v2.1",
     type: "基线文档",
+    typeKey: "baselineDoc",
     content: `1. 功能概述
 用户登录功能是系统的核心入口，负责验证用户身份并建立会话。
 
@@ -90,6 +96,7 @@ const mockReferenceMaterials: ReferenceMaterial[] = [
     id: "ref-2",
     name: "GB/T 25000.51-2016 软件测试规范",
     type: "行业标准",
+    typeKey: "industryStandard",
     content: `1. 范围
 本标准规定了软件测试的基本要求、测试类型、测试过程和测试文档要求。
 
@@ -113,6 +120,7 @@ const mockReferenceMaterials: ReferenceMaterial[] = [
     id: "ref-3",
     name: "账户开户业务需求文档 PRD v1.5",
     type: "需求文档",
+    typeKey: "requirementDoc",
     content: `1. 业务背景
 为提升用户开户体验，需要优化现有开户流程。
 
@@ -140,6 +148,7 @@ const mockReferenceMaterials: ReferenceMaterial[] = [
     id: "ref-4",
     name: "自动化测试规范 v3.0",
     type: "测试规范",
+    typeKey: "testSpec",
     content: `1. 测试框架选型
 推荐使用 Selenium/Playwright 进行UI自动化测试
 
@@ -157,6 +166,7 @@ const mockReferenceMaterials: ReferenceMaterial[] = [
     id: "ref-5",
     name: "用户服务接口文档 API v2.0",
     type: "接口文档",
+    typeKey: "apiDoc",
     content: `1. 登录接口
 POST /api/v1/auth/login
 请求参数：
@@ -695,13 +705,13 @@ export default function CaseReview() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-baseline gap-2">
-            <span>账户开户-案例审查</span>
+            <span>{t('caseReview.title')}</span>
             {isFromDeliverable && deliverableName && (
               <span className="text-primary">- {deliverableName}</span>
             )}
             {isFromChat && baseVersion && (
               <span className="text-sm font-normal text-muted-foreground">
-                （对比状态基于{baseVersion}版本）
+                {t('caseReview.comparedToBase', { version: baseVersion })}
               </span>
             )}
           </h1>
@@ -710,7 +720,7 @@ export default function CaseReview() {
           <Popover open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
             <PopoverTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1 cursor-pointer">
               <FileText className="w-4 h-4" />
-              <span>基于 {mockReferenceMaterials.length} 条资料作为参考</span>
+              <span>{t('caseReview.basedOnMaterials', { count: mockReferenceMaterials.length })}</span>
               {referenceMaterialsOpen ? (
                 <ChevronUp className="w-4 h-4" />
               ) : (
@@ -732,7 +742,7 @@ export default function CaseReview() {
                     <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1">
                       {material.name}
                     </span>
-                    <span className="text-xs text-muted-foreground">{material.type}</span>
+                    <span className="text-xs text-muted-foreground">{t(`referenceMaterials.${material.typeKey}`)}</span>
                   </div>
                 ))}
               </div>

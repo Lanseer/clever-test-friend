@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
@@ -11,6 +12,7 @@ export interface ReferenceMaterial {
   id: string;
   name: string;
   type: "基线文档" | "行业标准" | "需求文档" | "测试规范" | "接口文档";
+  typeKey?: string;
   content: string;
 }
 
@@ -21,6 +23,12 @@ interface ReferenceMaterialsSidebarProps {
 }
 
 const typeColorMap: Record<string, string> = {
+  "baselineDoc": "bg-blue-500/10 text-blue-600 border-blue-200",
+  "industryStandard": "bg-purple-500/10 text-purple-600 border-purple-200",
+  "requirementDoc": "bg-green-500/10 text-green-600 border-green-200",
+  "testSpec": "bg-amber-500/10 text-amber-600 border-amber-200",
+  "apiDoc": "bg-cyan-500/10 text-cyan-600 border-cyan-200",
+  // Fallback for legacy type values
   "基线文档": "bg-blue-500/10 text-blue-600 border-blue-200",
   "行业标准": "bg-purple-500/10 text-purple-600 border-purple-200",
   "需求文档": "bg-green-500/10 text-green-600 border-green-200",
@@ -33,7 +41,13 @@ export function ReferenceMaterialsSidebar({
   onOpenChange,
   material,
 }: ReferenceMaterialsSidebarProps) {
+  const { t } = useTranslation();
+  
   if (!material) return null;
+
+  const typeKey = material.typeKey || material.type;
+  const displayType = material.typeKey ? t(`referenceMaterials.${material.typeKey}`) : material.type;
+  const colorClass = typeColorMap[typeKey] || "bg-muted text-muted-foreground";
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -44,9 +58,9 @@ export function ReferenceMaterialsSidebar({
           </SheetTitle>
           <Badge
             variant="outline"
-            className={typeColorMap[material.type] || "bg-muted text-muted-foreground"}
+            className={colorClass}
           >
-            {material.type}
+            {displayType}
           </Badge>
         </SheetHeader>
 
