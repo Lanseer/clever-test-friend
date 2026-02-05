@@ -13,6 +13,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+ import { useTranslation } from "react-i18next";
 
 type CaseNature = "positive" | "negative";
 
@@ -89,26 +90,27 @@ const generateMockCases = (testPointId: string): GeneratedCase[] => {
   ];
 };
 
-const natureConfig: Record<CaseNature, { label: string; icon: typeof CheckCircle; className: string }> = {
-  positive: {
-    label: "正例",
-    icon: CheckCircle,
-    className: "bg-green-500/10 text-green-600 border-green-200",
-  },
-  negative: {
-    label: "反例",
-    icon: XCircle,
-    className: "bg-orange-500/10 text-orange-600 border-orange-200",
-  },
-};
-
 export default function CaseSelfReview() {
   const navigate = useNavigate();
   const { workspaceId, recordId, batchId, testPointId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [cases] = useState(() => generateMockCases(testPointId || "tp-1"));
+   const { t } = useTranslation();
 
   const info = testPointInfo[testPointId || "tp-1"] || { name: "测试点", dimensionName: "测试维度" };
+ 
+   const natureConfig: Record<CaseNature, { label: string; icon: typeof CheckCircle; className: string }> = {
+     positive: {
+       label: t('caseReview.adopted'),
+       icon: CheckCircle,
+       className: "bg-green-500/10 text-green-600 border-green-200",
+     },
+     negative: {
+       label: t('caseReview.discard'),
+       icon: XCircle,
+       className: "bg-orange-500/10 text-orange-600 border-orange-200",
+     },
+   };
 
   const filteredCases = cases.filter(
     (c) =>
@@ -127,7 +129,7 @@ export default function CaseSelfReview() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             >
-              智能用例设计
+               {t('smartDesign.title')}
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -136,7 +138,7 @@ export default function CaseSelfReview() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review`)}
             >
-              用例自评
+               {t('caseReview.title')}
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -168,7 +170,7 @@ export default function CaseSelfReview() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜索批次、编号或名称..."
+             placeholder={t('common.search') + '...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -233,7 +235,7 @@ export default function CaseSelfReview() {
         {filteredCases.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的用例</p>
+           <p>{t('caseReview.noMatchingCases')}</p>
           </div>
         )}
       </div>

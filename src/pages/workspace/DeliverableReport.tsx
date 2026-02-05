@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
+ import { useTranslation } from "react-i18next";
 
 interface IssueCategory {
   name: string;
@@ -56,7 +57,8 @@ export default function DeliverableReport() {
   const navigate = useNavigate();
   const { workspaceId, recordId } = useParams();
   const [searchParams] = useSearchParams();
-  const deliverableName = searchParams.get("name") || "交付物";
+  const { t } = useTranslation();
+  const deliverableName = searchParams.get("name") || t('deliverableReport.title');
 
   const stats = { totalScenarios: 45, totalCases: 165, adopted: 138, needsImprovement: 27 };
   const adoptedPercentage = stats.totalCases > 0 ? (stats.adopted / stats.totalCases) * 100 : 0;
@@ -68,7 +70,7 @@ export default function DeliverableReport() {
   };
 
   const handleExportIssues = () => {
-    toast.success("问题清单导出成功");
+    toast.success(t('testReport.exportSuccess'));
   };
 
   const handleIssueClick = (category: string) => {
@@ -94,7 +96,7 @@ export default function DeliverableReport() {
   };
 
   const handleDownload = () => {
-    toast.success("报告下载已开始");
+    toast.success(t('testReport.downloadStarted'));
   };
 
   return (
@@ -111,12 +113,12 @@ export default function DeliverableReport() {
           </Button>
           <div className="flex items-center gap-2">
             <ClipboardList className="w-5 h-5 text-primary" />
-            <h1 className="text-xl font-semibold">{deliverableName} - 审查报告</h1>
+            <h1 className="text-xl font-semibold">{deliverableName} - {t('deliverableReport.title')}</h1>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={handleDownload}>
           <Download className="w-4 h-4 mr-2" />
-          下载报告
+          {t('testReport.downloadReport')}
         </Button>
       </div>
 
@@ -126,31 +128,31 @@ export default function DeliverableReport() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-blue-500" />
-              案例审查汇总
+            {t('testReport.caseReviewSummary')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground">{stats.totalScenarios}</div>
-                <div className="text-xs text-muted-foreground">总场景</div>
+            <div className="text-xs text-muted-foreground">{t('testReport.totalScenarios')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground">{stats.totalCases}</div>
-                <div className="text-xs text-muted-foreground">总案例</div>
+            <div className="text-xs text-muted-foreground">{t('testReport.totalCases')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">{stats.adopted}</div>
-                <div className="text-xs text-muted-foreground">采纳</div>
+            <div className="text-xs text-muted-foreground">{t('testReport.adopted')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-amber-500">{stats.needsImprovement}</div>
-                <div className="text-xs text-muted-foreground">需完善</div>
+            <div className="text-xs text-muted-foreground">{t('testReport.needsImprovement')}</div>
               </div>
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>采纳率</span>
+            <span>{t('testReport.adoptionRate')}</span>
                 <span>{adoptedPercentage.toFixed(1)}%</span>
               </div>
               <Progress value={adoptedPercentage} className="h-2" />
@@ -161,7 +163,7 @@ export default function DeliverableReport() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm font-medium">问题分类汇总</span>
+              <span className="text-sm font-medium">{t('testReport.issueSummary')}</span>
                 </div>
                 <Button
                   variant="ghost"
@@ -170,7 +172,7 @@ export default function DeliverableReport() {
                   onClick={handleExportIssues}
                 >
                   <FileDown className="w-3.5 h-3.5 mr-1" />
-                  导出问题清单
+              {t('testReport.exportIssueList')}
                 </Button>
               </div>
               <div className="flex items-center gap-4">
@@ -208,7 +210,7 @@ export default function DeliverableReport() {
                         className="h-auto p-0 text-xs font-medium"
                         onClick={() => handleIssueClick(issue.name)}
                       >
-                        {issue.count}条
+                      {issue.count}{t('testReport.items')}
                       </Button>
                     </div>
                   ))}
@@ -223,7 +225,7 @@ export default function DeliverableReport() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Target className="w-4 h-4 text-green-500" />
-              覆盖率情况
+            {t('testReport.coverageSituation')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -257,21 +259,21 @@ export default function DeliverableReport() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">总覆盖率</span>
+                <span className="text-sm text-muted-foreground">{t('testReport.totalCoverage')}</span>
                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                     {coverageData.totalCoverage}%
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">未覆盖</span>
+                <span className="text-sm text-muted-foreground">{t('testReport.uncovered')}</span>
                   <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                    {coverageData.uncoveredCount}条
+                  {coverageData.uncoveredCount}{t('testReport.items')}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">补充案例</span>
+                <span className="text-sm text-muted-foreground">{t('testReport.supplementCases')}</span>
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                    {totalSupplement}条
+                  {totalSupplement}{t('testReport.items')}
                   </Badge>
                 </div>
               </div>
@@ -281,7 +283,7 @@ export default function DeliverableReport() {
             <div className="pt-3 border-t">
               <div className="flex items-center gap-2 mb-3">
                 <Plus className="w-4 h-4 text-blue-500" />
-                <span className="text-sm font-medium">补充案例分类</span>
+              <span className="text-sm font-medium">{t('testReport.supplementCategories')}</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {coverageSupplements.map((item) => {
@@ -296,7 +298,7 @@ export default function DeliverableReport() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-muted-foreground truncate">{item.name}</div>
-                        <div className="text-sm font-medium">{item.count}条</div>
+                      <div className="text-sm font-medium">{item.count}{t('testReport.items')}</div>
                       </div>
                     </div>
                   );
@@ -311,8 +313,8 @@ export default function DeliverableReport() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              丢弃情况汇总
-              <Badge variant="secondary" className="ml-auto">{totalDiscarded}条</Badge>
+            {t('testReport.discardSummary')}
+            <Badge variant="secondary" className="ml-auto">{totalDiscarded}{t('testReport.items')}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -352,7 +354,7 @@ export default function DeliverableReport() {
                       className="h-auto p-0 text-xs font-medium"
                       onClick={() => handleReasonClick(reason.name)}
                     >
-                      {reason.count}条
+                    {reason.count}{t('testReport.items')}
                     </Button>
                   </div>
                 ))}

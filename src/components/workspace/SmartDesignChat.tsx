@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { GenerationRecordItem } from "./GenerationRecordsPanel";
+ import { useTranslation } from "react-i18next";
 
 interface UploadedFile {
   id: string;
@@ -85,6 +86,7 @@ export function SmartDesignChat({
   onFileClick,
   generatedFiles = [],
 }: SmartDesignChatProps) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -146,7 +148,7 @@ export function SmartDesignChat({
     setPromptLibrary(prev => [...prev, newPromptValue.trim()]);
     setNewPromptValue("");
     setIsAddingPrompt(false);
-    toast.success("提示词已保存");
+    toast.success(t('smartDesign.promptSaved'));
   };
 
   const handleSelectPrompt = (prompt: string) => {
@@ -328,13 +330,13 @@ export function SmartDesignChat({
                 className="h-8 gap-1.5 bg-white/80 border-amber-200 hover:bg-amber-50/50 text-amber-700"
               >
                 <Lightbulb className="w-4 h-4" />
-                提示词库
+               {t('smartDesign.promptLibrary')}
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-80 p-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-2 py-1.5 border-b">
-                  <span className="text-xs font-medium text-muted-foreground">提示词库</span>
+                 <span className="text-xs font-medium text-muted-foreground">{t('smartDesign.promptLibrary')}</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -342,7 +344,7 @@ export function SmartDesignChat({
                     onClick={() => setIsAddingPrompt(true)}
                   >
                     <Plus className="w-3 h-3" />
-                    新增
+                   {t('common.new')}
                   </Button>
                 </div>
                 
@@ -351,7 +353,7 @@ export function SmartDesignChat({
                     <Textarea
                       value={newPromptValue}
                       onChange={(e) => setNewPromptValue(e.target.value)}
-                      placeholder="输入新的提示词..."
+                     placeholder={t('smartDesign.enterNewPrompt')}
                       className="min-h-[60px] text-sm resize-none"
                     />
                     <div className="flex justify-end gap-2">
@@ -364,7 +366,7 @@ export function SmartDesignChat({
                           setNewPromptValue("");
                         }}
                       >
-                        取消
+                       {t('common.cancel')}
                       </Button>
                       <Button
                         size="sm"
@@ -372,7 +374,7 @@ export function SmartDesignChat({
                         onClick={handleAddPrompt}
                         disabled={!newPromptValue.trim()}
                       >
-                        保存
+                       {t('common.save')}
                       </Button>
                     </div>
                   </div>
@@ -411,7 +413,7 @@ export function SmartDesignChat({
                 className="h-8 gap-1.5 bg-white/80 border-sky-200 hover:bg-sky-50/50 text-sky-700"
               >
                 <FolderOpen className="w-4 h-4" />
-                测试案例
+             {t('smartDesign.testCases')}
                 {generatedFiles.length > 0 && (
                   <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
                     {generatedFiles.length}
@@ -422,11 +424,11 @@ export function SmartDesignChat({
             <PopoverContent align="end" className="w-72 p-2">
               <div className="space-y-1">
                 <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-b mb-1">
-                  测试案例列表
+               {t('smartDesign.testCaseList')}
                 </div>
                 {generatedFiles.length === 0 ? (
                   <div className="py-4 text-center text-sm text-muted-foreground">
-                    暂无测试案例
+                 {t('smartDesign.noTestCases')}
                   </div>
                 ) : (
                   generatedFiles.map((file) => (
@@ -439,7 +441,7 @@ export function SmartDesignChat({
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{file.name}</div>
                         <div className="text-[10px] text-muted-foreground">
-                          {file.scenarioCount} 场景 · {file.caseCount} 案例
+                       {file.scenarioCount} {t('smartDesign.scenarios')} · {file.caseCount} {t('smartDesign.cases')}
                         </div>
                       </div>
                       <Button
@@ -448,7 +450,7 @@ export function SmartDesignChat({
                         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                         onClick={(e) => {
                           e.stopPropagation();
-                          toast.success(`开始下载 ${file.name}`);
+                         toast.success(t('smartDesign.startDownload'));
                         }}
                       >
                         <Download className="w-3.5 h-3.5 text-muted-foreground" />

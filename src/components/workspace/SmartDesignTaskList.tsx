@@ -6,6 +6,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+ import { useTranslation } from "react-i18next";
 
 interface SmartDesignTask {
   id: string;
@@ -57,6 +58,7 @@ export function SmartDesignTaskList({
   userName = "Lanseer",
 }: SmartDesignTaskListProps) {
   const navigate = useNavigate();
+   const { t } = useTranslation();
 
   const handleWorkspaceClick = () => {
     navigate("/workspaces");
@@ -96,13 +98,13 @@ export function SmartDesignTaskList({
           onClick={onNewSession}
         >
           <Plus className="w-4 h-4" />
-          <span className="text-sm">新建会话</span>
+           <span className="text-sm">{t('smartDesign.newSession')}</span>
         </Button>
       </div>
 
       {/* Recent Sessions Label */}
       <div className="px-4 py-2">
-        <span className="text-xs text-muted-foreground font-medium">最近</span>
+         <span className="text-xs text-muted-foreground font-medium">{t('smartDesign.recent')}</span>
       </div>
 
       {/* Session List */}

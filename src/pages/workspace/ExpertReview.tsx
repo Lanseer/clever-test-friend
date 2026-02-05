@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+ import { useTranslation } from "react-i18next";
 
 interface TestPoint {
   id: string;
@@ -96,6 +97,7 @@ export default function ExpertReview() {
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(
     new Set(mockDimensions.map((d) => d.id))
   );
+   const { t } = useTranslation();
   
 
   const totalStats = calculateTotalStats(mockDimensions);
@@ -149,12 +151,12 @@ export default function ExpertReview() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             >
-              智能案例设计
+               {t('smartDesign.title')}
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>专家评审</BreadcrumbPage>
+             <BreadcrumbPage>{t('expertReview.title')}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -169,18 +171,18 @@ export default function ExpertReview() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">专家评审</h1>
+           <h1 className="text-2xl font-bold text-foreground">{t('expertReview.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            生成记录: AI-001 · 共 {totalStats.total} 个案例，{pendingCount} 个待评审
+             {t('caseReview.totalCases')}: {totalStats.total}, {t('expertReview.pendingReview')}: {pendingCount}
           </p>
         </div>
-        <Button variant="outline" className="gap-2" onClick={handleNavigateToRecords}>
+         <Button variant="outline" className="gap-2" onClick={handleNavigateToRecords}>
           <History className="w-4 h-4" />
-          评审记录
+           {t('expertReview.reviewRecords')}
         </Button>
         <Button className="gap-2" onClick={handleInitiateReview}>
           <Plus className="w-4 h-4" />
-          发起评审
+           {t('expertReview.initiateReview')}
         </Button>
       </div>
 
@@ -189,7 +191,7 @@ export default function ExpertReview() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜索案例..."
+             placeholder={t('common.search') + '...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -201,26 +203,26 @@ export default function ExpertReview() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold">{totalStats.total}</div>
-          <div className="text-sm text-muted-foreground">总案例数</div>
+           <div className="text-sm text-muted-foreground">{t('expertReview.totalCases')}</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-green-600">{totalStats.passed}</div>
-          <div className="text-sm text-muted-foreground">通过</div>
+           <div className="text-sm text-muted-foreground">{t('testReport.passed')}</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-red-600">{totalStats.total - totalStats.passed - pendingCount}</div>
-          <div className="text-sm text-muted-foreground">拒绝</div>
+           <div className="text-sm text-muted-foreground">{t('testReport.rejected')}</div>
         </div>
         <div className="bg-card border rounded-lg p-4">
           <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
-          <div className="text-sm text-muted-foreground">待评审</div>
+           <div className="text-sm text-muted-foreground">{t('expertReview.pendingReview')}</div>
         </div>
       </div>
 
       {/* Hierarchical Case List */}
       <div className="rounded-xl border bg-card overflow-hidden">
         <div className="px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-          测试案例
+           {t('smartDesign.testCases')}
         </div>
 
         <div className="divide-y">
@@ -276,7 +278,7 @@ export default function ExpertReview() {
                       }}
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      查看详情
+                       {t('expertReview.viewDetails')}
                     </Button>
                   </div>
                 ))}
@@ -288,7 +290,7 @@ export default function ExpertReview() {
         {filteredDimensions.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Search className="w-12 h-12 mb-4 opacity-50" />
-            <p>未找到匹配的测试案例</p>
+             <p>{t('caseReview.noMatchingCases')}</p>
           </div>
         )}
       </div>
