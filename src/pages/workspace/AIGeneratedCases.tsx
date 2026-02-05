@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+ import { useTranslation } from "react-i18next";
 
 interface SmartDesignTask {
   id: string;
@@ -118,6 +119,7 @@ export default function AIGeneratedCases() {
   const { workspaceId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
+   const { t } = useTranslation();
   
   const [tasks, setTasks] = useState<SmartDesignTask[]>(mockTasks);
   const [recordsByTask, setRecordsByTask] = useState<Record<string, GenerationRecordItem[]>>(initialRecordsByTask);
@@ -247,8 +249,8 @@ export default function AIGeneratedCases() {
     setRecordsByTask({ ...recordsByTask, [newTask.id]: [] });
     setSelectedTaskId(newTask.id);
     toast({
-      title: "创建成功",
-      description: `任务"${data.name}"已创建`,
+       title: t('myTasks.taskCreated'),
+       description: data.name,
     });
   };
 
@@ -261,8 +263,8 @@ export default function AIGeneratedCases() {
       setSelectedTaskId(tasks[0]?.id || null);
     }
     toast({
-      title: "删除成功",
-      description: "任务已删除",
+       title: t('common.delete'),
+       description: t('myTasks.deleteTask'),
     });
   };
 
@@ -372,13 +374,13 @@ export default function AIGeneratedCases() {
       <AlertDialog open={noTaskAlertOpen} onOpenChange={setNoTaskAlertOpen}>
         <AlertDialogContent className="border-border/50 bg-card/95 backdrop-blur-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>暂无智能设计任务</AlertDialogTitle>
+             <AlertDialogTitle>{t('smartDesign.noTaskAlert')}</AlertDialogTitle>
             <AlertDialogDescription>
-              您还没有智能设计任务，是否要进行创建？
+               {t('smartDesign.noTaskAlertDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-gradient-to-r from-primary to-primary/80"
               onClick={() => {
@@ -386,7 +388,7 @@ export default function AIGeneratedCases() {
                 setCreateDialogOpen(true);
               }}
             >
-              创建任务
+               {t('smartDesign.createTask')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

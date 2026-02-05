@@ -59,6 +59,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+ import { useTranslation } from "react-i18next";
 
 // 参考资料 Mock 数据
 const mockReferenceMaterials: ReferenceMaterial[] = [
@@ -417,6 +418,8 @@ export default function CaseReview() {
   // 对话面板状态
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
+  const { t } = useTranslation();
+  
   const handleOpenMaterial = (material: ReferenceMaterial) => {
     setSelectedMaterial(material);
     setReferenceSidebarOpen(true);
@@ -646,12 +649,12 @@ export default function CaseReview() {
               className="cursor-pointer"
               onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             >
-              智能用例设计
+            {t('smartDesign.title')}
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>用例自评</BreadcrumbPage>
+          <BreadcrumbPage>{t('caseReview.title')}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -755,7 +758,7 @@ export default function CaseReview() {
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="搜索编号或场景描述..."
+              placeholder={t('common.search') + '...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -799,12 +802,12 @@ export default function CaseReview() {
             {isSmartReviewing ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                智能审查中...
+                {t('caseReview.smartReview')}...
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                智能审查
+                {t('caseReview.smartReview')}
               </>
             )}
           </Button>
@@ -1097,7 +1100,7 @@ Scenario: 完善后的场景描述
       {filteredDimensions.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
           <Search className="w-12 h-12 mb-4 opacity-50" />
-          <p>未找到匹配的测试场景</p>
+          <p>{t('caseReview.noMatchingCases')}</p>
         </div>
       )}
 
@@ -1105,15 +1108,15 @@ Scenario: 完善后的场景描述
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>确认采纳智能意见</AlertDialogTitle>
+            <AlertDialogTitle>{t('caseReview.confirmAiSuggestions')}</AlertDialogTitle>
             <AlertDialogDescription>
-              智能审查已完成，是否将智能审查结果应用到当前页面的用例审查结果？
+              {t('caseReview.confirmAiSuggestionsDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmAiSuggestions}>
-              确认
+              {t('common.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1162,7 +1165,7 @@ Scenario: 完善后的场景描述
           <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-center">
             <Button onClick={handleSave} className="gap-2">
               <Save className="w-4 h-4" />
-              保存
+              {t('common.save')}
             </Button>
           </div>
         </div>

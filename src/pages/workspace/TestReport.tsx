@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from "recharts";
+ import { useTranslation } from "react-i18next";
 // 问题分类数据
 interface IssueCategory {
   name: string;
@@ -658,6 +659,7 @@ export default function TestReport() {
   const { workspaceId } = useParams();
   const [caseDialogOpen, setCaseDialogOpen] = useState(false);
   const [caseDialogTitle, setCaseDialogTitle] = useState("");
+  const { t } = useTranslation();
 
   const handleIssueClick = (category: string) => {
     setCaseDialogTitle(`${category}相关用例`);
@@ -670,19 +672,19 @@ export default function TestReport() {
   };
 
   const handleUpdateReport = () => {
-    toast.success("报告数据已更新");
+    toast.success(t('testReport.exportSuccess'));
   };
 
   const handleDownloadReport = () => {
-    toast.success("报告下载已开始");
+    toast.success(t('testReport.downloadStarted'));
   };
 
   const handleExportSelfReviewIssues = () => {
-    toast.success("自评问题清单导出已开始");
+    toast.success(t('testReport.exportSuccess'));
   };
 
   const handleExportExpertReviewIssues = () => {
-    toast.success("专家评审问题清单导出已开始");
+    toast.success(t('testReport.exportSuccess'));
   };
 
   return (
@@ -694,32 +696,25 @@ export default function TestReport() {
             onClick={() => navigate(`/workspace/${workspaceId}/management/ai-cases`)}
             className="hover:text-foreground transition-colors"
           >
-            智能用例设计
+            {t('smartDesign.title')}
           </button>
           <ChevronRight className="w-4 h-4" />
-          <span className="text-foreground">评审报告</span>
+          <span className="text-foreground">{t('testReport.title')}</span>
         </div>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <FileText className="w-6 h-6 text-primary" />
-              评审报告
+              {t('testReport.title')}
               <span className="text-sm font-normal text-muted-foreground ml-2">
                 更新于 2024-01-15 14:30
               </span>
             </h1>
-            <p className="text-muted-foreground mt-1">
-              用例评审数据分析与覆盖率汇总
-            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleUpdateReport}>
-              <RefreshCw className="w-4 h-4 mr-1.5" />
-              更新报告
-            </Button>
             <Button size="sm" onClick={handleDownloadReport}>
               <Download className="w-4 h-4 mr-1.5" />
-              下载报告
+              {t('testReport.downloadReport')}
             </Button>
           </div>
         </div>

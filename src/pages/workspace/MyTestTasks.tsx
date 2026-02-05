@@ -10,6 +10,7 @@ import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartD
 import { Card, CardContent } from "@/components/ui/card";
 import { CaseFileCard, CaseFileData } from "@/components/workspace/CaseFileCard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+ import { useTranslation } from "react-i18next";
 
 interface TestTask {
   id: string;
@@ -109,6 +110,7 @@ export default function MyTestTasks() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialTaskId = searchParams.get("taskId") || mockTasks[0]?.id;
+   const { t } = useTranslation();
   
   const [selectedTaskId, setSelectedTaskId] = useState<string>(initialTaskId);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -136,7 +138,7 @@ export default function MyTestTasks() {
   };
 
   const handleCreateTask = (data: { name: string; testPhase: string; testCategory: string; tags: string[] }) => {
-    toast.success(`任务 "${data.name}" 创建成功`);
+     toast.success(t('myTasks.taskCreated'));
   };
 
   const handleOpenExpertReview = (e: React.MouseEvent, fileId: string) => {
@@ -158,12 +160,12 @@ export default function MyTestTasks() {
 
   const handleEditTask = (e: React.MouseEvent, taskId: string) => {
     e.stopPropagation();
-    toast.info(`编辑任务 ${taskId}`);
+     toast.info(t('myTasks.editTask'));
   };
 
   const handleDeleteTask = (e: React.MouseEvent, taskId: string) => {
     e.stopPropagation();
-    toast.info(`删除任务 ${taskId}`);
+     toast.info(t('myTasks.deleteTask'));
   };
 
   const handleInitiateExternalReview = () => {
@@ -178,8 +180,8 @@ export default function MyTestTasks() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-xl font-semibold">我的测试任务</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">管理和审查您的测试任务与案例</p>
+           <h1 className="text-xl font-semibold">{t('myTasks.title')}</h1>
+           <p className="text-sm text-muted-foreground mt-0.5">{t('myTasks.subtitle')}</p>
         </div>
       </div>
 
@@ -193,7 +195,7 @@ export default function MyTestTasks() {
         {/* Left Panel - Task List */}
         <div className="w-80 border-r bg-muted/30 flex flex-col">
           <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-sm font-medium">任务列表</h2>
+             <h2 className="text-sm font-medium">{t('myTasks.taskList')}</h2>
             <Button 
               variant="outline" 
               size="sm" 
@@ -201,7 +203,7 @@ export default function MyTestTasks() {
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus className="w-3.5 h-3.5" />
-              新建
+               {t('common.new')}
             </Button>
           </div>
           <ScrollArea className="flex-1">
@@ -244,14 +246,14 @@ export default function MyTestTasks() {
                           <DropdownMenuContent align="end" className="w-32">
                             <DropdownMenuItem onClick={(e) => handleEditTask(e, task.id)}>
                               <Pencil className="w-4 h-4 mr-2" />
-                              编辑
+                               {t('common.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={(e) => handleDeleteTask(e, task.id)}
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
-                              删除
+                               {t('common.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -260,7 +262,7 @@ export default function MyTestTasks() {
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-primary"
                           onClick={(e) => handleOpenTaskReport(e, task.id)}
-                          title="评审报告"
+                           title={t('myTasks.reviewReport')}
                         >
                           <ClipboardList className="w-4 h-4" />
                         </Button>
@@ -276,7 +278,7 @@ export default function MyTestTasks() {
         {/* Right Panel - Test Case Versions */}
         <div className="flex-1 flex flex-col bg-background/50">
           <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-lg font-medium">{selectedTask?.name || "测试案例"}</h2>
+             <h2 className="text-lg font-medium">{selectedTask?.name || t('smartDesign.testCases')}</h2>
             <Button 
               variant="outline" 
               size="sm" 
@@ -284,7 +286,7 @@ export default function MyTestTasks() {
               onClick={handleInitiateExternalReview}
             >
               <UserPlus className="w-4 h-4" />
-              发起外部评审
+               {t('myTasks.initiateExternalReview')}
             </Button>
           </div>
           
@@ -293,7 +295,7 @@ export default function MyTestTasks() {
               {generatedFiles.length === 0 ? (
                 <div className="py-16 text-center">
                   <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
-                  <p className="text-sm text-muted-foreground">暂无测试案例版本</p>
+                   <p className="text-sm text-muted-foreground">{t('myTasks.noVersions')}</p>
                 </div>
               ) : (
                 <div className="grid gap-3">
