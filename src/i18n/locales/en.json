@@ -1,0 +1,56 @@
+ {
+   "common": {
+     "search": "Search",
+     "create": "Create",
+     "enter": "Enter",
+     "settings": "Settings",
+     "delete": "Delete",
+     "cancel": "Cancel",
+     "confirm": "Confirm",
+     "members": "members",
+     "documents": "documents",
+     "activeAt": "Active"
+   },
+   "auth": {
+     "login": "Login",
+     "logout": "Logout",
+     "username": "Username",
+     "password": "Password",
+     "enterUsername": "Enter username",
+     "enterPassword": "Enter password",
+     "loggingIn": "Logging in...",
+     "forgotPassword": "Forgot Password",
+     "resetPassword": "Reset Password"
+   },
+   "brand": {
+     "name": "TestHand",
+     "slogan": "Intelligent Testing Platform"
+   },
+   "sidebar": {
+     "workspaces": "Workspaces",
+     "userManagement": "User Management",
+     "accountSettings": "Account Settings",
+     "collapse": "Collapse",
+     "tester": "Tester"
+   },
+   "workspaces": {
+     "title": "Workspaces",
+     "subtitle": "Manage your testing project spaces",
+     "searchPlaceholder": "Search workspaces...",
+     "createSpace": "Create Space",
+     "spaceSettings": "Space Settings",
+     "deleteSpace": "Delete Space",
+     "noMatchingSpaces": "No matching workspaces",
+     "selectRole": "Select Role",
+     "selectRoleDesc": "Please select which role to enter",
+     "workspace": "workspace",
+     "admin": "Administrator",
+     "adminDesc": "Full access",
+     "user": "User",
+     "userDesc": "Smart design features"
+   },
+   "language": {
+     "zh": "中文",
+     "en": "English"
+   }
+ }

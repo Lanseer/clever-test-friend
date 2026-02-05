@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   Plus, 
   Search, 
@@ -36,17 +37,19 @@ interface Workspace {
   id: string;
   name: string;
   description: string;
+  descriptionEn?: string;
   members: number;
   documents: number;
   lastActive: string;
+  lastActiveEn?: string;
   color: string;
 }
 
 const mockWorkspaces: Workspace[] = [
-  { id: "scb", name: "SCB", description: "渣打银行测试项目空间", members: 12, documents: 156, lastActive: "30分钟前", color: "142 76% 36%" },
-  { id: "dbs", name: "DBS", description: "星展银行测试项目空间", members: 8, documents: 89, lastActive: "2小时前", color: "217 91% 60%" },
-  { id: "cbs", name: "CBS", description: "招商银行测试项目空间", members: 15, documents: 234, lastActive: "刚刚", color: "0 84% 60%" },
-  { id: "rnd", name: "研发中心", description: "内部研发测试项目空间", members: 20, documents: 312, lastActive: "1小时前", color: "262 83% 58%" },
+  { id: "scb", name: "SCB", description: "渣打银行测试项目空间", descriptionEn: "Standard Chartered Bank Testing", members: 12, documents: 156, lastActive: "30分钟前", lastActiveEn: "30 min ago", color: "142 76% 36%" },
+  { id: "dbs", name: "DBS", description: "星展银行测试项目空间", descriptionEn: "DBS Bank Testing", members: 8, documents: 89, lastActive: "2小时前", lastActiveEn: "2 hours ago", color: "217 91% 60%" },
+  { id: "cbs", name: "CBS", description: "招商银行测试项目空间", descriptionEn: "China Merchants Bank Testing", members: 15, documents: 234, lastActive: "刚刚", lastActiveEn: "Just now", color: "0 84% 60%" },
+  { id: "rnd", name: "研发中心", description: "内部研发测试项目空间", descriptionEn: "Internal R&D Testing", members: 20, documents: 312, lastActive: "1小时前", lastActiveEn: "1 hour ago", color: "262 83% 58%" },
 ];
 
 export default function Workspaces() {
@@ -55,6 +58,8 @@ export default function Workspaces() {
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { setRole } = useRole();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
 
   const filteredWorkspaces = mockWorkspaces.filter(ws =>
     ws.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -81,12 +86,12 @@ export default function Workspaces() {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">工作空间</h1>
-              <p className="text-sm text-muted-foreground mt-1">管理您的测试项目空间</p>
+              <h1 className="text-2xl font-bold text-foreground">{t('workspaces.title')}</h1>
+              <p className="text-sm text-muted-foreground mt-1">{t('workspaces.subtitle')}</p>
             </div>
             <Button className="gradient-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity">
               <Plus className="w-4 h-4 mr-2" />
-              创建空间
+              {t('workspaces.createSpace')}
             </Button>
           </div>
         </div>
@@ -97,7 +102,7 @@ export default function Workspaces() {
         <div className="relative max-w-md mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="搜索工作空间..."
+            placeholder={t('workspaces.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-card border-border"
@@ -137,7 +142,7 @@ export default function Workspaces() {
                         {workspace.name}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-1">
-                        {workspace.description}
+                        {isEn ? workspace.descriptionEn : workspace.description}
                       </p>
                     </div>
                   </div>
@@ -155,12 +160,12 @@ export default function Workspaces() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>
                         <Settings className="w-4 h-4 mr-2" />
-                        空间设置
+                        {t('workspaces.spaceSettings')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive">
                         <Trash2 className="w-4 h-4 mr-2" />
-                        删除空间
+                        {t('workspaces.deleteSpace')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -170,11 +175,11 @@ export default function Workspaces() {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                   <div className="flex items-center gap-1.5">
                     <Users className="w-4 h-4" />
-                    <span>{workspace.members} 成员</span>
+                    <span>{workspace.members} {t('common.members')}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <FileText className="w-4 h-4" />
-                    <span>{workspace.documents} 文档</span>
+                    <span>{workspace.documents} {t('common.documents')}</span>
                   </div>
                 </div>
 
@@ -182,14 +187,14 @@ export default function Workspaces() {
                 <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>活跃于 {workspace.lastActive}</span>
+                    <span>{t('common.activeAt')} {isEn ? workspace.lastActiveEn : workspace.lastActive}</span>
                   </div>
                   <Button 
                     variant="ghost" 
                     size="sm"
                     className="text-primary hover:text-primary hover:bg-primary/10 gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    进入
+                    {t('common.enter')}
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -201,7 +206,7 @@ export default function Workspaces() {
         {filteredWorkspaces.length === 0 && (
           <div className="text-center py-12">
             <Folder className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">暂无匹配的工作空间</p>
+            <p className="text-muted-foreground">{t('workspaces.noMatchingSpaces')}</p>
           </div>
         )}
       </div>
@@ -210,9 +215,9 @@ export default function Workspaces() {
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>选择进入角色</DialogTitle>
+            <DialogTitle>{t('workspaces.selectRole')}</DialogTitle>
             <DialogDescription>
-              请选择您要以哪种角色进入 <span className="font-medium text-foreground">{selectedWorkspace?.name}</span> 工作空间
+              {t('workspaces.selectRoleDesc')} <span className="font-medium text-foreground">{selectedWorkspace?.name}</span> {t('workspaces.workspace')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
@@ -224,8 +229,8 @@ export default function Workspaces() {
                 <Shield className="w-8 h-8 text-amber-500" />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-foreground">管理员</p>
-                <p className="text-xs text-muted-foreground mt-1">完整功能访问</p>
+                <p className="font-semibold text-foreground">{t('workspaces.admin')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('workspaces.adminDesc')}</p>
               </div>
             </button>
             <button
@@ -236,8 +241,8 @@ export default function Workspaces() {
                 <UserRound className="w-8 h-8 text-blue-500" />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-foreground">普通人员</p>
-                <p className="text-xs text-muted-foreground mt-1">智能设计功能</p>
+                <p className="font-semibold text-foreground">{t('workspaces.user')}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('workspaces.userDesc')}</p>
               </div>
             </button>
           </div>

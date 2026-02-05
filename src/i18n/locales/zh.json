@@ -1,0 +1,56 @@
+ {
+   "common": {
+     "search": "搜索",
+     "create": "创建",
+     "enter": "进入",
+     "settings": "设置",
+     "delete": "删除",
+     "cancel": "取消",
+     "confirm": "确认",
+     "members": "成员",
+     "documents": "文档",
+     "activeAt": "活跃于"
+   },
+   "auth": {
+     "login": "登录",
+     "logout": "退出登录",
+     "username": "用户名",
+     "password": "密码",
+     "enterUsername": "请输入用户名",
+     "enterPassword": "请输入密码",
+     "loggingIn": "登录中...",
+     "forgotPassword": "忘记密码",
+     "resetPassword": "重置密码"
+   },
+   "brand": {
+     "name": "TestHand",
+     "slogan": "智能测试平台"
+   },
+   "sidebar": {
+     "workspaces": "工作空间",
+     "userManagement": "用户管理",
+     "accountSettings": "账户设置",
+     "collapse": "收起",
+     "tester": "测试人员"
+   },
+   "workspaces": {
+     "title": "工作空间",
+     "subtitle": "管理您的测试项目空间",
+     "searchPlaceholder": "搜索工作空间...",
+     "createSpace": "创建空间",
+     "spaceSettings": "空间设置",
+     "deleteSpace": "删除空间",
+     "noMatchingSpaces": "暂无匹配的工作空间",
+     "selectRole": "选择进入角色",
+     "selectRoleDesc": "请选择您要以哪种角色进入",
+     "workspace": "工作空间",
+     "admin": "管理员",
+     "adminDesc": "完整功能访问",
+     "user": "普通人员",
+     "userDesc": "智能设计功能"
+   },
+   "language": {
+     "zh": "中文",
+     "en": "English"
+   }
+ }
