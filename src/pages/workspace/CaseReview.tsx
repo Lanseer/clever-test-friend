@@ -838,21 +838,9 @@ export default function CaseReview() {
                       </div>
                       {/* 场景分类 */}
                       <div className="col-span-1 px-2 py-1 border-r border-border flex items-center justify-center">
-                        <Select
-                          value={tp.scenarioCategory || ""}
-                          onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "scenarioCategory", value)}
-                        >
-                          <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
-                            <SelectValue placeholder="请选择..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {scenarioCategoryOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value} className="text-xs">
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <span className="text-xs text-muted-foreground">
+                          {tp.scenarioCategory || "-"}
+                        </span>
                       </div>
                       {/* 对比状态 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
