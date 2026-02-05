@@ -31,7 +31,10 @@
     "yesterday": "Yesterday",
     "daysAgo": "days ago",
     "times": "times",
-    "inProgress": "In Progress"
+    "inProgress": "In Progress",
+    "scenarios": "scenarios",
+    "cases": "cases",
+    "items": "items"
   },
   "auth": {
     "login": "Login",
@@ -55,6 +58,14 @@
     "collapse": "Collapse",
     "tester": "Tester"
   },
+  "workspaceMenu": {
+    "dashboard": "Dashboard",
+    "ontology": "Test Ontology",
+    "templates": "Case Templates",
+    "environment": "Environment",
+    "tags": "Tags",
+    "testWorkbench": "Test Workbench"
+  },
   "workspaces": {
     "title": "Workspaces",
     "subtitle": "Manage your testing project spaces",
@@ -74,6 +85,25 @@
   "language": {
     "zh": "中文",
     "en": "English"
+  },
+  "xiaoLiang": {
+    "name": "Xiao Liang",
+    "goodMorning": "Good morning! 👋",
+    "summary": "Here's your summary",
+    "yesterdayDone": "Completed yesterday",
+    "todayTodo": "Today's to-do",
+    "viewAllTasks": "View all tasks",
+    "totalTasks": "Total Tasks",
+    "todoItems": "To-do items",
+    "yesterdayItems": {
+      "completedCases": "Completed 18 case reviews for 'User Login Module'",
+      "initiatedReview": "Initiated 'Payment Flow' expert review"
+    },
+    "todoItemsList": {
+      "pendingCases": "6 cases pending review",
+      "notStarted": "'Order Management Test Cases' not yet started",
+      "reviewDeadline": "Expert review deadline in 3 days"
+    }
   },
   "smartDesign": {
     "title": "Smart Design",
@@ -100,7 +130,21 @@
     "createTask": "Create Task",
     "promptSaved": "Prompt saved",
     "startDownload": "Starting download",
-    "enterNewPrompt": "Enter new prompt..."
+    "enterNewPrompt": "Enter new prompt...",
+    "attachment": "Attachment",
+    "bddTemplate": "BDD Standard Template",
+    "historyCases": "History Cases",
+    "noSelect": "None",
+    "inputPlaceholder": "Enter your requirements, e.g.: Generate test cases for user login module...",
+    "generationCompleteMsg": "Cases generated. Compared to V0.3, scenarios increased by",
+    "casesGenerated": " cases"
+  },
+  "generatedFiles": {
+    "scenariosLabel": "Scenarios:",
+    "casesLabel": "Cases:",
+    "casesCount": " cases",
+    "view": "View",
+    "startReview": "Start Review"
   },
   "caseReview": {
     "title": "Case Review",
@@ -114,6 +158,7 @@
     "source": "Source",
     "caseCount": "Case Count",
     "comparison": "Comparison",
+    "comparisonStatus": "Comparison Status",
     "reviewResult": "Review Result",
     "problemCategory": "Problem Category",
     "solution": "Solution",
@@ -137,7 +182,6 @@
     "smartReviewComplete": "Smart review completed",
     "scenarioAdded": "Scenario added",
     "savedToTask": "Successfully saved to test task",
-    "reviewSummaryComplete": "Case review completed",
     "saveToTask": "Save to Task",
     "selectReviewResult": "Select review result",
     "selectCategory": "Select category",
@@ -146,6 +190,14 @@
     "allResults": "All results",
     "allCategories": "All categories",
     "noMatchingCases": "No matching test cases found",
+    "resultUpdated": "Review result updated",
+    "smartReviewInProgress": "Smart review in progress, please wait...",
+    "smartReviewApplied": "Smart review results applied",
+    "comparedToBase": "(Comparison based on {version})",
+    "scenarioBasicInfo": "Scenario Basic Info",
+    "userReview": "User Review",
+    "code": "Code",
+    "scenarioCountLabel": " scenarios",
     "categories": {
       "improveScenario": "Improve Scenario",
       "improveInfo": "Improve Info",
@@ -167,6 +219,31 @@
       "duplicateScenario": "Duplicate scenario, suggest merging",
       "missingBoundary": "Missing boundary value test, suggest adding"
     }
+  },
+  "caseDetail": {
+    "title": "Case Details",
+    "bddContent": "Case Details (BDD)",
+    "reviewResult": "Review Result",
+    "caseCount": "Related Case Count",
+    "caseSource": "Case Source",
+    "contentModified": "* Content modified, please click save to persist",
+    "draftSaved": "Changes saved as draft"
+  },
+  "reviewHistory": {
+    "title": "Review History Details",
+    "statusChange": "Status Change",
+    "contentChange": "Content Change",
+    "before": "Before",
+    "after": "After"
+  },
+  "saveToTask": {
+    "title": "Save to Test Task",
+    "caseName": "Case Name",
+    "enterCaseName": "Enter case name",
+    "selectTask": "Select a test task to save to",
+    "noTasks": "No test tasks available. Please create one first.",
+    "newTask": "New Task",
+    "confirmSave": "Confirm Save"
   },
   "myTasks": {
     "title": "My Test Tasks",
@@ -203,8 +280,8 @@
     "rejected": "Rejected",
     "adoptionRate": "Adoption Rate",
     "passRate": "Pass Rate",
-    "adoptionTrend": "Adoption Trend by Deliverable Version",
-    "passTrend": "Pass Trend by Review Record",
+    "adoptionTrend": "Adoption Trend by Version",
+    "passTrend": "Pass Trend by Record",
     "issueSummary": "Issue Category Summary",
     "exportIssueList": "Export Issue List",
     "discardSummary": "Discard Summary",
@@ -212,7 +289,7 @@
     "totalCoverage": "Total Coverage",
     "uncovered": "Uncovered",
     "supplementCases": "Supplement Cases",
-    "supplementCategories": "Supplement Case Categories",
+    "supplementCategories": "Supplement Categories",
     "issueCategories": {
       "scenario": "Scenario Issue",
       "info": "Info Issue",
@@ -233,7 +310,13 @@
     "downloadReport": "Download Report",
     "exportSuccess": "Export successful",
     "downloadStarted": "Report download started",
-    "items": " items"
+    "items": " items",
+    "updatedAt": "Updated at",
+    "caseId": "Case ID",
+    "caseName": "Case Name",
+    "belongDimension": "Dimension",
+    "nature": "Nature",
+    "relatedCases": "Related Cases"
   },
   "deliverableReport": {
     "title": "Audit Report"
@@ -246,6 +329,13 @@
     "viewDetails": "View Details",
     "totalCases": "Total Cases",
     "pendingReview": "Pending Review"
+  },
+  "referenceMaterials": {
+    "baselineDoc": "Baseline Document",
+    "industryStandard": "Industry Standard",
+    "requirementDoc": "Requirement Document",
+    "testSpec": "Test Specification",
+    "apiDoc": "API Document"
   },
   "mockData": {
     "tasks": {

@@ -744,35 +744,35 @@ export default function CaseReview() {
       {/* Statistics Cards */}
        <div className="grid grid-cols-8 gap-3 mb-6">
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-          <span className="text-xs text-muted-foreground mb-1">总场景</span>
+          <span className="text-xs text-muted-foreground mb-1">{t('caseReview.totalScenarios')}</span>
           <span className="text-xl font-semibold">{statistics.totalScenarios}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-          <span className="text-xs text-muted-foreground mb-1">总案例</span>
+          <span className="text-xs text-muted-foreground mb-1">{t('caseReview.totalCases')}</span>
           <span className="text-xl font-semibold">{statistics.totalCases}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-           <span className="text-xs text-muted-foreground mb-1">待审查</span>
+           <span className="text-xs text-muted-foreground mb-1">{t('caseReview.pendingReview')}</span>
            <span className="text-xl font-semibold text-muted-foreground">{statistics.pending}</span>
          </div>
          <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-           <span className="text-xs text-muted-foreground mb-1">重点审查</span>
+           <span className="text-xs text-muted-foreground mb-1">{t('caseReview.focusReview')}</span>
            <span className="text-xl font-semibold text-amber-600">{statistics.focusReview}</span>
          </div>
          <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-          <span className="text-xs text-muted-foreground mb-1">采纳</span>
+          <span className="text-xs text-muted-foreground mb-1">{t('caseReview.adopted')}</span>
           <span className="text-xl font-semibold text-green-600">{statistics.adopted}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-          <span className="text-xs text-muted-foreground mb-1">需完善</span>
+          <span className="text-xs text-muted-foreground mb-1">{t('caseReview.needsImprovement')}</span>
            <span className="text-xl font-semibold text-orange-600">{statistics.needsImprovement}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-          <span className="text-xs text-muted-foreground mb-1">已完善</span>
+          <span className="text-xs text-muted-foreground mb-1">{t('caseReview.improved')}</span>
           <span className="text-xl font-semibold text-blue-600">{statistics.improved}</span>
         </div>
         <div className="bg-card border rounded-lg px-4 py-3 flex flex-col">
-          <span className="text-xs text-muted-foreground mb-1">丢弃</span>
+          <span className="text-xs text-muted-foreground mb-1">{t('caseReview.discard')}</span>
           <span className="text-xl font-semibold text-red-600">{statistics.needsDiscard}</span>
         </div>
       </div>
@@ -791,24 +791,24 @@ export default function CaseReview() {
           </div>
           <Select value={filterResult} onValueChange={setFilterResult}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="审查结果" />
+              <SelectValue placeholder={t('caseReview.reviewResult')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部结果</SelectItem>
-              <SelectItem value="adopted">采纳</SelectItem>
-              <SelectItem value="needsImprovement">需完善</SelectItem>
-              <SelectItem value="improved">已完善</SelectItem>
-              <SelectItem value="needsDiscard">丢弃</SelectItem>
-              <SelectItem value="pending">待审查</SelectItem>
-               <SelectItem value="focusReview">重点审查</SelectItem>
+              <SelectItem value="all">{t('caseReview.allResults')}</SelectItem>
+              <SelectItem value="adopted">{t('caseReview.adopted')}</SelectItem>
+              <SelectItem value="needsImprovement">{t('caseReview.needsImprovement')}</SelectItem>
+              <SelectItem value="improved">{t('caseReview.improved')}</SelectItem>
+              <SelectItem value="needsDiscard">{t('caseReview.discard')}</SelectItem>
+              <SelectItem value="pending">{t('caseReview.pendingReview')}</SelectItem>
+               <SelectItem value="focusReview">{t('caseReview.focusReview')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="分类" />
+              <SelectValue placeholder={t('caseReview.problemCategory')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部分类</SelectItem>
+              <SelectItem value="all">{t('caseReview.allCategories')}</SelectItem>
               {categoryOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -1020,7 +1020,7 @@ export default function CaseReview() {
                             onValueChange={(value) => handleFieldChange(dimension.id, tp.id, "category", value)}
                           >
                             <SelectTrigger className="h-8 text-xs border-0 bg-transparent focus:ring-1">
-                              <SelectValue placeholder="请选择分类..." />
+                              <SelectValue placeholder={t('caseReview.selectCategory')} />
                             </SelectTrigger>
                             <SelectContent>
                               {categoryOptions.map((option) => (
@@ -1041,7 +1041,7 @@ export default function CaseReview() {
                         ) : (
                           <Input
                             className="h-8 text-xs border-0 bg-transparent focus-visible:ring-1"
-                            placeholder="请输入处理方案..."
+                            placeholder={t('caseReview.solution') + '...'}
                             value={tp.solution || ""}
                             onChange={(e) => handleFieldChange(dimension.id, tp.id, "solution", e.target.value)}
                           />
@@ -1089,7 +1089,7 @@ Scenario: 完善后的场景描述
                               setHistorySidebarOpen(true);
                             }}
                           >
-                            查看
+                            {t('common.view')}
                           </span>
                         ) : (
                           <span className="text-xs text-muted-foreground">-</span>
@@ -1101,7 +1101,7 @@ Scenario: 完善后的场景描述
                 
                 {dimension.testPoints.length === 0 && (
                   <div className="col-span-12 px-3 py-6 text-center text-muted-foreground">
-                    暂无数据
+                    {t('common.noData')}
                   </div>
                 )}
                 
@@ -1111,7 +1111,7 @@ Scenario: 完善后的场景描述
                   onClick={() => handleAddScenario(dimension.id)}
                 >
                   <Plus className="w-4 h-4" />
-                  <span className="text-sm">新增场景</span>
+                  <span className="text-sm">{t('caseReview.addScenario')}</span>
                 </div>
               </div>
             </div>

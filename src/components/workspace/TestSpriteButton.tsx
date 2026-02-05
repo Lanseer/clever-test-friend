@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   Sparkles, 
   X, 
@@ -40,6 +41,7 @@ const mockGeneratedCases: GeneratedCase[] = [
 export function TestSpriteButton() {
   const { workspaceId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleDismissed, setBubbleDismissed] = useState(false);
@@ -123,16 +125,16 @@ export function TestSpriteButton() {
     return "bg-muted-foreground";
   };
 
-  // Mock data for morning summary
+  // Mock data for morning summary - use translation
   const morningMessage = {
     yesterdayDone: [
-      "完成了「用户登录模块」18个用例审查",
-      "发起了「支付流程」专家评审",
+      t('xiaoLiang.yesterdayItems.completedCases'),
+      t('xiaoLiang.yesterdayItems.initiatedReview'),
     ],
     todayTodo: [
-      "还有 6 个用例待审查",
-      "「订单管理测试案例」尚未开始审查",
-      "专家评审将在 3 天后截止",
+      t('xiaoLiang.todoItemsList.pendingCases'),
+      t('xiaoLiang.todoItemsList.notStarted'),
+      t('xiaoLiang.todoItemsList.reviewDeadline'),
     ],
   };
 
@@ -166,8 +168,8 @@ export function TestSpriteButton() {
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <span className="text-sm font-semibold text-foreground">早上好！👋</span>
-                <div className="text-xs text-muted-foreground">小亮为您总结</div>
+                <span className="text-sm font-semibold text-foreground">{t('xiaoLiang.goodMorning')}</span>
+                <div className="text-xs text-muted-foreground">{t('xiaoLiang.summary')}</div>
               </div>
             </div>
 
@@ -175,7 +177,7 @@ export function TestSpriteButton() {
             <div className="mb-3">
               <div className="text-xs font-medium text-violet-600 dark:text-violet-400 mb-1.5 flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
-                昨天完成
+                {t('xiaoLiang.yesterdayDone')}
               </div>
               <ul className="space-y-1">
                 {morningMessage.yesterdayDone.map((item, idx) => (
@@ -190,7 +192,7 @@ export function TestSpriteButton() {
             <div className="mb-3">
               <div className="text-xs font-medium text-amber-600 dark:text-amber-400 mb-1.5 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
-                今日待办
+                {t('xiaoLiang.todayTodo')}
               </div>
               <ul className="space-y-1">
                 {morningMessage.todayTodo.map((item, idx) => (
@@ -211,7 +213,7 @@ export function TestSpriteButton() {
                 handleNavigateToTasks();
               }}
             >
-              查看全部任务
+              {t('xiaoLiang.viewAllTasks')}
               <ChevronRight className="w-3 h-3 ml-1" />
             </Button>
           </div>
@@ -280,7 +282,7 @@ export function TestSpriteButton() {
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <h3 className="font-semibold text-sm">小亮</h3>
+              <h3 className="font-semibold text-sm">{t('xiaoLiang.name')}</h3>
             </div>
             <Button
               variant="ghost"
@@ -298,7 +300,7 @@ export function TestSpriteButton() {
           >
             <div className="flex items-center gap-2">
               <ListTodo className="w-4 h-4" />
-              <span className="text-sm">总任务</span>
+              <span className="text-sm">{t('xiaoLiang.totalTasks')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold">{mockTaskSummary.total}</span>
@@ -310,7 +312,7 @@ export function TestSpriteButton() {
         <div className="h-64">
           <ScrollArea className="h-full">
             <div className="p-3 space-y-2">
-              <div className="text-xs text-muted-foreground mb-2">待办事项</div>
+              <div className="text-xs text-muted-foreground mb-2">{t('xiaoLiang.todoItems')}</div>
               {mockGeneratedCases.map((caseItem) => (
                 <div
                   key={caseItem.id}

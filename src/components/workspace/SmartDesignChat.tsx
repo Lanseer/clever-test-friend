@@ -280,7 +280,7 @@ export function SmartDesignChat({
                 {message.isGenerationComplete && message.generationData && (
                   <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
                     <div className="text-sm">
-                      案例已经生成完成，相较于V0.3版本场景总数增加 <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> 个，案例增加 <span className="font-semibold text-primary">{message.generationData.caseCount}</span> 条
+                      {t('smartDesign.generationCompleteMsg')} <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> {t('common.scenarios')}, {t('smartDesign.casesGenerated')} <span className="font-semibold text-primary">{message.generationData.caseCount}</span>
                     </div>
                     
                     {/* File Link */}
@@ -492,7 +492,7 @@ export function SmartDesignChat({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="输入您的需求，例如：帮我生成用户登录模块的测试案例..."
+            placeholder={t('smartDesign.inputPlaceholder')}
             disabled={isProcessing}
             className="min-h-[80px] max-h-[120px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pb-12 pr-12"
           />
@@ -519,12 +519,12 @@ export function SmartDesignChat({
                 disabled={isProcessing}
               >
                 <Paperclip className="w-3.5 h-3.5" />
-                附件
+                {t('smartDesign.attachment')}
               </Button>
 
               {/* Fixed BDD Template Badge */}
               <Badge variant="outline" className="text-xs bg-muted/50 border-border/50 text-muted-foreground">
-                BDD标准模板
+                {t('smartDesign.bddTemplate')}
               </Badge>
 
               {/* History Cases Selector - renamed from 交付物 */}
@@ -539,22 +539,22 @@ export function SmartDesignChat({
                     >
                       <FileText className="w-3.5 h-3.5" />
                       {selectedRecordForDropdown 
-                        ? selectedRecordForDropdown.deliverableName || `${selectedTask?.name || '任务'}_V0.${selectedRecordForDropdown.batchNumber}` 
-                        : "历史案例"
+                        ? selectedRecordForDropdown.deliverableName || `${selectedTask?.name || t('myTasks.taskList')}_V0.${selectedRecordForDropdown.batchNumber}` 
+                        : t('smartDesign.historyCases')
                       }
                       <ChevronDown className="w-3 h-3" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-56">
                     <DropdownMenuItem onClick={() => setSelectedRecordId(null)}>
-                      <span className="text-xs text-muted-foreground">不选择</span>
+                      <span className="text-xs text-muted-foreground">{t('smartDesign.noSelect')}</span>
                     </DropdownMenuItem>
                     {records.map((record) => (
                       <DropdownMenuItem
                         key={record.id}
                         onClick={() => setSelectedRecordId(record.id)}
                       >
-                        <span className="text-xs">{record.deliverableName || `${selectedTask?.name || '任务'}_V0.${record.batchNumber}`}</span>
+                        <span className="text-xs">{record.deliverableName || `${selectedTask?.name || t('myTasks.taskList')}_V0.${record.batchNumber}`}</span>
                         <Badge variant="outline" className="ml-auto text-[10px]">
                           {record.scenarioCount} 场景
                         </Badge>

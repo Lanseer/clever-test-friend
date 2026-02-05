@@ -8,6 +8,7 @@ import {
   Tags
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Sidebar,
   SidebarContent,
@@ -24,18 +25,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface MenuItem {
-  title: string;
+  titleKey: string;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
 // Admin menu items only
 const adminMenuItems: MenuItem[] = [
-  { title: "数据监控", url: "dashboard", icon: LayoutDashboard },
-  { title: "测试本体", url: "ontology", icon: Network },
-  { title: "案例模板", url: "templates", icon: FileCode },
-  { title: "环境", url: "environment", icon: Server },
-  { title: "标签", url: "tags", icon: Tags },
+  { titleKey: "workspaceMenu.dashboard", url: "dashboard", icon: LayoutDashboard },
+  { titleKey: "workspaceMenu.ontology", url: "ontology", icon: Network },
+  { titleKey: "workspaceMenu.templates", url: "templates", icon: FileCode },
+  { titleKey: "workspaceMenu.environment", url: "environment", icon: Server },
+  { titleKey: "workspaceMenu.tags", url: "tags", icon: Tags },
 ];
 
 interface WorkspaceSidebarProps {
@@ -46,6 +47,7 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Sidebar
@@ -68,7 +70,7 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-semibold text-sidebar-foreground text-xs truncate">{workspaceName}</span>
-              <span className="text-[10px] text-sidebar-foreground/60">测试工作台</span>
+              <span className="text-[10px] text-sidebar-foreground/60">{t('workspaceMenu.testWorkbench')}</span>
             </div>
           )}
         </div>
@@ -79,7 +81,7 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {adminMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.titleKey}>
                   <SidebarMenuButton asChild className="h-9">
                     <NavLink
                       to={item.url}
@@ -92,7 +94,7 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
                       }
                     >
                       <item.icon className="w-4 h-4 flex-shrink-0" />
-                      {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
+                      {!isCollapsed && <span className="text-sm font-medium">{t(item.titleKey)}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -114,7 +116,7 @@ export function WorkspaceSidebar({ workspaceName }: WorkspaceSidebarProps) {
           ) : (
             <>
               <ChevronLeft className="w-4 h-4 mr-1" />
-              <span className="text-xs">收起</span>
+              <span className="text-xs">{t('sidebar.collapse')}</span>
             </>
           )}
         </Button>
