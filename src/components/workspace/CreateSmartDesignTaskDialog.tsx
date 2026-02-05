@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Tag } from "lucide-react";
 import {
   Dialog,
@@ -30,15 +31,16 @@ interface CreateSmartDesignTaskDialogProps {
   }) => void;
 }
 
-const testPhases = ["单元测试", "集成测试", "SIT测试", "UAT测试", "投产测试"];
-const testCategories = ["功能测试", "数据测试", "专项测试"];
-const availableTags = ["冒烟测试", "回归测试", "功能测试", "接口测试", "性能测试", "安全测试"];
+const testPhaseKeys = ["unit", "integration", "sit", "uat", "production"];
+const testCategoryKeys = ["functional", "data", "special"];
+const availableTagKeys = ["smoke", "regression", "functional", "api", "performance", "security"];
 
 export function CreateSmartDesignTaskDialog({
   open,
   onOpenChange,
   onConfirm,
 }: CreateSmartDesignTaskDialogProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [testPhase, setTestPhase] = useState("");
   const [testCategory, setTestCategory] = useState("");
@@ -77,38 +79,38 @@ export function CreateSmartDesignTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>新增智能设计任务</DialogTitle>
+          <DialogTitle>{t('createTask.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* 名称 */}
           <div className="space-y-2">
-            <Label htmlFor="name">任务名称</Label>
+            <Label htmlFor="name">{t('createTask.taskName')}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="请输入任务名称"
+              placeholder={t('createTask.enterTaskName')}
             />
           </div>
 
           {/* 测试活动 */}
           <div className="space-y-2">
-            <Label>测试活动</Label>
-            <Input value="测试案例设计" disabled className="bg-muted" />
+            <Label>{t('createTask.testActivity')}</Label>
+            <Input value={t('createTask.caseDesign')} disabled className="bg-muted" />
           </div>
 
           {/* 测试阶段 */}
           <div className="space-y-2">
-            <Label>测试阶段</Label>
+            <Label>{t('createTask.testPhase')}</Label>
             <Select value={testPhase} onValueChange={setTestPhase}>
               <SelectTrigger>
-                <SelectValue placeholder="请选择测试阶段" />
+                <SelectValue placeholder={t('createTask.selectTestPhase')} />
               </SelectTrigger>
               <SelectContent>
-                {testPhases.map((phase) => (
-                  <SelectItem key={phase} value={phase}>
-                    {phase}
+                {testPhaseKeys.map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {t(`myTasks.testPhase.${key}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -117,15 +119,15 @@ export function CreateSmartDesignTaskDialog({
 
           {/* 测试大类 */}
           <div className="space-y-2">
-            <Label>测试大类</Label>
+            <Label>{t('createTask.testCategory')}</Label>
             <Select value={testCategory} onValueChange={setTestCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="请选择测试大类" />
+                <SelectValue placeholder={t('createTask.selectTestCategory')} />
               </SelectTrigger>
               <SelectContent>
-                {testCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                {testCategoryKeys.map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {t(`myTasks.testCategory.${key}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -136,17 +138,17 @@ export function CreateSmartDesignTaskDialog({
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Tag className="w-4 h-4" />
-              选择标签（可选）
+              {t('createTask.selectTags')}
             </Label>
             <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
+              {availableTagKeys.map((key) => (
                 <Badge
-                  key={tag}
-                  variant={selectedTags.includes(tag) ? "default" : "outline"}
+                  key={key}
+                  variant={selectedTags.includes(key) ? "default" : "outline"}
                   className="cursor-pointer transition-colors hover:bg-primary/80"
-                  onClick={() => handleToggleTag(tag)}
+                  onClick={() => handleToggleTag(key)}
                 >
-                  {tag}
+                  {t(`createTask.tags.${key}`)}
                 </Badge>
               ))}
             </div>
@@ -155,10 +157,10 @@ export function CreateSmartDesignTaskDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleConfirm} disabled={!isValid}>
-            创建
+            {t('common.create')}
           </Button>
         </DialogFooter>
       </DialogContent>

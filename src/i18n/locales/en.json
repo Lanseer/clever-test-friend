@@ -36,6 +36,26 @@
     "cases": "cases",
     "items": "items"
   },
+  "createTask": {
+    "title": "New Smart Design Task",
+    "taskName": "Task Name",
+    "enterTaskName": "Enter task name",
+    "testActivity": "Test Activity",
+    "caseDesign": "Test Case Design",
+    "testPhase": "Test Phase",
+    "selectTestPhase": "Select test phase",
+    "testCategory": "Test Category",
+    "selectTestCategory": "Select test category",
+    "selectTags": "Select Tags (Optional)",
+    "tags": {
+      "smoke": "Smoke Test",
+      "regression": "Regression Test",
+      "functional": "Functional Test",
+      "api": "API Test",
+      "performance": "Performance Test",
+      "security": "Security Test"
+    }
+  },
   "auth": {
     "login": "Login",
     "logout": "Logout",
