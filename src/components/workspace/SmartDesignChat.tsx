@@ -193,7 +193,7 @@ export function SmartDesignChat({
       {
         id: (Date.now() + 1).toString(),
         role: "assistant" as const,
-        content: "正在分析您的需求...",
+        content: t('smartDesign.analyzing'),
         timestamp: new Date(),
       },
     ];
@@ -205,8 +205,8 @@ export function SmartDesignChat({
     step1Messages[step1Messages.length - 1] = {
       ...step1Messages[step1Messages.length - 1],
       content: uploadedFiles.length > 0 
-        ? `正在基于 ${uploadedFiles.length} 个附件生成测试案例...\n\n✅ 正在解析文档结构\n⏳ 识别功能模块...\n⏳ 生成BDD标准案例...`
-        : "正在生成测试案例...\n\n✅ 分析需求\n⏳ 生成案例...",
+        ? `${t('smartDesign.generating')}\n\n✅ ${t('smartDesign.docParsed')}\n⏳ ${t('smartDesign.modulesIdentified')}...\n⏳ ${t('smartDesign.bddGenerated')}...`
+        : `${t('smartDesign.generating')}\n\n✅ ${t('smartDesign.analyzing')}\n⏳ ${t('smartDesign.generating')}...`,
     };
     onMessagesChange(step1Messages);
 
@@ -216,8 +216,8 @@ export function SmartDesignChat({
     step2Messages[step2Messages.length - 1] = {
       ...step2Messages[step2Messages.length - 1],
       content: uploadedFiles.length > 0 
-        ? `正在基于 ${uploadedFiles.length} 个附件生成测试案例...\n\n✅ 正在解析文档结构\n✅ 识别功能模块\n⏳ 生成BDD标准案例...`
-        : "正在生成测试案例...\n\n✅ 分析需求\n✅ 识别测试点\n⏳ 生成案例...",
+        ? `${t('smartDesign.generating')}\n\n✅ ${t('smartDesign.docParsed')}\n✅ ${t('smartDesign.modulesIdentified')}\n⏳ ${t('smartDesign.bddGenerated')}...`
+        : `${t('smartDesign.generating')}\n\n✅ ${t('smartDesign.analyzing')}\n✅ ${t('smartDesign.modulesIdentified')}\n⏳ ${t('smartDesign.bddGenerated')}...`,
     };
     onMessagesChange(step2Messages);
 
@@ -230,7 +230,7 @@ export function SmartDesignChat({
     const finalMessages = [...step2Messages];
     finalMessages[finalMessages.length - 1] = {
       ...finalMessages[finalMessages.length - 1],
-      content: `生成完成！🎉\n\n✅ 文档解析完成\n✅ 功能模块识别完成\n✅ BDD案例生成完成`,
+      content: `${t('smartDesign.generationComplete')}\n\n✅ ${t('smartDesign.docParsed')}\n✅ ${t('smartDesign.modulesIdentified')}\n✅ ${t('smartDesign.bddGenerated')}`,
       isGenerationComplete: true,
       generationData: { scenarioCount, caseCount, fileName },
     };
