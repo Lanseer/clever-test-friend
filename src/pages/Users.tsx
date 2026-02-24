@@ -375,10 +375,16 @@ export default function Users() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Switch
-                    checked={user.status === "active"}
-                    onCheckedChange={() => toggleUserStatus(user.id)}
-                  />
+                  <Badge
+                    variant={user.status === "active" ? "outline" : "secondary"}
+                    className={
+                      user.status === "active"
+                        ? "border-green-500/50 text-green-600"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    {user.status === "active" ? "启用" : "禁用"}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
                   {user.createdAt}
