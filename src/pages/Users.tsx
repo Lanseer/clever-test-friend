@@ -9,7 +9,8 @@ import {
   Building2,
   Mail,
   Phone,
-  Shield
+  Shield,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,8 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 
 interface User {
@@ -229,6 +232,30 @@ export default function Users() {
       .join(", ");
   };
 
+  const toggleUserStatus = (userId: string) => {
+    setUsers(users.map(u => 
+      u.id === userId 
+        ? { ...u, status: u.status === "active" ? "inactive" as const : "active" as const }
+        : u
+    ));
+  };
+
+  const addWorkspaceToUser = (userId: string, workspaceId: string) => {
+    setUsers(users.map(u =>
+      u.id === userId && !u.workspaces.includes(workspaceId)
+        ? { ...u, workspaces: [...u.workspaces, workspaceId] }
+        : u
+    ));
+  };
+
+  const removeWorkspaceFromUser = (userId: string, workspaceId: string) => {
+    setUsers(users.map(u =>
+      u.id === userId
+        ? { ...u, workspaces: u.workspaces.filter(w => w !== workspaceId) }
+        : u
+    ));
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -307,22 +334,51 @@ export default function Users() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <Building2 className="w-3.5 h-3.5" />
-                    {getWorkspaceNames(user.workspaces) || "-"}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {user.workspaces.map((wId) => {
+                      const ws = mockWorkspaces.find((w) => w.id === wId);
+                      return ws ? (
+                        <Badge key={wId} variant="secondary" className="gap-1 pr-1">
+                          {ws.name}
+                          <button
+                            onClick={() => removeWorkspaceFromUser(user.id, wId)}
+                            className="ml-0.5 rounded-full hover:bg-muted p-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ) : null;
+                    })}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <Plus className="w-3.5 h-3.5" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-40 p-2" align="start">
+                        {mockWorkspaces
+                          .filter((w) => !user.workspaces.includes(w.id))
+                          .map((w) => (
+                            <button
+                              key={w.id}
+                              className="w-full text-left text-sm px-2 py-1.5 rounded hover:bg-accent"
+                              onClick={() => addWorkspaceToUser(user.id, w.id)}
+                            >
+                              {w.name}
+                            </button>
+                          ))}
+                        {mockWorkspaces.filter((w) => !user.workspaces.includes(w.id)).length === 0 && (
+                          <p className="text-xs text-muted-foreground px-2 py-1">已添加全部空间</p>
+                        )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={user.status === "active" ? "outline" : "secondary"}
-                    className={
-                      user.status === "active"
-                        ? "border-green-500 text-green-600"
-                        : "text-muted-foreground"
-                    }
-                  >
-                    {user.status === "active" ? "启用" : "禁用"}
-                  </Badge>
+                  <Switch
+                    checked={user.status === "active"}
+                    onCheckedChange={() => toggleUserStatus(user.id)}
+                  />
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
                   {user.createdAt}
