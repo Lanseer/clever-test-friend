@@ -39,17 +39,17 @@ interface Workspace {
   description: string;
   descriptionEn?: string;
   members: number;
-  documents: number;
+  testTasks: number;
   lastActive: string;
   lastActiveEn?: string;
   color: string;
 }
 
 const mockWorkspaces: Workspace[] = [
-  { id: "scb", name: "SCB", description: "渣打银行测试项目空间", descriptionEn: "Standard Chartered Bank Testing", members: 12, documents: 156, lastActive: "30分钟前", lastActiveEn: "30 min ago", color: "142 76% 36%" },
-  { id: "dbs", name: "DBS", description: "星展银行测试项目空间", descriptionEn: "DBS Bank Testing", members: 8, documents: 89, lastActive: "2小时前", lastActiveEn: "2 hours ago", color: "217 91% 60%" },
-  { id: "cbs", name: "CBS", description: "招商银行测试项目空间", descriptionEn: "China Merchants Bank Testing", members: 15, documents: 234, lastActive: "刚刚", lastActiveEn: "Just now", color: "0 84% 60%" },
-  { id: "rnd", name: "研发中心", description: "内部研发测试项目空间", descriptionEn: "Internal R&D Testing", members: 20, documents: 312, lastActive: "1小时前", lastActiveEn: "1 hour ago", color: "262 83% 58%" },
+  { id: "scb", name: "SCB", description: "渣打银行测试项目空间", descriptionEn: "Standard Chartered Bank Testing", members: 12, testTasks: 156, lastActive: "30分钟前", lastActiveEn: "30 min ago", color: "142 76% 36%" },
+  { id: "dbs", name: "DBS", description: "星展银行测试项目空间", descriptionEn: "DBS Bank Testing", members: 8, testTasks: 89, lastActive: "2小时前", lastActiveEn: "2 hours ago", color: "217 91% 60%" },
+  { id: "cbs", name: "CBS", description: "招商银行测试项目空间", descriptionEn: "China Merchants Bank Testing", members: 15, testTasks: 234, lastActive: "刚刚", lastActiveEn: "Just now", color: "0 84% 60%" },
+  { id: "rnd", name: "研发中心", description: "内部研发测试项目空间", descriptionEn: "Internal R&D Testing", members: 20, testTasks: 312, lastActive: "1小时前", lastActiveEn: "1 hour ago", color: "262 83% 58%" },
 ];
 
 export default function Workspaces() {
@@ -179,7 +179,7 @@ export default function Workspaces() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <FileText className="w-4 h-4" />
-                    <span>{workspace.documents} {t('common.documents')}</span>
+                    <span>{workspace.testTasks} {isEn ? 'Test Tasks' : '测试任务'}</span>
                   </div>
                 </div>
 
