@@ -294,7 +294,7 @@ export default function Users() {
               <TableHead>联系方式</TableHead>
               <TableHead>角色</TableHead>
               <TableHead>工作空间</TableHead>
-              <TableHead>状态</TableHead>
+              <TableHead>是否启用</TableHead>
               <TableHead>创建时间</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
