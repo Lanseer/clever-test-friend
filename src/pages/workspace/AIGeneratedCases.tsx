@@ -5,6 +5,7 @@ import { SmartDesignTaskList, mockChatSessions } from "@/components/workspace/Sm
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { GenerationRecordItem, RecordStatus } from "@/components/workspace/GenerationRecordsPanel";
 import { GeneratedFilesPanel } from "@/components/workspace/GeneratedFilesPanel";
+import { VersionDiffPanel } from "@/components/workspace/VersionDiffPanel";
 import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -132,6 +133,7 @@ export default function AIGeneratedCases() {
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>(mockGeneratedFiles);
   const [selectedFile, setSelectedFile] = useState<GeneratedFile | null>(null);
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [diffPanelOpen, setDiffPanelOpen] = useState(false);
 
   // Chat session management
   const [activeChatSessionId, setActiveChatSessionId] = useState<string | null>(null);
@@ -290,6 +292,46 @@ export default function AIGeneratedCases() {
   const handleFileClick = (file: GeneratedFile) => {
     setSelectedFile(file);
     setRightPanelOpen(true);
+    setDiffPanelOpen(false);
+  };
+
+  const handleViewDiff = (generationData: { scenarioCount: number; caseCount: number; fileName?: string }) => {
+    setDiffPanelOpen(true);
+    setRightPanelOpen(false);
+  };
+
+  const handleDiffDiscard = () => {
+    setDiffPanelOpen(false);
+    const discardMessage: Message = {
+      id: `discard-${Date.now()}`,
+      role: "assistant",
+      content: t('smartDesign.discardedMessage'),
+      timestamp: new Date(),
+    };
+    setChatMessages(prev => [...prev, discardMessage]);
+  };
+
+  const handleDiffConfirm = () => {
+    setDiffPanelOpen(false);
+    const newCount = Math.floor(Math.random() * 5) + 3;
+    const modifiedCount = Math.floor(Math.random() * 4) + 2;
+    const deletedCount = Math.floor(Math.random() * 3) + 1;
+    const fileName = generatedFiles.length > 0 
+      ? generatedFiles[generatedFiles.length - 1].name 
+      : "案例文件";
+    const confirmMessage: Message = {
+      id: `confirm-${Date.now()}`,
+      role: "assistant",
+      content: `${t('smartDesign.confirmMessage')}\n\n✅ ${t('smartDesign.newCases')}: ${newCount} 条\n🔧 ${t('smartDesign.modifiedCases')}: ${modifiedCount} 条\n❌ ${t('smartDesign.deletedCases')}: ${deletedCount} 条`,
+      timestamp: new Date(),
+      isGenerationComplete: true,
+      generationData: {
+        scenarioCount: newCount + modifiedCount,
+        caseCount: newCount + modifiedCount + 10,
+        fileName,
+      },
+    };
+    setChatMessages(prev => [...prev, confirmMessage]);
   };
 
   const handleStartReviewFromPanel = () => {
@@ -347,6 +389,7 @@ export default function AIGeneratedCases() {
             }
           }}
           onFileClick={handleFileClick}
+          onViewDiff={handleViewDiff}
           generatedFiles={generatedFiles}
         />
       </div>
@@ -360,6 +403,20 @@ export default function AIGeneratedCases() {
             file={selectedFile}
             dimensions={mockDimensions}
             onStartReview={handleStartReviewFromPanel}
+          />
+        </div>
+      )}
+
+      {/* Right Panel - Version Diff (conditionally rendered) */}
+      {diffPanelOpen && (
+        <div className="w-96 flex-shrink-0 relative z-10">
+          <VersionDiffPanel
+            open={diffPanelOpen}
+            onClose={() => setDiffPanelOpen(false)}
+            onDiscard={handleDiffDiscard}
+            onConfirm={handleDiffConfirm}
+            oldVersion="V0.3"
+            newVersion="V0.4"
           />
         </div>
       )}

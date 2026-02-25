@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download, Lightbulb, Plus } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download, Lightbulb, Plus, GitCompare } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,6 +70,7 @@ interface SmartDesignChatProps {
   onViewGenerationResult: () => void;
   onStartReview: () => void;
   onFileClick?: (file: GeneratedFile) => void;
+  onViewDiff?: (generationData: { scenarioCount: number; caseCount: number; fileName?: string }) => void;
   generatedFiles?: GeneratedFile[];
 }
 
@@ -84,6 +85,7 @@ export function SmartDesignChat({
   onViewGenerationResult,
   onStartReview,
   onFileClick,
+  onViewDiff,
   generatedFiles = [],
 }: SmartDesignChatProps) {
   const { t } = useTranslation();
@@ -280,7 +282,7 @@ export function SmartDesignChat({
                 {message.isGenerationComplete && message.generationData && (
                   <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
                     <div className="text-sm">
-                      {t('smartDesign.generationCompleteMsg')} <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> {t('common.scenarios')}, {t('smartDesign.casesGenerated')} <span className="font-semibold text-primary">{message.generationData.caseCount}</span>
+                      {t('smartDesign.generationCompleteMsg')} <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> {t('common.scenarios')}，{t('smartDesign.casesGenerated')} <span className="font-semibold text-primary">{message.generationData.caseCount}</span>{t('smartDesign.casesUnit')}
                     </div>
                     
                     {/* File Link */}
@@ -300,6 +302,17 @@ export function SmartDesignChat({
                       <FileText className="w-4 h-4 text-sky-600" />
                       <span className="text-sm font-medium text-sky-700">
                         {message.generationData.fileName || generateFileName()}
+                      </span>
+                    </div>
+
+                    {/* View Diff Link */}
+                    <div 
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 cursor-pointer hover:bg-amber-100 transition-colors"
+                      onClick={() => onViewDiff?.(message.generationData!)}
+                    >
+                      <GitCompare className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm font-medium text-amber-700">
+                        {t('smartDesign.viewDiffComparison')}
                       </span>
                     </div>
                   </div>

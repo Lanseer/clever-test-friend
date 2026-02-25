@@ -157,7 +157,16 @@
     "noSelect": "None",
     "inputPlaceholder": "Enter your requirements, e.g.: Generate test cases for user login module...",
     "generationCompleteMsg": "Cases generated. Compared to V0.3, scenarios increased by",
-    "casesGenerated": " cases"
+    "casesGenerated": "total cases increased by",
+    "casesUnit": "",
+    "viewDiffComparison": "View Changes",
+    "discardChanges": "Discard Changes",
+    "confirmChanges": "Confirm Changes",
+    "discardedMessage": "You have discarded the changes. Cases will remain at the previous version. Please continue with your requirements if you need to regenerate.",
+    "confirmMessage": "Changes confirmed! Summary:",
+    "newCases": "New cases",
+    "modifiedCases": "Modified cases",
+    "deletedCases": "Deleted cases"
   },
   "generatedFiles": {
     "scenariosLabel": "Scenarios:",
