@@ -285,6 +285,7 @@ export function SmartDesignChat({
                       {t('smartDesign.generationCompleteMsg')} <span className="font-semibold text-primary">{message.generationData.scenarioCount}</span> {t('common.scenarios')}，{t('smartDesign.casesGenerated')} <span className="font-semibold text-primary">{message.generationData.caseCount}</span>{t('smartDesign.casesUnit')}
                     </div>
                     
+                    <div className="flex flex-wrap items-center gap-2">
                     {/* File Link */}
                     <div 
                       className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-50 border border-sky-200 cursor-pointer hover:bg-sky-100 transition-colors"
@@ -307,13 +308,14 @@ export function SmartDesignChat({
 
                     {/* View Diff Link */}
                     <div 
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 cursor-pointer hover:bg-amber-100 transition-colors"
+                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-amber-50 border border-amber-200 cursor-pointer hover:bg-amber-100 transition-colors"
                       onClick={() => onViewDiff?.(message.generationData!)}
                     >
-                      <GitCompare className="w-4 h-4 text-amber-600" />
+                      <GitCompare className="w-3.5 h-3.5 text-amber-600" />
                       <span className="text-sm font-medium text-amber-700">
-                        {t('smartDesign.viewDiffComparison')}
+                        {t('smartDesign.viewComparison')}
                       </span>
+                    </div>
                     </div>
                   </div>
                 )}

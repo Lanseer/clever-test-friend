@@ -160,6 +160,7 @@
     "casesGenerated": "案例总数增加",
     "casesUnit": "条",
     "viewDiffComparison": "查看修改对比",
+    "viewComparison": "查看对比",
     "discardChanges": "丢弃修改",
     "confirmChanges": "确认修改",
     "discardedMessage": "您已丢弃了本次修改，案例将保持上一版本不变。如需重新生成，请继续输入您的需求。",
