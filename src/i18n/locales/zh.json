@@ -157,7 +157,16 @@
     "noSelect": "不选择",
     "inputPlaceholder": "输入您的需求，例如：帮我生成用户登录模块的测试案例...",
     "generationCompleteMsg": "案例已经生成完成，相较于V0.3版本场景总数增加",
-    "casesGenerated": "条"
+    "casesGenerated": "案例总数增加",
+    "casesUnit": "条",
+    "viewDiffComparison": "查看修改对比",
+    "discardChanges": "丢弃修改",
+    "confirmChanges": "确认修改",
+    "discardedMessage": "您已丢弃了本次修改，案例将保持上一版本不变。如需重新生成，请继续输入您的需求。",
+    "confirmMessage": "修改已确认！本次变更统计：",
+    "newCases": "新增案例",
+    "modifiedCases": "修改案例",
+    "deletedCases": "删除案例"
   },
   "generatedFiles": {
     "scenariosLabel": "场景:",
