@@ -160,6 +160,7 @@
     "casesGenerated": "total cases increased by",
     "casesUnit": "",
     "viewDiffComparison": "View Changes",
+    "viewComparison": "View Diff",
     "discardChanges": "Discard Changes",
     "confirmChanges": "Confirm Changes",
     "discardedMessage": "You have discarded the changes. Cases will remain at the previous version. Please continue with your requirements if you need to regenerate.",
