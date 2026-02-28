@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle } from "lucide-react";
-import { CaseReviewChatPanel } from "@/components/workspace/CaseReviewChatPanel";
+import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
+import { GenerationRecordItem } from "@/components/workspace/GenerationRecordsPanel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -455,6 +456,73 @@ export default function CaseReview() {
   // 对话面板状态
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
+  // SmartDesignChat state
+  interface GeneratedFile {
+    id: string;
+    name: string;
+    scenarioCount: number;
+    caseCount: number;
+    createdAt: string;
+  }
+  
+  const defaultChatMessages: Message[] = [
+    {
+      id: "init",
+      role: "assistant",
+      content: t('smartDesign.assistantGreeting'),
+      timestamp: new Date(),
+    },
+  ];
+  const [chatMessages, setChatMessages] = useState<Message[]>(defaultChatMessages);
+  const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([]);
+  const chatRecords: GenerationRecordItem[] = [];
+  
+  // Mock different case data sets for different generated files
+  const createAlternativeDimensions = (fileId: string): TestDimension[] => {
+    const hash = fileId.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+    const base = Math.abs(hash) % 10;
+    return [
+      {
+        id: "dim-1",
+        name: `01-${t('mockData.dimensions.businessFlow')}`,
+        testPoints: [
+          { id: `tp-${fileId}-1`, code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 10 + base, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+          { id: `tp-${fileId}-2`, code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 15 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+          { id: `tp-${fileId}-3`, code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 6 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+        ],
+      },
+      {
+        id: "dim-2",
+        name: `02-${t('mockData.dimensions.businessFunction')}`,
+        testPoints: [
+          { id: `tp-${fileId}-4`, code: "SC-004", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 20 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+          { id: `tp-${fileId}-5`, code: "SC-005", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 12 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+        ],
+      },
+    ];
+  };
+  
+  const handleChatFileClick = (file: GeneratedFile) => {
+    // Update the case review table with data corresponding to this file
+    const newDimensions = createAlternativeDimensions(file.id);
+    setDimensions(newDimensions);
+    toast.success(`${t('caseReview.title')}：${file.name}`);
+  };
+  
+  const handleChatGenerationComplete = (scenarioCount: number, caseCount: number) => {
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const version = `V0.${generatedFiles.length + 1}`;
+    const newFile: GeneratedFile = {
+      id: `file-${Date.now()}`,
+      name: `${dateStr}${t('smartDesign.generatedCases')}_${version}`,
+      scenarioCount,
+      caseCount,
+      createdAt: now.toISOString(),
+    };
+    setGeneratedFiles(prev => [...prev, newFile]);
+  };
+  
   const handleOpenMaterial = (material: ReferenceMaterial) => {
     setSelectedMaterial(material);
     setReferenceSidebarOpen(true);
@@ -658,8 +726,35 @@ export default function CaseReview() {
     <div className="flex h-screen overflow-hidden relative">
       {/* Left Chat Panel - only when open */}
       {chatPanelOpen && (
-        <div className="w-1/5 min-w-[280px] max-w-[360px] border-r bg-muted/20 flex-shrink-0 h-full">
-          <CaseReviewChatPanel onClose={() => setChatPanelOpen(false)} />
+        <div className="w-[320px] min-w-[280px] max-w-[400px] border-r bg-muted/20 flex-shrink-0 h-full">
+          <div className="h-full flex flex-col">
+            <div className="flex items-center justify-end px-3 py-2 border-b bg-background">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setChatPanelOpen(false)}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <SmartDesignChat
+                selectedTaskId={recordId || "1"}
+                selectedTask={{ id: recordId || "1", name: t('caseReview.title') }}
+                records={chatRecords}
+                messages={chatMessages}
+                onMessagesChange={setChatMessages}
+                onNoTaskPrompt={() => {}}
+                onGenerationComplete={handleChatGenerationComplete}
+                onViewGenerationResult={() => {}}
+                onStartReview={() => {}}
+                onFileClick={handleChatFileClick}
+                onViewDiff={() => {}}
+                generatedFiles={generatedFiles}
+              />
+            </div>
+          </div>
         </div>
       )}
       
