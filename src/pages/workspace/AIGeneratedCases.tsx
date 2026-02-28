@@ -407,19 +407,15 @@ export default function AIGeneratedCases() {
         </div>
       )}
 
-      {/* Right Panel - Version Diff (conditionally rendered) */}
-      {diffPanelOpen && (
-        <div className="w-96 flex-shrink-0 relative z-10">
-          <VersionDiffPanel
-            open={diffPanelOpen}
-            onClose={() => setDiffPanelOpen(false)}
-            onDiscard={handleDiffDiscard}
-            onConfirm={handleDiffConfirm}
-            oldVersion="V0.3"
-            newVersion="V0.4"
-          />
-        </div>
-      )}
+      {/* Version Diff Dialog */}
+      <VersionDiffPanel
+        open={diffPanelOpen}
+        onOpenChange={setDiffPanelOpen}
+        onDiscard={handleDiffDiscard}
+        onConfirm={handleDiffConfirm}
+        oldVersion="V0.3"
+        newVersion="V0.4"
+      />
 
       {/* Floating Test Sprite Button */}
       <TestSpriteButton />
