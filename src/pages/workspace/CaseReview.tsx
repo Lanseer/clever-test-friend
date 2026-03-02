@@ -44,6 +44,7 @@ import { ReferenceMaterialsSidebar, ReferenceMaterial } from "@/components/works
 import { SaveToTaskDialog } from "@/components/workspace/SaveToTaskDialog";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { toast } from "sonner";
+import { VersionDiffPanel } from "@/components/workspace/VersionDiffPanel";
 import {
   Tooltip,
   TooltipContent,
@@ -456,6 +457,9 @@ export default function CaseReview() {
   // 对话面板状态
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
+  // 版本对比弹窗状态
+  const [diffPanelOpen, setDiffPanelOpen] = useState(false);
+  
   // SmartDesignChat state
   interface GeneratedFile {
     id: string;
@@ -750,7 +754,7 @@ export default function CaseReview() {
                 onViewGenerationResult={() => {}}
                 onStartReview={() => {}}
                 onFileClick={handleChatFileClick}
-                onViewDiff={() => {}}
+                onViewDiff={() => setDiffPanelOpen(true)}
                 generatedFiles={generatedFiles}
               />
             </div>
@@ -1289,7 +1293,16 @@ Scenario: 完善后的场景描述
         onConfirm={handleCreateTask}
       />
 
-      {/* Fixed Footer - Save (only when from chat) */}
+      {/* Version Diff Panel */}
+      <VersionDiffPanel
+        open={diffPanelOpen}
+        onOpenChange={setDiffPanelOpen}
+        onDiscard={() => toast.info(t('smartDesign.discardChanges'))}
+        onConfirm={() => toast.success(t('smartDesign.confirmChanges'))}
+        oldVersion="V0.1"
+        newVersion={`V0.${generatedFiles.length + 1}`}
+      />
+
       {isFromChat && (
         <div className="fixed bottom-0 left-[20%] right-0 bg-background border-t shadow-lg z-50">
           <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-center">
