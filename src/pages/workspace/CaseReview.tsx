@@ -832,70 +832,51 @@ export default function CaseReview() {
           
           {/* Reference Materials & Coverage & Smart Review */}
           <div className="flex items-center gap-4 mt-1 flex-wrap">
-            {/* Reference Materials */}
-            <Popover open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
-              <PopoverTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                <FileText className="w-4 h-4" />
-                <span>{t('caseReview.basedOnMaterials', { count: mockReferenceMaterials.length })}</span>
-                {referenceMaterialsOpen ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-[480px] p-0">
-                <div className="bg-card rounded-lg p-3 space-y-1 max-h-[400px] overflow-y-auto">
-                  {mockReferenceMaterials.map((material, index) => (
-                    <div
-                      key={material.id}
-                      className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer group"
-                      onClick={() => {
-                        handleOpenMaterial(material);
-                        setReferenceMaterialsOpen(false);
-                      }}
-                    >
-                      <span className="text-muted-foreground text-sm">{index + 1}.</span>
-                      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1">
-                        {material.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{t(`referenceMaterials.${material.typeKey}`)}</span>
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <span className="text-muted-foreground">|</span>
-
             {/* Document Coverage Rate */}
             <Popover>
               <PopoverTrigger className="flex items-center gap-1.5 text-sm cursor-pointer hover:opacity-80 transition-opacity">
+                <FileText className="w-4 h-4 text-muted-foreground" />
                 <span className="text-muted-foreground">文档覆盖率</span>
                 <span className="font-semibold text-primary text-base">{avgCoverage}%</span>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-[380px] p-4">
+              <PopoverContent align="start" className="w-[420px] p-4">
                 <h4 className="font-medium text-sm mb-3">文档覆盖率明细</h4>
                 <div className="space-y-3">
-                  {documentCoverageRates.map((doc, idx) => (
-                    <div key={idx} className="space-y-1">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-foreground truncate flex-1 mr-2">{doc.name}</span>
-                        <span className={cn(
-                          "font-semibold",
-                          doc.coverage >= 90 ? "text-green-600" : doc.coverage >= 80 ? "text-amber-600" : "text-red-600"
-                        )}>{doc.coverage}%</span>
+                  {documentCoverageRates.map((doc, idx) => {
+                    const matchedMaterial = mockReferenceMaterials.find(m => m.name === doc.name);
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span 
+                            className={cn(
+                              "truncate flex-1 mr-2",
+                              matchedMaterial ? "text-primary cursor-pointer hover:underline" : "text-foreground"
+                            )}
+                            onClick={() => {
+                              if (matchedMaterial) {
+                                handleOpenMaterial(matchedMaterial);
+                              }
+                            }}
+                          >
+                            {doc.name}
+                          </span>
+                          <span className={cn(
+                            "font-semibold",
+                            doc.coverage >= 90 ? "text-green-600" : doc.coverage >= 80 ? "text-amber-600" : "text-red-600"
+                          )}>{doc.coverage}%</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-1.5">
+                          <div 
+                            className={cn(
+                              "h-1.5 rounded-full transition-all",
+                              doc.coverage >= 90 ? "bg-green-500" : doc.coverage >= 80 ? "bg-amber-500" : "bg-red-500"
+                            )}
+                            style={{ width: `${doc.coverage}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-muted rounded-full h-1.5">
-                        <div 
-                          className={cn(
-                            "h-1.5 rounded-full transition-all",
-                            doc.coverage >= 90 ? "bg-green-500" : doc.coverage >= 80 ? "bg-amber-500" : "bg-red-500"
-                          )}
-                          style={{ width: `${doc.coverage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="mt-3 pt-3 border-t flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">汇总覆盖率（主文档平均）</span>
