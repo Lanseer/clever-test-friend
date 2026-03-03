@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle } from "lucide-react";
 import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
 import { GenerationRecordItem } from "@/components/workspace/GenerationRecordsPanel";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,7 @@ import { SaveToTaskDialog } from "@/components/workspace/SaveToTaskDialog";
 import { CreateSmartDesignTaskDialog } from "@/components/workspace/CreateSmartDesignTaskDialog";
 import { toast } from "sonner";
 import { VersionDiffPanel } from "@/components/workspace/VersionDiffPanel";
+import { MultiDimensionReviewDialog } from "@/components/workspace/MultiDimensionReviewDialog";
 import {
   Tooltip,
   TooltipContent,
@@ -454,6 +455,20 @@ export default function CaseReview() {
   const [referenceSidebarOpen, setReferenceSidebarOpen] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<ReferenceMaterial | null>(null);
   
+  // 多维度智能审查弹窗
+  const [multiDimensionReviewOpen, setMultiDimensionReviewOpen] = useState(false);
+
+  // Mock 文档覆盖率数据
+  const documentCoverageRates = [
+    { name: "用户登录功能规格说明书 v2.1", coverage: 92 },
+    { name: "账户开户业务需求文档 PRD v1.5", coverage: 88 },
+    { name: "用户服务接口文档 API v2.0", coverage: 85 },
+  ];
+  const avgCoverage = Math.round(
+    documentCoverageRates.reduce((sum, d) => sum + d.coverage, 0) / documentCoverageRates.length
+  );
+  const riskItemCount = 5;
+
   // 对话面板状态
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
@@ -815,38 +830,92 @@ export default function CaseReview() {
             )}
           </h1>
           
-          {/* Reference Materials */}
-          <Popover open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
-            <PopoverTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1 cursor-pointer">
-              <FileText className="w-4 h-4" />
-              <span>{t('caseReview.basedOnMaterials', { count: mockReferenceMaterials.length })}</span>
-              {referenceMaterialsOpen ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-[480px] p-0">
-              <div className="bg-card rounded-lg p-3 space-y-1 max-h-[400px] overflow-y-auto">
-                {mockReferenceMaterials.map((material, index) => (
-                  <div
-                    key={material.id}
-                    className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer group"
-                    onClick={() => {
-                      handleOpenMaterial(material);
-                      setReferenceMaterialsOpen(false);
-                    }}
-                  >
-                    <span className="text-muted-foreground text-sm">{index + 1}.</span>
-                    <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1">
-                      {material.name}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{t(`referenceMaterials.${material.typeKey}`)}</span>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+          {/* Reference Materials & Coverage & Smart Review */}
+          <div className="flex items-center gap-4 mt-1 flex-wrap">
+            {/* Reference Materials */}
+            <Popover open={referenceMaterialsOpen} onOpenChange={setReferenceMaterialsOpen}>
+              <PopoverTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                <FileText className="w-4 h-4" />
+                <span>{t('caseReview.basedOnMaterials', { count: mockReferenceMaterials.length })}</span>
+                {referenceMaterialsOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-[480px] p-0">
+                <div className="bg-card rounded-lg p-3 space-y-1 max-h-[400px] overflow-y-auto">
+                  {mockReferenceMaterials.map((material, index) => (
+                    <div
+                      key={material.id}
+                      className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer group"
+                      onClick={() => {
+                        handleOpenMaterial(material);
+                        setReferenceMaterialsOpen(false);
+                      }}
+                    >
+                      <span className="text-muted-foreground text-sm">{index + 1}.</span>
+                      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors flex-1">
+                        {material.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{t(`referenceMaterials.${material.typeKey}`)}</span>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-muted-foreground">|</span>
+
+            {/* Document Coverage Rate */}
+            <Popover>
+              <PopoverTrigger className="flex items-center gap-1.5 text-sm cursor-pointer hover:opacity-80 transition-opacity">
+                <span className="text-muted-foreground">文档覆盖率</span>
+                <span className="font-semibold text-primary text-base">{avgCoverage}%</span>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-[380px] p-4">
+                <h4 className="font-medium text-sm mb-3">文档覆盖率明细</h4>
+                <div className="space-y-3">
+                  {documentCoverageRates.map((doc, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-foreground truncate flex-1 mr-2">{doc.name}</span>
+                        <span className={cn(
+                          "font-semibold",
+                          doc.coverage >= 90 ? "text-green-600" : doc.coverage >= 80 ? "text-amber-600" : "text-red-600"
+                        )}>{doc.coverage}%</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div 
+                          className={cn(
+                            "h-1.5 rounded-full transition-all",
+                            doc.coverage >= 90 ? "bg-green-500" : doc.coverage >= 80 ? "bg-amber-500" : "bg-red-500"
+                          )}
+                          style={{ width: `${doc.coverage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 pt-3 border-t flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">汇总覆盖率（主文档平均）</span>
+                  <span className="font-bold text-primary">{avgCoverage}%</span>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-muted-foreground">|</span>
+
+            {/* Multi-dimension Smart Review */}
+            <button
+              className="flex items-center gap-1.5 text-sm cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setMultiDimensionReviewOpen(true)}
+            >
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="text-muted-foreground">多维度智能覆盖率评估</span>
+              <span className="font-semibold text-destructive">{riskItemCount} 个风险项</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1303,6 +1372,11 @@ Scenario: 完善后的场景描述
         newVersion={`V0.${generatedFiles.length + 1}`}
       />
 
+      {/* Multi-Dimension Review Dialog */}
+      <MultiDimensionReviewDialog
+        open={multiDimensionReviewOpen}
+        onOpenChange={setMultiDimensionReviewOpen}
+      />
       {isFromChat && (
         <div className="fixed bottom-0 left-[20%] right-0 bg-background border-t shadow-lg z-50">
           <div className="max-w-full mx-auto px-6 py-4 flex items-center justify-center">
