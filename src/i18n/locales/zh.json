@@ -167,7 +167,10 @@
     "confirmMessage": "修改已确认！本次变更统计：",
     "newCases": "新增案例",
     "modifiedCases": "修改案例",
-    "deletedCases": "删除案例"
+    "deletedCases": "删除案例",
+    "existingCasesDetected": "检查到文档存在已经生成的案例，请检查是否使用",
+    "generatedOn": "于",
+    "generated": "生成"
   },
   "generatedFiles": {
     "scenariosLabel": "场景:",

@@ -167,7 +167,10 @@
     "confirmMessage": "Changes confirmed! Summary:",
     "newCases": "New cases",
     "modifiedCases": "Modified cases",
-    "deletedCases": "Deleted cases"
+    "deletedCases": "Deleted cases",
+    "existingCasesDetected": "Existing generated cases detected for this document. Please check if you want to use them.",
+    "generatedOn": "on",
+    "generated": "generated"
   },
   "generatedFiles": {
     "scenariosLabel": "Scenarios:",
