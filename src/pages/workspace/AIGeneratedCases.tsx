@@ -159,8 +159,15 @@ export default function AIGeneratedCases() {
     ],
     "session-2": [
       { id: "s2-1", role: "assistant", content: t('smartDesign.assistantGreeting'), timestamp: new Date() },
-      { id: "s2-2", role: "user", content: `${t('smartDesign.analyzing')}\n\n📎 ${t('smartDesign.attachment')}: 需求规格说明书.pdf`, timestamp: new Date() },
-      { id: "s2-3", role: "assistant", content: `${t('smartDesign.analyzing')}\n\n✅ ${t('smartDesign.docParsed')}\n✅ ${t('smartDesign.modulesIdentified')}`, timestamp: new Date() },
+      { 
+        id: "s2-2", role: "assistant", 
+        content: t('smartDesign.existingCasesDetected'),
+        timestamp: new Date(),
+        existingFiles: [
+          { fileName: "2026-02-06生成案例_V0.1", author: "Lanseer", date: "2026-02-06", scenarioCount: 12, caseCount: 36 },
+          { fileName: "2026-02-07生成案例_V0.2", author: "Lanseer", date: "2026-02-07", scenarioCount: 15, caseCount: 42 },
+        ]
+      },
     ],
     "session-3": [
       { id: "s3-1", role: "assistant", content: t('smartDesign.assistantGreeting'), timestamp: new Date() },

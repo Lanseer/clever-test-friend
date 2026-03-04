@@ -42,6 +42,13 @@ export interface Message {
     caseCount: number;
     fileName?: string;
   };
+  existingFiles?: Array<{
+    fileName: string;
+    author: string;
+    date: string;
+    scenarioCount: number;
+    caseCount: number;
+  }>;
 }
 
 interface SmartDesignTask {
@@ -278,6 +285,33 @@ export function SmartDesignChat({
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 
+                {/* Existing Files List */}
+                {message.existingFiles && message.existingFiles.length > 0 && (
+                  <div className="mt-3 space-y-3">
+                    {message.existingFiles.map((file, idx) => (
+                      <div key={idx}>
+                        <p className="text-xs text-muted-foreground mb-1">{file.author} {t('smartDesign.generatedOn')} {file.date} {t('smartDesign.generated')}</p>
+                        <div 
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-50 border border-sky-200 cursor-pointer hover:bg-sky-100 transition-colors"
+                          onClick={() => {
+                            const generatedFile: GeneratedFile = {
+                              id: `file-existing-${idx}`,
+                              name: file.fileName,
+                              scenarioCount: file.scenarioCount,
+                              caseCount: file.caseCount,
+                              createdAt: new Date().toISOString(),
+                            };
+                            onFileClick?.(generatedFile);
+                          }}
+                        >
+                          <FileText className="w-4 h-4 text-sky-600" />
+                          <span className="text-sm font-medium text-sky-700">{file.fileName}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Generation Complete - Show file link only */}
                 {message.isGenerationComplete && message.generationData && (
                   <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
