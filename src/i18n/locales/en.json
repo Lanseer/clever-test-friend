@@ -259,6 +259,7 @@
     "reviewResult": "Review Result",
     "caseCount": "Related Case Count",
     "caseSource": "Case Source",
+    "caseScript": "Case Script",
     "contentModified": "* Content modified, please click save to persist",
     "draftSaved": "Changes saved as draft"
   },

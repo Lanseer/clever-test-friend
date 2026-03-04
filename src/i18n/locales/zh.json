@@ -259,6 +259,7 @@
     "reviewResult": "审查结果",
     "caseCount": "对应案例数",
     "caseSource": "案例来源",
+    "caseScript": "案例脚本",
     "contentModified": "* 内容已修改，请点击暂存按钮保存",
     "draftSaved": "修改内容已暂存"
   },

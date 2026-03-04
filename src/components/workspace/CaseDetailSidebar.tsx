@@ -131,27 +131,23 @@ export function CaseDetailSidebar({
                   )}
                 </div>
 
-                {/* 审查结果和对应案例数 - 仅在非只读模式显示 */}
-                {!isReadOnly && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">{t('caseDetail.reviewResult')}</Label>
-                      <Badge 
-                        variant="outline" 
-                        className={cn("text-xs", resultConfig.className)}
-                      >
-                        {resultConfig.label}
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-muted-foreground text-xs">{t('caseDetail.caseCount')}</Label>
-                      <Badge variant="outline" className="text-xs">
-                        {caseData.caseCount ?? "-"}
-                      </Badge>
-                    </div>
+                {/* 案例脚本 */}
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground text-xs">{t('caseDetail.caseScript')}</Label>
+                  <div className="rounded-md border bg-muted/30 p-3 font-mono text-xs whitespace-pre-wrap text-foreground/80 min-h-[120px]">
+{`// 测试脚本: ${caseData.id}
+describe('用户登录功能', () => {
+  it('应该使用有效凭证成功登录', async () => {
+    await page.goto('/login');
+    await page.fill('#username', 'testuser');
+    await page.fill('#password', 'Password123');
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL('/dashboard');
+    await expect(page.locator('.welcome')).toBeVisible();
+  });
+});`}
                   </div>
-                )}
-                
+                </div>
                 {/* 案例来源详情 */}
                 <div className="space-y-2">
                   <Label className="text-muted-foreground text-xs">{t('caseDetail.caseSource')}</Label>
