@@ -1,74 +1,57 @@
 
-# 我的测试任务页面 - 增加发起外部评审按钮
 
-## 概述
-在"我的测试任务"页面的右侧面板标题区域增加一个"发起外部评审"按钮，点击后跳转到发起外部评审的流程页面。
+## Plan: Update "订单支付流程分析" (session-2) Mock Content
 
-## 当前页面结构
-- **左侧面板**：任务列表（w-80）
-- **右侧面板**：测试案例版本列表
-  - 标题区域：显示当前选中任务名称
-  - 内容区域：案例文件卡片列表
+**Goal:** Change session-2's chat messages to show a detection prompt about existing generated cases, followed by a file list where each file has author/date metadata above it.
 
-## 实现方案
+### Changes
 
-### UI 设计
-在右侧面板的标题栏（`p-4 border-b`）中，将任务名称和按钮放在同一行：
-- 左侧：任务名称（保持原样）
-- 右侧：新增「发起外部评审」按钮
+**1. Update `sessionMessagesMap` in `AIGeneratedCases.tsx` (lines 160-163)**
 
-```text
-┌─────────────────────────────────────────────────────┐
-│ 用户登录模块测试                    [发起外部评审] │
-├─────────────────────────────────────────────────────┤
-│ 案例文件卡片列表...                                 │
-└─────────────────────────────────────────────────────┘
+Replace session-2 messages with:
+- `s2-1`: Assistant greeting (keep)
+- `s2-2`: Assistant message with text: "检查到文档存在已经生成的案例，请检查是否使用" followed by a list of file entries. Each file entry rendered as a generation-complete message with `generationData` and a new `authorInfo` field.
+
+Since the `Message` interface doesn't support multiple file entries or author metadata natively, we need to:
+
+**2. Extend `Message` interface in `SmartDesignChat.tsx`**
+
+Add optional field to `Message`:
+```ts
+existingFiles?: Array<{
+  fileName: string;
+  author: string;
+  date: string;
+  scenarioCount: number;
+  caseCount: number;
+}>;
 ```
 
-### 按钮样式
-- 使用 `variant="outline"` 轮廓按钮样式
-- 添加 `UserPlus` 图标（表示邀请外部人员）
-- 按钮文字：「发起外部评审」
+**3. Render existing files in `SmartDesignChat.tsx`**
 
-### 点击行为
-点击按钮后，跳转到发起外部评审页面：
-`/workspace/${workspaceId}/management/ai-cases/record-1/initiate-expert-review`
+In the message rendering section, after the `message.content` block, add a check for `message.existingFiles`. If present, render a vertical list of file cards, each showing:
+- Small gray text above: `{author} 于 {date} 生成`
+- File link card (same style as generation complete file links) with FileText icon and file name
+- Clickable to trigger `onFileClick`
 
----
+**4. Update session-2 mock data in `AIGeneratedCases.tsx`**
 
-## 技术实现
+```ts
+"session-2": [
+  { id: "s2-1", role: "assistant", content: t('smartDesign.assistantGreeting'), timestamp: new Date() },
+  { 
+    id: "s2-2", role: "assistant", 
+    content: "检查到文档存在已经生成的案例，请检查是否使用",
+    timestamp: new Date(),
+    existingFiles: [
+      { fileName: "2026-02-06生成案例_V0.1", author: "Lanseer", date: "2026-02-06", scenarioCount: 12, caseCount: 36 },
+      { fileName: "2026-02-07生成案例_V0.2", author: "Lanseer", date: "2026-02-07", scenarioCount: 15, caseCount: 42 },
+    ]
+  },
+],
+```
 
-### 修改文件
-**src/pages/workspace/MyTestTasks.tsx**
+**5. Add i18n key** for the detection text in `zh.json` and `en.json`:
+- `smartDesign.existingCasesDetected`: "检查到文档存在已经生成的案例，请检查是否使用" / "Existing generated cases detected for this document. Please check if you want to use them."
+- `smartDesign.generatedBy`: "于" / "on" (for the author line pattern)
 
-1. **添加图标导入**
-   - 导入 `UserPlus` 图标
-
-2. **添加处理函数**
-   ```typescript
-   const handleInitiateExternalReview = () => {
-     navigate(`/workspace/${workspaceId}/management/ai-cases/record-1/initiate-expert-review`);
-   };
-   ```
-
-3. **修改右侧面板标题区域**
-   将原有的简单标题改为 flex 布局，左侧显示任务名称，右侧显示按钮：
-   ```tsx
-   <div className="p-4 border-b flex items-center justify-between">
-     <h2 className="text-lg font-medium">{selectedTask?.name || "测试案例"}</h2>
-     <Button 
-       variant="outline" 
-       size="sm" 
-       className="gap-1.5"
-       onClick={handleInitiateExternalReview}
-     >
-       <UserPlus className="w-4 h-4" />
-       发起外部评审
-     </Button>
-   </div>
-   ```
-
-## 预期效果
-- 右侧面板标题栏右侧出现「发起外部评审」按钮
-- 点击按钮跳转到发起外部评审流程页面
-- 按钮样式与页面整体风格一致
