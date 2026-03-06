@@ -1023,39 +1023,39 @@ export default function CaseReview() {
                     <ChevronRight className={cn("w-4 h-4 transition-transform", !isCollapsed && "rotate-90")} />
                     {dimension.name}
                     <span className="text-xs text-muted-foreground ml-2">({dimension.testPoints.length}{t('caseReview.scenarioCountLabel')})</span>
+                    {/* 业务流程维度 - 查看流程说明 */}
+                    {dimension.id === "dim-1" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary/80 ml-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProcessFlowDialogOpen(true);
+                        }}
+                      >
+                        <GitBranch className="w-3.5 h-3.5" />
+                        查看流程说明
+                      </Button>
+                    )}
+                    {/* 业务功能/业务要素维度 - 查看思维导图 */}
+                    {(dimension.id === "dim-2" || dimension.id === "dim-3") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary/80 ml-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMindMapDimension({ name: dimension.name, testPoints: dimension.testPoints });
+                          setMindMapDialogOpen(true);
+                        }}
+                      >
+                        <Network className="w-3.5 h-3.5" />
+                        查看思维导图
+                      </Button>
+                    )}
                   </div>
                 </CollapsibleTrigger>
-                {/* 业务流程维度 - 查看流程说明 */}
-                {dimension.id === "dim-1" && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary/80"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setProcessFlowDialogOpen(true);
-                    }}
-                  >
-                    <GitBranch className="w-3.5 h-3.5" />
-                    查看流程说明
-                  </Button>
-                )}
-                {/* 业务功能/业务要素维度 - 查看思维导图 */}
-                {(dimension.id === "dim-2" || dimension.id === "dim-3") && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary/80"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setMindMapDimension({ name: dimension.name, testPoints: dimension.testPoints });
-                      setMindMapDialogOpen(true);
-                    }}
-                  >
-                    <Network className="w-3.5 h-3.5" />
-                    查看思维导图
-                  </Button>
-                )}
               </div>
               
               <CollapsibleContent>
