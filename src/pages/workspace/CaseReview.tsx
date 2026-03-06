@@ -62,7 +62,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
- import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
+import { ProcessFlowDialog } from "@/components/workspace/ProcessFlowDialog";
+import { MindMapDialog } from "@/components/workspace/MindMapDialog";
+import { GitBranch, Network } from "lucide-react";
 
 // 参考资料 Mock 数据 - with typeKey for i18n
 interface ReferenceMaterialWithKey extends Omit<ReferenceMaterial, 'type'> {
@@ -457,6 +460,13 @@ export default function CaseReview() {
   
   // 多维度智能审查弹窗
   const [multiDimensionReviewOpen, setMultiDimensionReviewOpen] = useState(false);
+
+  // 流程说明弹窗
+  const [processFlowDialogOpen, setProcessFlowDialogOpen] = useState(false);
+  
+  // 思维导图弹窗
+  const [mindMapDialogOpen, setMindMapDialogOpen] = useState(false);
+  const [mindMapDimension, setMindMapDimension] = useState<{ name: string; testPoints: TestPoint[] } | null>(null);
 
   // Mock 文档覆盖率数据
   const documentCoverageRates = [
@@ -1007,13 +1017,46 @@ export default function CaseReview() {
           <Collapsible key={dimension.id} open={!isCollapsed} onOpenChange={() => toggleDimensionCollapse(dimension.id)}>
             <div className="overflow-hidden">
               {/* Dimension Header */}
-              <CollapsibleTrigger asChild>
-                <div className="bg-[hsl(200,60%,94%)] border-l-4 border-l-[hsl(200,70%,50%)] px-4 py-3 font-medium text-foreground cursor-pointer hover:bg-[hsl(200,60%,90%)] transition-colors flex items-center gap-2">
-                  <ChevronRight className={cn("w-4 h-4 transition-transform", !isCollapsed && "rotate-90")} />
-                  {dimension.name}
-                  <span className="text-xs text-muted-foreground ml-2">({dimension.testPoints.length}{t('caseReview.scenarioCountLabel')})</span>
-                </div>
-              </CollapsibleTrigger>
+              <div className="bg-[hsl(200,60%,94%)] border-l-4 border-l-[hsl(200,70%,50%)] px-4 py-3 font-medium text-foreground flex items-center gap-2">
+                <CollapsibleTrigger asChild>
+                  <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity flex-1">
+                    <ChevronRight className={cn("w-4 h-4 transition-transform", !isCollapsed && "rotate-90")} />
+                    {dimension.name}
+                    <span className="text-xs text-muted-foreground ml-2">({dimension.testPoints.length}{t('caseReview.scenarioCountLabel')})</span>
+                  </div>
+                </CollapsibleTrigger>
+                {/* 业务流程维度 - 查看流程说明 */}
+                {dimension.id === "dim-1" && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary/80"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProcessFlowDialogOpen(true);
+                    }}
+                  >
+                    <GitBranch className="w-3.5 h-3.5" />
+                    查看流程说明
+                  </Button>
+                )}
+                {/* 业务功能/业务要素维度 - 查看思维导图 */}
+                {(dimension.id === "dim-2" || dimension.id === "dim-3") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary/80"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMindMapDimension({ name: dimension.name, testPoints: dimension.testPoints });
+                      setMindMapDialogOpen(true);
+                    }}
+                  >
+                    <Network className="w-3.5 h-3.5" />
+                    查看思维导图
+                  </Button>
+                )}
+              </div>
               
               <CollapsibleContent>
             {/* Table */}
@@ -1357,6 +1400,20 @@ Scenario: 完善后的场景描述
       <MultiDimensionReviewDialog
         open={multiDimensionReviewOpen}
         onOpenChange={setMultiDimensionReviewOpen}
+      />
+
+      {/* Process Flow Dialog */}
+      <ProcessFlowDialog
+        open={processFlowDialogOpen}
+        onOpenChange={setProcessFlowDialogOpen}
+      />
+
+      {/* Mind Map Dialog */}
+      <MindMapDialog
+        open={mindMapDialogOpen}
+        onOpenChange={setMindMapDialogOpen}
+        dimensionName={mindMapDimension?.name || ""}
+        testPoints={mindMapDimension?.testPoints || []}
       />
       {isFromChat && (
         <div className="fixed bottom-0 left-[20%] right-0 bg-background border-t shadow-lg z-50">
