@@ -164,43 +164,33 @@ export function ReferenceMaterialsSidebar({
   const [selectedUncoveredLines, setSelectedUncoveredLines] = useState<Set<number>>(new Set());
   const [supplementDialogOpen, setSupplementDialogOpen] = useState(false);
 
-  if (!material) return null;
-
-  const typeKey = material.typeKey || material.type;
-  const displayType = material.typeKey ? t(`referenceMaterials.${material.typeKey}`) : material.type;
+  const typeKey = material?.typeKey || material?.type || "";
+  const displayType = material?.typeKey ? t(`referenceMaterials.${material.typeKey}`) : (material?.type || "");
   const colorClass = typeColorMap[typeKey] || "bg-muted text-muted-foreground";
 
-  const lines = material.content.split('\n');
-  const covered = coveredLineIndices[material.id] || [];
-  const noNeed = noNeedLineIndices[material.id] || [];
-  const outlines = outlineNumbers[material.id] || {};
-
-  // Determine line status
-  const getLineStatus = (idx: number): "covered" | "uncovered" | "noNeed" => {
-    if (covered.includes(idx)) return "covered";
-    if (noNeed.includes(idx)) return "noNeed";
-    return "uncovered";
-  };
+  const lines = useMemo(() => material?.content.split('\n') || [], [material?.content]);
+  const covered = material ? (coveredLineIndices[material.id] || []) : [];
+  const noNeed = material ? (noNeedLineIndices[material.id] || []) : [];
+  const outlines = material ? (outlineNumbers[material.id] || {}) : {};
 
   // Filter lines based on mode
   const filteredLines = useMemo(() => {
-    return lines.map((line, idx) => ({
-      line,
-      idx,
-      status: getLineStatus(idx),
-    })).filter(({ status, line }) => {
+    return lines.map((line, idx) => {
+      const status: "covered" | "uncovered" | "noNeed" = 
+        covered.includes(idx) ? "covered" : noNeed.includes(idx) ? "noNeed" : "uncovered";
+      return { line, idx, status };
+    }).filter(({ status }) => {
       if (filterMode === "all") return true;
-      if (filterMode === "covered") return status === "covered";
-      if (filterMode === "uncovered") return status === "uncovered";
-      if (filterMode === "noNeed") return status === "noNeed";
-      return true;
+      return status === filterMode;
     });
-  }, [lines, filterMode, material.id]);
+  }, [lines, filterMode, covered, noNeed]);
 
   // Uncovered non-empty lines for selection
   const uncoveredNonEmptyLines = useMemo(() => {
     return filteredLines.filter(l => l.status === "uncovered" && l.line.trim().length > 0);
   }, [filteredLines]);
+
+  if (!material) return null;
 
   const allUncoveredSelected = uncoveredNonEmptyLines.length > 0 && 
     uncoveredNonEmptyLines.every(l => selectedUncoveredLines.has(l.idx));
