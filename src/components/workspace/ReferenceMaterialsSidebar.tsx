@@ -229,8 +229,7 @@ export function ReferenceMaterialsSidebar({
   const filterButtons: { mode: FilterMode; label: string }[] = [
     { mode: "all", label: "全部" },
     { mode: "covered", label: "已覆盖" },
-    { mode: "uncovered", label: "未覆盖" },
-    { mode: "noNeed", label: "无需覆盖" },
+    { mode: "uncovered", label: "无需覆盖" },
   ];
 
   const handleDialogChange = (v: boolean) => {
