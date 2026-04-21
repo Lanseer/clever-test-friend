@@ -1184,7 +1184,7 @@ export default function CaseReview() {
                             </TooltipProvider>
                           )}
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -1194,7 +1194,7 @@ export default function CaseReview() {
                                 <ChevronDown className="w-3 h-3" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="center">
+                            <DropdownMenuContent align="center" onClick={(e) => e.stopPropagation()}>
                                {(["adopted", "needsImprovement", "improved", "needsDiscard", "focusReview"] as ReviewResult[]).map((result) => {
                                 const config = reviewResultConfig[result];
                                 return (
