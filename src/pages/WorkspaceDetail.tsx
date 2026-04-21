@@ -8,6 +8,7 @@ import TestCaseDetail from "./workspace/TestCaseDetail";
 import AIGeneratedCases from "./workspace/AIGeneratedCases";
 import AIGeneratedCaseDetail from "./workspace/AIGeneratedCaseDetail";
 import CaseReview from "./workspace/CaseReview";
+import CaseReviewDetail from "./workspace/CaseReviewDetail";
 import CaseSelfReview from "./workspace/CaseSelfReview";
 import GenerationRecords from "./workspace/GenerationRecords";
 import BatchCaseList from "./workspace/BatchCaseList";
@@ -53,10 +54,12 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/case-review" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId/case-review/case/:caseId" element={<CaseReviewDetail />} />
             <Route path="management/ai-cases/:recordId/generation-records" element={<BatchCaseList />} />
             <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/review/case/:caseId" element={<CaseReviewDetail />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/self-review/:testPointId" element={<CaseSelfReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
@@ -94,10 +97,12 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/case-review" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId/case-review/case/:caseId" element={<CaseReviewDetail />} />
             <Route path="management/ai-cases/:recordId/generation-records" element={<BatchCaseList />} />
             <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
+            <Route path="management/ai-cases/:recordId/batch/:batchId/review/case/:caseId" element={<CaseReviewDetail />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/self-review/:testPointId" element={<CaseSelfReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
             <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
