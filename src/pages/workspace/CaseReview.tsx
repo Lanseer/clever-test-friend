@@ -617,12 +617,11 @@ export default function CaseReview() {
     );
 
   const handleOpenSidebar = (dimId: string, tp: TestPoint) => {
-    setSidebarCaseData({
-      id: tp.id,
-      reviewResult: tp.reviewResult,
-      caseCount: tp.caseCount,
-    });
-    setSidebarOpen(true);
+    // Navigate to a new detail page instead of opening sidebar
+    const base = batchId
+      ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review`
+      : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review`;
+    navigate(`${base}/case/${tp.id}`);
   };
 
   const handleReviewResultChange = (dimId: string, tpId: string, result: ReviewResult) => {
