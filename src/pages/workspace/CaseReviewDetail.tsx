@@ -73,9 +73,14 @@ export default function CaseReviewDetail() {
   const [selectedTags, setSelectedTags] = useState<string[]>(["登录", "核心功能"]);
   const [appUrl, setAppUrl] = useState("https://test.example.com/login");
   const [testData, setTestData] = useState(
-    "用户名: testuser\n密码: Password123\n备用账号: admin / Admin@456"
+    `Examples:
+  | 用户名    | 密码        | 预期结果   |
+  | testuser  | Password123 | 登录成功   |
+  | admin     | Admin@456   | 登录成功   |
+  | user01    | User#789    | 登录成功   |`
   );
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
+  const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
