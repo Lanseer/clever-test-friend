@@ -1095,13 +1095,14 @@ export default function CaseReview() {
                   return (
                     <div
                       key={tp.id}
-                      className="grid text-sm hover:bg-muted/30 transition-colors"
+                      className="grid text-sm hover:bg-muted/30 transition-colors cursor-pointer"
                       style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}
+                      onClick={() => handleOpenSidebar(dimension.id, tp)}
                     >
                       {/* 编号 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
                          <span className={cn(
-                           "font-mono text-xs",
+                           "font-mono text-xs text-primary hover:underline",
                            tp.reviewResult === "focusReview" && "text-amber-600 font-semibold"
                          )}>{tp.code}</span>
                       </div>
