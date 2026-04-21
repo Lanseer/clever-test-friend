@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, FileCode, Tag, Globe, Database } from "lucide-react";
+import { ArrowLeft, FileCode, Tag, Globe, Database, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 import { cn } from "@/lib/utils";
 
@@ -68,9 +73,14 @@ export default function CaseReviewDetail() {
   const [selectedTags, setSelectedTags] = useState<string[]>(["登录", "核心功能"]);
   const [appUrl, setAppUrl] = useState("https://test.example.com/login");
   const [testData, setTestData] = useState(
-    "用户名: testuser\n密码: Password123\n备用账号: admin / Admin@456"
+    `Examples:
+  | 用户名    | 密码        | 预期结果   |
+  | testuser  | Password123 | 登录成功   |
+  | admin     | Admin@456   | 登录成功   |
+  | user01    | User#789    | 登录成功   |`
   );
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
+  const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -111,66 +121,98 @@ export default function CaseReviewDetail() {
         </Button>
       </div>
 
-      {/* Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Detail + Source */}
-        <div className="space-y-6">
-          <div className="rounded-xl border bg-card overflow-hidden">
-            <div className="px-5 py-3 border-b bg-muted/30">
-              <h2 className="font-semibold text-foreground text-sm">
-                {t('caseDetail.bddContent')}
-              </h2>
-            </div>
-            <div className="p-5">
-              <Textarea
-                className="min-h-[320px] font-mono text-xs resize-none bg-muted/30"
-                value={bddContent}
-                onChange={(e) => setBddContent(e.target.value)}
-              />
-            </div>
+      {/* Two columns with visible divider */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_400px] gap-0 rounded-xl border bg-card overflow-hidden">
+        {/* Left: Detail + Source (no inner border/background) */}
+        <div className="p-6 space-y-6">
+          <div>
+            <h2 className="font-semibold text-foreground text-sm mb-3">
+              测试场景
+            </h2>
+            <Textarea
+              className="min-h-[320px] font-mono text-xs resize-none bg-muted/30"
+              value={bddContent}
+              onChange={(e) => setBddContent(e.target.value)}
+            />
           </div>
 
-          <div className="rounded-xl border bg-card overflow-hidden">
-            <div className="px-5 py-3 border-b bg-muted/30">
-              <h2 className="font-semibold text-foreground text-sm">
-                {t('caseDetail.caseSource')}
-              </h2>
-            </div>
-            <div className="p-5">
-              <CaseSourceInfo caseId={caseId} showHeader={false} />
-            </div>
+          <div>
+            <h2 className="font-semibold text-foreground text-sm mb-3">
+              {t('caseDetail.caseSource')}
+            </h2>
+            <CaseSourceInfo caseId={caseId} showHeader={false} />
           </div>
         </div>
 
+        {/* Vertical divider */}
+        <div className="hidden lg:block w-px bg-border" />
+
         {/* Right: Configuration */}
-        <div className="rounded-xl border bg-card overflow-hidden h-fit">
+        <div className="bg-muted/20">
           <div className="px-5 py-3 border-b bg-muted/30">
-            <h2 className="font-semibold text-foreground text-sm">案例配置</h2>
+            <h2 className="font-semibold text-foreground text-sm">配置</h2>
           </div>
           <div className="p-5 space-y-6">
-            {/* Tags */}
+            {/* Tags - dropdown */}
             <div className="space-y-3">
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <Tag className="w-4 h-4" />
                 标签
               </Label>
-              <div className="flex flex-wrap gap-2">
-                {availableTags.map((tag) => (
+              <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
+                <PopoverTrigger asChild>
                   <button
-                    key={tag}
                     type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full border text-sm transition-colors",
-                      selectedTags.includes(tag)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background hover:bg-muted border-border"
-                    )}
+                    className="flex min-h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    {tag}
+                    <div className="flex flex-wrap gap-1.5 flex-1">
+                      {selectedTags.length === 0 ? (
+                        <span className="text-muted-foreground">选择标签...</span>
+                      ) : (
+                        selectedTags.map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                          >
+                            {tag}
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTag(tag);
+                              }}
+                              className="ml-0.5 rounded-sm hover:bg-muted-foreground/20 p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </span>
+                          </Badge>
+                        ))
+                      )}
+                    </div>
                   </button>
-                ))}
-              </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTag(tag)}
+                        className={cn(
+                          "px-3 py-1 rounded-full border text-xs transition-colors",
+                          selectedTags.includes(tag)
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background hover:bg-muted border-border"
+                        )}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* App URL */}
@@ -186,17 +228,17 @@ export default function CaseReviewDetail() {
               />
             </div>
 
-            {/* Test Data */}
+            {/* Test Cases (Examples) */}
             <div className="space-y-3">
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <Database className="w-4 h-4" />
-                测试数据
+                测试案例
               </Label>
               <Textarea
                 value={testData}
                 onChange={(e) => setTestData(e.target.value)}
-                placeholder="输入测试数据..."
-                className="min-h-[180px] resize-none font-mono text-xs"
+                placeholder="Examples..."
+                className="min-h-[200px] resize-none font-mono text-xs"
               />
             </div>
           </div>
