@@ -128,27 +128,27 @@ export function CreateExecutionDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Mode switch */}
-          <div className="space-y-2">
-            <Label>执行方式</Label>
-            <RadioGroup
+          {/* Mode switch - radio button style, centered */}
+          <div className="flex justify-center">
+            <ToggleGroup
+              type="single"
               value={mode}
-              onValueChange={(v) => setMode(v as ExecutionMode)}
-              className="flex gap-6"
+              onValueChange={(v) => v && setMode(v as ExecutionMode)}
+              className="bg-muted p-1 rounded-md gap-0"
             >
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="single" id="mode-single" />
-                <Label htmlFor="mode-single" className="cursor-pointer font-normal">
-                  单个执行
-                </Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="batch" id="mode-batch" />
-                <Label htmlFor="mode-batch" className="cursor-pointer font-normal">
-                  批量执行
-                </Label>
-              </div>
-            </RadioGroup>
+              <ToggleGroupItem
+                value="single"
+                className="px-6 h-8 rounded data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm text-muted-foreground"
+              >
+                单个执行
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="batch"
+                className="px-6 h-8 rounded data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm text-muted-foreground"
+              >
+                批量执行
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
 
           {/* Name */}
