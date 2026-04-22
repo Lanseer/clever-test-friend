@@ -32,6 +32,7 @@ import CaseTemplates from "./workspace/CaseTemplates";
 import DeliverableReport from "./workspace/DeliverableReport";
 import MyTestTasks from "./workspace/MyTestTasks";
 import Environment from "./workspace/Environment";
+import SmartExecution from "./workspace/SmartExecution";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -78,6 +79,7 @@ export default function WorkspaceDetail() {
               <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
               <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
               <Route path="management/my-test-tasks" element={<MyTestTasks />} />
+              <Route path="smart-execution" element={<SmartExecution />} />
               <Route path="environment" element={<Environment />} />
               <Route path="tags" element={<Tags />} />
               <Route path="*" element={<Navigate to="management/ai-cases" replace />} />

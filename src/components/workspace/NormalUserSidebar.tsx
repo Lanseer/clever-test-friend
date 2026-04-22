@@ -32,7 +32,7 @@ interface MenuItem {
 
 const normalUserMenuItems: MenuItem[] = [
   { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },
-  { titleKey: "workspaceMenu.smartExecution", defaultLabel: "智能执行", url: "management/my-test-tasks", icon: PlayCircle },
+  { titleKey: "workspaceMenu.smartExecution", defaultLabel: "智能执行", url: "smart-execution", icon: PlayCircle },
   { titleKey: "workspaceMenu.environment", defaultLabel: "测试环境", url: "environment", icon: Server },
   { titleKey: "workspaceMenu.tags", defaultLabel: "标签", url: "tags", icon: TagsIcon },
 ];
