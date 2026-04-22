@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import {
+  CreateExecutionDialog,
+  type CreateExecutionData,
+} from "@/components/workspace/CreateExecutionDialog";
 
 interface ExecutionRecord {
   id: string;
