@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2, PlayCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -186,15 +186,25 @@ export default function CaseReviewDetail() {
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setScriptDialogOpen(true)}
-          className="gap-2"
-        >
-          <FileCode className="w-4 h-4" />
-          查看脚本
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setScriptDialogOpen(true)}
+            className="gap-2"
+          >
+            <FileCode className="w-4 h-4" />
+            查看脚本
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-2"
+          >
+            <PlayCircle className="w-4 h-4" />
+            现场测试
+          </Button>
+        </div>
       </div>
 
       {/* Two columns with visible divider */}
