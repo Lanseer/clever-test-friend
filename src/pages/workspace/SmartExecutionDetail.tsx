@@ -396,6 +396,8 @@ export default function SmartExecutionDetail() {
         </Card>
       </div>
 
+      {!isLiveLoading && (
+        <>
       {/* Video Playback */}
       <div className="px-4">
         <Card className="p-5">
