@@ -200,7 +200,9 @@ export default function CaseReviewDetail() {
             variant="default"
             size="sm"
             className="gap-2"
-            onClick={() => navigate(`../../../../smart-execution/live-${caseId}?live=1`)}
+            onClick={() =>
+              navigate(`/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1`)
+            }
           >
             <PlayCircle className="w-4 h-4" />
             现场测试
