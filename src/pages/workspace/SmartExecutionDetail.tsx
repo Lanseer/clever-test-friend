@@ -230,8 +230,6 @@ export default function SmartExecutionDetail() {
         </div>
       )}
 
-      {!isLiveLoading && (
-        <>
       {/* AI Reasoning */}
       <div className="px-4">
         <Card className="p-5 border-2 border-green-300 bg-green-50/30">
