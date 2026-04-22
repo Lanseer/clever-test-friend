@@ -82,6 +82,7 @@
     "dashboard": "Dashboard",
     "ontology": "Test Ontology",
     "templates": "Case Templates",
+    "testReport": "Test Report",
     "environment": "Environment",
     "tags": "Tags",
     "testWorkbench": "Test Workbench"

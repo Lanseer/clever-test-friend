@@ -82,6 +82,7 @@
     "dashboard": "数据监控",
     "ontology": "测试本体",
     "templates": "案例模板",
+    "testReport": "测试报告",
     "environment": "环境",
     "tags": "标签",
     "testWorkbench": "测试工作台"
