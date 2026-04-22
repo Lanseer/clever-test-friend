@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Select,
   SelectContent,
@@ -77,9 +77,8 @@ export function CreateExecutionDialog({
   const [mode, setMode] = useState<ExecutionMode>("single");
   const [name, setName] = useState("");
   const [environment, setEnvironment] = useState("");
-  const [selectedCases, setSelectedCases] = useState<string[]>([]);
+  const [selectedCase, setSelectedCase] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [casePopoverOpen, setCasePopoverOpen] = useState(false);
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   useEffect(() => {
@@ -87,16 +86,10 @@ export function CreateExecutionDialog({
       setMode("single");
       setName("");
       setEnvironment("");
-      setSelectedCases([]);
+      setSelectedCase("");
       setSelectedTags([]);
     }
   }, [open]);
-
-  const toggleCase = (id: string) => {
-    setSelectedCases((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
-    );
-  };
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -107,14 +100,14 @@ export function CreateExecutionDialog({
   const isValid =
     name.trim() &&
     environment &&
-    (mode === "single" ? selectedCases.length > 0 : selectedTags.length > 0);
+    (mode === "single" ? !!selectedCase : selectedTags.length > 0);
 
   const handleConfirm = () => {
     onConfirm({
       mode,
       name: name.trim(),
       environment,
-      testCases: mode === "single" ? selectedCases : undefined,
+      testCases: mode === "single" && selectedCase ? [selectedCase] : undefined,
       tags: mode === "batch" ? selectedTags : undefined,
     });
     onOpenChange(false);
@@ -128,27 +121,27 @@ export function CreateExecutionDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Mode switch */}
-          <div className="space-y-2">
-            <Label>执行方式</Label>
-            <RadioGroup
+          {/* Mode switch - radio button style, centered */}
+          <div className="flex justify-center">
+            <ToggleGroup
+              type="single"
               value={mode}
-              onValueChange={(v) => setMode(v as ExecutionMode)}
-              className="flex gap-6"
+              onValueChange={(v) => v && setMode(v as ExecutionMode)}
+              className="bg-muted p-1 rounded-md gap-0"
             >
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="single" id="mode-single" />
-                <Label htmlFor="mode-single" className="cursor-pointer font-normal">
-                  单个执行
-                </Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="batch" id="mode-batch" />
-                <Label htmlFor="mode-batch" className="cursor-pointer font-normal">
-                  批量执行
-                </Label>
-              </div>
-            </RadioGroup>
+              <ToggleGroupItem
+                value="single"
+                className="px-6 h-8 rounded data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm text-muted-foreground"
+              >
+                单个执行
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="batch"
+                className="px-6 h-8 rounded data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm text-muted-foreground"
+              >
+                批量执行
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
 
           {/* Name */}
@@ -164,69 +157,24 @@ export function CreateExecutionDialog({
             />
           </div>
 
-          {/* Single: Test Cases */}
+          {/* Single: Test Case (single select) */}
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
                 测试 <span className="text-destructive">*</span>
               </Label>
-              <Popover open={casePopoverOpen} onOpenChange={setCasePopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-between font-normal",
-                      selectedCases.length === 0 && "text-muted-foreground",
-                    )}
-                  >
-                    <span className="truncate">
-                      {selectedCases.length === 0
-                        ? "请选择测试案例"
-                        : `已选择 ${selectedCases.length} 个案例`}
-                    </span>
-                    <ChevronDown className="w-4 h-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
-                  <div className="max-h-64 overflow-auto space-y-1">
-                    {availableTestCases.map((tc) => (
-                      <label
-                        key={tc.id}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted cursor-pointer text-sm"
-                      >
-                        <Checkbox
-                          checked={selectedCases.includes(tc.id)}
-                          onCheckedChange={() => toggleCase(tc.id)}
-                        />
-                        <span>{tc.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-              {selectedCases.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {selectedCases.map((id) => {
-                    const tc = availableTestCases.find((c) => c.id === id);
-                    return (
-                      <Badge
-                        key={id}
-                        variant="secondary"
-                        className="gap-1 font-normal"
-                      >
-                        {tc?.name}
-                        <button
-                          type="button"
-                          onClick={() => toggleCase(id)}
-                          className="hover:text-destructive"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </Badge>
-                    );
-                  })}
-                </div>
-              )}
+              <Select value={selectedCase} onValueChange={setSelectedCase}>
+                <SelectTrigger>
+                  <SelectValue placeholder="请选择测试案例" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTestCases.map((tc) => (
+                    <SelectItem key={tc.id} value={tc.id}>
+                      {tc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
