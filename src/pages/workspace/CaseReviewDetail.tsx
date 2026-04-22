@@ -135,6 +135,8 @@ export default function CaseReviewDetail() {
   const [appUrl, setAppUrl] = useState("https://test.example.com/login");
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
+  const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
+  const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
 
   const parsed = useMemo(() => parseCases(bddContent), [bddContent]);
   const headers = parsed?.headers ?? ["用户名", "密码", "预期结果"];
