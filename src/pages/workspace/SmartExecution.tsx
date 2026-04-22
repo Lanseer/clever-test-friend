@@ -239,6 +239,12 @@ export default function SmartExecution() {
           </Table>
         </Card>
       </div>
+
+      <CreateExecutionDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onConfirm={handleConfirmCreate}
+      />
     </div>
   );
 }
