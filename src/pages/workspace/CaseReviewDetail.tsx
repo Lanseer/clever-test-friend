@@ -207,7 +207,7 @@ export default function CaseReviewDetail() {
             className="gap-2"
           >
             <FileCode className="w-4 h-4" />
-            查看脚本
+            现场测试记录
           </Button>
           <Button
             variant="default"
