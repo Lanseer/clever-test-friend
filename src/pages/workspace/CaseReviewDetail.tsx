@@ -532,7 +532,7 @@ export default function CaseReviewDetail() {
               }}
               disabled={rows.length === 0}
             >
-              下一步
+              开始执行
             </Button>
           </DialogFooter>
         </DialogContent>
