@@ -433,19 +433,113 @@ export default function CaseReviewDetail() {
         </div>
       </div>
 
-      {/* Script Dialog */}
+      {/* Live Test Records Dialog */}
       <Dialog open={scriptDialogOpen} onOpenChange={setScriptDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-5xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileCode className="w-5 h-5" />
-              Playwright 脚本
+              现场测试记录
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
-            <pre className="rounded-md border bg-muted/40 p-4 font-mono text-xs whitespace-pre-wrap text-foreground/90">
-              {getMockPlaywrightScript(caseId || "")}
-            </pre>
+            <div className="rounded-md border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40">
+                  <tr className="text-left">
+                    <th className="px-3 py-2 font-medium">名称</th>
+                    <th className="px-3 py-2 font-medium">状态</th>
+                    <th className="px-3 py-2 font-medium">测试状态</th>
+                    <th className="px-3 py-2 font-medium">环境</th>
+                    <th className="px-3 py-2 font-medium">创建者</th>
+                    <th className="px-3 py-2 font-medium">开始时间</th>
+                    <th className="px-3 py-2 font-medium">完成时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      id: "live-001",
+                      name: `${caseId}-现场测试-001`,
+                      status: "已完成",
+                      testStatus: "通过",
+                      env: "测试环境",
+                      creator: "张三",
+                      startTime: "2026-04-20 10:12:33",
+                      endTime: "2026-04-20 10:15:08",
+                    },
+                    {
+                      id: "live-002",
+                      name: `${caseId}-现场测试-002`,
+                      status: "已完成",
+                      testStatus: "失败",
+                      env: "预发布环境",
+                      creator: "李四",
+                      startTime: "2026-04-21 14:02:11",
+                      endTime: "2026-04-21 14:06:42",
+                    },
+                    {
+                      id: "live-003",
+                      name: `${caseId}-现场测试-003`,
+                      status: "执行中",
+                      testStatus: "-",
+                      env: "测试环境",
+                      creator: "王五",
+                      startTime: "2026-04-22 09:31:50",
+                      endTime: "-",
+                    },
+                  ].map((rec) => {
+                    const statusCls =
+                      rec.status === "已完成"
+                        ? "bg-green-500/10 text-green-600 border-green-200"
+                        : rec.status === "执行中"
+                        ? "bg-blue-500/10 text-blue-600 border-blue-200"
+                        : "bg-gray-100 text-gray-600 border-gray-200";
+                    const testCls =
+                      rec.testStatus === "通过"
+                        ? "bg-green-500/10 text-green-600 border-green-200"
+                        : rec.testStatus === "失败"
+                        ? "bg-red-500/10 text-red-600 border-red-200"
+                        : "bg-gray-100 text-gray-500 border-gray-200";
+                    return (
+                      <tr key={rec.id} className="border-t hover:bg-muted/30">
+                        <td className="px-3 py-2">
+                          <button
+                            className="text-primary hover:underline font-medium"
+                            onClick={() => {
+                              setScriptDialogOpen(false);
+                              navigate(
+                                `/workspace/${workspaceId}/smart-execution/${rec.id}?live=1&caseIdx=0`
+                              );
+                            }}
+                          >
+                            {rec.name}
+                          </button>
+                        </td>
+                        <td className="px-3 py-2">
+                          <Badge variant="outline" className={statusCls}>
+                            {rec.status}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2">
+                          <Badge variant="outline" className={testCls}>
+                            {rec.testStatus}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-muted-foreground">{rec.env}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{rec.creator}</td>
+                        <td className="px-3 py-2 text-muted-foreground font-mono text-xs">
+                          {rec.startTime}
+                        </td>
+                        <td className="px-3 py-2 text-muted-foreground font-mono text-xs">
+                          {rec.endTime}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </ScrollArea>
         </DialogContent>
       </Dialog>
