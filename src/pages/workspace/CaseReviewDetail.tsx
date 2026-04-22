@@ -448,6 +448,8 @@ export default function CaseReviewDetail() {
                 <thead className="bg-muted/40">
                   <tr className="text-left">
                     <th className="px-3 py-2 font-medium">名称</th>
+                    <th className="px-3 py-2 font-medium">案例性质</th>
+                    <th className="px-3 py-2 font-medium">测试数据</th>
                     <th className="px-3 py-2 font-medium">状态</th>
                     <th className="px-3 py-2 font-medium">测试状态</th>
                     <th className="px-3 py-2 font-medium">环境</th>
@@ -461,6 +463,8 @@ export default function CaseReviewDetail() {
                     {
                       id: "live-001",
                       name: `${caseId}-现场测试-001`,
+                      nature: "positive" as const,
+                      testData: "testuser / Password123",
                       status: "已完成",
                       testStatus: "通过",
                       env: "测试环境",
@@ -471,6 +475,8 @@ export default function CaseReviewDetail() {
                     {
                       id: "live-002",
                       name: `${caseId}-现场测试-002`,
+                      nature: "negative" as const,
+                      testData: "wronguser / wrongpass",
                       status: "已完成",
                       testStatus: "失败",
                       env: "预发布环境",
@@ -481,6 +487,8 @@ export default function CaseReviewDetail() {
                     {
                       id: "live-003",
                       name: `${caseId}-现场测试-003`,
+                      nature: "positive" as const,
+                      testData: "admin / Admin@456",
                       status: "执行中",
                       testStatus: "-",
                       env: "测试环境",
