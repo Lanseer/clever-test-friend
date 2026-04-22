@@ -50,7 +50,7 @@ export default function WorkspaceDetail() {
     return (
       <div className="min-h-screen flex w-full bg-background">
         <NormalUserSidebar workspaceName={workspace?.name} />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto">
           <Routes>
             <Route index element={<Navigate to="management/ai-cases" replace />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
