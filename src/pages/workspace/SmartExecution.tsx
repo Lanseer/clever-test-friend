@@ -150,6 +150,7 @@ export default function SmartExecution() {
                 <TableHead className="min-w-[180px]">名称</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>测试状态</TableHead>
+                <TableHead>执行案例</TableHead>
                 <TableHead>标签</TableHead>
                 <TableHead>环境</TableHead>
                 <TableHead>创建人</TableHead>
@@ -160,7 +161,7 @@ export default function SmartExecution() {
             <TableBody>
               {executions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
                   </TableCell>
                 </TableRow>
@@ -187,6 +188,12 @@ export default function SmartExecution() {
                         <Badge variant="outline" className={cn("font-normal", testStatus.className)}>
                           {testStatus.label}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <span className="font-mono text-sm">
+                          <span className="text-green-600 font-semibold">{exec.completedCases}</span>
+                          <span className="text-muted-foreground">/{exec.totalCases}</span>
+                        </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
