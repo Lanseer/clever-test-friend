@@ -1,6 +1,7 @@
 import { useParams, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
+import { NormalUserSidebar } from "@/components/workspace/NormalUserSidebar";
 import { useRole } from "@/contexts/RoleContext";
 import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
