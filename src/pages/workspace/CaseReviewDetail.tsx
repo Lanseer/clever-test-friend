@@ -137,6 +137,14 @@ export default function CaseReviewDetail() {
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
   const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
+  const [caseNatures, setCaseNatures] = useState<Record<number, "positive" | "negative">>({
+    0: "positive",
+    1: "positive",
+    2: "negative",
+  });
+  const getNature = (idx: number): "positive" | "negative" => caseNatures[idx] ?? "positive";
+  const setNature = (idx: number, nature: "positive" | "negative") =>
+    setCaseNatures((prev) => ({ ...prev, [idx]: nature }));
 
   const parsed = useMemo(() => parseCases(bddContent), [bddContent]);
   const headers = parsed?.headers ?? ["用户名", "密码", "预期结果"];
@@ -357,21 +365,53 @@ export default function CaseReviewDetail() {
                       </Button>
                     </div>
                     {headers.map((header, colIdx) => (
-                      <div
-                        key={colIdx}
-                        className="grid grid-cols-[90px_1fr] items-center gap-2"
-                      >
-                        <Label className="text-xs text-muted-foreground truncate">
-                          {header}
-                        </Label>
-                        <Input
-                          value={row[colIdx] ?? ""}
-                          onChange={(e) =>
-                            handleCellChange(rowIdx, colIdx, e.target.value)
-                          }
-                          className="h-8 text-xs"
-                          placeholder={`请输入${header}`}
-                        />
+                      <div key={colIdx} className="space-y-2">
+                        <div className="grid grid-cols-[90px_1fr] items-center gap-2">
+                          <Label className="text-xs text-muted-foreground truncate">
+                            {header}
+                          </Label>
+                          <Input
+                            value={row[colIdx] ?? ""}
+                            onChange={(e) =>
+                              handleCellChange(rowIdx, colIdx, e.target.value)
+                            }
+                            className="h-8 text-xs"
+                            placeholder={`请输入${header}`}
+                          />
+                        </div>
+                        {header === "预期结果" && (
+                          <div className="grid grid-cols-[90px_1fr] items-center gap-2">
+                            <Label className="text-xs text-muted-foreground truncate">
+                              案例性质
+                            </Label>
+                            <div className="flex gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setNature(rowIdx, "positive")}
+                                className={cn(
+                                  "flex-1 px-2 py-1 rounded-md border text-xs transition-colors",
+                                  getNature(rowIdx) === "positive"
+                                    ? "bg-success/10 text-success border-success"
+                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
+                                )}
+                              >
+                                正例
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setNature(rowIdx, "negative")}
+                                className={cn(
+                                  "flex-1 px-2 py-1 rounded-md border text-xs transition-colors",
+                                  getNature(rowIdx) === "negative"
+                                    ? "bg-destructive/10 text-destructive border-destructive"
+                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
+                                )}
+                              >
+                                反例
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -447,7 +487,20 @@ export default function CaseReviewDetail() {
                       className="mt-0.5"
                     />
                     <div className="flex-1 space-y-1">
-                      <div className="text-sm font-medium">案例{rowIdx + 1}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-medium">案例{rowIdx + 1}</div>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs",
+                            getNature(rowIdx) === "positive"
+                              ? "bg-success/10 text-success border-success/30"
+                              : "bg-destructive/10 text-destructive border-destructive/30"
+                          )}
+                        >
+                          {getNature(rowIdx) === "positive" ? "正例" : "反例"}
+                        </Badge>
+                      </div>
                       <div className="space-y-0.5">
                         {headers.map((header, colIdx) => (
                           <div key={colIdx} className="text-xs text-muted-foreground">
