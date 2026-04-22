@@ -31,6 +31,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -428,35 +435,38 @@ export default function SmartExecutionDetail() {
               View All
             </Button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {[
-              { label: "Step 1: Navigate to login", time: "06:02:35" },
-              { label: "Step 2: Enter email", time: "06:02:38" },
-              { label: "Step 3: Enter password", time: "06:02:42" },
-              { label: "Step 4: Click login", time: "06:02:45" },
-              { label: "Step 5: Login success", time: "06:02:48" },
-              { label: "Step 5: User center page", time: "06:02:52" },
-            ].map((shot, idx) => (
-              <div
-                key={idx}
-                className="group relative rounded-lg border border-border/60 overflow-hidden bg-muted hover:border-primary/50 transition-colors cursor-pointer"
-              >
-                <div className="aspect-video bg-gradient-to-br from-muted to-muted-foreground/10 flex items-center justify-center">
-                  <ImageIcon className="w-10 h-10 text-muted-foreground/40" />
-                </div>
-                <div className="p-2 bg-background/80 backdrop-blur-sm border-t border-border/60">
-                  <div className="text-xs font-medium truncate">{shot.label}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">{shot.time}</div>
-                </div>
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <Button variant="secondary" size="sm" className="gap-1.5">
-                    <Eye className="w-4 h-4" />
-                    Preview
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Carousel opts={{ align: "start", loop: true }} className="w-full px-10">
+            <CarouselContent className="-ml-3">
+              {[
+                { label: "Step 1: Navigate to login", time: "06:02:35" },
+                { label: "Step 2: Enter email", time: "06:02:38" },
+                { label: "Step 3: Enter password", time: "06:02:42" },
+                { label: "Step 4: Click login", time: "06:02:45" },
+                { label: "Step 5: Login success", time: "06:02:48" },
+                { label: "Step 5: User center page", time: "06:02:52" },
+              ].map((shot, idx) => (
+                <CarouselItem key={idx} className="pl-3 basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <div className="group relative rounded-lg border border-border/60 overflow-hidden bg-muted hover:border-primary/50 transition-colors cursor-pointer">
+                    <div className="aspect-video bg-gradient-to-br from-muted to-muted-foreground/10 flex items-center justify-center">
+                      <ImageIcon className="w-10 h-10 text-muted-foreground/40" />
+                    </div>
+                    <div className="p-2 bg-background/80 backdrop-blur-sm border-t border-border/60">
+                      <div className="text-xs font-medium truncate">{shot.label}</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">{shot.time}</div>
+                    </div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <Button variant="secondary" size="sm" className="gap-1.5">
+                        <Eye className="w-4 h-4" />
+                        Preview
+                      </Button>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-0" />
+            <CarouselNext className="right-0" />
+          </Carousel>
         </Card>
       </div>
     </div>
