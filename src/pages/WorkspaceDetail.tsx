@@ -1,6 +1,7 @@
 import { useParams, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
+import { NormalUserSidebar } from "@/components/workspace/NormalUserSidebar";
 import { useRole } from "@/contexts/RoleContext";
 import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
@@ -44,10 +45,11 @@ export default function WorkspaceDetail() {
   const workspace = workspaceId ? mockWorkspaces[workspaceId] : null;
   const { isAdmin } = useRole();
 
-  // Normal user: no sidebar, directly show AIGeneratedCases (Smart Design)
+  // Normal user: show NormalUserSidebar with limited menu
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex w-full bg-background">
+        <NormalUserSidebar workspaceName={workspace?.name} />
         <main className="flex-1 p-6 overflow-auto">
           <Routes>
             <Route index element={<Navigate to="management/ai-cases" replace />} />
@@ -75,6 +77,8 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
             <Route path="management/my-test-tasks" element={<MyTestTasks />} />
+            <Route path="environment" element={<Environment />} />
+            <Route path="tags" element={<Tags />} />
             <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
           </Routes>
         </main>
