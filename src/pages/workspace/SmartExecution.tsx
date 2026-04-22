@@ -121,7 +121,7 @@ export default function SmartExecution() {
   };
 
   const handleOpenDetail = (id: string) => {
-    navigate(`/workspace/${workspaceId}/smart-execution/${id}`);
+    navigate(`/workspace/${workspaceId}/smart-execution/${id}/cases`);
   };
 
   return (
