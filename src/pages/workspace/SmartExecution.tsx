@@ -119,9 +119,20 @@ export default function SmartExecution() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
   const [executions] = useState<ExecutionRecord[]>(mockExecutions);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const handleCreate = () => {
-    toast.info("新增执行");
+    setCreateOpen(true);
+  };
+
+  const handleConfirmCreate = (data: CreateExecutionData) => {
+    const count =
+      data.mode === "single"
+        ? data.testCases?.length ?? 0
+        : data.tags?.length ?? 0;
+    toast.success(
+      `已创建${data.mode === "single" ? "单个" : "批量"}执行：${data.name}（${count} 项）`,
+    );
   };
 
   const handleOpenDetail = (id: string) => {
