@@ -365,21 +365,53 @@ export default function CaseReviewDetail() {
                       </Button>
                     </div>
                     {headers.map((header, colIdx) => (
-                      <div
-                        key={colIdx}
-                        className="grid grid-cols-[90px_1fr] items-center gap-2"
-                      >
-                        <Label className="text-xs text-muted-foreground truncate">
-                          {header}
-                        </Label>
-                        <Input
-                          value={row[colIdx] ?? ""}
-                          onChange={(e) =>
-                            handleCellChange(rowIdx, colIdx, e.target.value)
-                          }
-                          className="h-8 text-xs"
-                          placeholder={`请输入${header}`}
-                        />
+                      <div key={colIdx} className="space-y-2">
+                        <div className="grid grid-cols-[90px_1fr] items-center gap-2">
+                          <Label className="text-xs text-muted-foreground truncate">
+                            {header}
+                          </Label>
+                          <Input
+                            value={row[colIdx] ?? ""}
+                            onChange={(e) =>
+                              handleCellChange(rowIdx, colIdx, e.target.value)
+                            }
+                            className="h-8 text-xs"
+                            placeholder={`请输入${header}`}
+                          />
+                        </div>
+                        {header === "预期结果" && (
+                          <div className="grid grid-cols-[90px_1fr] items-center gap-2">
+                            <Label className="text-xs text-muted-foreground truncate">
+                              案例性质
+                            </Label>
+                            <div className="flex gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setNature(rowIdx, "positive")}
+                                className={cn(
+                                  "flex-1 px-2 py-1 rounded-md border text-xs transition-colors",
+                                  getNature(rowIdx) === "positive"
+                                    ? "bg-success/10 text-success border-success"
+                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
+                                )}
+                              >
+                                正例
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setNature(rowIdx, "negative")}
+                                className={cn(
+                                  "flex-1 px-2 py-1 rounded-md border text-xs transition-colors",
+                                  getNature(rowIdx) === "negative"
+                                    ? "bg-destructive/10 text-destructive border-destructive"
+                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
+                                )}
+                              >
+                                反例
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
