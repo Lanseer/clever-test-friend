@@ -77,9 +77,8 @@ export function CreateExecutionDialog({
   const [mode, setMode] = useState<ExecutionMode>("single");
   const [name, setName] = useState("");
   const [environment, setEnvironment] = useState("");
-  const [selectedCases, setSelectedCases] = useState<string[]>([]);
+  const [selectedCase, setSelectedCase] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [casePopoverOpen, setCasePopoverOpen] = useState(false);
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   useEffect(() => {
@@ -87,16 +86,10 @@ export function CreateExecutionDialog({
       setMode("single");
       setName("");
       setEnvironment("");
-      setSelectedCases([]);
+      setSelectedCase("");
       setSelectedTags([]);
     }
   }, [open]);
-
-  const toggleCase = (id: string) => {
-    setSelectedCases((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
-    );
-  };
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -107,7 +100,7 @@ export function CreateExecutionDialog({
   const isValid =
     name.trim() &&
     environment &&
-    (mode === "single" ? selectedCases.length > 0 : selectedTags.length > 0);
+    (mode === "single" ? !!selectedCase : selectedTags.length > 0);
 
   const handleConfirm = () => {
     onConfirm({
