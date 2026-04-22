@@ -45,11 +45,12 @@ export default function WorkspaceDetail() {
   const workspace = workspaceId ? mockWorkspaces[workspaceId] : null;
   const { isAdmin } = useRole();
 
-  // Normal user: no sidebar, directly show AIGeneratedCases (Smart Design)
+  // Normal user: show NormalUserSidebar with limited menu
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex w-full bg-background">
-        <main className="flex-1 p-6 overflow-auto">
+        <NormalUserSidebar workspaceName={workspace?.name} />
+        <main className="flex-1 overflow-auto">
           <Routes>
             <Route index element={<Navigate to="management/ai-cases" replace />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
@@ -76,6 +77,8 @@ export default function WorkspaceDetail() {
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
             <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
             <Route path="management/my-test-tasks" element={<MyTestTasks />} />
+            <Route path="environment" element={<Environment />} />
+            <Route path="tags" element={<Tags />} />
             <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
           </Routes>
         </main>
