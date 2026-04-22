@@ -525,6 +525,21 @@ export default function CaseReviewDetail() {
                           </button>
                         </td>
                         <td className="px-3 py-2">
+                          <Badge
+                            variant="outline"
+                            className={
+                              rec.nature === "positive"
+                                ? "bg-green-500/10 text-green-600 border-green-200"
+                                : "bg-red-500/10 text-red-600 border-red-200"
+                            }
+                          >
+                            {rec.nature === "positive" ? "正例" : "反例"}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-muted-foreground font-mono text-xs">
+                          {rec.testData}
+                        </td>
+                        <td className="px-3 py-2">
                           <Badge variant="outline" className={statusCls}>
                             {rec.status}
                           </Badge>
