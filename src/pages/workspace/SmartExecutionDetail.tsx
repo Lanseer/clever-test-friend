@@ -171,16 +171,6 @@ export default function SmartExecutionDetail() {
                   Pass
                 </Badge>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Edit className="w-4 h-4" />
-                  Edit Test
-                </Button>
-                <Button size="sm" className="gap-1.5">
-                  <Play className="w-4 h-4" />
-                  Rerun
-                </Button>
-              </div>
             </div>
           </div>
         </Card>
