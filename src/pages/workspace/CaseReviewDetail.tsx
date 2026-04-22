@@ -325,7 +325,7 @@ export default function CaseReviewDetail() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-muted-foreground">
-                        第 {rowIdx + 1} 条
+                        案例{rowIdx + 1}
                       </span>
                       <Button
                         type="button"
@@ -366,7 +366,7 @@ export default function CaseReviewDetail() {
                   className="w-full gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  新增一行
+                  新增案例
                 </Button>
               </div>
             </div>
