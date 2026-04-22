@@ -187,6 +187,51 @@ export default function SmartExecutionDetail() {
         </Card>
       </div>
 
+      {/* Live Test Preview - shown for first 3 seconds */}
+      {isLiveLoading && (
+        <div className="px-4 pb-4">
+          <Card className="overflow-hidden border-border/60">
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/40 border-b border-border/60">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-red-400" />
+                <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                <span className="w-3 h-3 rounded-full bg-green-400" />
+              </div>
+              <div className="flex-1 flex justify-center">
+                <div className="flex items-center gap-2 px-3 py-1 bg-background rounded-md border border-border/60 text-xs text-muted-foreground max-w-md w-full">
+                  <span className="w-3 h-3 rounded-full bg-green-500/80" />
+                  <span className="truncate">https://sctocloud.com/auth/login</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative aspect-video bg-gradient-to-br from-orange-100 via-amber-50 to-rose-50 flex items-center justify-center">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                  <Play className="w-7 h-7 text-primary absolute inset-0 m-auto" />
+                </div>
+                <div className="text-center space-y-1">
+                  <div className="text-base font-semibold text-foreground">现场测试启动中...</div>
+                  <div className="text-sm text-muted-foreground">正在启动浏览器并加载目标页面</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border/60 bg-muted/20">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                </span>
+                <span className="font-medium">Live · 实时执行中</span>
+              </div>
+              <div className="text-xs text-muted-foreground">即将进入完整执行报告...</div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {!isLiveLoading && (
+        <>
       {/* AI Reasoning */}
       <div className="px-4">
         <Card className="p-5 border-2 border-green-300 bg-green-50/30">
