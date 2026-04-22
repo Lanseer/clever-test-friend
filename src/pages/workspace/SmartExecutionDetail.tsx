@@ -515,6 +515,8 @@ export default function SmartExecutionDetail() {
           </Carousel>
         </Card>
       </div>
+        </>
+      )}
     </div>
   );
 }
