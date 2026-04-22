@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, FileCode, Tag, Globe, Database, X } from "lucide-react";
+import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ const getMockBddContent = () => `Feature: 用户登录功能
     And 用户应该被重定向到主页
     And 系统应该显示欢迎消息
 
-  Examples:
+  Cases:
     | 用户名    | 密码        | 预期结果   |
     | testuser  | Password123 | 登录成功   |
     | admin     | Admin@456   | 登录成功   |
@@ -64,6 +64,64 @@ test.describe('用户登录功能', () => {
   });
 });`;
 
+// ---- BDD <-> Cases table sync helpers ----
+const parseRow = (line: string): string[] =>
+  line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((c) => c.trim());
+
+const parseCases = (
+  bdd: string
+): { headers: string[]; rows: string[][] } | null => {
+  const lines = bdd.split("\n");
+  const idx = lines.findIndex((l) => /^\s*Cases:\s*$/.test(l));
+  if (idx === -1) return null;
+  const tableLines: string[] = [];
+  for (let i = idx + 1; i < lines.length; i++) {
+    if (lines[i].trim().startsWith("|")) tableLines.push(lines[i]);
+    else if (lines[i].trim() === "") continue;
+    else break;
+  }
+  if (tableLines.length === 0) return null;
+  const headers = parseRow(tableLines[0]);
+  const rows = tableLines.slice(1).map(parseRow);
+  return { headers, rows };
+};
+
+const formatTable = (headers: string[], rows: string[][]) => {
+  const widths = headers.map((h, i) =>
+    Math.max(h.length, ...rows.map((r) => (r[i] || "").length))
+  );
+  const fmt = (cells: string[]) =>
+    "    | " +
+    cells.map((c, i) => (c || "").padEnd(widths[i], " ")).join(" | ") +
+    " |";
+  return [fmt(headers), ...rows.map(fmt)].join("\n");
+};
+
+const replaceCasesInBdd = (
+  bdd: string,
+  headers: string[],
+  rows: string[][]
+): string => {
+  const lines = bdd.split("\n");
+  const idx = lines.findIndex((l) => /^\s*Cases:\s*$/.test(l));
+  if (idx === -1) return bdd;
+  let endIdx = idx + 1;
+  while (
+    endIdx < lines.length &&
+    (lines[endIdx].trim().startsWith("|") || lines[endIdx].trim() === "")
+  ) {
+    endIdx++;
+  }
+  const before = lines.slice(0, idx + 1);
+  const after = lines.slice(endIdx);
+  return [...before, formatTable(headers, rows), ...after].join("\n");
+};
+
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
   const { caseId } = useParams<{ caseId: string }>();
@@ -72,15 +130,33 @@ export default function CaseReviewDetail() {
   const [bddContent, setBddContent] = useState(getMockBddContent());
   const [selectedTags, setSelectedTags] = useState<string[]>(["登录", "核心功能"]);
   const [appUrl, setAppUrl] = useState("https://test.example.com/login");
-  const [testData, setTestData] = useState(
-    `Examples:
-  | 用户名    | 密码        | 预期结果   |
-  | testuser  | Password123 | 登录成功   |
-  | admin     | Admin@456   | 登录成功   |
-  | user01    | User#789    | 登录成功   |`
-  );
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
+
+  const parsed = useMemo(() => parseCases(bddContent), [bddContent]);
+  const headers = parsed?.headers ?? ["用户名", "密码", "预期结果"];
+  const rows = parsed?.rows ?? [];
+
+  const updateRows = (newRows: string[][]) => {
+    setBddContent((prev) => replaceCasesInBdd(prev, headers, newRows));
+  };
+
+  const handleCellChange = (rowIdx: number, colIdx: number, value: string) => {
+    const next = rows.map((r) => [...r]);
+    while (next[rowIdx].length < headers.length) next[rowIdx].push("");
+    next[rowIdx][colIdx] = value;
+    updateRows(next);
+  };
+
+  const handleDeleteRow = (rowIdx: number) => {
+    const next = rows.filter((_, i) => i !== rowIdx);
+    updateRows(next);
+  };
+
+  const handleAddRow = () => {
+    const next = [...rows, headers.map(() => "")];
+    updateRows(next);
+  };
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -123,7 +199,7 @@ export default function CaseReviewDetail() {
 
       {/* Two columns with visible divider */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_400px] gap-0 rounded-xl border bg-card overflow-hidden">
-        {/* Left: Detail + Source (no inner border/background) */}
+        {/* Left: Detail + Source */}
         <div className="p-6 space-y-6">
           <div>
             <h2 className="font-semibold text-foreground text-sm mb-3">
@@ -228,18 +304,71 @@ export default function CaseReviewDetail() {
               />
             </div>
 
-            {/* Test Cases (Examples) */}
+            {/* Test Cases (key|value editable rows) */}
             <div className="space-y-3">
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <Database className="w-4 h-4" />
                 测试案例
               </Label>
-              <Textarea
-                value={testData}
-                onChange={(e) => setTestData(e.target.value)}
-                placeholder="Examples..."
-                className="min-h-[200px] resize-none font-mono text-xs"
-              />
+
+              <div className="space-y-3 rounded-md border bg-background p-3">
+                {rows.length === 0 && (
+                  <p className="text-xs text-muted-foreground py-2 text-center">
+                    暂无数据，点击下方按钮新增一行
+                  </p>
+                )}
+
+                {rows.map((row, rowIdx) => (
+                  <div
+                    key={rowIdx}
+                    className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        第 {rowIdx + 1} 条
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDeleteRow(rowIdx)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                    {headers.map((header, colIdx) => (
+                      <div
+                        key={colIdx}
+                        className="grid grid-cols-[90px_1fr] items-center gap-2"
+                      >
+                        <Label className="text-xs text-muted-foreground truncate">
+                          {header}
+                        </Label>
+                        <Input
+                          value={row[colIdx] ?? ""}
+                          onChange={(e) =>
+                            handleCellChange(rowIdx, colIdx, e.target.value)
+                          }
+                          className="h-8 text-xs"
+                          placeholder={`请输入${header}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddRow}
+                  className="w-full gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  新增一行
+                </Button>
+              </div>
             </div>
           </div>
         </div>
