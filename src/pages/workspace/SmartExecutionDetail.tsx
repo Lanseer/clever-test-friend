@@ -341,10 +341,8 @@ export default function SmartExecutionDetail() {
               >
                 List
               </button>
-      </div>
-        </>
-      )}
-    </div>
+            </div>
+          </div>
 
           <div className="flex items-center gap-2 mb-3">
             <div className="relative flex-1">
