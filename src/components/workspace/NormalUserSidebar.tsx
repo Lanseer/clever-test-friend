@@ -1,103 +1,133 @@
-import { Sparkles, PlayCircle, Server, Tags as TagsIcon, User, ChevronRight } from "lucide-react";
-import { NavLink, useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  Sparkles,
+  PlayCircle,
+  Server,
+  Tags as TagsIcon,
+  ChevronLeft,
+  ArrowLeft,
+} from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+interface MenuItem {
+  titleKey: string;
+  defaultLabel: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+const normalUserMenuItems: MenuItem[] = [
+  { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },
+  { titleKey: "workspaceMenu.smartExecution", defaultLabel: "智能执行", url: "management/my-test-tasks", icon: PlayCircle },
+  { titleKey: "workspaceMenu.environment", defaultLabel: "测试环境", url: "environment", icon: Server },
+  { titleKey: "workspaceMenu.tags", defaultLabel: "标签", url: "tags", icon: TagsIcon },
+];
 
 interface NormalUserSidebarProps {
   workspaceName?: string;
-  userName?: string;
 }
 
-const mockWorkspaces: Record<string, { name: string }> = {
-  scb: { name: "SCB" },
-  dbs: { name: "DBS" },
-  cbs: { name: "CBS" },
-  rnd: { name: "研发中心" },
-};
-
-export function NormalUserSidebar({ userName = "Lanseer", workspaceName }: NormalUserSidebarProps) {
+export function NormalUserSidebar({ workspaceName = "工作空间" }: NormalUserSidebarProps) {
+  const { state, toggleSidebar } = useSidebar();
+  const isCollapsed = state === "collapsed";
   const navigate = useNavigate();
-  const { workspaceId } = useParams<{ workspaceId: string }>();
-  const location = useLocation();
   const { t } = useTranslation();
 
-  const wsName = workspaceName || (workspaceId ? mockWorkspaces[workspaceId]?.name : "工作空间");
-
-  const menuItems = [
-    {
-      label: t("workspaceMenu.smartDesign", { defaultValue: "智能设计" }),
-      icon: Sparkles,
-      path: "management/ai-cases",
-      match: "management/ai-cases",
-    },
-    {
-      label: t("workspaceMenu.smartExecution", { defaultValue: "智能执行" }),
-      icon: PlayCircle,
-      path: "management/my-test-tasks",
-      match: "management/my-test-tasks",
-    },
-    {
-      label: t("workspaceMenu.environment", { defaultValue: "测试环境" }),
-      icon: Server,
-      path: "environment",
-      match: "/environment",
-    },
-    {
-      label: t("workspaceMenu.tags", { defaultValue: "标签" }),
-      icon: TagsIcon,
-      path: "tags",
-      match: "/tags",
-    },
-  ];
-
-  const handleWorkspaceClick = () => {
-    navigate("/workspaces");
-  };
-
   return (
-    <div className="w-48 flex-shrink-0 flex flex-col h-full bg-white/60 dark:bg-background/60 backdrop-blur-sm border-r border-sky-200/50 dark:border-sky-800/30 relative z-10">
-      {/* Header - User and Workspace Info */}
-      <div className="px-4 py-4 border-b border-sky-200/50 dark:border-sky-800/30">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md flex-shrink-0">
-            <User className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-medium text-sm text-foreground truncate">{userName}</span>
-            <div
-              className="flex items-center gap-1 cursor-pointer group"
-              onClick={handleWorkspaceClick}
-              title="返回空间选择"
-            >
-              <span className="text-xs text-primary truncate group-hover:underline">{wsName}</span>
-              <ChevronRight className="w-3 h-3 text-primary flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+    <Sidebar
+      className={cn(
+        "border-r-0 transition-all duration-300",
+        isCollapsed ? "w-14" : "w-52"
+      )}
+      collapsible="icon"
+    >
+      <SidebarHeader className="p-3 border-b border-sidebar-border">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            onClick={() => navigate("/workspaces")}
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          {!isCollapsed && (
+            <div className="flex flex-col">
+              <span className="font-semibold text-sidebar-foreground text-xs truncate">
+                {workspaceName}
+              </span>
+              <span className="text-[10px] text-sidebar-foreground/60">
+                {t("workspaceMenu.testWorkbench")}
+              </span>
             </div>
-          </div>
+          )}
         </div>
-      </div>
+      </SidebarHeader>
 
-      {/* Menu */}
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname.includes(item.match);
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm",
-                isActive
-                  ? "bg-primary text-primary-foreground shadow-md font-medium"
-                  : "text-foreground/70 hover:text-foreground hover:bg-sky-50 dark:hover:bg-sky-950/30"
-              )}
-            >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate">{item.label}</span>
-            </NavLink>
-          );
-        })}
-      </nav>
-    </div>
+      <SidebarContent className="p-2">
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1">
+              {normalUserMenuItems.map((item) => (
+                <SidebarMenuItem key={item.titleKey}>
+                  <SidebarMenuButton asChild className="h-9">
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
+                          "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                          isActive &&
+                            "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md"
+                        )
+                      }
+                    >
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
+                      {!isCollapsed && (
+                        <span className="text-sm font-medium">
+                          {t(item.titleKey, { defaultValue: item.defaultLabel })}
+                        </span>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="p-2 border-t border-sidebar-border">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleSidebar}
+          className="w-full justify-center text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent h-8"
+        >
+          {isCollapsed ? (
+            <ChevronLeft className="w-4 h-4 rotate-180" />
+          ) : (
+            <>
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              <span className="text-xs">{t("sidebar.collapse")}</span>
+            </>
+          )}
+        </Button>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
