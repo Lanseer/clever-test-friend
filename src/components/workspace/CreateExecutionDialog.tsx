@@ -157,69 +157,24 @@ export function CreateExecutionDialog({
             />
           </div>
 
-          {/* Single: Test Cases */}
+          {/* Single: Test Case (single select) */}
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
                 测试 <span className="text-destructive">*</span>
               </Label>
-              <Popover open={casePopoverOpen} onOpenChange={setCasePopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-between font-normal",
-                      selectedCases.length === 0 && "text-muted-foreground",
-                    )}
-                  >
-                    <span className="truncate">
-                      {selectedCases.length === 0
-                        ? "请选择测试案例"
-                        : `已选择 ${selectedCases.length} 个案例`}
-                    </span>
-                    <ChevronDown className="w-4 h-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
-                  <div className="max-h-64 overflow-auto space-y-1">
-                    {availableTestCases.map((tc) => (
-                      <label
-                        key={tc.id}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted cursor-pointer text-sm"
-                      >
-                        <Checkbox
-                          checked={selectedCases.includes(tc.id)}
-                          onCheckedChange={() => toggleCase(tc.id)}
-                        />
-                        <span>{tc.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-              {selectedCases.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {selectedCases.map((id) => {
-                    const tc = availableTestCases.find((c) => c.id === id);
-                    return (
-                      <Badge
-                        key={id}
-                        variant="secondary"
-                        className="gap-1 font-normal"
-                      >
-                        {tc?.name}
-                        <button
-                          type="button"
-                          onClick={() => toggleCase(id)}
-                          className="hover:text-destructive"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </Badge>
-                    );
-                  })}
-                </div>
-              )}
+              <Select value={selectedCase} onValueChange={setSelectedCase}>
+                <SelectTrigger>
+                  <SelectValue placeholder="请选择测试案例" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTestCases.map((tc) => (
+                    <SelectItem key={tc.id} value={tc.id}>
+                      {tc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
