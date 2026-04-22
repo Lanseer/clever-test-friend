@@ -107,7 +107,7 @@ export function CreateExecutionDialog({
       mode,
       name: name.trim(),
       environment,
-      testCases: mode === "single" ? selectedCases : undefined,
+      testCases: mode === "single" && selectedCase ? [selectedCase] : undefined,
       tags: mode === "batch" ? selectedTags : undefined,
     });
     onOpenChange(false);
