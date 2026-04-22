@@ -409,6 +409,81 @@ export default function CaseReviewDetail() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {/* Live Test Case Selection Dialog */}
+      <Dialog open={liveCaseDialogOpen} onOpenChange={setLiveCaseDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <PlayCircle className="w-5 h-5" />
+              选择测试案例
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            {rows.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                暂无测试案例，请先在右侧配置中新增案例
+              </p>
+            ) : (
+              <RadioGroup
+                value={selectedLiveCaseIdx}
+                onValueChange={setSelectedLiveCaseIdx}
+                className="space-y-2"
+              >
+                {rows.map((row, rowIdx) => (
+                  <label
+                    key={rowIdx}
+                    htmlFor={`live-case-${rowIdx}`}
+                    className={cn(
+                      "flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-colors",
+                      selectedLiveCaseIdx === String(rowIdx)
+                        ? "border-primary bg-primary/5"
+                        : "hover:bg-muted/50"
+                    )}
+                  >
+                    <RadioGroupItem
+                      value={String(rowIdx)}
+                      id={`live-case-${rowIdx}`}
+                      className="mt-0.5"
+                    />
+                    <div className="flex-1 space-y-1">
+                      <div className="text-sm font-medium">案例{rowIdx + 1}</div>
+                      <div className="space-y-0.5">
+                        {headers.map((header, colIdx) => (
+                          <div key={colIdx} className="text-xs text-muted-foreground">
+                            <span className="font-medium">{header}：</span>
+                            <span>{row[colIdx] || "-"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </RadioGroup>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLiveCaseDialogOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                if (!selectedLiveCaseIdx) {
+                  toast.error("请选择一个测试案例");
+                  return;
+                }
+                setLiveCaseDialogOpen(false);
+                navigate(
+                  `/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1&caseIdx=${selectedLiveCaseIdx}`
+                );
+              }}
+              disabled={rows.length === 0}
+            >
+              下一步
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
