@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Plus, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -99,10 +100,16 @@ const testStatusConfig: Record<ExecutionRecord["testStatus"], { label: string; c
 };
 
 export default function SmartExecution() {
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
   const [executions] = useState<ExecutionRecord[]>(mockExecutions);
 
   const handleCreate = () => {
     toast.info("新增执行");
+  };
+
+  const handleOpenDetail = (id: string) => {
+    navigate(`/workspace/${workspaceId}/smart-execution/${id}`);
   };
 
   return (
@@ -151,7 +158,14 @@ export default function SmartExecution() {
                   const testStatus = testStatusConfig[exec.testStatus];
                   return (
                     <TableRow key={exec.id} className="hover:bg-muted/30">
-                      <TableCell className="font-medium">{exec.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <button
+                          onClick={() => handleOpenDetail(exec.id)}
+                          className="text-primary hover:underline text-left"
+                        >
+                          {exec.name}
+                        </button>
+                      </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={cn("font-normal", status.className)}>
                           {status.label}
