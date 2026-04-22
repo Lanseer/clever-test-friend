@@ -48,41 +48,43 @@ export default function WorkspaceDetail() {
   // Normal user: show NormalUserSidebar with limited menu
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex w-full bg-background">
-        <NormalUserSidebar workspaceName={workspace?.name} />
-        <main className="flex-1 p-6 overflow-auto">
-          <Routes>
-            <Route index element={<Navigate to="management/ai-cases" replace />} />
-            <Route path="management/ai-cases" element={<AIGeneratedCases />} />
-            <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
-            <Route path="management/ai-cases/:recordId/case-review" element={<CaseReview />} />
-            <Route path="management/ai-cases/:recordId/case-review/case/:caseId" element={<CaseReviewDetail />} />
-            <Route path="management/ai-cases/:recordId/generation-records" element={<BatchCaseList />} />
-            <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/review/case/:caseId" element={<CaseReviewDetail />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/self-review/:testPointId" element={<CaseSelfReview />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
-            <Route path="management/ai-cases/:recordId/expert-review" element={<ExpertReview />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review" element={<ExpertReview />} />
-            <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review/:testPointId" element={<ExpertReviewDetail />} />
-            <Route path="management/ai-cases/:recordId/expert-review-records" element={<ExpertReviewRecords />} />
-            <Route path="management/ai-cases/:recordId/expert-review-records/:reviewId/cases" element={<ExpertReviewDetail />} />
-            <Route path="management/ai-cases/:recordId/initiate-expert-review" element={<InitiateExpertReview />} />
-            <Route path="management/ai-cases/:recordId/expert-case-review" element={<ExpertCaseReview />} />
-            <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
-            <Route path="management/ai-cases/:recordId/deliverable-report" element={<DeliverableReport />} />
-            <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
-            <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
-            <Route path="management/my-test-tasks" element={<MyTestTasks />} />
-            <Route path="environment" element={<Environment />} />
-            <Route path="tags" element={<Tags />} />
-            <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
-          </Routes>
-        </main>
-      </div>
+      <SidebarProvider defaultOpen={true}>
+        <div className="min-h-screen flex w-full bg-background">
+          <NormalUserSidebar workspaceName={workspace?.name} />
+          <main className="flex-1 p-6 overflow-auto">
+            <Routes>
+              <Route index element={<Navigate to="management/ai-cases" replace />} />
+              <Route path="management/ai-cases" element={<AIGeneratedCases />} />
+              <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
+              <Route path="management/ai-cases/:recordId/case-review" element={<CaseReview />} />
+              <Route path="management/ai-cases/:recordId/case-review/case/:caseId" element={<CaseReviewDetail />} />
+              <Route path="management/ai-cases/:recordId/generation-records" element={<BatchCaseList />} />
+              <Route path="management/batch-cases/:batchId" element={<BatchCaseList />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/cases" element={<BatchCaseList />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/review" element={<CaseReview />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/review/case/:caseId" element={<CaseReviewDetail />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/self-review/:testPointId" element={<CaseSelfReview />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/ai-review" element={<AIReview />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/ai-assistant" element={<AIAssistant />} />
+              <Route path="management/ai-cases/:recordId/expert-review" element={<ExpertReview />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review" element={<ExpertReview />} />
+              <Route path="management/ai-cases/:recordId/batch/:batchId/expert-review/:testPointId" element={<ExpertReviewDetail />} />
+              <Route path="management/ai-cases/:recordId/expert-review-records" element={<ExpertReviewRecords />} />
+              <Route path="management/ai-cases/:recordId/expert-review-records/:reviewId/cases" element={<ExpertReviewDetail />} />
+              <Route path="management/ai-cases/:recordId/initiate-expert-review" element={<InitiateExpertReview />} />
+              <Route path="management/ai-cases/:recordId/expert-case-review" element={<ExpertCaseReview />} />
+              <Route path="management/ai-cases/:recordId/report" element={<TestReport />} />
+              <Route path="management/ai-cases/:recordId/deliverable-report" element={<DeliverableReport />} />
+              <Route path="management/ai-cases/:recordId/report/test-point/:testPointId" element={<TestReportCases />} />
+              <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
+              <Route path="management/my-test-tasks" element={<MyTestTasks />} />
+              <Route path="environment" element={<Environment />} />
+              <Route path="tags" element={<Tags />} />
+              <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </SidebarProvider>
     );
   }
 
