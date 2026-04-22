@@ -124,7 +124,7 @@ const replaceCasesInBdd = (
 
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
-  const { caseId } = useParams<{ caseId: string }>();
+  const { caseId, workspaceId } = useParams<{ caseId: string; workspaceId: string }>();
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
@@ -200,6 +200,9 @@ export default function CaseReviewDetail() {
             variant="default"
             size="sm"
             className="gap-2"
+            onClick={() =>
+              navigate(`/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1`)
+            }
           >
             <PlayCircle className="w-4 h-4" />
             现场测试
