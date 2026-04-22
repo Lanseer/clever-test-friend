@@ -137,6 +137,14 @@ export default function CaseReviewDetail() {
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
   const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
+  const [caseNatures, setCaseNatures] = useState<Record<number, "positive" | "negative">>({
+    0: "positive",
+    1: "positive",
+    2: "negative",
+  });
+  const getNature = (idx: number): "positive" | "negative" => caseNatures[idx] ?? "positive";
+  const setNature = (idx: number, nature: "positive" | "negative") =>
+    setCaseNatures((prev) => ({ ...prev, [idx]: nature }));
 
   const parsed = useMemo(() => parseCases(bddContent), [bddContent]);
   const headers = parsed?.headers ?? ["用户名", "密码", "预期结果"];
