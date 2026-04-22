@@ -20,6 +20,8 @@ interface ExecutionRecord {
   name: string;
   status: "draft" | "running" | "completed" | "failed";
   testStatus: "passed" | "failed" | "partial" | "pending";
+  completedCases: number;
+  totalCases: number;
   tags: string[];
   environment: string;
   creator: string;
