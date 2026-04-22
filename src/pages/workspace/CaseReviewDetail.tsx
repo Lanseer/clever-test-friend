@@ -124,7 +124,7 @@ const replaceCasesInBdd = (
 
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
-  const { caseId } = useParams<{ caseId: string }>();
+  const { caseId, workspaceId } = useParams<{ caseId: string; workspaceId: string }>();
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
