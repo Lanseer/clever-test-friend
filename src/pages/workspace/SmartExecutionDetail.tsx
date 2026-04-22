@@ -443,10 +443,7 @@ export default function SmartExecutionDetail() {
           </div>
           <div className="bg-zinc-900 rounded-lg overflow-hidden">
             <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700">
-              <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                T⚡Z
-              </div>
-              <span className="text-white font-medium">TestZeus Trace Viewer</span>
+              <span className="text-white font-medium">Trace Viewer</span>
             </div>
             <div className="px-4 py-3 border-b border-zinc-700 flex items-center gap-8 text-xs text-zinc-400 overflow-x-auto">
               {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32].map((s) => (
