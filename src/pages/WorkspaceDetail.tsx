@@ -26,6 +26,7 @@ import Dashboard from "./Index";
 import TestData from "./workspace/TestData";
 import TestDataCreate from "./workspace/TestDataCreate";
 import TestReport from "./workspace/TestReport";
+import SmartTestReports from "./workspace/SmartTestReports";
 import TestReportCases from "./workspace/TestReportCases";
 import TestReportSource from "./workspace/TestReportSource";
 import CaseTemplates from "./workspace/CaseTemplates";
@@ -85,6 +86,7 @@ export default function WorkspaceDetail() {
               <Route path="smart-execution/:executionId/cases" element={<SmartExecutionCases />} />
               <Route path="smart-execution/:executionId/case/:caseId" element={<SmartExecutionDetail />} />
               <Route path="smart-execution/:executionId" element={<SmartExecutionDetail />} />
+              <Route path="test-report" element={<SmartTestReports />} />
               <Route path="environment" element={<Environment />} />
               <Route path="tags" element={<Tags />} />
               <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
