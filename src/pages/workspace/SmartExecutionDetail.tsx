@@ -122,9 +122,20 @@ function ArtifactIcon({ type }: { type: ArtifactItem["type"] }) {
 export default function SmartExecutionDetail() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
+  const [searchParams] = useSearchParams();
+  const isLiveEntry = searchParams.get("live") === "1";
+
+  const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [searchArtifact, setSearchArtifact] = useState("");
   const [filterType, setFilterType] = useState("all");
+
+  useEffect(() => {
+    if (!isLiveEntry) return;
+    setIsLiveLoading(true);
+    const timer = setTimeout(() => setIsLiveLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, [isLiveEntry]);
 
   const filteredArtifacts = mockArtifacts.filter((a) => {
     const matchesSearch = a.name.toLowerCase().includes(searchArtifact.toLowerCase());
