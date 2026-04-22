@@ -375,8 +375,47 @@ export default function SmartExecutionDetail() {
         </Card>
       </div>
 
-      {/* Screenshot */}
-      <div className="px-4">
+      {/* Browser Trace Viewer */}
+      <div className="p-4">
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Video className="w-5 h-5 text-muted-foreground" />
+              <h2 className="text-lg font-semibold">Browser Trace Viewer</h2>
+            </div>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <ExternalLink className="w-4 h-4" />
+              Open in new tab
+            </Button>
+          </div>
+          <div className="bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700">
+              <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                T⚡Z
+              </div>
+              <span className="text-white font-medium">TestZeus Trace Viewer</span>
+            </div>
+            <div className="px-4 py-3 border-b border-zinc-700 flex items-center gap-8 text-xs text-zinc-400 overflow-x-auto">
+              {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32].map((s) => (
+                <span key={s} className="whitespace-nowrap">{s}.0s</span>
+              ))}
+            </div>
+            <div className="px-4 py-2 border-b border-zinc-700 flex items-center gap-4 text-sm text-zinc-300">
+              <span>Actions</span>
+              <span>Metadata</span>
+              <span className="ml-auto">Action · Before · After</span>
+            </div>
+            <div className="h-64 flex items-center justify-center bg-zinc-800/50">
+              <div className="bg-zinc-700/40 border border-zinc-600 rounded-md p-4 w-80 h-32 flex items-center justify-center text-zinc-500 text-xs">
+                about:blank
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Screenshot - 页面底部 */}
+      <div className="px-4 pb-4">
         <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -417,45 +456,6 @@ export default function SmartExecutionDetail() {
                 </div>
               </div>
             ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Browser Trace Viewer */}
-      <div className="p-4">
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Video className="w-5 h-5 text-muted-foreground" />
-              <h2 className="text-lg font-semibold">Browser Trace Viewer</h2>
-            </div>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <ExternalLink className="w-4 h-4" />
-              Open in new tab
-            </Button>
-          </div>
-          <div className="bg-zinc-900 rounded-lg overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700">
-              <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                T⚡Z
-              </div>
-              <span className="text-white font-medium">TestZeus Trace Viewer</span>
-            </div>
-            <div className="px-4 py-3 border-b border-zinc-700 flex items-center gap-8 text-xs text-zinc-400 overflow-x-auto">
-              {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32].map((s) => (
-                <span key={s} className="whitespace-nowrap">{s}.0s</span>
-              ))}
-            </div>
-            <div className="px-4 py-2 border-b border-zinc-700 flex items-center gap-4 text-sm text-zinc-300">
-              <span>Actions</span>
-              <span>Metadata</span>
-              <span className="ml-auto">Action · Before · After</span>
-            </div>
-            <div className="h-64 flex items-center justify-center bg-zinc-800/50">
-              <div className="bg-zinc-700/40 border border-zinc-600 rounded-md p-4 w-80 h-32 flex items-center justify-center text-zinc-500 text-xs">
-                about:blank
-              </div>
-            </div>
           </div>
         </Card>
       </div>
