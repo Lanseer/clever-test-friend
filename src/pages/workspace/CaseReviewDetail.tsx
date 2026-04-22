@@ -487,7 +487,20 @@ export default function CaseReviewDetail() {
                       className="mt-0.5"
                     />
                     <div className="flex-1 space-y-1">
-                      <div className="text-sm font-medium">案例{rowIdx + 1}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-medium">案例{rowIdx + 1}</div>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs",
+                            getNature(rowIdx) === "positive"
+                              ? "bg-success/10 text-success border-success/30"
+                              : "bg-destructive/10 text-destructive border-destructive/30"
+                          )}
+                        >
+                          {getNature(rowIdx) === "positive" ? "正例" : "反例"}
+                        </Badge>
+                      </div>
                       <div className="space-y-0.5">
                         {headers.map((header, colIdx) => (
                           <div key={colIdx} className="text-xs text-muted-foreground">
