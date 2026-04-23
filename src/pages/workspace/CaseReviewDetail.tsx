@@ -40,10 +40,10 @@ const getMockBddContent = () => `Feature: 用户登录功能
     And 系统应该显示欢迎消息
 
   Cases:
-    | 编号  | 用户名    | 密码        | 预期结果   |
-    | 1     | testuser  | Password123 | 登录成功   |
-    | 2     | admin     | Admin@456   | 登录成功   |
-    | 3     | user01    | User#789    | 登录成功   |`;
+    | 编号    | 用户名    | 密码        | 预期结果   |
+    | TC-001  | testuser  | Password123 | 登录成功   |
+    | TC-002  | admin     | Admin@456   | 登录成功   |
+    | TC-003  | user01    | User#789    | 登录成功   |`;
 
 const getMockPlaywrightScript = (caseId: string) => `// Playwright 测试脚本: ${caseId}
 import { test, expect } from '@playwright/test';
@@ -167,8 +167,20 @@ export default function CaseReviewDetail() {
   };
 
   const handleAddRow = () => {
-    const next = [...rows, headers.map(() => "")];
-    updateRows(next);
+    const idColIdx = headers.findIndex((h) => h === "编号");
+    const newRow = headers.map(() => "");
+    if (idColIdx !== -1) {
+      // Find next TC-XXX number
+      const used = rows
+        .map((r) => r[idColIdx] || "")
+        .map((v) => {
+          const m = /^TC-(\d+)$/.exec(v.trim());
+          return m ? parseInt(m[1], 10) : 0;
+        });
+      const next = (used.length ? Math.max(...used) : 0) + 1;
+      newRow[idColIdx] = `TC-${String(next).padStart(3, "0")}`;
+    }
+    updateRows([...rows, newRow]);
   };
 
   const toggleTag = (tag: string) => {
@@ -348,60 +360,38 @@ export default function CaseReviewDetail() {
                             {h}
                           </th>
                         ))}
-                        <th className="px-2 py-2 font-medium text-muted-foreground whitespace-nowrap">
-                          案例性质
-                        </th>
                         <th className="px-2 py-2 w-10"></th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.length === 0 && (
                         <tr>
-                          <td colSpan={headers.length + 2} className="px-2 py-4 text-center text-muted-foreground">
+                          <td colSpan={headers.length + 1} className="px-2 py-4 text-center text-muted-foreground">
                             暂无数据，点击下方按钮新增一行
                           </td>
                         </tr>
                       )}
                       {rows.map((row, rowIdx) => (
                         <tr key={rowIdx} className="border-b last:border-b-0">
-                          {headers.map((header, colIdx) => (
-                            <td key={colIdx} className="px-1.5 py-1.5 align-top">
-                              <Input
-                                value={row[colIdx] ?? ""}
-                                onChange={(e) => handleCellChange(rowIdx, colIdx, e.target.value)}
-                                className="h-7 text-xs px-2"
-                                placeholder={header}
-                              />
-                            </td>
-                          ))}
-                          <td className="px-1.5 py-1.5 align-top">
-                            <div className="flex gap-1">
-                              <button
-                                type="button"
-                                onClick={() => setNature(rowIdx, "positive")}
-                                className={cn(
-                                  "flex-1 px-1.5 py-1 rounded-md border text-[11px] transition-colors",
-                                  getNature(rowIdx) === "positive"
-                                    ? "bg-success/10 text-success border-success"
-                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
+                          {headers.map((header, colIdx) => {
+                            const isIdCol = header === "编号";
+                            return (
+                              <td key={colIdx} className="px-1.5 py-1.5 align-top">
+                                {isIdCol ? (
+                                  <div className="h-7 px-2 flex items-center text-xs font-mono text-muted-foreground bg-muted/40 rounded-md border border-transparent">
+                                    {row[colIdx] ?? ""}
+                                  </div>
+                                ) : (
+                                  <Input
+                                    value={row[colIdx] ?? ""}
+                                    onChange={(e) => handleCellChange(rowIdx, colIdx, e.target.value)}
+                                    className="h-7 text-xs px-2"
+                                    placeholder={header}
+                                  />
                                 )}
-                              >
-                                正例
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setNature(rowIdx, "negative")}
-                                className={cn(
-                                  "flex-1 px-1.5 py-1 rounded-md border text-[11px] transition-colors",
-                                  getNature(rowIdx) === "negative"
-                                    ? "bg-destructive/10 text-destructive border-destructive"
-                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
-                                )}
-                              >
-                                反例
-                              </button>
-                            </div>
-                          </td>
+                              </td>
+                            );
+                          })}
                           <td className="px-1 py-1.5 align-top">
                             <Button
                               type="button"
@@ -607,27 +597,26 @@ export default function CaseReviewDetail() {
                       className="mt-0.5"
                     />
                     <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm font-medium">案例{rowIdx + 1}</div>
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "text-xs",
-                            getNature(rowIdx) === "positive"
-                              ? "bg-success/10 text-success border-success/30"
-                              : "bg-destructive/10 text-destructive border-destructive/30"
-                          )}
-                        >
-                          {getNature(rowIdx) === "positive" ? "正例" : "反例"}
-                        </Badge>
-                      </div>
+                      {(() => {
+                        const idColIdx = headers.findIndex((h) => h === "编号");
+                        const caseLabel =
+                          idColIdx !== -1 && row[idColIdx]
+                            ? row[idColIdx]
+                            : `TC-${String(rowIdx + 1).padStart(3, "0")}`;
+                        return (
+                          <div className="text-sm font-medium font-mono">{caseLabel}</div>
+                        );
+                      })()}
                       <div className="space-y-0.5">
-                        {headers.map((header, colIdx) => (
-                          <div key={colIdx} className="text-xs text-muted-foreground">
-                            <span className="font-medium">{header}：</span>
-                            <span>{row[colIdx] || "-"}</span>
-                          </div>
-                        ))}
+                        {headers
+                          .map((header, colIdx) => ({ header, colIdx }))
+                          .filter(({ header }) => header !== "编号")
+                          .map(({ header, colIdx }) => (
+                            <div key={colIdx} className="text-xs text-muted-foreground">
+                              <span className="font-medium">{header}：</span>
+                              <span>{row[colIdx] || "-"}</span>
+                            </div>
+                          ))}
                       </div>
                     </div>
                   </label>
