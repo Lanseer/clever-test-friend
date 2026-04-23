@@ -147,7 +147,7 @@ export default function SmartExecutionCases() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40">
-                <TableHead className="min-w-[220px]">案例名称</TableHead>
+                <TableHead className="min-w-[140px]">案例编号</TableHead>
                 <TableHead className="min-w-[200px]">测试数据</TableHead>
                 <TableHead>案例性质</TableHead>
                 <TableHead>状态</TableHead>
