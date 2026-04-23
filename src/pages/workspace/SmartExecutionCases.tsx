@@ -171,7 +171,7 @@ export default function SmartExecutionCases() {
                   const testStatus = testStatusConfig[c.testStatus];
                   return (
                     <TableRow key={c.id} className="hover:bg-muted/30">
-                      <TableCell className="font-medium">
+                      <TableCell className="font-mono font-medium">
                         <button
                           onClick={() => handleOpenCase(c.id)}
                           className="text-primary hover:underline text-left"
