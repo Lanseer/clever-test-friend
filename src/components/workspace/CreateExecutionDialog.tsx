@@ -44,14 +44,16 @@ interface CreateExecutionDialogProps {
 }
 
 const availableTestCases = [
-  { id: "tc1", name: "案例1 - 用户登录" },
-  { id: "tc2", name: "案例2 - 用户注册" },
-  { id: "tc3", name: "案例3 - 密码重置" },
-  { id: "tc4", name: "案例4 - 商品搜索" },
-  { id: "tc5", name: "案例5 - 加入购物车" },
-  { id: "tc6", name: "案例6 - 提交订单" },
-  { id: "tc7", name: "案例7 - 支付流程" },
-  { id: "tc8", name: "案例8 - 订单查询" },
+  { id: "tc1", name: "用户登录" },
+  { id: "tc2", name: "用户注册" },
+  { id: "tc3", name: "密码重置" },
+  { id: "tc4", name: "商品搜索" },
+  { id: "tc5", name: "加入购物车" },
+  { id: "tc6", name: "提交订单" },
+  { id: "tc7", name: "支付流程" },
+  { id: "tc8", name: "订单查询" },
+  { id: "tc9", name: "个人信息修改" },
+  { id: "tc10", name: "退款申请" },
 ];
 
 const availableTags = [
@@ -161,11 +163,11 @@ export function CreateExecutionDialog({
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
-                测试 <span className="text-destructive">*</span>
+                场景 <span className="text-destructive">*</span>
               </Label>
               <Select value={selectedCase} onValueChange={setSelectedCase}>
                 <SelectTrigger>
-                  <SelectValue placeholder="请选择测试案例" />
+                  <SelectValue placeholder="请选择测试场景" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTestCases.map((tc) => (
