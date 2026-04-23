@@ -597,27 +597,26 @@ export default function CaseReviewDetail() {
                       className="mt-0.5"
                     />
                     <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm font-medium">案例{rowIdx + 1}</div>
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "text-xs",
-                            getNature(rowIdx) === "positive"
-                              ? "bg-success/10 text-success border-success/30"
-                              : "bg-destructive/10 text-destructive border-destructive/30"
-                          )}
-                        >
-                          {getNature(rowIdx) === "positive" ? "正例" : "反例"}
-                        </Badge>
-                      </div>
+                      {(() => {
+                        const idColIdx = headers.findIndex((h) => h === "编号");
+                        const caseLabel =
+                          idColIdx !== -1 && row[idColIdx]
+                            ? row[idColIdx]
+                            : `TC-${String(rowIdx + 1).padStart(3, "0")}`;
+                        return (
+                          <div className="text-sm font-medium font-mono">{caseLabel}</div>
+                        );
+                      })()}
                       <div className="space-y-0.5">
-                        {headers.map((header, colIdx) => (
-                          <div key={colIdx} className="text-xs text-muted-foreground">
-                            <span className="font-medium">{header}：</span>
-                            <span>{row[colIdx] || "-"}</span>
-                          </div>
-                        ))}
+                        {headers
+                          .map((header, colIdx) => ({ header, colIdx }))
+                          .filter(({ header }) => header !== "编号")
+                          .map(({ header, colIdx }) => (
+                            <div key={colIdx} className="text-xs text-muted-foreground">
+                              <span className="font-medium">{header}：</span>
+                              <span>{row[colIdx] || "-"}</span>
+                            </div>
+                          ))}
                       </div>
                     </div>
                   </label>
