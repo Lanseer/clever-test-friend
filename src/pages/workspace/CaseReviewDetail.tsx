@@ -167,8 +167,20 @@ export default function CaseReviewDetail() {
   };
 
   const handleAddRow = () => {
-    const next = [...rows, headers.map(() => "")];
-    updateRows(next);
+    const idColIdx = headers.findIndex((h) => h === "编号");
+    const newRow = headers.map(() => "");
+    if (idColIdx !== -1) {
+      // Find next TC-XXX number
+      const used = rows
+        .map((r) => r[idColIdx] || "")
+        .map((v) => {
+          const m = /^TC-(\d+)$/.exec(v.trim());
+          return m ? parseInt(m[1], 10) : 0;
+        });
+      const next = (used.length ? Math.max(...used) : 0) + 1;
+      newRow[idColIdx] = `TC-${String(next).padStart(3, "0")}`;
+    }
+    updateRows([...rows, newRow]);
   };
 
   const toggleTag = (tag: string) => {
