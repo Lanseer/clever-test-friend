@@ -40,10 +40,10 @@ const getMockBddContent = () => `Feature: 用户登录功能
     And 系统应该显示欢迎消息
 
   Cases:
-    | 用户名    | 密码        | 预期结果   |
-    | testuser  | Password123 | 登录成功   |
-    | admin     | Admin@456   | 登录成功   |
-    | user01    | User#789    | 登录成功   |`;
+    | 编号  | 用户名    | 密码        | 预期结果   |
+    | 1     | testuser  | Password123 | 登录成功   |
+    | 2     | admin     | Admin@456   | 登录成功   |
+    | 3     | user01    | User#789    | 登录成功   |`;
 
 const getMockPlaywrightScript = (caseId: string) => `// Playwright 测试脚本: ${caseId}
 import { test, expect } from '@playwright/test';
@@ -147,7 +147,7 @@ export default function CaseReviewDetail() {
     setCaseNatures((prev) => ({ ...prev, [idx]: nature }));
 
   const parsed = useMemo(() => parseCases(bddContent), [bddContent]);
-  const headers = parsed?.headers ?? ["用户名", "密码", "预期结果"];
+  const headers = parsed?.headers ?? ["编号", "用户名", "密码", "预期结果"];
   const rows = parsed?.rows ?? [];
 
   const updateRows = (newRows: string[][]) => {
@@ -338,58 +338,49 @@ export default function CaseReviewDetail() {
                 测试案例
               </Label>
 
-              <div className="space-y-3 rounded-md border bg-background p-3">
-                {rows.length === 0 && (
-                  <p className="text-xs text-muted-foreground py-2 text-center">
-                    暂无数据，点击下方按钮新增一行
-                  </p>
-                )}
-
-                {rows.map((row, rowIdx) => (
-                  <div
-                    key={rowIdx}
-                    className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-muted-foreground">
-                        案例{rowIdx + 1}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDeleteRow(rowIdx)}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                    {headers.map((header, colIdx) => (
-                      <div key={colIdx} className="space-y-2">
-                        <div className="grid grid-cols-[90px_1fr] items-center gap-2">
-                          <Label className="text-xs text-muted-foreground truncate">
-                            {header}
-                          </Label>
-                          <Input
-                            value={row[colIdx] ?? ""}
-                            onChange={(e) =>
-                              handleCellChange(rowIdx, colIdx, e.target.value)
-                            }
-                            className="h-8 text-xs"
-                            placeholder={`请输入${header}`}
-                          />
-                        </div>
-                        {header === "预期结果" && (
-                          <div className="grid grid-cols-[90px_1fr] items-center gap-2">
-                            <Label className="text-xs text-muted-foreground truncate">
-                              案例性质
-                            </Label>
-                            <div className="flex gap-1.5">
+              <div className="rounded-md border bg-background overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-muted/40 border-b">
+                      <tr className="text-left">
+                        {headers.map((h, i) => (
+                          <th key={i} className="px-2 py-2 font-medium text-muted-foreground whitespace-nowrap">
+                            {h}
+                          </th>
+                        ))}
+                        <th className="px-2 py-2 font-medium text-muted-foreground whitespace-nowrap">
+                          案例性质
+                        </th>
+                        <th className="px-2 py-2 w-10"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.length === 0 && (
+                        <tr>
+                          <td colSpan={headers.length + 2} className="px-2 py-4 text-center text-muted-foreground">
+                            暂无数据，点击下方按钮新增一行
+                          </td>
+                        </tr>
+                      )}
+                      {rows.map((row, rowIdx) => (
+                        <tr key={rowIdx} className="border-b last:border-b-0">
+                          {headers.map((header, colIdx) => (
+                            <td key={colIdx} className="px-1.5 py-1.5 align-top">
+                              <Input
+                                value={row[colIdx] ?? ""}
+                                onChange={(e) => handleCellChange(rowIdx, colIdx, e.target.value)}
+                                className="h-7 text-xs px-2"
+                                placeholder={header}
+                              />
+                            </td>
+                          ))}
+                          <td className="px-1.5 py-1.5 align-top">
+                            <div className="flex gap-1">
                               <button
                                 type="button"
                                 onClick={() => setNature(rowIdx, "positive")}
                                 className={cn(
-                                  "flex-1 px-2 py-1 rounded-md border text-xs transition-colors",
+                                  "flex-1 px-1.5 py-1 rounded-md border text-[11px] transition-colors",
                                   getNature(rowIdx) === "positive"
                                     ? "bg-success/10 text-success border-success"
                                     : "bg-background hover:bg-muted border-border text-muted-foreground"
@@ -401,7 +392,7 @@ export default function CaseReviewDetail() {
                                 type="button"
                                 onClick={() => setNature(rowIdx, "negative")}
                                 className={cn(
-                                  "flex-1 px-2 py-1 rounded-md border text-xs transition-colors",
+                                  "flex-1 px-1.5 py-1 rounded-md border text-[11px] transition-colors",
                                   getNature(rowIdx) === "negative"
                                     ? "bg-destructive/10 text-destructive border-destructive"
                                     : "bg-background hover:bg-muted border-border text-muted-foreground"
@@ -410,23 +401,35 @@ export default function CaseReviewDetail() {
                                 反例
                               </button>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddRow}
-                  className="w-full gap-1.5"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  新增案例
-                </Button>
+                          </td>
+                          <td className="px-1 py-1.5 align-top">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDeleteRow(rowIdx)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="p-2 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddRow}
+                    className="w-full gap-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    新增案例
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
