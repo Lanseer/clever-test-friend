@@ -360,60 +360,38 @@ export default function CaseReviewDetail() {
                             {h}
                           </th>
                         ))}
-                        <th className="px-2 py-2 font-medium text-muted-foreground whitespace-nowrap">
-                          案例性质
-                        </th>
                         <th className="px-2 py-2 w-10"></th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.length === 0 && (
                         <tr>
-                          <td colSpan={headers.length + 2} className="px-2 py-4 text-center text-muted-foreground">
+                          <td colSpan={headers.length + 1} className="px-2 py-4 text-center text-muted-foreground">
                             暂无数据，点击下方按钮新增一行
                           </td>
                         </tr>
                       )}
                       {rows.map((row, rowIdx) => (
                         <tr key={rowIdx} className="border-b last:border-b-0">
-                          {headers.map((header, colIdx) => (
-                            <td key={colIdx} className="px-1.5 py-1.5 align-top">
-                              <Input
-                                value={row[colIdx] ?? ""}
-                                onChange={(e) => handleCellChange(rowIdx, colIdx, e.target.value)}
-                                className="h-7 text-xs px-2"
-                                placeholder={header}
-                              />
-                            </td>
-                          ))}
-                          <td className="px-1.5 py-1.5 align-top">
-                            <div className="flex gap-1">
-                              <button
-                                type="button"
-                                onClick={() => setNature(rowIdx, "positive")}
-                                className={cn(
-                                  "flex-1 px-1.5 py-1 rounded-md border text-[11px] transition-colors",
-                                  getNature(rowIdx) === "positive"
-                                    ? "bg-success/10 text-success border-success"
-                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
+                          {headers.map((header, colIdx) => {
+                            const isIdCol = header === "编号";
+                            return (
+                              <td key={colIdx} className="px-1.5 py-1.5 align-top">
+                                {isIdCol ? (
+                                  <div className="h-7 px-2 flex items-center text-xs font-mono text-muted-foreground bg-muted/40 rounded-md border border-transparent">
+                                    {row[colIdx] ?? ""}
+                                  </div>
+                                ) : (
+                                  <Input
+                                    value={row[colIdx] ?? ""}
+                                    onChange={(e) => handleCellChange(rowIdx, colIdx, e.target.value)}
+                                    className="h-7 text-xs px-2"
+                                    placeholder={header}
+                                  />
                                 )}
-                              >
-                                正例
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setNature(rowIdx, "negative")}
-                                className={cn(
-                                  "flex-1 px-1.5 py-1 rounded-md border text-[11px] transition-colors",
-                                  getNature(rowIdx) === "negative"
-                                    ? "bg-destructive/10 text-destructive border-destructive"
-                                    : "bg-background hover:bg-muted border-border text-muted-foreground"
-                                )}
-                              >
-                                反例
-                              </button>
-                            </div>
-                          </td>
+                              </td>
+                            );
+                          })}
                           <td className="px-1 py-1.5 align-top">
                             <Button
                               type="button"
