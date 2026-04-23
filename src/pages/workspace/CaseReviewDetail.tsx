@@ -147,7 +147,7 @@ export default function CaseReviewDetail() {
     setCaseNatures((prev) => ({ ...prev, [idx]: nature }));
 
   const parsed = useMemo(() => parseCases(bddContent), [bddContent]);
-  const headers = parsed?.headers ?? ["用户名", "密码", "预期结果"];
+  const headers = parsed?.headers ?? ["编号", "用户名", "密码", "预期结果"];
   const rows = parsed?.rows ?? [];
 
   const updateRows = (newRows: string[][]) => {
