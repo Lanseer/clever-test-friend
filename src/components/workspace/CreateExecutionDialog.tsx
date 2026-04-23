@@ -163,11 +163,11 @@ export function CreateExecutionDialog({
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
-                测试 <span className="text-destructive">*</span>
+                场景 <span className="text-destructive">*</span>
               </Label>
               <Select value={selectedCase} onValueChange={setSelectedCase}>
                 <SelectTrigger>
-                  <SelectValue placeholder="请选择测试案例" />
+                  <SelectValue placeholder="请选择测试场景" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTestCases.map((tc) => (
