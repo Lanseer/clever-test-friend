@@ -29,7 +29,7 @@ interface ExecutionCaseRow {
 const mockCases: ExecutionCaseRow[] = [
   {
     id: "live-tp-1",
-    name: "案例1：用户使用正确账号密码登录",
+    name: "TC-001",
     testData: "user01@test.com / Pass@123",
     nature: "positive",
     status: "completed",
@@ -40,7 +40,7 @@ const mockCases: ExecutionCaseRow[] = [
   },
   {
     id: "live-tp-2",
-    name: "案例2：用户使用错误密码登录",
+    name: "TC-002",
     testData: "user01@test.com / WrongPass",
     nature: "negative",
     status: "completed",
@@ -51,7 +51,7 @@ const mockCases: ExecutionCaseRow[] = [
   },
   {
     id: "live-tp-3",
-    name: "案例3：邮箱格式校验",
+    name: "TC-003",
     testData: "invalid-email / Pass@123",
     nature: "negative",
     status: "completed",
@@ -62,7 +62,7 @@ const mockCases: ExecutionCaseRow[] = [
   },
   {
     id: "live-tp-4",
-    name: "案例4：空密码提交",
+    name: "TC-004",
     testData: "user01@test.com / (空)",
     nature: "negative",
     status: "running",
@@ -73,7 +73,7 @@ const mockCases: ExecutionCaseRow[] = [
   },
   {
     id: "live-tp-5",
-    name: "案例5：记住我功能",
+    name: "TC-005",
     testData: "user01@test.com / Pass@123",
     nature: "positive",
     status: "pending",
@@ -84,7 +84,7 @@ const mockCases: ExecutionCaseRow[] = [
   },
   {
     id: "live-tp-6",
-    name: "案例6：多次错误锁定",
+    name: "TC-006",
     testData: "user01@test.com / x5次",
     nature: "negative",
     status: "pending",
