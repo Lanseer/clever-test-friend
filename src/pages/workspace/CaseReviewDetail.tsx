@@ -440,8 +440,7 @@ export default function CaseReviewDetail() {
               <table className="w-full text-sm">
                 <thead className="bg-muted/40">
                   <tr className="text-left">
-                    <th className="px-3 py-2 font-medium">名称</th>
-                    <th className="px-3 py-2 font-medium">案例性质</th>
+                    <th className="px-3 py-2 font-medium">编号</th>
                     <th className="px-3 py-2 font-medium">测试数据</th>
                     <th className="px-3 py-2 font-medium">状态</th>
                     <th className="px-3 py-2 font-medium">测试状态</th>
@@ -455,8 +454,7 @@ export default function CaseReviewDetail() {
                   {[
                     {
                       id: "live-001",
-                      name: `${caseId}-现场测试-001`,
-                      nature: "positive" as const,
+                      name: "TC-001",
                       testData: "testuser / Password123",
                       status: "已完成",
                       testStatus: "通过",
@@ -467,8 +465,7 @@ export default function CaseReviewDetail() {
                     },
                     {
                       id: "live-002",
-                      name: `${caseId}-现场测试-002`,
-                      nature: "negative" as const,
+                      name: "TC-002",
                       testData: "wronguser / wrongpass",
                       status: "已完成",
                       testStatus: "失败",
@@ -479,8 +476,7 @@ export default function CaseReviewDetail() {
                     },
                     {
                       id: "live-003",
-                      name: `${caseId}-现场测试-003`,
-                      nature: "positive" as const,
+                      name: "TC-003",
                       testData: "admin / Admin@456",
                       status: "执行中",
                       testStatus: "-",
@@ -506,7 +502,7 @@ export default function CaseReviewDetail() {
                       <tr key={rec.id} className="border-t hover:bg-muted/30">
                         <td className="px-3 py-2">
                           <button
-                            className="text-primary hover:underline font-medium"
+                            className="text-primary hover:underline font-mono font-medium"
                             onClick={() => {
                               setScriptDialogOpen(false);
                               navigate(
@@ -516,18 +512,6 @@ export default function CaseReviewDetail() {
                           >
                             {rec.name}
                           </button>
-                        </td>
-                        <td className="px-3 py-2">
-                          <Badge
-                            variant="outline"
-                            className={
-                              rec.nature === "positive"
-                                ? "bg-green-500/10 text-green-600 border-green-200"
-                                : "bg-red-500/10 text-red-600 border-red-200"
-                            }
-                          >
-                            {rec.nature === "positive" ? "正例" : "反例"}
-                          </Badge>
                         </td>
                         <td className="px-3 py-2 text-muted-foreground font-mono text-xs">
                           {rec.testData}
