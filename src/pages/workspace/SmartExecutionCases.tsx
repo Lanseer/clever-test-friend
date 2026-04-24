@@ -149,7 +149,6 @@ export default function SmartExecutionCases() {
               <TableRow className="bg-muted/40">
                 <TableHead className="min-w-[140px]">案例编号</TableHead>
                 <TableHead className="min-w-[200px]">测试数据</TableHead>
-                <TableHead>案例性质</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>测试状态</TableHead>
                 <TableHead>环境</TableHead>
@@ -160,13 +159,12 @@ export default function SmartExecutionCases() {
             <TableBody>
               {cases.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                     暂无案例
                   </TableCell>
                 </TableRow>
               ) : (
                 cases.map((c) => {
-                  const nature = natureConfig[c.nature];
                   const status = statusConfig[c.status];
                   const testStatus = testStatusConfig[c.testStatus];
                   return (
@@ -181,11 +179,6 @@ export default function SmartExecutionCases() {
                       </TableCell>
                       <TableCell className="text-sm font-mono text-muted-foreground">
                         {c.testData}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={cn("font-normal", nature.className)}>
-                          {nature.label}
-                        </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={cn("font-normal", status.className)}>
