@@ -215,27 +215,31 @@ export default function CaseReviewDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setScriptDialogOpen(true)}
-            className="gap-2"
-          >
-            <FileCode className="w-4 h-4" />
-            现场测试记录
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
-              setSelectedLiveCaseIdx("");
-              setLiveCaseDialogOpen(true);
-            }}
-          >
-            <PlayCircle className="w-4 h-4" />
-            现场测试
-          </Button>
+          {isAdopted && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setScriptDialogOpen(true)}
+                className="gap-2"
+              >
+                <FileCode className="w-4 h-4" />
+                现场测试记录
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="gap-2"
+                onClick={() => {
+                  setSelectedLiveCaseIdx("");
+                  setLiveCaseDialogOpen(true);
+                }}
+              >
+                <PlayCircle className="w-4 h-4" />
+                现场测试
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
