@@ -231,8 +231,8 @@ const useMockDimensions = (): TestDimension[] => {
       id: "dim-1",
       name: `01-${t('mockData.dimensions.businessFlow')}`,
       testPoints: [
-        { id: "tp-1", code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 12, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-2", code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 18, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+        { id: "tp-1", code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
+        { id: "tp-2", code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 18, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
         { id: "tp-3", code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 8, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
         { id: "tp-4", code: "SC-004", name: t('mockData.testPoints.multiFactorAuth'), scenarioCategory: t('caseReview.scenarioCategories.security'), source: "PRD", caseCount: 5, reviewResult: "pending", comparisonStatus: "deleted", reviewHistory: [] },
       ],
@@ -241,8 +241,8 @@ const useMockDimensions = (): TestDimension[] => {
       id: "dim-2",
       name: `02-${t('mockData.dimensions.businessFunction')}`,
       testPoints: [
-        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
+        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
       ],
     },
     {

@@ -130,7 +130,7 @@ export default function CaseReviewDetail() {
   const { caseId, workspaceId, recordId, batchId } = useParams<{ caseId: string; workspaceId: string; recordId: string; batchId?: string }>();
   const [searchParams] = useSearchParams();
   const reviewStatus = searchParams.get("status");
-  const isAdopted = reviewStatus === "adopted";
+  const isAdopted = reviewStatus === "adopted" || reviewStatus === "improved";
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
