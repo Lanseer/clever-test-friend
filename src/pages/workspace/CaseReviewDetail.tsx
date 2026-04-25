@@ -244,7 +244,10 @@ export default function CaseReviewDetail() {
       </div>
 
       {/* Two columns with visible divider */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-0 rounded-xl border bg-card overflow-hidden">
+      <div className={cn(
+        "grid grid-cols-1 gap-0 rounded-xl border bg-card overflow-hidden",
+        isAdopted && "lg:grid-cols-[1fr_auto_1fr]"
+      )}>
         {/* Left: Detail + Source */}
         <div className="p-6 space-y-6">
           <div>
