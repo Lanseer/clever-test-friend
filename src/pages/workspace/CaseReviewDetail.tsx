@@ -436,6 +436,8 @@ export default function CaseReviewDetail() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* Live Test Records Dialog */}
