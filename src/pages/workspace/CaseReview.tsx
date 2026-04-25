@@ -621,7 +621,7 @@ export default function CaseReview() {
     const base = batchId
       ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review`
       : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review`;
-    navigate(`${base}/case/${tp.id}`);
+    navigate(`${base}/case/${tp.id}?status=${tp.reviewResult}`);
   };
 
   const handleReviewResultChange = (dimId: string, tpId: string, result: ReviewResult) => {
