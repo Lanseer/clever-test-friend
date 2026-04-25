@@ -638,8 +638,11 @@ export default function CaseReviewDetail() {
                   return;
                 }
                 setLiveCaseDialogOpen(false);
+                const backUrl = batchId
+                  ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}`
+                  : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}`;
                 navigate(
-                  `/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1&caseIdx=${selectedLiveCaseIdx}`
+                  `/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1&caseIdx=${selectedLiveCaseIdx}&result=failed&editBack=${encodeURIComponent(backUrl)}`
                 );
               }}
               disabled={rows.length === 0}
