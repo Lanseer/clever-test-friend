@@ -187,7 +187,15 @@ export default function Tags() {
             ) : (
               filteredTags.map((tag) => (
                 <TableRow key={tag.id}>
-                  <TableCell className="font-medium">{tag.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <button
+                      type="button"
+                      onClick={() => openEditDialog(tag)}
+                      className="text-primary hover:underline"
+                    >
+                      {tag.name}
+                    </button>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">
                     {tag.description || "-"}
                   </TableCell>
