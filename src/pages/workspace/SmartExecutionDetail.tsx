@@ -107,6 +107,21 @@ const executionPlan = [
 
 const aiReasoning = `The test passed because the login flow completed exactly as expected from start to finish. The test first confirmed that the SCTO Cloud login page opened at the correct URL, that the email and password fields were visible and usable, and that there were no blocking popups or dialogs interfering with the process. It then entered the correct email and verified that the value appeared in the right field, followed by entering the password after confirming the email step had already succeeded. After that, the login button was clicked and the system responded with a "登录成功" message, which showed the credentials were accepted. The browser then redirected from the login page to the User Center page at https://sctocloud.com/user, and the test was able to see user-specific account details like remaining traffic and membership duration. That combination of successful input, success notification, correct redirect, and visible account information is why the test was marked as passed.`;
 
+const aiFailureReasoning = `测试在第 3 步执行失败：页面无法定位到密码输入框元素（选择器 #password 未找到匹配节点），因此无法输入密码，后续登录步骤未能继续。
+
+失败原因分析：
+1. 目标页面的密码输入框 DOM 结构与案例脚本中描述的不一致，实际渲染的元素 id 可能为 "user-password" 或被嵌入在 iframe 中。
+2. 页面加载较慢，元素在脚本执行查找时尚未挂载，缺少必要的等待逻辑。
+3. 案例的 BDD 描述未明确指出密码输入框的定位方式（id / name / placeholder），导致 AI 生成的脚本选择器不准确。
+
+修改案例的建议：
+• 在 "When 用户输入正确的密码" 步骤中补充元素定位特征，例如 placeholder="请输入密码" 或 name="password"。
+• 在 Given 步骤前增加 "And 等待登录页面完全加载" 的前置条件，确保页面渲染完成。
+• 如果密码框在 iframe 中，请在 BDD 中显式说明 iframe 的入口及切换上下文。
+• 更新预期结果，覆盖元素定位失败时的兜底分支（例如显示错误提示）。
+
+请点击右上角「编辑案例」返回案例进行修改后再次执行现场测试。`;
+
 function ArtifactIcon({ type }: { type: ArtifactItem["type"] }) {
   const iconCls = "w-5 h-5 text-muted-foreground";
   switch (type) {
