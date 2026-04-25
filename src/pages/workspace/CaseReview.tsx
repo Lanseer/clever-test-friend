@@ -241,8 +241,8 @@ const useMockDimensions = (): TestDimension[] => {
       id: "dim-2",
       name: `02-${t('mockData.dimensions.businessFunction')}`,
       testPoints: [
-        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
+        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
       ],
     },
     {
