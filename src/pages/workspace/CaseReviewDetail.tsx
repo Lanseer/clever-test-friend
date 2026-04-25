@@ -127,7 +127,7 @@ const replaceCasesInBdd = (
 
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
-  const { caseId, workspaceId } = useParams<{ caseId: string; workspaceId: string }>();
+  const { caseId, workspaceId, recordId, batchId } = useParams<{ caseId: string; workspaceId: string; recordId: string; batchId?: string }>();
   const [searchParams] = useSearchParams();
   const reviewStatus = searchParams.get("status");
   const isAdopted = reviewStatus === "adopted";
