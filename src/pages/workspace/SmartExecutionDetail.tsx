@@ -194,12 +194,36 @@ export default function SmartExecutionDetail() {
             </div>
             <div className="flex flex-col items-end gap-3 shrink-0">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
-                  Completed
-                </Badge>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
-                  Pass
-                </Badge>
+                {isFailedRun ? (
+                  <>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                      Completed
+                    </Badge>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
+                      Fail
+                    </Badge>
+                    {editBackUrl && (
+                      <Button
+                        size="sm"
+                        variant="default"
+                        className="gap-1.5"
+                        onClick={() => navigate(editBackUrl)}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        编辑案例
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                      Completed
+                    </Badge>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                      Pass
+                    </Badge>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -209,10 +233,35 @@ export default function SmartExecutionDetail() {
 
       {/* AI Reasoning */}
       <div className="px-4">
-        <Card className="p-5 border-2 border-green-300 bg-green-50/30">
-          <h2 className="text-lg font-semibold text-green-700 mb-3">AI Reasoning</h2>
-          <p className="text-sm leading-relaxed text-foreground/90">{aiReasoning}</p>
-        </Card>
+        {isFailedRun ? (
+          <Card className="p-5 border-2 border-red-300 bg-red-50/30">
+            <h2 className="text-lg font-semibold text-red-700 mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              AI Reasoning · 失败原因与修改建议
+            </h2>
+            <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
+              {aiFailureReasoning}
+            </p>
+            {editBackUrl && (
+              <div className="mt-4 flex justify-end">
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="gap-1.5"
+                  onClick={() => navigate(editBackUrl)}
+                >
+                  <Edit3 className="w-4 h-4" />
+                  返回案例进行编辑
+                </Button>
+              </div>
+            )}
+          </Card>
+        ) : (
+          <Card className="p-5 border-2 border-green-300 bg-green-50/30">
+            <h2 className="text-lg font-semibold text-green-700 mb-3">AI Reasoning</h2>
+            <p className="text-sm leading-relaxed text-foreground/90">{aiReasoning}</p>
+          </Card>
+        )}
       </div>
 
       {/* Feature Code + Execution Plan */}
