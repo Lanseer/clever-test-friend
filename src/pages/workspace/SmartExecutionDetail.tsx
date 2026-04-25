@@ -18,6 +18,8 @@ import {
   RefreshCw,
   Maximize2,
   Camera,
+  AlertTriangle,
+  Edit3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -105,6 +107,21 @@ const executionPlan = [
 
 const aiReasoning = `The test passed because the login flow completed exactly as expected from start to finish. The test first confirmed that the SCTO Cloud login page opened at the correct URL, that the email and password fields were visible and usable, and that there were no blocking popups or dialogs interfering with the process. It then entered the correct email and verified that the value appeared in the right field, followed by entering the password after confirming the email step had already succeeded. After that, the login button was clicked and the system responded with a "登录成功" message, which showed the credentials were accepted. The browser then redirected from the login page to the User Center page at https://sctocloud.com/user, and the test was able to see user-specific account details like remaining traffic and membership duration. That combination of successful input, success notification, correct redirect, and visible account information is why the test was marked as passed.`;
 
+const aiFailureReasoning = `测试在第 3 步执行失败：页面无法定位到密码输入框元素（选择器 #password 未找到匹配节点），因此无法输入密码，后续登录步骤未能继续。
+
+失败原因分析：
+1. 目标页面的密码输入框 DOM 结构与案例脚本中描述的不一致，实际渲染的元素 id 可能为 "user-password" 或被嵌入在 iframe 中。
+2. 页面加载较慢，元素在脚本执行查找时尚未挂载，缺少必要的等待逻辑。
+3. 案例的 BDD 描述未明确指出密码输入框的定位方式（id / name / placeholder），导致 AI 生成的脚本选择器不准确。
+
+修改案例的建议：
+• 在 "When 用户输入正确的密码" 步骤中补充元素定位特征，例如 placeholder="请输入密码" 或 name="password"。
+• 在 Given 步骤前增加 "And 等待登录页面完全加载" 的前置条件，确保页面渲染完成。
+• 如果密码框在 iframe 中，请在 BDD 中显式说明 iframe 的入口及切换上下文。
+• 更新预期结果，覆盖元素定位失败时的兜底分支（例如显示错误提示）。
+
+请点击右上角「编辑案例」返回案例进行修改后再次执行现场测试。`;
+
 function ArtifactIcon({ type }: { type: ArtifactItem["type"] }) {
   const iconCls = "w-5 h-5 text-muted-foreground";
   switch (type) {
@@ -124,6 +141,8 @@ export default function SmartExecutionDetail() {
   const { workspaceId } = useParams();
   const [searchParams] = useSearchParams();
   const isLiveEntry = searchParams.get("live") === "1";
+  const isFailedRun = searchParams.get("result") === "failed";
+  const editBackUrl = searchParams.get("editBack") || "";
 
   const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
@@ -175,12 +194,36 @@ export default function SmartExecutionDetail() {
             </div>
             <div className="flex flex-col items-end gap-3 shrink-0">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
-                  Completed
-                </Badge>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
-                  Pass
-                </Badge>
+                {isFailedRun ? (
+                  <>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                      Completed
+                    </Badge>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
+                      Fail
+                    </Badge>
+                    {editBackUrl && (
+                      <Button
+                        size="sm"
+                        variant="default"
+                        className="gap-1.5"
+                        onClick={() => navigate(editBackUrl)}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        编辑案例
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                      Completed
+                    </Badge>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                      Pass
+                    </Badge>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -190,10 +233,35 @@ export default function SmartExecutionDetail() {
 
       {/* AI Reasoning */}
       <div className="px-4">
-        <Card className="p-5 border-2 border-green-300 bg-green-50/30">
-          <h2 className="text-lg font-semibold text-green-700 mb-3">AI Reasoning</h2>
-          <p className="text-sm leading-relaxed text-foreground/90">{aiReasoning}</p>
-        </Card>
+        {isFailedRun ? (
+          <Card className="p-5 border-2 border-red-300 bg-red-50/30">
+            <h2 className="text-lg font-semibold text-red-700 mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              AI Reasoning · 失败原因与修改建议
+            </h2>
+            <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
+              {aiFailureReasoning}
+            </p>
+            {editBackUrl && (
+              <div className="mt-4 flex justify-end">
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="gap-1.5"
+                  onClick={() => navigate(editBackUrl)}
+                >
+                  <Edit3 className="w-4 h-4" />
+                  返回案例进行编辑
+                </Button>
+              </div>
+            )}
+          </Card>
+        ) : (
+          <Card className="p-5 border-2 border-green-300 bg-green-50/30">
+            <h2 className="text-lg font-semibold text-green-700 mb-3">AI Reasoning</h2>
+            <p className="text-sm leading-relaxed text-foreground/90">{aiReasoning}</p>
+          </Card>
+        )}
       </div>
 
       {/* Feature Code + Execution Plan */}
