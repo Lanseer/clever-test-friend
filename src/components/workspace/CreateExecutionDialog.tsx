@@ -163,7 +163,7 @@ export function CreateExecutionDialog({
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
-                场景 <span className="text-destructive">*</span>
+                测试 <span className="text-destructive">*</span>
               </Label>
               <Select value={selectedCase} onValueChange={setSelectedCase}>
                 <SelectTrigger>
