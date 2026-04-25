@@ -126,6 +126,8 @@ export default function SmartExecutionDetail() {
   const { workspaceId } = useParams();
   const [searchParams] = useSearchParams();
   const isLiveEntry = searchParams.get("live") === "1";
+  const isFailedRun = searchParams.get("result") === "failed";
+  const editBackUrl = searchParams.get("editBack") || "";
 
   const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
