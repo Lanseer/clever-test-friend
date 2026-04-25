@@ -127,7 +127,7 @@ const replaceCasesInBdd = (
 
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
-  const { caseId, workspaceId } = useParams<{ caseId: string; workspaceId: string }>();
+  const { caseId, workspaceId, recordId, batchId } = useParams<{ caseId: string; workspaceId: string; recordId: string; batchId?: string }>();
   const [searchParams] = useSearchParams();
   const reviewStatus = searchParams.get("status");
   const isAdopted = reviewStatus === "adopted";
@@ -197,7 +197,12 @@ export default function CaseReviewDetail() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => {
+            const target = batchId
+              ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review`
+              : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review`;
+            navigate(target);
+          }}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
