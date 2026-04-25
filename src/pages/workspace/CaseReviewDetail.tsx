@@ -269,6 +269,8 @@ export default function CaseReviewDetail() {
           </div>
         </div>
 
+        {isAdopted && (
+        <>
         {/* Vertical divider */}
         <div className="hidden lg:block w-px bg-border" />
 
