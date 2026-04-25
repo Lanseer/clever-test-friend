@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2, PlayCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -128,6 +128,9 @@ const replaceCasesInBdd = (
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
   const { caseId, workspaceId } = useParams<{ caseId: string; workspaceId: string }>();
+  const [searchParams] = useSearchParams();
+  const reviewStatus = searchParams.get("status");
+  const isAdopted = reviewStatus === "adopted";
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
@@ -212,32 +215,39 @@ export default function CaseReviewDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setScriptDialogOpen(true)}
-            className="gap-2"
-          >
-            <FileCode className="w-4 h-4" />
-            现场测试记录
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
-              setSelectedLiveCaseIdx("");
-              setLiveCaseDialogOpen(true);
-            }}
-          >
-            <PlayCircle className="w-4 h-4" />
-            现场测试
-          </Button>
+          {isAdopted && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setScriptDialogOpen(true)}
+                className="gap-2"
+              >
+                <FileCode className="w-4 h-4" />
+                现场测试记录
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="gap-2"
+                onClick={() => {
+                  setSelectedLiveCaseIdx("");
+                  setLiveCaseDialogOpen(true);
+                }}
+              >
+                <PlayCircle className="w-4 h-4" />
+                现场测试
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Two columns with visible divider */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-0 rounded-xl border bg-card overflow-hidden">
+      <div className={cn(
+        "grid grid-cols-1 gap-0 rounded-xl border bg-card overflow-hidden",
+        isAdopted && "lg:grid-cols-[1fr_auto_1fr]"
+      )}>
         {/* Left: Detail + Source */}
         <div className="p-6 space-y-6">
           <div>
@@ -259,6 +269,8 @@ export default function CaseReviewDetail() {
           </div>
         </div>
 
+        {isAdopted && (
+        <>
         {/* Vertical divider */}
         <div className="hidden lg:block w-px bg-border" />
 
@@ -424,6 +436,8 @@ export default function CaseReviewDetail() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* Live Test Records Dialog */}
