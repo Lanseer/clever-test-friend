@@ -204,7 +204,16 @@ export default function SmartExecution() {
                         </button>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={cn("font-normal", status.className)}>
+                        <button
+                          onClick={() => {
+                            setActiveScenarioId(exec.scenarioId);
+                            setScenarioOpen(true);
+                          }}
+                          className="font-mono text-sm text-primary hover:underline"
+                        >
+                          {exec.scenarioId}
+                        </button>
+                      </TableCell>
                           {status.label}
                         </Badge>
                       </TableCell>
