@@ -31,11 +31,13 @@ interface ExecutionRecord {
   creator: string;
   startTime: string;
   endTime: string;
+  scenarioId: string;
 }
 
 const mockExecutions: ExecutionRecord[] = [
   {
     id: "e1",
+    scenarioId: "SC-1001",
     name: "用户登录回归执行",
     status: "completed",
     testStatus: "passed",
