@@ -351,7 +351,7 @@ export default function CaseReviewDetail() {
             <div className="space-y-3">
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <Globe className="w-4 h-4" />
-                应用地址
+                环境
               </Label>
               <Input
                 value={appUrl}
