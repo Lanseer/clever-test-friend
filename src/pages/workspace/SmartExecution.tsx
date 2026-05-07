@@ -18,6 +18,7 @@ import {
   CreateExecutionDialog,
   type CreateExecutionData,
 } from "@/components/workspace/CreateExecutionDialog";
+import { ScenarioDetailDialog } from "@/components/workspace/ScenarioDetailDialog";
 
 interface ExecutionRecord {
   id: string;
