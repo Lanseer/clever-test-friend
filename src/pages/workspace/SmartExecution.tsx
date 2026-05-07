@@ -51,6 +51,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e2",
+    scenarioId: "SC-1002",
     name: "支付流程冒烟测试",
     status: "running",
     testStatus: "pending",
@@ -64,6 +65,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e3",
+    scenarioId: "SC-1003",
     name: "订单管理集成验证",
     status: "completed",
     testStatus: "partial",
@@ -77,6 +79,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e4",
+    scenarioId: "SC-1004",
     name: "商品搜索性能测试",
     status: "failed",
     testStatus: "failed",
@@ -90,6 +93,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e5",
+    scenarioId: "SC-1005",
     name: "购物车功能验证",
     status: "draft",
     testStatus: "pending",
