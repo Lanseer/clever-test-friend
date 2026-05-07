@@ -18,6 +18,7 @@ import {
   CreateExecutionDialog,
   type CreateExecutionData,
 } from "@/components/workspace/CreateExecutionDialog";
+import { ScenarioDetailDialog } from "@/components/workspace/ScenarioDetailDialog";
 
 interface ExecutionRecord {
   id: string;
@@ -31,11 +32,13 @@ interface ExecutionRecord {
   creator: string;
   startTime: string;
   endTime: string;
+  scenarioId: string;
 }
 
 const mockExecutions: ExecutionRecord[] = [
   {
     id: "e1",
+    scenarioId: "SC-1001",
     name: "用户登录回归执行",
     status: "completed",
     testStatus: "passed",
@@ -49,6 +52,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e2",
+    scenarioId: "SC-1002",
     name: "支付流程冒烟测试",
     status: "running",
     testStatus: "pending",
@@ -62,6 +66,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e3",
+    scenarioId: "SC-1003",
     name: "订单管理集成验证",
     status: "completed",
     testStatus: "partial",
@@ -75,6 +80,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e4",
+    scenarioId: "SC-1004",
     name: "商品搜索性能测试",
     status: "failed",
     testStatus: "failed",
@@ -88,6 +94,7 @@ const mockExecutions: ExecutionRecord[] = [
   },
   {
     id: "e5",
+    scenarioId: "SC-1005",
     name: "购物车功能验证",
     status: "draft",
     testStatus: "pending",
@@ -124,7 +131,8 @@ export default function SmartExecution() {
   const handleCreate = () => {
     setCreateOpen(true);
   };
-
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const handleConfirmCreate = (data: CreateExecutionData) => {
     const count =
       data.mode === "single"
@@ -163,6 +171,7 @@ export default function SmartExecution() {
             <TableHeader>
               <TableRow className="bg-muted/40">
                 <TableHead className="min-w-[180px]">名称</TableHead>
+                <TableHead>场景编号</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>测试状态</TableHead>
                 <TableHead>执行案例</TableHead>
@@ -176,7 +185,7 @@ export default function SmartExecution() {
             <TableBody>
               {executions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
                   </TableCell>
                 </TableRow>
@@ -192,6 +201,17 @@ export default function SmartExecution() {
                           className="text-primary hover:underline text-left"
                         >
                           {exec.name}
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          onClick={() => {
+                            setActiveScenarioId(exec.scenarioId);
+                            setScenarioOpen(true);
+                          }}
+                          className="font-mono text-sm text-primary hover:underline"
+                        >
+                          {exec.scenarioId}
                         </button>
                       </TableCell>
                       <TableCell>
@@ -244,6 +264,11 @@ export default function SmartExecution() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         onConfirm={handleConfirmCreate}
+      />
+      <ScenarioDetailDialog
+        open={scenarioOpen}
+        onOpenChange={setScenarioOpen}
+        scenarioId={activeScenarioId}
       />
     </div>
   );
