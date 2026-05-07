@@ -98,7 +98,13 @@ Response 200:
 
   // Use caseId to deterministically select a source
   const index = caseId ? parseInt(caseId.replace(/\D/g, "") || "0") % sources.length : 0;
-  return sources[index];
+  const testMethods = ["边界值测试", "等价类测试", "场景法测试", "异常流测试"];
+  const testMethod = testMethods[index % testMethods.length];
+  const source = sources[index];
+  return {
+    ...source,
+    contentSnippet: `<p><strong>测试方法：</strong>${testMethod}</p>\n${source.contentSnippet}`,
+  };
 }
 
 interface CaseSourceInfoProps {
