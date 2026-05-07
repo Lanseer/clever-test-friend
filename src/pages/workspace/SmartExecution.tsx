@@ -214,6 +214,8 @@ export default function SmartExecution() {
                           {exec.scenarioId}
                         </button>
                       </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn("font-normal", status.className)}>
                           {status.label}
                         </Badge>
                       </TableCell>
