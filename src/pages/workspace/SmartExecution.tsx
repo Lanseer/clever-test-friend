@@ -171,6 +171,7 @@ export default function SmartExecution() {
             <TableHeader>
               <TableRow className="bg-muted/40">
                 <TableHead className="min-w-[180px]">名称</TableHead>
+                <TableHead>场景编号</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>测试状态</TableHead>
                 <TableHead>执行案例</TableHead>
