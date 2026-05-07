@@ -265,6 +265,11 @@ export default function SmartExecution() {
         onOpenChange={setCreateOpen}
         onConfirm={handleConfirmCreate}
       />
+      <ScenarioDetailDialog
+        open={scenarioOpen}
+        onOpenChange={setScenarioOpen}
+        scenarioId={activeScenarioId}
+      />
     </div>
   );
 }
