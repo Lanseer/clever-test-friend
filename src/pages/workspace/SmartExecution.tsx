@@ -131,7 +131,8 @@ export default function SmartExecution() {
   const handleCreate = () => {
     setCreateOpen(true);
   };
-
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const handleConfirmCreate = (data: CreateExecutionData) => {
     const count =
       data.mode === "single"
