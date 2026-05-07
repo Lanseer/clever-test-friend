@@ -185,7 +185,7 @@ export default function SmartExecution() {
             <TableBody>
               {executions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
                   </TableCell>
                 </TableRow>
