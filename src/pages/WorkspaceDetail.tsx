@@ -36,6 +36,7 @@ import Environment from "./workspace/Environment";
 import SmartExecution from "./workspace/SmartExecution";
 import SmartExecutionCases from "./workspace/SmartExecutionCases";
 import SmartExecutionDetail from "./workspace/SmartExecutionDetail";
+import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
