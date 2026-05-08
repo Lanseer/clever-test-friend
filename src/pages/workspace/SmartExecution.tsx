@@ -128,11 +128,16 @@ export default function SmartExecution() {
   const { workspaceId } = useParams();
   const [executions] = useState<ExecutionRecord[]>(mockExecutions);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTag, setActiveTag] = useState<string>("");
   const [createOpen, setCreateOpen] = useState(false);
 
-  const filteredExecutions = executions.filter((exec) =>
-    exec.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const allTags = Array.from(new Set(executions.flatMap((exec) => exec.tags)));
+
+  const filteredExecutions = executions.filter((exec) => {
+    const matchesName = exec.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTag = !activeTag || exec.tags.includes(activeTag);
+    return matchesName && matchesTag;
+  });
 
   const handleCreate = () => {
     setCreateOpen(true);
@@ -172,14 +177,41 @@ export default function SmartExecution() {
 
       {/* List */}
       <div className="flex-1 overflow-auto p-4 space-y-3">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="搜索名称..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative max-w-sm flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="搜索名称..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs text-muted-foreground mr-1">标签:</span>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                className={cn(
+                  "text-xs px-2 py-0.5 rounded-full border transition-colors",
+                  activeTag === tag
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/50"
+                )}
+              >
+                {tag}
+              </button>
+            ))}
+            {activeTag && (
+              <button
+                onClick={() => setActiveTag("")}
+                className="text-xs text-muted-foreground underline hover:text-foreground ml-1"
+              >
+                清除
+              </button>
+            )}
+          </div>
         </div>
         <Card className="overflow-hidden">
           <Table>
