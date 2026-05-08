@@ -261,7 +261,7 @@ export function TestSpriteButton() {
       >
         <Sparkles className="w-6 h-6" />
         <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center">
-          {mockGeneratedCases.length}
+          {mockTodoItems.length}
         </span>
       </button>
 
