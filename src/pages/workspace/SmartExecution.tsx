@@ -100,20 +100,6 @@ const mockExecutions: ExecutionRecord[] = [
     startTime: "2026-02-08 10:00",
     endTime: "2026-02-08 11:30",
   },
-  {
-    id: "e5",
-    scenarioId: "SC-1005",
-    name: "购物车功能验证",
-    status: "draft",
-    testStatus: "pending",
-    completedCases: 0,
-    totalCases: 4,
-    tags: ["购物车"],
-    environment: "SIT-01",
-    creator: "孙七",
-    startTime: "-",
-    endTime: "-",
-  },
 ];
 
 const statusConfig: Record<ExecutionRecord["status"], { label: string; className: string }> = {
@@ -260,9 +246,13 @@ export default function SmartExecution() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={cn("font-normal", testStatus.className)}>
-                          {testStatus.label}
-                        </Badge>
+                        {exec.status === "failed" ? (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        ) : (
+                          <Badge variant="outline" className={cn("font-normal", testStatus.className)}>
+                            {testStatus.label}
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
                         <span className="font-mono text-sm">
