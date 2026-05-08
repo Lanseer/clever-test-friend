@@ -205,7 +205,7 @@ export default function SmartExecution() {
                   </TableCell>
                 </TableRow>
               ) : (
-                executions.map((exec) => {
+                filteredExecutions.map((exec) => {
                   const status = statusConfig[exec.status];
                   const testStatus = testStatusConfig[exec.testStatus];
                   return (
