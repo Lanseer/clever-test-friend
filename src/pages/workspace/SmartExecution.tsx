@@ -127,7 +127,12 @@ export default function SmartExecution() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
   const [executions] = useState<ExecutionRecord[]>(mockExecutions);
+  const [searchQuery, setSearchQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+
+  const filteredExecutions = executions.filter((exec) =>
+    exec.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleCreate = () => {
     setCreateOpen(true);
