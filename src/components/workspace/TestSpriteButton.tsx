@@ -8,16 +8,21 @@ import {
   ListTodo,
   CheckCircle,
   AlertCircle,
+  FlaskConical,
+  PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface TaskSummary {
   total: number;
 }
 
-interface GeneratedCase {
+type TodoType = "design" | "execution";
+
+interface TodoItem {
   id: string;
   taskId: string;
   name: string;
@@ -25,17 +30,25 @@ interface GeneratedCase {
   progress: number; // 0-100
   reviewedCount: number;
   totalCount: number;
+  type: TodoType;
+  statusLabel?: string;
 }
 
 const mockTaskSummary: TaskSummary = {
   total: 12,
 };
 
-const mockGeneratedCases: GeneratedCase[] = [
-  { id: "1", taskId: "1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", progress: 75, reviewedCount: 18, totalCount: 24 },
-  { id: "2", taskId: "2", name: "2026-01-22支付流程测试案例", version: "V1.2", progress: 30, reviewedCount: 5, totalCount: 18 },
-  { id: "3", taskId: "3", name: "2026-01-21订单管理测试案例", version: "V0.8", progress: 0, reviewedCount: 0, totalCount: 32 },
-  { id: "4", taskId: "5", name: "2026-01-20购物车功能测试案例", version: "V1.1", progress: 60, reviewedCount: 12, totalCount: 20 },
+const mockTodoItems: TodoItem[] = [
+  // 智能设计案例
+  { id: "d1", taskId: "1", name: "2026-01-23用户登录模块测试案例", version: "V1.0", progress: 75, reviewedCount: 18, totalCount: 24, type: "design" },
+  { id: "d2", taskId: "2", name: "2026-01-22支付流程测试案例", version: "V1.2", progress: 30, reviewedCount: 5, totalCount: 18, type: "design" },
+  { id: "d3", taskId: "3", name: "2026-01-21订单管理测试案例", version: "V0.8", progress: 0, reviewedCount: 0, totalCount: 32, type: "design" },
+  { id: "d4", taskId: "5", name: "2026-01-20购物车功能测试案例", version: "V1.1", progress: 60, reviewedCount: 12, totalCount: 20, type: "design" },
+  // 智能执行任务
+  { id: "e1", taskId: "e1", name: "用户登录模块现场测试", version: "场景-001", progress: 100, reviewedCount: 5, totalCount: 5, type: "execution", statusLabel: "4成功 1失败" },
+  { id: "e2", taskId: "e2", name: "支付流程现场测试", version: "场景-002", progress: 60, reviewedCount: 3, totalCount: 5, type: "execution", statusLabel: "3成功 2待执行" },
+  { id: "e3", taskId: "e3", name: "订单管理现场测试", version: "场景-003", progress: 0, reviewedCount: 0, totalCount: 4, type: "execution", statusLabel: "未开始" },
+  { id: "e4", taskId: "e4", name: "购物车功能现场测试", version: "场景-004", progress: 80, reviewedCount: 4, totalCount: 5, type: "execution", statusLabel: "4成功 1待执行" },
 ];
 
 export function TestSpriteButton() {
