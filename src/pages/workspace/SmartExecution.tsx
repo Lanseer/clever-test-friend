@@ -194,12 +194,12 @@ export default function SmartExecution() {
               className="pl-10"
             />
           </div>
-          <Select value={activeTag} onValueChange={(value) => setActiveTag(value)}>
+          <Select value={activeTag || "all"} onValueChange={(value) => setActiveTag(value === "all" ? "" : value)}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="选择标签..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">全部</SelectItem>
+              <SelectItem value="all">全部</SelectItem>
               {allTags.map((tag) => (
                 <SelectItem key={tag} value={tag}>{tag}</SelectItem>
               ))}
