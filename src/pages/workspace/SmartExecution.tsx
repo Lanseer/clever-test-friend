@@ -198,7 +198,7 @@ export default function SmartExecution() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {executions.length === 0 ? (
+              {filteredExecutions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
