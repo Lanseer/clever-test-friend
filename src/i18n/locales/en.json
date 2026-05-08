@@ -118,12 +118,16 @@
     "todoItems": "To-do items",
     "yesterdayItems": {
       "completedCases": "Completed 18 case reviews for 'User Login Module'",
-      "initiatedReview": "Initiated 'Payment Flow' expert review"
+      "initiatedReview": "Initiated 'Payment Flow' expert review",
+      "completedExecution": "Completed 'User Login Regression Execution', all 12 cases passed",
+      "failedExecution": "'Payment Flow Smoke Test' execution failed, 3 cases not passed"
     },
     "todoItemsList": {
       "pendingCases": "6 cases pending review",
       "notStarted": "'Order Management Test Cases' not yet started",
-      "reviewDeadline": "Expert review deadline in 3 days"
+      "reviewDeadline": "Expert review deadline in 3 days",
+      "pendingExecution": "'Order Management Integration Test' is running, please monitor",
+      "retryFailedExecution": "'Product Search Performance Test' failed, suggest re-executing"
     }
   },
   "smartDesign": {
