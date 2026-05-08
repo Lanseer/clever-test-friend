@@ -13,6 +13,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -187,31 +194,17 @@ export default function SmartExecution() {
               className="pl-10"
             />
           </div>
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs text-muted-foreground mr-1">标签:</span>
-            {allTags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
-                className={cn(
-                  "text-xs px-2 py-0.5 rounded-full border transition-colors",
-                  activeTag === tag
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-muted-foreground border-border hover:border-primary/50"
-                )}
-              >
-                {tag}
-              </button>
-            ))}
-            {activeTag && (
-              <button
-                onClick={() => setActiveTag("")}
-                className="text-xs text-muted-foreground underline hover:text-foreground ml-1"
-              >
-                清除
-              </button>
-            )}
-          </div>
+          <Select value={activeTag} onValueChange={(value) => setActiveTag(value)}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="选择标签..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">全部</SelectItem>
+              {allTags.map((tag) => (
+                <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Card className="overflow-hidden">
           <Table>
