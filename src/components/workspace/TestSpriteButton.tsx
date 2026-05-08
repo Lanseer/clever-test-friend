@@ -343,25 +343,45 @@ export function TestSpriteButton() {
           <ScrollArea className="h-full">
             <div className="p-3 space-y-2">
               <div className="text-xs text-muted-foreground mb-2">{t('xiaoLiang.todoItems')}</div>
-              {mockGeneratedCases.map((caseItem) => (
+              {mockTodoItems.map((item) => (
                 <div
-                  key={caseItem.id}
+                  key={item.id}
                   className="p-2.5 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors group"
-                  onClick={() => handleNavigateToTask(caseItem.taskId)}
+                  onClick={() => {
+                    if (item.type === "design") {
+                      handleNavigateToTask(item.taskId);
+                    } else {
+                      navigate(`/workspace/${workspaceId}/smart-execution`);
+                      setIsOpen(false);
+                    }
+                  }}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm truncate flex-1">{caseItem.name}_{caseItem.version}</span>
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] px-1 py-0 h-4",
+                          item.type === "design"
+                            ? "bg-violet-500/10 text-violet-600 border-violet-200"
+                            : "bg-emerald-500/10 text-emerald-600 border-emerald-200"
+                        )}
+                      >
+                        {item.type === "design" ? "智能设计" : "智能执行"}
+                      </Badge>
+                      <span className="text-sm truncate">{item.name}_{item.version}</span>
+                    </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className={cn("h-full rounded-full transition-all", getProgressColor(caseItem.progress))}
-                        style={{ width: `${caseItem.progress}%` }}
+                        className={cn("h-full rounded-full transition-all", getProgressColor(item.progress))}
+                        style={{ width: `${item.progress}%` }}
                       />
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {caseItem.reviewedCount}/{caseItem.totalCount}
+                      {item.statusLabel || `${item.reviewedCount}/${item.totalCount}`}
                     </span>
                   </div>
                 </div>
