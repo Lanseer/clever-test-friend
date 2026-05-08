@@ -36,6 +36,7 @@ import Environment from "./workspace/Environment";
 import SmartExecution from "./workspace/SmartExecution";
 import SmartExecutionCases from "./workspace/SmartExecutionCases";
 import SmartExecutionDetail from "./workspace/SmartExecutionDetail";
+import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
   "scb": { name: "SCB", description: "SCB 测试工作空间" },
@@ -92,6 +93,7 @@ export default function WorkspaceDetail() {
               <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
             </Routes>
           </main>
+          <TestSpriteButton />
         </div>
       </SidebarProvider>
     );
@@ -143,6 +145,7 @@ export default function WorkspaceDetail() {
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </main>
+        <TestSpriteButton />
       </div>
     </SidebarProvider>
   );

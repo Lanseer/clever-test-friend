@@ -300,10 +300,27 @@ export function TestSpriteButton() {
           >
             <div className="flex items-center gap-2">
               <ListTodo className="w-4 h-4" />
-              <span className="text-sm">{t('xiaoLiang.totalTasks')}</span>
+              <span className="text-sm">智能设计任务</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold">{mockTaskSummary.total}</span>
+              <ChevronRight className="w-4 h-4 opacity-60" />
+            </div>
+          </div>
+
+          <div 
+            className="mt-2 bg-white/10 rounded-lg px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-white/20 transition-colors"
+            onClick={() => {
+              navigate(`/workspace/${workspaceId}/smart-execution`);
+              setIsOpen(false);
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <ListTodo className="w-4 h-4" />
+              <span className="text-sm">智能执行任务</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-bold">8</span>
               <ChevronRight className="w-4 h-4 opacity-60" />
             </div>
           </div>
