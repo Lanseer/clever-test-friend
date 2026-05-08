@@ -128,11 +128,16 @@ export default function SmartExecution() {
   const { workspaceId } = useParams();
   const [executions] = useState<ExecutionRecord[]>(mockExecutions);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTag, setActiveTag] = useState<string>("");
   const [createOpen, setCreateOpen] = useState(false);
 
-  const filteredExecutions = executions.filter((exec) =>
-    exec.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const allTags = Array.from(new Set(executions.flatMap((exec) => exec.tags)));
+
+  const filteredExecutions = executions.filter((exec) => {
+    const matchesName = exec.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTag = !activeTag || exec.tags.includes(activeTag);
+    return matchesName && matchesTag;
+  });
 
   const handleCreate = () => {
     setCreateOpen(true);
