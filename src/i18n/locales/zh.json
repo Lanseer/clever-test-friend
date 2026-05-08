@@ -118,12 +118,16 @@
     "todoItems": "待办事项",
     "yesterdayItems": {
       "completedCases": "完成了「用户登录模块」18个用例审查",
-      "initiatedReview": "发起了「支付流程」专家评审"
+      "initiatedReview": "发起了「支付流程」专家评审",
+      "completedExecution": "完成了「用户登录回归执行」，12条案例全部通过",
+      "failedExecution": "「支付流程冒烟测试」执行失败，3条案例未通过"
     },
     "todoItemsList": {
       "pendingCases": "还有 6 个用例待审查",
       "notStarted": "「订单管理测试案例」尚未开始审查",
-      "reviewDeadline": "专家评审将在 3 天后截止"
+      "reviewDeadline": "专家评审将在 3 天后截止",
+      "pendingExecution": "「订单管理集成验证」执行中，请持续关注",
+      "retryFailedExecution": "「商品搜索性能测试」执行失败，建议重新执行"
     }
   },
   "smartDesign": {
