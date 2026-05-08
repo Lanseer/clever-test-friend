@@ -246,7 +246,7 @@ export default function SmartExecution() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {exec.status === "failed" ? (
+                        {exec.status === "failed" || exec.status === "running" ? (
                           <span className="text-sm text-muted-foreground">-</span>
                         ) : (
                           <Badge variant="outline" className={cn("font-normal", testStatus.className)}>
