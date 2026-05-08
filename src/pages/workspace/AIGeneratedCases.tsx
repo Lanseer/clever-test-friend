@@ -424,8 +424,6 @@ export default function AIGeneratedCases() {
         newVersion="V0.4"
       />
 
-      {/* Floating Test Sprite Button */}
-      <TestSpriteButton />
 
       {/* Create Task Dialog */}
       <CreateSmartDesignTaskDialog
