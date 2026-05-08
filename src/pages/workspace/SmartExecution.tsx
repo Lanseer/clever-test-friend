@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Plus, PlayCircle } from "lucide-react";
+import { Plus, PlayCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -126,7 +127,12 @@ export default function SmartExecution() {
   const navigate = useNavigate();
   const { workspaceId } = useParams();
   const [executions] = useState<ExecutionRecord[]>(mockExecutions);
+  const [searchQuery, setSearchQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+
+  const filteredExecutions = executions.filter((exec) =>
+    exec.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleCreate = () => {
     setCreateOpen(true);
@@ -165,7 +171,16 @@ export default function SmartExecution() {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4 space-y-3">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="搜索名称..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
         <Card className="overflow-hidden">
           <Table>
             <TableHeader>
@@ -183,14 +198,14 @@ export default function SmartExecution() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {executions.length === 0 ? (
+              {filteredExecutions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
                   </TableCell>
                 </TableRow>
               ) : (
-                executions.map((exec) => {
+                filteredExecutions.map((exec) => {
                   const status = statusConfig[exec.status];
                   const testStatus = testStatusConfig[exec.testStatus];
                   return (
