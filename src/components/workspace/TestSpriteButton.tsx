@@ -141,11 +141,15 @@ export function TestSpriteButton() {
     yesterdayDone: [
       t('xiaoLiang.yesterdayItems.completedCases'),
       t('xiaoLiang.yesterdayItems.initiatedReview'),
+      t('xiaoLiang.yesterdayItems.completedExecution'),
+      t('xiaoLiang.yesterdayItems.failedExecution'),
     ],
     todayTodo: [
       t('xiaoLiang.todoItemsList.pendingCases'),
       t('xiaoLiang.todoItemsList.notStarted'),
       t('xiaoLiang.todoItemsList.reviewDeadline'),
+      t('xiaoLiang.todoItemsList.pendingExecution'),
+      t('xiaoLiang.todoItemsList.retryFailedExecution'),
     ],
   };
 
