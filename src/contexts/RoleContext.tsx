@@ -11,7 +11,17 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<UserRole>("admin");
+  const [role, setRoleState] = useState<UserRole>(() => {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+    return stored === "admin" || stored === "user" ? (stored as UserRole) : "user";
+  });
+
+  const setRole = (newRole: UserRole) => {
+    setRoleState(newRole);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("userRole", newRole);
+    }
+  };
 
   return (
     <RoleContext.Provider value={{ role, setRole, isAdmin: role === "admin" }}>
