@@ -40,10 +40,15 @@ const getMockBddContent = () => `Feature: 用户登录功能
     And 系统应该显示欢迎消息
 
   Cases:
-    | 编号    | 用户名    | 密码        | 预期结果   |
-    | TC-001  | testuser  | Password123 | 登录成功   |
-    | TC-002  | admin     | Admin@456   | 登录成功   |
-    | TC-003  | user01    | User#789    | 登录成功   |`;
+    | 编号    | 用户名      | 密码         | 预期结果           |
+    | TC-001  | testuser    | Password123  | 登录成功           |
+    | TC-002  | admin       | Admin@456    | 登录成功           |
+    | TC-003  | user01      | User#789     | 登录成功           |
+    | TC-004  | guest       | Guest@2026   | 登录成功并跳转首页 |
+    | TC-005  | dev_user    | Dev$Pass01   | 登录成功           |
+    | TC-006  | qa.tester   | Qa!Test2026  | 登录成功           |
+    | TC-007  | manager01   | Mgr#Pwd2026  | 登录成功           |
+    | TC-008  | finance     | Fin@2026Sec  | 登录成功并显示财务模块 |`;
 
 const getMockPlaywrightScript = (caseId: string) => `// Playwright 测试脚本: ${caseId}
 import { test, expect } from '@playwright/test';
