@@ -321,15 +321,22 @@ export default function SmartExecutionDetail() {
             </div>
             <div className="flex flex-col items-end gap-3 shrink-0">
               <div className="flex items-center gap-2">
-                {isFailedRun ? (
+                {isFailedRun && !showAsPassed ? (
                   <>
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
                       Completed
                     </Badge>
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
-                      Fail
-                    </Badge>
-                    {editBackUrl && (
+                    {selfHealEnabled ? (
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1 gap-1">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        AI 自愈中
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
+                        Fail
+                      </Badge>
+                    )}
+                    {!selfHealEnabled && editBackUrl && (
                       <Button
                         size="sm"
                         variant="default"
@@ -349,6 +356,12 @@ export default function SmartExecutionDetail() {
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
                       Pass
                     </Badge>
+                    {showAsPassed && (
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1 gap-1">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        AI 自愈成功
+                      </Badge>
+                    )}
                   </>
                 )}
               </div>
