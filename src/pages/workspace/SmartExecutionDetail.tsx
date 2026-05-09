@@ -371,9 +371,61 @@ export default function SmartExecutionDetail() {
       </div>
 
 
+      {/* AI Self-Healing Panel (caseIdx===0) */}
+      {selfHealEnabled && (
+        <div className="px-4 pb-2">
+          <Card className="p-5 border-2 border-purple-300 bg-gradient-to-br from-purple-50/60 to-blue-50/40 space-y-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+              <h2 className="text-lg font-semibold text-purple-800">AI 自愈 · 元素定位修复</h2>
+              {!healingDone && (
+                <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-200 ml-1">
+                  进行中
+                </Badge>
+              )}
+              {healingDone && (
+                <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200 ml-1 gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  已完成
+                </Badge>
+              )}
+            </div>
+            <div className="space-y-2">
+              {healSteps.map((s) => {
+                const active = healPhase === s.phase;
+                const done = healPhase > s.phase;
+                const visible = healPhase >= s.phase;
+                if (!visible) return null;
+                return (
+                  <div
+                    key={s.phase}
+                    className={cn(
+                      "flex items-start gap-2.5 rounded-md p-2.5 text-sm leading-relaxed transition-colors",
+                      active && "bg-purple-100/70 border border-purple-200",
+                      done && "bg-white/70 border border-purple-100",
+                    )}
+                  >
+                    <div className="shrink-0 mt-0.5">
+                      {done ? (
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                      ) : active ? (
+                        <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
+                      ) : (
+                        <Loader2 className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                    <span className={cn(active && "text-purple-900 font-medium")}>{s.text}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* AI Reasoning */}
       <div className="px-4">
-        {isFailedRun ? (
+        {isFailedRun && !showAsPassed ? (
           <Card className="p-5 border-2 border-red-300 bg-red-50/30 space-y-4">
             <div>
               <h2 className="text-lg font-semibold text-red-700 mb-2 flex items-center gap-2">
@@ -394,7 +446,9 @@ export default function SmartExecutionDetail() {
             </div>
 
             <div className="rounded-md border border-amber-200 bg-amber-50/60 p-4">
-              <h3 className="text-sm font-semibold text-amber-800 mb-2">建议修复过程</h3>
+              <h3 className="text-sm font-semibold text-amber-800 mb-2">
+                {selfHealEnabled ? "AI 自愈修复过程" : "建议修复过程"}
+              </h3>
               <ol className="space-y-1.5 text-sm text-foreground/85 list-decimal list-inside">
                 {failureScenario.fixSteps.map((step, i) => (
                   <li key={i} className="leading-relaxed">{step}</li>
@@ -410,7 +464,7 @@ export default function SmartExecutionDetail() {
                   {failureScenario.retryHint}
                 </p>
               </div>
-              {editBackUrl && (
+              {!selfHealEnabled && editBackUrl && (
                 <Button
                   size="sm"
                   variant="default"
@@ -425,8 +479,14 @@ export default function SmartExecutionDetail() {
           </Card>
         ) : (
           <Card className="p-5 border-2 border-green-300 bg-green-50/30">
-            <h2 className="text-lg font-semibold text-green-700 mb-3">AI Reasoning</h2>
-            <p className="text-sm leading-relaxed text-foreground/90">{aiReasoning}</p>
+            <h2 className="text-lg font-semibold text-green-700 mb-3">
+              {showAsPassed ? "AI Reasoning · 自愈后重试通过" : "AI Reasoning"}
+            </h2>
+            <p className="text-sm leading-relaxed text-foreground/90">
+              {showAsPassed
+                ? '案例首次执行因 BDD 中 "登录" 按钮描述不够明确而无法定位元素。AI 自愈模式自动启用：通过视觉模型在登录区域唯一识别出 text="登录" 且 type="submit" 的目标按钮，生成稳定选择器并回写到案例脚本，随后自动重试执行。重试过程中输入账号密码、点击登录、跳转到用户中心均按预期完成，最终判定为 PASS。'
+                : aiReasoning}
+            </p>
           </Card>
         )}
       </div>
