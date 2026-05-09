@@ -570,7 +570,7 @@ export default function CaseReviewDetail() {
 
       {/* Live Test Case Selection Dialog */}
       <Dialog open={liveCaseDialogOpen} onOpenChange={setLiveCaseDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <PlayCircle className="w-5 h-5" />
@@ -583,53 +583,73 @@ export default function CaseReviewDetail() {
                 暂无测试案例，请先在右侧配置中新增案例
               </p>
             ) : (
-              <RadioGroup
-                value={selectedLiveCaseIdx}
-                onValueChange={setSelectedLiveCaseIdx}
-                className="space-y-2"
-              >
-                {rows.map((row, rowIdx) => (
-                  <label
-                    key={rowIdx}
-                    htmlFor={`live-case-${rowIdx}`}
-                    className={cn(
-                      "flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-colors",
-                      selectedLiveCaseIdx === String(rowIdx)
-                        ? "border-primary bg-primary/5"
-                        : "hover:bg-muted/50"
-                    )}
-                  >
-                    <RadioGroupItem
-                      value={String(rowIdx)}
-                      id={`live-case-${rowIdx}`}
-                      className="mt-0.5"
-                    />
-                    <div className="flex-1 space-y-1">
-                      {(() => {
-                        const idColIdx = headers.findIndex((h) => h === "编号");
-                        const caseLabel =
-                          idColIdx !== -1 && row[idColIdx]
-                            ? row[idColIdx]
-                            : `TC-${String(rowIdx + 1).padStart(3, "0")}`;
-                        return (
-                          <div className="text-sm font-medium font-mono">{caseLabel}</div>
-                        );
-                      })()}
-                      <div className="space-y-0.5">
-                        {headers
-                          .map((header, colIdx) => ({ header, colIdx }))
-                          .filter(({ header }) => header !== "编号")
-                          .map(({ header, colIdx }) => (
-                            <div key={colIdx} className="text-xs text-muted-foreground">
-                              <span className="font-medium">{header}：</span>
-                              <span>{row[colIdx] || "-"}</span>
-                            </div>
+              <ScrollArea className="max-h-[55vh]">
+                <RadioGroup
+                  value={selectedLiveCaseIdx}
+                  onValueChange={setSelectedLiveCaseIdx}
+                >
+                  <div className="rounded-md border overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/40 border-b">
+                        <tr className="text-left">
+                          <th className="px-3 py-2 w-10"></th>
+                          {headers.map((h, i) => (
+                            <th
+                              key={i}
+                              className="px-3 py-2 font-medium text-muted-foreground whitespace-nowrap"
+                            >
+                              {h}
+                            </th>
                           ))}
-                      </div>
-                    </div>
-                  </label>
-                ))}
-              </RadioGroup>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row, rowIdx) => {
+                          const isSelected = selectedLiveCaseIdx === String(rowIdx);
+                          return (
+                            <tr
+                              key={rowIdx}
+                              onClick={() => setSelectedLiveCaseIdx(String(rowIdx))}
+                              className={cn(
+                                "border-b last:border-b-0 cursor-pointer transition-colors",
+                                isSelected ? "bg-primary/5" : "hover:bg-muted/40"
+                              )}
+                            >
+                              <td className="px-3 py-2 align-middle">
+                                <RadioGroupItem
+                                  value={String(rowIdx)}
+                                  id={`live-case-${rowIdx}`}
+                                />
+                              </td>
+                              {headers.map((header, colIdx) => {
+                                const isIdCol = header === "编号";
+                                const value =
+                                  row[colIdx] ||
+                                  (isIdCol
+                                    ? `TC-${String(rowIdx + 1).padStart(3, "0")}`
+                                    : "-");
+                                return (
+                                  <td
+                                    key={colIdx}
+                                    className={cn(
+                                      "px-3 py-2 whitespace-nowrap",
+                                      isIdCol
+                                        ? "font-mono text-xs"
+                                        : "text-muted-foreground"
+                                    )}
+                                  >
+                                    {value}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </RadioGroup>
+              </ScrollArea>
             )}
           </div>
           <DialogFooter>
