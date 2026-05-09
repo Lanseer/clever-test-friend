@@ -20,6 +20,9 @@ import {
   Camera,
   AlertTriangle,
   Edit3,
+  Sparkles,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -118,15 +121,15 @@ interface FailureScenario {
 const failureScenarios: FailureScenario[] = [
   {
     category: "脚本自身问题",
-    type: "Gherkin 语法错误",
+    type: "案例描述不清晰 · 元素定位失败",
     reasoning:
-      '测试在第 2 步执行失败：BDD 脚本中的 "When 用户输入正确的密码" 缺少 Given/When/Then 关键字前置层级，AI 解析时报 "Step keyword not recognized"，导致整个 Scenario 无法进入执行阶段。',
+      '测试在第 4 步执行失败：BDD 步骤 "AND I click on the \"登录\" button" 描述较为模糊，页面上同时存在 "登录"、"快速登录"、"登录/注册" 三个候选按钮，AI 在 DOM 中未能唯一匹配到目标元素，抛出 "Element not located: ambiguous selector"。',
     fixSteps: [
-      "检查 Cases 表对应行的 BDD 步骤，补全 Given/When/Then 关键字。",
-      '在 "When 用户输入正确的密码" 之前增加 "And" 连接词，确保步骤层级正确。',
-      "保存并重新解析 BDD，确认无 Gherkin 语法警告。",
+      "AI 自愈模式已自动启用，正在基于上下文（用户名/密码已填写）推断目标按钮。",
+      '通过视觉模型识别出主操作区按钮 text="登录" 且 type="submit"，生成新的稳定选择器。',
+      "已将修复后的选择器回写到案例草稿，并触发自动重试执行。",
     ],
-    retryHint: "修复完成后请点击「编辑案例」返回，再次发起现场测试以重新执行。",
+    retryHint: "AI 已完成自愈修复，正在自动重新执行该案例，无需手工干预。",
   },
   {
     category: "脚本自身问题",
@@ -246,12 +249,39 @@ export default function SmartExecutionDetail() {
   const [searchArtifact, setSearchArtifact] = useState("");
   const [filterType, setFilterType] = useState("all");
 
+  // AI 自愈流程：仅 caseIdx===0（元素定位失败）启用
+  const selfHealEnabled = isFailedRun && caseIdx === 0;
+  // phase: 0 idle, 1 detecting, 2 fixing, 3 fixed, 4 retrying, 5 passed
+  const [healPhase, setHealPhase] = useState(0);
+
   useEffect(() => {
     if (!isLiveEntry) return;
     setIsLiveLoading(true);
     const timer = setTimeout(() => setIsLiveLoading(false), 3000);
     return () => clearTimeout(timer);
   }, [isLiveEntry]);
+
+  useEffect(() => {
+    if (!selfHealEnabled || isLiveLoading) return;
+    setHealPhase(1);
+    const timers = [
+      setTimeout(() => setHealPhase(2), 1500),
+      setTimeout(() => setHealPhase(3), 3500),
+      setTimeout(() => setHealPhase(4), 5000),
+      setTimeout(() => setHealPhase(5), 7500),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [selfHealEnabled, isLiveLoading]);
+
+  const healSteps = [
+    { phase: 1, text: "检测到元素定位异常，正在分析失败上下文..." },
+    { phase: 2, text: "正在尝试修复元素无法定位的问题（基于视觉模型重新识别目标按钮）..." },
+    { phase: 3, text: "很好，问题已经修复！已生成新的稳定选择器并回写到案例脚本。" },
+    { phase: 4, text: "现在让我重新执行案例..." },
+    { phase: 5, text: "案例重试执行成功，登录流程已通过 ✅" },
+  ];
+  const healingDone = healPhase >= 5;
+  const showAsPassed = selfHealEnabled && healingDone;
 
   const filteredArtifacts = mockArtifacts.filter((a) => {
     const matchesSearch = a.name.toLowerCase().includes(searchArtifact.toLowerCase());
@@ -291,15 +321,22 @@ export default function SmartExecutionDetail() {
             </div>
             <div className="flex flex-col items-end gap-3 shrink-0">
               <div className="flex items-center gap-2">
-                {isFailedRun ? (
+                {isFailedRun && !showAsPassed ? (
                   <>
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
                       Completed
                     </Badge>
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
-                      Fail
-                    </Badge>
-                    {editBackUrl && (
+                    {selfHealEnabled ? (
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1 gap-1">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        AI 自愈中
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
+                        Fail
+                      </Badge>
+                    )}
+                    {!selfHealEnabled && editBackUrl && (
                       <Button
                         size="sm"
                         variant="default"
@@ -319,6 +356,12 @@ export default function SmartExecutionDetail() {
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
                       Pass
                     </Badge>
+                    {showAsPassed && (
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1 gap-1">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        AI 自愈成功
+                      </Badge>
+                    )}
                   </>
                 )}
               </div>
@@ -328,9 +371,61 @@ export default function SmartExecutionDetail() {
       </div>
 
 
+      {/* AI Self-Healing Panel (caseIdx===0) */}
+      {selfHealEnabled && (
+        <div className="px-4 pb-2">
+          <Card className="p-5 border-2 border-purple-300 bg-gradient-to-br from-purple-50/60 to-blue-50/40 space-y-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+              <h2 className="text-lg font-semibold text-purple-800">AI 自愈 · 元素定位修复</h2>
+              {!healingDone && (
+                <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-200 ml-1">
+                  进行中
+                </Badge>
+              )}
+              {healingDone && (
+                <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200 ml-1 gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  已完成
+                </Badge>
+              )}
+            </div>
+            <div className="space-y-2">
+              {healSteps.map((s) => {
+                const active = healPhase === s.phase;
+                const done = healPhase > s.phase;
+                const visible = healPhase >= s.phase;
+                if (!visible) return null;
+                return (
+                  <div
+                    key={s.phase}
+                    className={cn(
+                      "flex items-start gap-2.5 rounded-md p-2.5 text-sm leading-relaxed transition-colors",
+                      active && "bg-purple-100/70 border border-purple-200",
+                      done && "bg-white/70 border border-purple-100",
+                    )}
+                  >
+                    <div className="shrink-0 mt-0.5">
+                      {done ? (
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                      ) : active ? (
+                        <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
+                      ) : (
+                        <Loader2 className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                    <span className={cn(active && "text-purple-900 font-medium")}>{s.text}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* AI Reasoning */}
       <div className="px-4">
-        {isFailedRun ? (
+        {isFailedRun && !showAsPassed ? (
           <Card className="p-5 border-2 border-red-300 bg-red-50/30 space-y-4">
             <div>
               <h2 className="text-lg font-semibold text-red-700 mb-2 flex items-center gap-2">
@@ -351,7 +446,9 @@ export default function SmartExecutionDetail() {
             </div>
 
             <div className="rounded-md border border-amber-200 bg-amber-50/60 p-4">
-              <h3 className="text-sm font-semibold text-amber-800 mb-2">建议修复过程</h3>
+              <h3 className="text-sm font-semibold text-amber-800 mb-2">
+                {selfHealEnabled ? "AI 自愈修复过程" : "建议修复过程"}
+              </h3>
               <ol className="space-y-1.5 text-sm text-foreground/85 list-decimal list-inside">
                 {failureScenario.fixSteps.map((step, i) => (
                   <li key={i} className="leading-relaxed">{step}</li>
@@ -367,7 +464,7 @@ export default function SmartExecutionDetail() {
                   {failureScenario.retryHint}
                 </p>
               </div>
-              {editBackUrl && (
+              {!selfHealEnabled && editBackUrl && (
                 <Button
                   size="sm"
                   variant="default"
@@ -382,8 +479,14 @@ export default function SmartExecutionDetail() {
           </Card>
         ) : (
           <Card className="p-5 border-2 border-green-300 bg-green-50/30">
-            <h2 className="text-lg font-semibold text-green-700 mb-3">AI Reasoning</h2>
-            <p className="text-sm leading-relaxed text-foreground/90">{aiReasoning}</p>
+            <h2 className="text-lg font-semibold text-green-700 mb-3">
+              {showAsPassed ? "AI Reasoning · 自愈后重试通过" : "AI Reasoning"}
+            </h2>
+            <p className="text-sm leading-relaxed text-foreground/90">
+              {showAsPassed
+                ? '案例首次执行因 BDD 中 "登录" 按钮描述不够明确而无法定位元素。AI 自愈模式自动启用：通过视觉模型在登录区域唯一识别出 text="登录" 且 type="submit" 的目标按钮，生成稳定选择器并回写到案例脚本，随后自动重试执行。重试过程中输入账号密码、点击登录、跳转到用户中心均按预期完成，最终判定为 PASS。'
+                : aiReasoning}
+            </p>
           </Card>
         )}
       </div>
