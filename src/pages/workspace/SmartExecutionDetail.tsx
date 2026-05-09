@@ -306,7 +306,7 @@ export default function SmartExecutionDetail() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 shrink-0 mt-0.5"
-                onClick={() => navigate(`/workspace/${workspaceId}/smart-execution`)}
+                onClick={() => navigate(-1)}
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
