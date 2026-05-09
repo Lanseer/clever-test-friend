@@ -118,15 +118,15 @@ interface FailureScenario {
 const failureScenarios: FailureScenario[] = [
   {
     category: "脚本自身问题",
-    type: "Gherkin 语法错误",
+    type: "案例描述不清晰 · 元素定位失败",
     reasoning:
-      '测试在第 2 步执行失败：BDD 脚本中的 "When 用户输入正确的密码" 缺少 Given/When/Then 关键字前置层级，AI 解析时报 "Step keyword not recognized"，导致整个 Scenario 无法进入执行阶段。',
+      '测试在第 4 步执行失败：BDD 步骤 "AND I click on the \"登录\" button" 描述较为模糊，页面上同时存在 "登录"、"快速登录"、"登录/注册" 三个候选按钮，AI 在 DOM 中未能唯一匹配到目标元素，抛出 "Element not located: ambiguous selector"。',
     fixSteps: [
-      "检查 Cases 表对应行的 BDD 步骤，补全 Given/When/Then 关键字。",
-      '在 "When 用户输入正确的密码" 之前增加 "And" 连接词，确保步骤层级正确。',
-      "保存并重新解析 BDD，确认无 Gherkin 语法警告。",
+      "AI 自愈模式已自动启用，正在基于上下文（用户名/密码已填写）推断目标按钮。",
+      '通过视觉模型识别出主操作区按钮 text="登录" 且 type="submit"，生成新的稳定选择器。',
+      "已将修复后的选择器回写到案例草稿，并触发自动重试执行。",
     ],
-    retryHint: "修复完成后请点击「编辑案例」返回，再次发起现场测试以重新执行。",
+    retryHint: "AI 已完成自愈修复，正在自动重新执行该案例，无需手工干预。",
   },
   {
     category: "脚本自身问题",
