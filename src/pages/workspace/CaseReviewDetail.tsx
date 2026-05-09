@@ -666,8 +666,10 @@ export default function CaseReviewDetail() {
                 const backUrl = batchId
                   ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}`
                   : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}`;
+                const idxNum = parseInt(selectedLiveCaseIdx, 10) || 0;
+                const runResult = idxNum === 2 ? "passed" : "failed";
                 navigate(
-                  `/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1&caseIdx=${selectedLiveCaseIdx}&result=failed&editBack=${encodeURIComponent(backUrl)}`
+                  `/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1&caseIdx=${selectedLiveCaseIdx}&result=${runResult}&editBack=${encodeURIComponent(backUrl)}`
                 );
               }}
               disabled={rows.length === 0}
