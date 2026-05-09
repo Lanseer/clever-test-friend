@@ -107,20 +107,115 @@ const executionPlan = [
 
 const aiReasoning = `The test passed because the login flow completed exactly as expected from start to finish. The test first confirmed that the SCTO Cloud login page opened at the correct URL, that the email and password fields were visible and usable, and that there were no blocking popups or dialogs interfering with the process. It then entered the correct email and verified that the value appeared in the right field, followed by entering the password after confirming the email step had already succeeded. After that, the login button was clicked and the system responded with a "登录成功" message, which showed the credentials were accepted. The browser then redirected from the login page to the User Center page at https://sctocloud.com/user, and the test was able to see user-specific account details like remaining traffic and membership duration. That combination of successful input, success notification, correct redirect, and visible account information is why the test was marked as passed.`;
 
-const aiFailureReasoning = `测试在第 3 步执行失败：页面无法定位到密码输入框元素（选择器 #password 未找到匹配节点），因此无法输入密码，后续登录步骤未能继续。
+interface FailureScenario {
+  category: string;
+  type: string;
+  reasoning: string;
+  fixSteps: string[];
+  retryHint: string;
+}
 
-失败原因分析：
-1. 目标页面的密码输入框 DOM 结构与案例脚本中描述的不一致，实际渲染的元素 id 可能为 "user-password" 或被嵌入在 iframe 中。
-2. 页面加载较慢，元素在脚本执行查找时尚未挂载，缺少必要的等待逻辑。
-3. 案例的 BDD 描述未明确指出密码输入框的定位方式（id / name / placeholder），导致 AI 生成的脚本选择器不准确。
+const failureScenarios: FailureScenario[] = [
+  {
+    category: "脚本自身问题",
+    type: "Gherkin 语法错误",
+    reasoning:
+      '测试在第 2 步执行失败：BDD 脚本中的 "When 用户输入正确的密码" 缺少 Given/When/Then 关键字前置层级，AI 解析时报 "Step keyword not recognized"，导致整个 Scenario 无法进入执行阶段。',
+    fixSteps: [
+      "检查 Cases 表对应行的 BDD 步骤，补全 Given/When/Then 关键字。",
+      '在 "When 用户输入正确的密码" 之前增加 "And" 连接词，确保步骤层级正确。',
+      "保存并重新解析 BDD，确认无 Gherkin 语法警告。",
+    ],
+    retryHint: "修复完成后请点击「编辑案例」返回，再次发起现场测试以重新执行。",
+  },
+  {
+    category: "脚本自身问题",
+    type: "步骤描述模糊",
+    reasoning:
+      '测试在第 3 步执行失败：步骤 "用户点击登录按钮" 未明确按钮的定位特征，AI 在页面上识别到 2 个候选按钮（"登录"、"快速登录"），错误地点击了 "快速登录"，触发了非预期跳转。',
+    fixSteps: [
+      '在 BDD 步骤中补充按钮的唯一标识，例如 text="登录" 或 id="loginBtn"。',
+      "若页面存在多个相似按钮，请使用更精确的 selector（如 :has-text + class）。",
+      "更新预期结果，明确点击后应跳转到的目标页面 URL。",
+    ],
+    retryHint: "修复 BDD 后请重新发起现场测试，AI 将基于新描述重新识别元素。",
+  },
+  {
+    category: "被测系统/环境问题",
+    type: "页面元素变更",
+    reasoning:
+      '测试在第 3 步执行失败：页面无法定位到密码输入框元素（选择器 #password 未找到匹配节点）。被测系统已升级，密码框 id 由 "password" 修改为 "user-password"，原案例脚本未同步更新。',
+    fixSteps: [
+      "登录被测系统确认密码输入框最新的 id / name / placeholder 值。",
+      '在案例 BDD 中更新元素定位描述，例如改为 name="user-password"。',
+      '增加 "And 等待登录页面完全加载" 的前置等待逻辑，避免 DOM 未挂载。',
+    ],
+    retryHint: "更新元素定位后重新执行现场测试，AI 将按新选择器定位元素。",
+  },
+  {
+    category: "被测系统/环境问题",
+    type: "环境不可用",
+    reasoning:
+      "测试在第 1 步执行失败：访问 https://test.example.com/login 超时（30s），目标环境返回 502 Bad Gateway。环境监控显示该 SIT 环境正在进行例行重启。",
+    fixSteps: [
+      "通过环境管理页确认 SIT 环境当前状态，等待重启完成。",
+      "若需立即执行，可在配置中切换到可用的 UAT 环境 URL。",
+      "联系环境运维确认服务恢复时间，并在案例中记录环境切换说明。",
+    ],
+    retryHint: "环境恢复后请重新发起现场测试，建议先做一次手工冒烟验证。",
+  },
+  {
+    category: "配置问题",
+    type: "环境配置错误",
+    reasoning:
+      "测试在第 4 步执行失败：登录接口返回 401 Unauthorized。检查发现案例配置中的环境 URL 指向了已废弃的 v1 域名（test-v1.example.com），认证服务已迁移到 v2。",
+    fixSteps: [
+      "在右侧配置中将「环境」URL 更新为 https://test-v2.example.com/login。",
+      "确认所选环境的认证 token 与目标系统一致。",
+      "保存配置后查看环境变量是否生效。",
+    ],
+    retryHint: "环境 URL 修正后重新执行现场测试即可。",
+  },
+  {
+    category: "配置问题",
+    type: "测试数据绑定错误",
+    reasoning:
+      '测试在第 2 步执行失败：脚本期望读取字段 "username"，但 Cases 表当前列名为 "用户名"，AI 在做数据绑定时未找到匹配字段，传入了空值导致登录失败。',
+    fixSteps: [
+      "检查 Cases 表头与 BDD 中引用的字段名是否一致。",
+      '将列名 "用户名" 调整为脚本期望的字段标识，或在 BDD 中改为引用 "用户名"。',
+      "确认所有行的对应单元格均已填写。",
+    ],
+    retryHint: "字段对齐后重新执行现场测试，数据绑定将正常生效。",
+  },
+  {
+    category: "真实业务缺陷",
+    type: "功能回归",
+    reasoning:
+      '测试在第 5 步执行失败：登录成功后未跳转到主页，停留在登录页且显示 "系统繁忙"。最近一次发布修改了登录后的路由逻辑，破坏了原有跳转。这属于被测系统的真实缺陷，建议提交 Bug。',
+    fixSteps: [
+      "在缺陷管理系统提交 Bug，附上本次现场测试的录屏与日志。",
+      "保留当前案例不变，等待开发修复后再次执行验证。",
+      '在案例备注中标记 "已发现回归缺陷"，避免误判为案例问题。',
+    ],
+    retryHint: "缺陷修复后请重新执行现场测试以验证回归。",
+  },
+  {
+    category: "真实业务缺陷",
+    type: "数据处理错误",
+    reasoning:
+      "测试在第 5 步执行失败：登录成功但财务模块未显示。后端日志显示用户角色权限计算错误，返回的菜单列表缺少 finance 节点。属于业务逻辑缺陷。",
+    fixSteps: [
+      "提交 Bug 至开发团队，附上后端日志与请求/响应。",
+      "在案例中保留预期结果，等待修复后再次验证。",
+      "可临时切换为通用账号验证其他登录流程不受影响。",
+    ],
+    retryHint: "缺陷修复后请重新执行现场测试。",
+  },
+];
 
-修改案例的建议：
-• 在 "When 用户输入正确的密码" 步骤中补充元素定位特征，例如 placeholder="请输入密码" 或 name="password"。
-• 在 Given 步骤前增加 "And 等待登录页面完全加载" 的前置条件，确保页面渲染完成。
-• 如果密码框在 iframe 中，请在 BDD 中显式说明 iframe 的入口及切换上下文。
-• 更新预期结果，覆盖元素定位失败时的兜底分支（例如显示错误提示）。
-
-请点击右上角「编辑案例」返回案例进行修改后再次执行现场测试。`;
+const getFailureScenario = (idx: number): FailureScenario =>
+  failureScenarios[idx % failureScenarios.length];
 
 function ArtifactIcon({ type }: { type: ArtifactItem["type"] }) {
   const iconCls = "w-5 h-5 text-muted-foreground";
