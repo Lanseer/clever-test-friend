@@ -331,27 +331,54 @@ export default function SmartExecutionDetail() {
       {/* AI Reasoning */}
       <div className="px-4">
         {isFailedRun ? (
-          <Card className="p-5 border-2 border-red-300 bg-red-50/30">
-            <h2 className="text-lg font-semibold text-red-700 mb-3 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5" />
-              AI Reasoning · 失败原因与修改建议
-            </h2>
-            <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
-              {aiFailureReasoning}
-            </p>
-            {editBackUrl && (
-              <div className="mt-4 flex justify-end">
+          <Card className="p-5 border-2 border-red-300 bg-red-50/30 space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-red-700 mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5" />
+                AI Reasoning · 失败原因与修改建议
+              </h2>
+              <div className="flex items-center gap-2 mb-3">
+                <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200">
+                  {failureScenario.category}
+                </Badge>
+                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                  {failureScenario.type}
+                </Badge>
+              </div>
+              <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                {failureScenario.reasoning}
+              </p>
+            </div>
+
+            <div className="rounded-md border border-amber-200 bg-amber-50/60 p-4">
+              <h3 className="text-sm font-semibold text-amber-800 mb-2">建议修复过程</h3>
+              <ol className="space-y-1.5 text-sm text-foreground/85 list-decimal list-inside">
+                {failureScenario.fixSteps.map((step, i) => (
+                  <li key={i} className="leading-relaxed">{step}</li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="rounded-md border border-blue-200 bg-blue-50/60 p-4 flex items-start gap-3">
+              <RefreshCw className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-blue-800 mb-1">下一步：重试执行</h3>
+                <p className="text-sm text-foreground/85 leading-relaxed">
+                  {failureScenario.retryHint}
+                </p>
+              </div>
+              {editBackUrl && (
                 <Button
                   size="sm"
                   variant="default"
-                  className="gap-1.5"
+                  className="gap-1.5 shrink-0"
                   onClick={() => navigate(editBackUrl)}
                 >
                   <Edit3 className="w-4 h-4" />
-                  返回案例进行编辑
+                  返回修复案例
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </Card>
         ) : (
           <Card className="p-5 border-2 border-green-300 bg-green-50/30">
