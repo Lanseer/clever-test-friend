@@ -249,12 +249,39 @@ export default function SmartExecutionDetail() {
   const [searchArtifact, setSearchArtifact] = useState("");
   const [filterType, setFilterType] = useState("all");
 
+  // AI 自愈流程：仅 caseIdx===0（元素定位失败）启用
+  const selfHealEnabled = isFailedRun && caseIdx === 0;
+  // phase: 0 idle, 1 detecting, 2 fixing, 3 fixed, 4 retrying, 5 passed
+  const [healPhase, setHealPhase] = useState(0);
+
   useEffect(() => {
     if (!isLiveEntry) return;
     setIsLiveLoading(true);
     const timer = setTimeout(() => setIsLiveLoading(false), 3000);
     return () => clearTimeout(timer);
   }, [isLiveEntry]);
+
+  useEffect(() => {
+    if (!selfHealEnabled || isLiveLoading) return;
+    setHealPhase(1);
+    const timers = [
+      setTimeout(() => setHealPhase(2), 1500),
+      setTimeout(() => setHealPhase(3), 3500),
+      setTimeout(() => setHealPhase(4), 5000),
+      setTimeout(() => setHealPhase(5), 7500),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [selfHealEnabled, isLiveLoading]);
+
+  const healSteps = [
+    { phase: 1, text: "检测到元素定位异常，正在分析失败上下文..." },
+    { phase: 2, text: "正在尝试修复元素无法定位的问题（基于视觉模型重新识别目标按钮）..." },
+    { phase: 3, text: "很好，问题已经修复！已生成新的稳定选择器并回写到案例脚本。" },
+    { phase: 4, text: "现在让我重新执行案例..." },
+    { phase: 5, text: "案例重试执行成功，登录流程已通过 ✅" },
+  ];
+  const healingDone = healPhase >= 5;
+  const showAsPassed = selfHealEnabled && healingDone;
 
   const filteredArtifacts = mockArtifacts.filter((a) => {
     const matchesSearch = a.name.toLowerCase().includes(searchArtifact.toLowerCase());
