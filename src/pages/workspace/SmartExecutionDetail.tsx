@@ -238,6 +238,8 @@ export default function SmartExecutionDetail() {
   const isLiveEntry = searchParams.get("live") === "1";
   const isFailedRun = searchParams.get("result") === "failed";
   const editBackUrl = searchParams.get("editBack") || "";
+  const caseIdx = parseInt(searchParams.get("caseIdx") || "0", 10) || 0;
+  const failureScenario = getFailureScenario(caseIdx);
 
   const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
