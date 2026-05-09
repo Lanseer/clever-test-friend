@@ -20,6 +20,9 @@ import {
   Camera,
   AlertTriangle,
   Edit3,
+  Sparkles,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
