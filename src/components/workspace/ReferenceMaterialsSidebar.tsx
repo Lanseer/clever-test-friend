@@ -330,42 +330,74 @@ export function ReferenceMaterialsSidebar({
           </div>
 
           <ScrollArea className="flex-1 px-6 pb-4">
-            <div className="space-y-0">
-              {filteredLines.map(({ line, idx, status }) => {
-                const outlineNum = outlines[idx];
-                const prevOutline = idx > 0 ? outlines[idx - 1] : undefined;
-                const showOutline = outlineNum && outlineNum !== prevOutline;
-                const isNonEmpty = line.trim().length > 0;
-
-                return (
-                  <div
-                    key={idx}
-                    className={cn(
-                      "flex items-start gap-2 px-3 py-0.5 text-sm font-sans",
-                      status === "covered" && "bg-green-500/15 border-l-2 border-green-500",
-                      status === "uncovered" && isNonEmpty && "bg-amber-500/10 border-l-2 border-amber-400",
-                      status === "noNeed" && isNonEmpty && "bg-muted/50 border-l-2 border-muted-foreground/30",
-                    )}
-                  >
-                    {filterMode === "uncovered" && status === "uncovered" && isNonEmpty && (
+            {filterMode === "uncovered" ? (
+              <div className="space-y-2">
+                {uncoveredNonEmptyLines.length === 0 && (
+                  <div className="text-sm text-muted-foreground text-center py-8">
+                    暂无未覆盖的需求条目
+                  </div>
+                )}
+                {uncoveredNonEmptyLines.map(({ line, idx }, i) => {
+                  const reason = uncoveredReasonsMap[material.id]?.[idx]
+                    || "AI 暂未识别到匹配的测试场景，建议人工补充";
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-500/5 p-3"
+                    >
                       <Checkbox
                         checked={selectedUncoveredLines.has(idx)}
                         onCheckedChange={() => toggleLine(idx)}
-                        className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                        className="mt-1 h-4 w-4 shrink-0"
                       />
-                    )}
-                    <span className="flex-1 whitespace-pre-wrap">
-                      {status === "covered" && showOutline && (
-                        <span className="text-xs font-mono text-green-700 bg-green-500/20 px-1 py-0.5 rounded mr-1.5">
-                          {outlineNum}
-                        </span>
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono bg-amber-500/20 text-amber-700 px-1.5 py-0.5 rounded">
+                            #{i + 1}
+                          </span>
+                          <span className="text-xs text-muted-foreground">未覆盖原因</span>
+                        </div>
+                        <div className="text-sm text-foreground">{reason}</div>
+                        <div className="text-xs text-muted-foreground mt-1">需求片段</div>
+                        <div className="text-sm bg-background border border-border rounded px-2 py-1.5 whitespace-pre-wrap font-mono">
+                          {line}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-0">
+                {filteredLines.map(({ line, idx, status }) => {
+                  const outlineNum = outlines[idx];
+                  const prevOutline = idx > 0 ? outlines[idx - 1] : undefined;
+                  const showOutline = outlineNum && outlineNum !== prevOutline;
+                  const isNonEmpty = line.trim().length > 0;
+
+                  return (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "flex items-start gap-2 px-3 py-0.5 text-sm font-sans",
+                        status === "covered" && "bg-green-500/15 border-l-2 border-green-500",
+                        status === "uncovered" && isNonEmpty && "bg-amber-500/10 border-l-2 border-amber-400",
+                        status === "noNeed" && isNonEmpty && "bg-muted/50 border-l-2 border-muted-foreground/30",
                       )}
-                      {line || '\u00A0'}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                    >
+                      <span className="flex-1 whitespace-pre-wrap">
+                        {status === "covered" && showOutline && (
+                          <span className="text-xs font-mono text-green-700 bg-green-500/20 px-1 py-0.5 rounded mr-1.5">
+                            {outlineNum}
+                          </span>
+                        )}
+                        {line || '\u00A0'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </ScrollArea>
         </DialogContent>
       </Dialog>
