@@ -90,6 +90,33 @@ const uncoveredReasonsMap: Record<string, Record<number, string>> = {
   },
 };
 
+// Mock: no need reasons by line index
+const noNeedReasonsMap: Record<string, Record<number, string>> = {
+  "ref-1": {
+    0: "文档标题，不属于测试需求内容",
+    1: "空行，无实质需求内容",
+    15: "文档结尾备注信息，非功能性需求",
+  },
+  "ref-2": {
+    0: "章节标题",
+    1: "空行",
+    2: "文档信息说明",
+  },
+  "ref-3": {
+    0: "文档标题",
+    1: "空行",
+    2: "版本说明信息",
+  },
+  "ref-4": {
+    0: "文档标题",
+    1: "空行",
+  },
+  "ref-5": {
+    0: "接口名称标题",
+    1: "空行",
+  },
+};
+
 // Mock: outline numbers for covered lines
 const outlineNumbers: Record<string, Record<number, string>> = {
   "ref-1": { 3: "AC-SF-001", 4: "AC-SF-001", 5: "AC-SF-002", 7: "AC-SF-002", 8: "AS-FG-001", 9: "AS-FG-001", 12: "SF-002", 13: "SF-002" },
@@ -191,6 +218,7 @@ export function ReferenceMaterialsSidebar({
   const { t } = useTranslation();
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [selectedUncoveredLines, setSelectedUncoveredLines] = useState<Set<number>>(new Set());
+  const [selectedNoNeedLines, setSelectedNoNeedLines] = useState<Set<number>>(new Set());
   const [supplementDialogOpen, setSupplementDialogOpen] = useState(false);
 
   const typeKey = material?.typeKey || material?.type || "";
@@ -219,12 +247,20 @@ export function ReferenceMaterialsSidebar({
     return filteredLines.filter(l => l.status === "uncovered" && l.line.trim().length > 0);
   }, [filteredLines]);
 
+  // NoNeed non-empty lines for selection
+  const noNeedNonEmptyLines = useMemo(() => {
+    return filteredLines.filter(l => l.status === "noNeed" && l.line.trim().length > 0);
+  }, [filteredLines]);
+
   if (!material) return null;
 
   const allUncoveredSelected = uncoveredNonEmptyLines.length > 0 && 
     uncoveredNonEmptyLines.every(l => selectedUncoveredLines.has(l.idx));
 
-  const toggleLine = (idx: number) => {
+  const allNoNeedSelected = noNeedNonEmptyLines.length > 0 && 
+    noNeedNonEmptyLines.every(l => selectedNoNeedLines.has(l.idx));
+
+  const toggleUncoveredLine = (idx: number) => {
     setSelectedUncoveredLines(prev => {
       const next = new Set(prev);
       if (next.has(idx)) next.delete(idx);
@@ -233,11 +269,28 @@ export function ReferenceMaterialsSidebar({
     });
   };
 
-  const toggleAll = () => {
+  const toggleNoNeedLine = (idx: number) => {
+    setSelectedNoNeedLines(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const toggleAllUncovered = () => {
     if (allUncoveredSelected) {
       setSelectedUncoveredLines(new Set());
     } else {
       setSelectedUncoveredLines(new Set(uncoveredNonEmptyLines.map(l => l.idx)));
+    }
+  };
+
+  const toggleAllNoNeed = () => {
+    if (allNoNeedSelected) {
+      setSelectedNoNeedLines(new Set());
+    } else {
+      setSelectedNoNeedLines(new Set(noNeedNonEmptyLines.map(l => l.idx)));
     }
   };
 
@@ -266,6 +319,7 @@ export function ReferenceMaterialsSidebar({
     if (!v) {
       setFilterMode("all");
       setSelectedUncoveredLines(new Set());
+      setSelectedNoNeedLines(new Set());
     }
     onOpenChange(v);
   };
@@ -298,6 +352,7 @@ export function ReferenceMaterialsSidebar({
                   onClick={() => {
                     setFilterMode(mode);
                     setSelectedUncoveredLines(new Set());
+                    setSelectedNoNeedLines(new Set());
                   }}
                 >
                   {label}
@@ -305,32 +360,34 @@ export function ReferenceMaterialsSidebar({
               ))}
             </div>
             <div className="flex items-center gap-2">
-              {filterMode === "uncovered" && (
+              {(filterMode === "uncovered" || filterMode === "noNeed") && (
                 <>
                   <div className="flex items-center gap-1.5">
                     <Checkbox
-                      checked={allUncoveredSelected}
-                      onCheckedChange={toggleAll}
+                      checked={filterMode === "uncovered" ? allUncoveredSelected : allNoNeedSelected}
+                      onCheckedChange={filterMode === "uncovered" ? toggleAllUncovered : toggleAllNoNeed}
                       className="h-3.5 w-3.5"
                     />
                     <span className="text-xs text-muted-foreground">全选</span>
                   </div>
-                  <Button
-                    size="sm"
-                    className="h-7 px-3 text-xs gap-1"
-                    disabled={selectedUncoveredLines.size === 0}
-                    onClick={handleOpenSupplement}
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    补充案例
-                  </Button>
+                  {filterMode === "uncovered" && (
+                    <Button
+                      size="sm"
+                      className="h-7 px-3 text-xs gap-1"
+                      disabled={selectedUncoveredLines.size === 0}
+                      onClick={handleOpenSupplement}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      补充案例
+                    </Button>
+                  )}
                 </>
               )}
             </div>
           </div>
 
           <ScrollArea className="flex-1 px-6 pb-4">
-            {filterMode === "uncovered" ? (
+            {filterMode === "uncovered" && (
               <div className="space-y-2">
                 {uncoveredNonEmptyLines.length === 0 && (
                   <div className="text-sm text-muted-foreground text-center py-8">
@@ -347,7 +404,7 @@ export function ReferenceMaterialsSidebar({
                     >
                       <Checkbox
                         checked={selectedUncoveredLines.has(idx)}
-                        onCheckedChange={() => toggleLine(idx)}
+                        onCheckedChange={() => toggleUncoveredLine(idx)}
                         className="mt-1 h-4 w-4 shrink-0"
                       />
                       <div className="flex-1 space-y-1.5 min-w-0">
@@ -367,7 +424,48 @@ export function ReferenceMaterialsSidebar({
                   );
                 })}
               </div>
-            ) : (
+            )}
+
+            {filterMode === "noNeed" && (
+              <div className="space-y-2">
+                {noNeedNonEmptyLines.length === 0 && (
+                  <div className="text-sm text-muted-foreground text-center py-8">
+                    暂无无需覆盖的需求条目
+                  </div>
+                )}
+                {noNeedNonEmptyLines.map(({ line, idx }, i) => {
+                  const reason = noNeedReasonsMap[material.id]?.[idx]
+                    || "该条目不属于测试范围";
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 rounded-md border border-muted-foreground/20 bg-muted/30 p-3"
+                    >
+                      <Checkbox
+                        checked={selectedNoNeedLines.has(idx)}
+                        onCheckedChange={() => toggleNoNeedLine(idx)}
+                        className="mt-1 h-4 w-4 shrink-0"
+                      />
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono bg-muted-foreground/20 text-muted-foreground px-1.5 py-0.5 rounded">
+                            #{i + 1}
+                          </span>
+                          <span className="text-xs text-muted-foreground">无需覆盖原因</span>
+                        </div>
+                        <div className="text-sm text-foreground">{reason}</div>
+                        <div className="text-xs text-muted-foreground mt-1">需求片段</div>
+                        <div className="text-sm bg-background border border-border rounded px-2 py-1.5 whitespace-pre-wrap font-mono">
+                          {line}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {filterMode !== "uncovered" && filterMode !== "noNeed" && (
               <div className="space-y-0">
                 {filteredLines.map(({ line, idx, status }) => {
                   const outlineNum = outlines[idx];
