@@ -61,6 +61,35 @@ const noNeedLineIndices: Record<string, number[]> = {
   "ref-5": [0, 1],
 };
 
+// Mock: uncovered reasons by line index
+const uncoveredReasonsMap: Record<string, Record<number, string>> = {
+  "ref-1": {
+    2: "需求描述过于宽泛，未明确具体验收标准，AI 无法生成可执行的测试步骤",
+    6: "缺少边界值定义和异常输入示例，需补充测试数据范围",
+    10: "依赖外部接口尚未提供契约文档，无法生成接口层案例",
+    11: "性能指标未量化（如响应时间、并发量），无法形成性能验证案例",
+    14: "涉及第三方支付通道，沙箱环境未就绪",
+  },
+  "ref-2": {
+    3: "业务规则存在歧义，需产品方进一步澄清",
+    4: "缺少异常分支说明",
+    7: "未提供示例数据，无法构造有效输入",
+  },
+  "ref-3": {
+    3: "需求条目缺少可观测的输出，无法定义断言",
+    7: "涉及历史数据迁移，依赖生产快照",
+    11: "权限矩阵未明确，需补充角色定义",
+    12: "并发场景描述缺失",
+  },
+  "ref-4": {
+    2: "接口字段含义不清晰",
+    6: "缺少错误码列表",
+  },
+  "ref-5": {
+    4: "未说明鉴权方式",
+  },
+};
+
 // Mock: outline numbers for covered lines
 const outlineNumbers: Record<string, Record<number, string>> = {
   "ref-1": { 3: "AC-SF-001", 4: "AC-SF-001", 5: "AC-SF-002", 7: "AC-SF-002", 8: "AS-FG-001", 9: "AS-FG-001", 12: "SF-002", 13: "SF-002" },
@@ -229,7 +258,8 @@ export function ReferenceMaterialsSidebar({
   const filterButtons: { mode: FilterMode; label: string }[] = [
     { mode: "all", label: "全部" },
     { mode: "covered", label: "已覆盖" },
-    { mode: "uncovered", label: "无需覆盖" },
+    { mode: "uncovered", label: "未覆盖" },
+    { mode: "noNeed", label: "无需覆盖" },
   ];
 
   const handleDialogChange = (v: boolean) => {
@@ -300,42 +330,74 @@ export function ReferenceMaterialsSidebar({
           </div>
 
           <ScrollArea className="flex-1 px-6 pb-4">
-            <div className="space-y-0">
-              {filteredLines.map(({ line, idx, status }) => {
-                const outlineNum = outlines[idx];
-                const prevOutline = idx > 0 ? outlines[idx - 1] : undefined;
-                const showOutline = outlineNum && outlineNum !== prevOutline;
-                const isNonEmpty = line.trim().length > 0;
-
-                return (
-                  <div
-                    key={idx}
-                    className={cn(
-                      "flex items-start gap-2 px-3 py-0.5 text-sm font-sans",
-                      status === "covered" && "bg-green-500/15 border-l-2 border-green-500",
-                      status === "uncovered" && isNonEmpty && "bg-amber-500/10 border-l-2 border-amber-400",
-                      status === "noNeed" && isNonEmpty && "bg-muted/50 border-l-2 border-muted-foreground/30",
-                    )}
-                  >
-                    {filterMode === "uncovered" && status === "uncovered" && isNonEmpty && (
+            {filterMode === "uncovered" ? (
+              <div className="space-y-2">
+                {uncoveredNonEmptyLines.length === 0 && (
+                  <div className="text-sm text-muted-foreground text-center py-8">
+                    暂无未覆盖的需求条目
+                  </div>
+                )}
+                {uncoveredNonEmptyLines.map(({ line, idx }, i) => {
+                  const reason = uncoveredReasonsMap[material.id]?.[idx]
+                    || "AI 暂未识别到匹配的测试场景，建议人工补充";
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-500/5 p-3"
+                    >
                       <Checkbox
                         checked={selectedUncoveredLines.has(idx)}
                         onCheckedChange={() => toggleLine(idx)}
-                        className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                        className="mt-1 h-4 w-4 shrink-0"
                       />
-                    )}
-                    <span className="flex-1 whitespace-pre-wrap">
-                      {status === "covered" && showOutline && (
-                        <span className="text-xs font-mono text-green-700 bg-green-500/20 px-1 py-0.5 rounded mr-1.5">
-                          {outlineNum}
-                        </span>
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono bg-amber-500/20 text-amber-700 px-1.5 py-0.5 rounded">
+                            #{i + 1}
+                          </span>
+                          <span className="text-xs text-muted-foreground">未覆盖原因</span>
+                        </div>
+                        <div className="text-sm text-foreground">{reason}</div>
+                        <div className="text-xs text-muted-foreground mt-1">需求片段</div>
+                        <div className="text-sm bg-background border border-border rounded px-2 py-1.5 whitespace-pre-wrap font-mono">
+                          {line}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-0">
+                {filteredLines.map(({ line, idx, status }) => {
+                  const outlineNum = outlines[idx];
+                  const prevOutline = idx > 0 ? outlines[idx - 1] : undefined;
+                  const showOutline = outlineNum && outlineNum !== prevOutline;
+                  const isNonEmpty = line.trim().length > 0;
+
+                  return (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "flex items-start gap-2 px-3 py-0.5 text-sm font-sans",
+                        status === "covered" && "bg-green-500/15 border-l-2 border-green-500",
+                        status === "uncovered" && isNonEmpty && "bg-amber-500/10 border-l-2 border-amber-400",
+                        status === "noNeed" && isNonEmpty && "bg-muted/50 border-l-2 border-muted-foreground/30",
                       )}
-                      {line || '\u00A0'}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                    >
+                      <span className="flex-1 whitespace-pre-wrap">
+                        {status === "covered" && showOutline && (
+                          <span className="text-xs font-mono text-green-700 bg-green-500/20 px-1 py-0.5 rounded mr-1.5">
+                            {outlineNum}
+                          </span>
+                        )}
+                        {line || '\u00A0'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </ScrollArea>
         </DialogContent>
       </Dialog>
