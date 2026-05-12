@@ -61,6 +61,35 @@ const noNeedLineIndices: Record<string, number[]> = {
   "ref-5": [0, 1],
 };
 
+// Mock: uncovered reasons by line index
+const uncoveredReasonsMap: Record<string, Record<number, string>> = {
+  "ref-1": {
+    2: "需求描述过于宽泛，未明确具体验收标准，AI 无法生成可执行的测试步骤",
+    6: "缺少边界值定义和异常输入示例，需补充测试数据范围",
+    10: "依赖外部接口尚未提供契约文档，无法生成接口层案例",
+    11: "性能指标未量化（如响应时间、并发量），无法形成性能验证案例",
+    14: "涉及第三方支付通道，沙箱环境未就绪",
+  },
+  "ref-2": {
+    3: "业务规则存在歧义，需产品方进一步澄清",
+    4: "缺少异常分支说明",
+    7: "未提供示例数据，无法构造有效输入",
+  },
+  "ref-3": {
+    3: "需求条目缺少可观测的输出，无法定义断言",
+    7: "涉及历史数据迁移，依赖生产快照",
+    11: "权限矩阵未明确，需补充角色定义",
+    12: "并发场景描述缺失",
+  },
+  "ref-4": {
+    2: "接口字段含义不清晰",
+    6: "缺少错误码列表",
+  },
+  "ref-5": {
+    4: "未说明鉴权方式",
+  },
+};
+
 // Mock: outline numbers for covered lines
 const outlineNumbers: Record<string, Record<number, string>> = {
   "ref-1": { 3: "AC-SF-001", 4: "AC-SF-001", 5: "AC-SF-002", 7: "AC-SF-002", 8: "AS-FG-001", 9: "AS-FG-001", 12: "SF-002", 13: "SF-002" },
