@@ -408,14 +408,7 @@ export function ReferenceMaterialsSidebar({
                         className="mt-1 h-4 w-4 shrink-0"
                       />
                       <div className="flex-1 space-y-1.5 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono bg-amber-500/20 text-amber-700 px-1.5 py-0.5 rounded">
-                            #{i + 1}
-                          </span>
-                          <span className="text-xs text-muted-foreground">未覆盖原因</span>
-                        </div>
                         <div className="text-sm text-foreground">{reason}</div>
-                        <div className="text-xs text-muted-foreground mt-1">需求片段</div>
                         <div className="text-sm bg-background border border-border rounded px-2 py-1.5 whitespace-pre-wrap font-mono">
                           {line}
                         </div>
