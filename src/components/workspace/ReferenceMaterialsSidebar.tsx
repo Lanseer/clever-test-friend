@@ -437,11 +437,6 @@ export function ReferenceMaterialsSidebar({
                       className="mt-0.5 h-4 w-4 shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-xs font-mono bg-muted-foreground/20 text-muted-foreground px-1.5 py-0.5 rounded">
-                          #{i + 1}
-                        </span>
-                      </div>
                       <div className="text-sm bg-background border border-border rounded px-2 py-1.5 whitespace-pre-wrap font-mono">
                         {line}
                       </div>
