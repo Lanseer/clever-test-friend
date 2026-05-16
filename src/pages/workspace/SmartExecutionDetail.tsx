@@ -580,7 +580,7 @@ export default function SmartExecutionDetail() {
   const healingDone = healPhase >= 5;
   const showAsPassed = selfHealEnabled && healingDone;
 
-  const filteredArtifacts = mockArtifacts.filter((a) => {
+  const filteredArtifacts = (isApiCase ? oaArtifacts : mockArtifacts).filter((a) => {
     const matchesSearch = a.name.toLowerCase().includes(searchArtifact.toLowerCase());
     const matchesType = filterType === "all" || a.type === filterType;
     return matchesSearch && matchesType;
