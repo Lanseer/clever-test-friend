@@ -100,6 +100,20 @@ const mockExecutions: ExecutionRecord[] = [
     startTime: "2026-02-08 10:00",
     endTime: "2026-02-08 11:30",
   },
+  {
+    id: "e5",
+    scenarioId: "SC-1005",
+    name: "对公活期开户交易执行",
+    status: "completed",
+    testStatus: "passed",
+    completedCases: 15,
+    totalCases: 15,
+    tags: ["开户", "对公"],
+    environment: "SIT-03",
+    creator: "孙七",
+    startTime: "2026-02-11 09:00",
+    endTime: "2026-02-11 10:40",
+  },
 ];
 
 const statusConfig: Record<ExecutionRecord["status"], { label: string; className: string }> = {
