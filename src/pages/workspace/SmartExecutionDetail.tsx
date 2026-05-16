@@ -23,11 +23,22 @@ import {
   Sparkles,
   Loader2,
   CheckCircle2,
+  Globe,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -235,9 +246,294 @@ function ArtifactIcon({ type }: { type: ArtifactItem["type"] }) {
   }
 }
 
+// ============ 开户交易 API 案例专用 Mock 数据 ============
+interface ApiTraceRequest {
+  id: string;
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  url: string;
+  status: number;
+  time: string;
+  requestHeaders: { key: string; value: string }[];
+  responseHeaders: { key: string; value: string }[];
+  responseBody: string;
+}
+
+const oaApiTraces: ApiTraceRequest[] = [
+  {
+    id: "r1",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/customer/query?custNo=&channel=CORP",
+    status: 200,
+    time: "Feb 11, 2026, 9:00 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "accept-encoding", value: "gzip, deflate" },
+      { key: "connection", value: "keep-alive" },
+      { key: "user-agent", value: "python-httpx/0.28.1" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "62" },
+      { key: "connection", value: "close" },
+      { key: "trace-id", value: "0330421391141778738523722000367903746" },
+      { key: "sc", value: "0.012" },
+    ],
+    responseBody: `{
+  "status": "0",
+  "info": "INVALID_PARAMS",
+  "infocode": "20000"
+}`,
+  },
+  {
+    id: "r2",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/customer/query?custNo=C00001&channel=CORP",
+    status: 200,
+    time: "Feb 11, 2026, 9:01 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "accept-encoding", value: "gzip, deflate" },
+      { key: "connection", value: "keep-alive" },
+      { key: "user-agent", value: "python-httpx/0.28.1" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "286" },
+      { key: "connection", value: "keep-alive" },
+      { key: "trace-id", value: "0330421391141778738523722000367903747" },
+      { key: "sc", value: "0.038" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "OK",
+  "data": {
+    "custNo": "C00001",
+    "custName": "北京某某科技有限公司",
+    "certType": "USCC",
+    "certNo": "91110000XXXXXXXX1A",
+    "custType": "CORP"
+  }
+}`,
+  },
+  {
+    id: "r3",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/open/validate",
+    status: 200,
+    time: "Feb 11, 2026, 9:02 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "94" },
+      { key: "trace-id", value: "0330421391141778738523722000367903748" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "VALIDATION_PASSED",
+  "data": { "checkCode": "VC20260211090201" }
+}`,
+  },
+  {
+    id: "r4",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/open/create?currency=CNY&type=CURRENT",
+    status: 200,
+    time: "Feb 11, 2026, 9:04 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+      { key: "x-idempotency-key", value: "OA-20260211-0001" },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "212" },
+      { key: "trace-id", value: "0330421391141778738523722000367903749" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "ACCOUNT_CREATED",
+  "data": {
+    "accountNo": "6225 8801 2034 5678",
+    "custNo": "C00001",
+    "currency": "CNY",
+    "openDate": "2026-02-11"
+  }
+}`,
+  },
+  {
+    id: "r5",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/auth/approve?accountNo=6225880120345678",
+    status: 200,
+    time: "Feb 11, 2026, 9:05 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "78" },
+      { key: "trace-id", value: "0330421391141778738523722000367903750" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "AUTH_APPROVED",
+  "data": { "approver": "S1023" }
+}`,
+  },
+  {
+    id: "r6",
+    method: "GET",
+    url: "https://api.bank-corp.com/v3/account/detail?accountNo=6225880120345678",
+    status: 200,
+    time: "Feb 11, 2026, 9:06 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "accept", value: "*/*" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "248" },
+      { key: "trace-id", value: "0330421391141778738523722000367903751" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "OK",
+  "data": {
+    "accountNo": "6225 8801 2034 5678",
+    "custNo": "C00001",
+    "custName": "北京某某科技有限公司",
+    "currency": "CNY",
+    "balance": "0.00",
+    "status": "ACTIVE"
+  }
+}`,
+  },
+  {
+    id: "r7",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/print/voucher?accountNo=6225880120345678&type=PAPERLESS",
+    status: 200,
+    time: "Feb 11, 2026, 9:07 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "108" },
+      { key: "trace-id", value: "0330421391141778738523722000367903752" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "VOUCHER_GENERATED",
+  "data": { "voucherId": "VCH20260211090701", "url": "/voucher/VCH20260211090701.pdf" }
+}`,
+  },
+];
+
+const oaFeatureCode = `FEATURE: 对公活期开户交易
+; 通过 API 完成对公客户活期账户开户的端到端测试
+
+  SCENARIO: 对公客户成功开立人民币活期账户
+    GIVEN 客户 "C00001" 已通过准入审核
+    AND  系统当前为 SIT-03 环境
+
+    WHEN 调用 客户信息查询接口
+    AND  调用 开户校验接口
+    AND  调用 开户创建接口（币种=人民币, 类型=活期, 现金）
+    AND  调用 授权审批接口
+    AND  调用 无纸化打印接口
+
+    THEN 账户状态应为 ACTIVE
+    AND  返回的账户号应为 19 位有效卡号
+    AND  打印凭证应成功生成`;
+
+const oaExecutionPlan = [
+  { step: 1, content: "调用 /account/customer/query 查询客户号 C00001 的基本信息。" },
+  { step: 2, content: "调用 /account/open/validate 校验客户准入与币种/账户类型组合。" },
+  { step: 3, content: "调用 /account/open/create 提交开户请求（CNY · 活期 · 现金）。" },
+  { step: 4, content: "调用 /account/auth/approve 完成柜员授权审批。" },
+  { step: 5, content: "调用 /account/detail 校验账户状态为 ACTIVE。" },
+  { step: 6, content: "调用 /print/voucher 完成无纸化凭证打印。" },
+];
+
+const oaSteps: TimelineStep[] = [
+  { id: "os1", step: 1, title: "POST /account/customer/query — 客户信息查询", type: "API", status: "completed" },
+  { id: "os2", step: 2, title: "POST /account/open/validate — 开户校验", type: "API", status: "completed" },
+  { id: "os3", step: 3, title: "POST /account/open/create — 创建开户请求", type: "API", status: "completed" },
+  { id: "os4", step: 4, title: "POST /account/auth/approve — 授权审批", type: "API", status: "completed" },
+  { id: "os5", step: 5, title: "GET /account/detail — 账户状态校验", type: "API", status: "completed" },
+  {
+    id: "os6",
+    step: 6,
+    title: "POST /print/voucher — 无纸化打印凭证生成，账户开立成功",
+    type: "API",
+    status: "completed",
+    highlighted: true,
+  },
+];
+
+const oaArtifacts: ArtifactItem[] = [
+  { id: "oa-a1", name: "all_api_traces.har", date: "Feb 11, 2026, 9:08 AM", type: "archive" },
+  { id: "oa-a2", name: "open_account_result.xml", date: "Feb 11, 2026, 9:08 AM", type: "file", viewable: true },
+  { id: "oa-a3", name: "request_payload_create.json", date: "Feb 11, 2026, 9:04 AM", type: "file", viewable: true },
+  { id: "oa-a4", name: "response_account_detail.json", date: "Feb 11, 2026, 9:06 AM", type: "file", viewable: true },
+  { id: "oa-a5", name: "voucher_VCH20260211090701.pdf", date: "Feb 11, 2026, 9:07 AM", type: "file", viewable: true },
+];
+
+const oaReasoning =
+  "本次开户交易执行整体通过。AI 依次调用 客户信息查询 → 开户校验 → 开户创建 → 授权审批 → 账户详情校验 → 无纸化打印 共 6 个接口，所有响应 status 均为 \"1\"，且关键字段（accountNo、custNo、currency、status）与预期一致。开户后账户状态返回 ACTIVE，凭证已成功生成，符合「对公客户成功开立人民币活期账户」的预期断言，因此判定为 PASS。";
+
+function ApiMethodBadge({ method }: { method: ApiTraceRequest["method"] }) {
+  const color =
+    method === "GET"
+      ? "text-blue-600 border-blue-200 bg-blue-50"
+      : method === "POST"
+      ? "text-green-600 border-green-200 bg-green-50"
+      : method === "PUT"
+      ? "text-amber-600 border-amber-200 bg-amber-50"
+      : "text-red-600 border-red-200 bg-red-50";
+  return (
+    <Badge variant="outline" className={cn("font-semibold tracking-wide rounded-full px-3 py-0.5", color)}>
+      {method}
+    </Badge>
+  );
+}
+
+function ApiStatusBadge({ status }: { status: number }) {
+  const ok = status >= 200 && status < 300;
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "font-semibold rounded-full px-3 py-0.5",
+        ok ? "text-green-600 border-green-200 bg-green-50" : "text-red-600 border-red-200 bg-red-50",
+      )}
+    >
+      {status}
+    </Badge>
+  );
+}
+
 export default function SmartExecutionDetail() {
   const navigate = useNavigate();
-  const { workspaceId } = useParams();
+  const { workspaceId, caseId } = useParams();
+  const isApiCase = (caseId || "").startsWith("live-oa");
+  const [selectedTrace, setSelectedTrace] = useState<ApiTraceRequest | null>(null);
+  const [traceTab, setTraceTab] = useState<"request" | "response">("request");
   const [searchParams] = useSearchParams();
   const isLiveEntry = searchParams.get("live") === "1";
   const isFailedRun = searchParams.get("result") === "failed";
@@ -284,7 +580,7 @@ export default function SmartExecutionDetail() {
   const healingDone = healPhase >= 5;
   const showAsPassed = selfHealEnabled && healingDone;
 
-  const filteredArtifacts = mockArtifacts.filter((a) => {
+  const filteredArtifacts = (isApiCase ? oaArtifacts : mockArtifacts).filter((a) => {
     const matchesSearch = a.name.toLowerCase().includes(searchArtifact.toLowerCase());
     const matchesType = filterType === "all" || a.type === filterType;
     return matchesSearch && matchesType;
@@ -311,11 +607,13 @@ export default function SmartExecutionDetail() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-semibold truncate">web-网页测试</h1>
+                <h1 className="text-xl font-semibold truncate">
+                  {isApiCase ? "对公活期开户交易 - API 案例" : "web-网页测试"}
+                </h1>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm text-muted-foreground">Tags:</span>
                   <Badge variant="outline" className="bg-muted/50 font-normal">
-                    web case
+                    {isApiCase ? "API case · 开户" : "web case"}
                   </Badge>
                 </div>
               </div>
@@ -484,7 +782,9 @@ export default function SmartExecutionDetail() {
               {showAsPassed ? "AI Reasoning · 自愈后重试通过" : "AI Reasoning"}
             </h2>
             <p className="text-sm leading-relaxed text-foreground/90">
-              {showAsPassed
+              {isApiCase
+                ? oaReasoning
+                : showAsPassed
                 ? '案例首次执行因 BDD 中 "登录" 按钮描述不够明确而无法定位元素。AI 自愈模式自动启用：通过视觉模型在登录区域唯一识别出 text="登录" 且 type="submit" 的目标按钮，生成稳定选择器并回写到案例脚本，随后自动重试执行。重试过程中输入账号密码、点击登录、跳转到用户中心均按预期完成，最终判定为 PASS。'
                 : aiReasoning}
             </p>
@@ -503,6 +803,9 @@ export default function SmartExecutionDetail() {
           >
             <Copy className="w-4 h-4" />
           </Button>
+          {isApiCase ? (
+            <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap pr-10">{oaFeatureCode}</pre>
+          ) : (
           <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap pr-10">
             <span className="text-blue-600 font-semibold">FEATURE:</span> Login Test
             {"\n"}; Use Given Account and password to login website
@@ -517,12 +820,13 @@ export default function SmartExecutionDetail() {
             {"\n\n    "}
             <span className="text-purple-600 font-semibold">THEN</span> I see the login successfule message and turn to homepage
           </pre>
+          )}
         </Card>
 
         <Card className="p-5">
           <h2 className="text-lg font-semibold mb-4">Execution Plan</h2>
           <div className="space-y-4">
-            {executionPlan.map((p) => (
+            {(isApiCase ? oaExecutionPlan : executionPlan).map((p) => (
               <div key={p.step}>
                 <h3 className="font-semibold text-sm mb-1">Step {p.step}</h3>
                 <p className="text-sm text-foreground/80 leading-relaxed">{p.content}</p>
@@ -537,7 +841,7 @@ export default function SmartExecutionDetail() {
         <Card className="p-5">
           <h2 className="text-lg font-semibold mb-4">Execution Timeline</h2>
           <div className="space-y-3">
-            {mockSteps.map((step) => (
+            {(isApiCase ? oaSteps : mockSteps).map((step) => (
               <div
                 key={step.id}
                 className={cn(
@@ -572,7 +876,7 @@ export default function SmartExecutionDetail() {
             <div className="flex items-center gap-2">
               <Paperclip className="w-5 h-5 text-muted-foreground" />
               <h2 className="text-lg font-semibold">Artifacts</h2>
-              <span className="text-muted-foreground">({mockArtifacts.length})</span>
+              <span className="text-muted-foreground">({(isApiCase ? oaArtifacts : mockArtifacts).length})</span>
             </div>
             <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
               <button
@@ -692,9 +996,143 @@ export default function SmartExecutionDetail() {
           </Card>
         </div>
       )}
-      {!isLiveLoading && (
+      {!isLiveLoading && isApiCase && (
+        <div className="p-4">
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-muted-foreground" />
+                <h2 className="text-lg font-semibold">API Trace Viewer</h2>
+                <span className="text-muted-foreground text-sm">
+                  ({oaApiTraces.length} 个请求)
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {oaApiTraces.map((req) => (
+                <button
+                  key={req.id}
+                  onClick={() => {
+                    setSelectedTrace(req);
+                    setTraceTab("request");
+                  }}
+                  className="w-full flex items-center gap-4 p-3 rounded-lg border bg-background/50 hover:bg-muted/30 hover:border-primary/40 transition-colors text-left"
+                >
+                  <ApiMethodBadge method={req.method} />
+                  <div className="flex-1 min-w-0 text-sm font-mono break-all line-clamp-2">
+                    {req.url}
+                  </div>
+                  <ApiStatusBadge status={req.status} />
+                  <div className="text-sm text-muted-foreground whitespace-nowrap">
+                    {req.time}
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <Sheet
+        open={!!selectedTrace}
+        onOpenChange={(open) => !open && setSelectedTrace(null)}
+      >
+        <SheetContent className="w-[640px] sm:max-w-[640px] flex flex-col p-0">
+          {selectedTrace && (
+            <>
+              <SheetHeader className="px-6 pt-6 pb-4 border-b">
+                <SheetTitle>API Request</SheetTitle>
+              </SheetHeader>
+              <div className="px-6 py-4 border-b space-y-3">
+                <div className="text-sm font-mono break-all leading-relaxed">
+                  {selectedTrace.url}
+                </div>
+                <div className="flex items-center gap-2">
+                  <ApiMethodBadge method={selectedTrace.method} />
+                  <ApiStatusBadge status={selectedTrace.status} />
+                  <Badge className="rounded-full bg-primary text-primary-foreground px-3 py-0.5">
+                    complete
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">{selectedTrace.time}</div>
+              </div>
+              <div className="px-6 pt-3 border-b flex items-center gap-6">
+                {(["request", "response"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setTraceTab(tab)}
+                    className={cn(
+                      "pb-3 text-sm font-medium border-b-2 -mb-px transition-colors",
+                      traceTab === tab
+                        ? "border-foreground text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {tab === "request" ? "Request" : "Response"}
+                  </button>
+                ))}
+              </div>
+              <ScrollArea className="flex-1">
+                <div className="px-6 py-4 space-y-4">
+                  {traceTab === "request" ? (
+                    <>
+                      <h3 className="font-semibold text-base">Request Headers</h3>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-1/3">Key</TableHead>
+                            <TableHead>Value</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedTrace.requestHeaders.map((h) => (
+                            <TableRow key={h.key}>
+                              <TableCell className="font-mono text-sm">{h.key}</TableCell>
+                              <TableCell className="font-mono text-sm break-all">
+                                {h.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="font-semibold text-base">Response Headers</h3>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-1/3">Key</TableHead>
+                            <TableHead>Value</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedTrace.responseHeaders.map((h) => (
+                            <TableRow key={h.key}>
+                              <TableCell className="font-mono text-sm">{h.key}</TableCell>
+                              <TableCell className="font-mono text-sm break-all">
+                                {h.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      <h3 className="font-semibold text-base mt-4">Response Body</h3>
+                      <pre className="rounded-md border bg-muted/40 p-3 text-xs font-mono leading-relaxed whitespace-pre-wrap text-foreground/90">
+                        {selectedTrace.responseBody}
+                      </pre>
+                    </>
+                  )}
+                </div>
+              </ScrollArea>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {!isLiveLoading && !isApiCase && (
         <>
-      {/* Video Playback */}
       <div className="px-4">
         <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
