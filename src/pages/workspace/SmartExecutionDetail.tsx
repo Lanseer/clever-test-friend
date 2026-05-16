@@ -841,7 +841,7 @@ export default function SmartExecutionDetail() {
         <Card className="p-5">
           <h2 className="text-lg font-semibold mb-4">Execution Timeline</h2>
           <div className="space-y-3">
-            {mockSteps.map((step) => (
+            {(isApiCase ? oaSteps : mockSteps).map((step) => (
               <div
                 key={step.id}
                 className={cn(
