@@ -207,7 +207,9 @@ const testStatusConfig: Record<ExecutionCaseRow["testStatus"], { label: string; 
 export default function SmartExecutionCases() {
   const navigate = useNavigate();
   const { workspaceId, executionId } = useParams();
-  const [cases] = useState<ExecutionCaseRow[]>(mockCases);
+  const [cases] = useState<ExecutionCaseRow[]>(
+    executionId === "e5" ? openAccountCases : mockCases,
+  );
 
   const handleOpenCase = (caseId: string) => {
     navigate(`/workspace/${workspaceId}/smart-execution/${executionId}/case/${caseId}?live=1`);
