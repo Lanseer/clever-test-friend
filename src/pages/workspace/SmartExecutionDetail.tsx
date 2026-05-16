@@ -803,6 +803,9 @@ export default function SmartExecutionDetail() {
           >
             <Copy className="w-4 h-4" />
           </Button>
+          {isApiCase ? (
+            <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap pr-10">{oaFeatureCode}</pre>
+          ) : (
           <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap pr-10">
             <span className="text-blue-600 font-semibold">FEATURE:</span> Login Test
             {"\n"}; Use Given Account and password to login website
@@ -817,6 +820,7 @@ export default function SmartExecutionDetail() {
             {"\n\n    "}
             <span className="text-purple-600 font-semibold">THEN</span> I see the login successfule message and turn to homepage
           </pre>
+          )}
         </Card>
 
         <Card className="p-5">
