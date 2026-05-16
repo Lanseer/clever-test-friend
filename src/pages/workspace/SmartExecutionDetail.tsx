@@ -607,11 +607,13 @@ export default function SmartExecutionDetail() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-semibold truncate">web-网页测试</h1>
+                <h1 className="text-xl font-semibold truncate">
+                  {isApiCase ? "对公活期开户交易 - API 案例" : "web-网页测试"}
+                </h1>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm text-muted-foreground">Tags:</span>
                   <Badge variant="outline" className="bg-muted/50 font-normal">
-                    web case
+                    {isApiCase ? "API case · 开户" : "web case"}
                   </Badge>
                 </div>
               </div>
