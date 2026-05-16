@@ -782,7 +782,9 @@ export default function SmartExecutionDetail() {
               {showAsPassed ? "AI Reasoning · 自愈后重试通过" : "AI Reasoning"}
             </h2>
             <p className="text-sm leading-relaxed text-foreground/90">
-              {showAsPassed
+              {isApiCase
+                ? oaReasoning
+                : showAsPassed
                 ? '案例首次执行因 BDD 中 "登录" 按钮描述不够明确而无法定位元素。AI 自愈模式自动启用：通过视觉模型在登录区域唯一识别出 text="登录" 且 type="submit" 的目标按钮，生成稳定选择器并回写到案例脚本，随后自动重试执行。重试过程中输入账号密码、点击登录、跳转到用户中心均按预期完成，最终判定为 PASS。'
                 : aiReasoning}
             </p>
