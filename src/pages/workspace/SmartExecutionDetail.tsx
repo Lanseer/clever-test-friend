@@ -246,9 +246,294 @@ function ArtifactIcon({ type }: { type: ArtifactItem["type"] }) {
   }
 }
 
+// ============ 开户交易 API 案例专用 Mock 数据 ============
+interface ApiTraceRequest {
+  id: string;
+  method: "GET" | "POST" | "PUT" | "DELETE";
+  url: string;
+  status: number;
+  time: string;
+  requestHeaders: { key: string; value: string }[];
+  responseHeaders: { key: string; value: string }[];
+  responseBody: string;
+}
+
+const oaApiTraces: ApiTraceRequest[] = [
+  {
+    id: "r1",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/customer/query?custNo=&channel=CORP",
+    status: 200,
+    time: "Feb 11, 2026, 9:00 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "accept-encoding", value: "gzip, deflate" },
+      { key: "connection", value: "keep-alive" },
+      { key: "user-agent", value: "python-httpx/0.28.1" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "62" },
+      { key: "connection", value: "close" },
+      { key: "trace-id", value: "0330421391141778738523722000367903746" },
+      { key: "sc", value: "0.012" },
+    ],
+    responseBody: `{
+  "status": "0",
+  "info": "INVALID_PARAMS",
+  "infocode": "20000"
+}`,
+  },
+  {
+    id: "r2",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/customer/query?custNo=C00001&channel=CORP",
+    status: 200,
+    time: "Feb 11, 2026, 9:01 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "accept-encoding", value: "gzip, deflate" },
+      { key: "connection", value: "keep-alive" },
+      { key: "user-agent", value: "python-httpx/0.28.1" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "286" },
+      { key: "connection", value: "keep-alive" },
+      { key: "trace-id", value: "0330421391141778738523722000367903747" },
+      { key: "sc", value: "0.038" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "OK",
+  "data": {
+    "custNo": "C00001",
+    "custName": "北京某某科技有限公司",
+    "certType": "USCC",
+    "certNo": "91110000XXXXXXXX1A",
+    "custType": "CORP"
+  }
+}`,
+  },
+  {
+    id: "r3",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/open/validate",
+    status: 200,
+    time: "Feb 11, 2026, 9:02 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "94" },
+      { key: "trace-id", value: "0330421391141778738523722000367903748" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "VALIDATION_PASSED",
+  "data": { "checkCode": "VC20260211090201" }
+}`,
+  },
+  {
+    id: "r4",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/open/create?currency=CNY&type=CURRENT",
+    status: 200,
+    time: "Feb 11, 2026, 9:04 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+      { key: "x-idempotency-key", value: "OA-20260211-0001" },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "212" },
+      { key: "trace-id", value: "0330421391141778738523722000367903749" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "ACCOUNT_CREATED",
+  "data": {
+    "accountNo": "6225 8801 2034 5678",
+    "custNo": "C00001",
+    "currency": "CNY",
+    "openDate": "2026-02-11"
+  }
+}`,
+  },
+  {
+    id: "r5",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/account/auth/approve?accountNo=6225880120345678",
+    status: 200,
+    time: "Feb 11, 2026, 9:05 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "78" },
+      { key: "trace-id", value: "0330421391141778738523722000367903750" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "AUTH_APPROVED",
+  "data": { "approver": "S1023" }
+}`,
+  },
+  {
+    id: "r6",
+    method: "GET",
+    url: "https://api.bank-corp.com/v3/account/detail?accountNo=6225880120345678",
+    status: 200,
+    time: "Feb 11, 2026, 9:06 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "accept", value: "*/*" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "248" },
+      { key: "trace-id", value: "0330421391141778738523722000367903751" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "OK",
+  "data": {
+    "accountNo": "6225 8801 2034 5678",
+    "custNo": "C00001",
+    "custName": "北京某某科技有限公司",
+    "currency": "CNY",
+    "balance": "0.00",
+    "status": "ACTIVE"
+  }
+}`,
+  },
+  {
+    id: "r7",
+    method: "POST",
+    url: "https://api.bank-corp.com/v3/print/voucher?accountNo=6225880120345678&type=PAPERLESS",
+    status: 200,
+    time: "Feb 11, 2026, 9:07 AM",
+    requestHeaders: [
+      { key: "host", value: "api.bank-corp.com" },
+      { key: "content-type", value: "application/json" },
+      { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
+    ],
+    responseHeaders: [
+      { key: "content-type", value: "application/json;charset=UTF-8" },
+      { key: "content-length", value: "108" },
+      { key: "trace-id", value: "0330421391141778738523722000367903752" },
+    ],
+    responseBody: `{
+  "status": "1",
+  "info": "VOUCHER_GENERATED",
+  "data": { "voucherId": "VCH20260211090701", "url": "/voucher/VCH20260211090701.pdf" }
+}`,
+  },
+];
+
+const oaFeatureCode = `FEATURE: 对公活期开户交易
+; 通过 API 完成对公客户活期账户开户的端到端测试
+
+  SCENARIO: 对公客户成功开立人民币活期账户
+    GIVEN 客户 "C00001" 已通过准入审核
+    AND  系统当前为 SIT-03 环境
+
+    WHEN 调用 客户信息查询接口
+    AND  调用 开户校验接口
+    AND  调用 开户创建接口（币种=人民币, 类型=活期, 现金）
+    AND  调用 授权审批接口
+    AND  调用 无纸化打印接口
+
+    THEN 账户状态应为 ACTIVE
+    AND  返回的账户号应为 19 位有效卡号
+    AND  打印凭证应成功生成`;
+
+const oaExecutionPlan = [
+  { step: 1, content: "调用 /account/customer/query 查询客户号 C00001 的基本信息。" },
+  { step: 2, content: "调用 /account/open/validate 校验客户准入与币种/账户类型组合。" },
+  { step: 3, content: "调用 /account/open/create 提交开户请求（CNY · 活期 · 现金）。" },
+  { step: 4, content: "调用 /account/auth/approve 完成柜员授权审批。" },
+  { step: 5, content: "调用 /account/detail 校验账户状态为 ACTIVE。" },
+  { step: 6, content: "调用 /print/voucher 完成无纸化凭证打印。" },
+];
+
+const oaSteps: TimelineStep[] = [
+  { id: "os1", step: 1, title: "POST /account/customer/query — 客户信息查询", type: "API", status: "completed" },
+  { id: "os2", step: 2, title: "POST /account/open/validate — 开户校验", type: "API", status: "completed" },
+  { id: "os3", step: 3, title: "POST /account/open/create — 创建开户请求", type: "API", status: "completed" },
+  { id: "os4", step: 4, title: "POST /account/auth/approve — 授权审批", type: "API", status: "completed" },
+  { id: "os5", step: 5, title: "GET /account/detail — 账户状态校验", type: "API", status: "completed" },
+  {
+    id: "os6",
+    step: 6,
+    title: "POST /print/voucher — 无纸化打印凭证生成，账户开立成功",
+    type: "API",
+    status: "completed",
+    highlighted: true,
+  },
+];
+
+const oaArtifacts: ArtifactItem[] = [
+  { id: "oa-a1", name: "all_api_traces.har", date: "Feb 11, 2026, 9:08 AM", type: "archive" },
+  { id: "oa-a2", name: "open_account_result.xml", date: "Feb 11, 2026, 9:08 AM", type: "file", viewable: true },
+  { id: "oa-a3", name: "request_payload_create.json", date: "Feb 11, 2026, 9:04 AM", type: "file", viewable: true },
+  { id: "oa-a4", name: "response_account_detail.json", date: "Feb 11, 2026, 9:06 AM", type: "file", viewable: true },
+  { id: "oa-a5", name: "voucher_VCH20260211090701.pdf", date: "Feb 11, 2026, 9:07 AM", type: "file", viewable: true },
+];
+
+const oaReasoning =
+  "本次开户交易执行整体通过。AI 依次调用 客户信息查询 → 开户校验 → 开户创建 → 授权审批 → 账户详情校验 → 无纸化打印 共 6 个接口，所有响应 status 均为 \"1\"，且关键字段（accountNo、custNo、currency、status）与预期一致。开户后账户状态返回 ACTIVE，凭证已成功生成，符合「对公客户成功开立人民币活期账户」的预期断言，因此判定为 PASS。";
+
+function ApiMethodBadge({ method }: { method: ApiTraceRequest["method"] }) {
+  const color =
+    method === "GET"
+      ? "text-blue-600 border-blue-200 bg-blue-50"
+      : method === "POST"
+      ? "text-green-600 border-green-200 bg-green-50"
+      : method === "PUT"
+      ? "text-amber-600 border-amber-200 bg-amber-50"
+      : "text-red-600 border-red-200 bg-red-50";
+  return (
+    <Badge variant="outline" className={cn("font-semibold tracking-wide rounded-full px-3 py-0.5", color)}>
+      {method}
+    </Badge>
+  );
+}
+
+function ApiStatusBadge({ status }: { status: number }) {
+  const ok = status >= 200 && status < 300;
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "font-semibold rounded-full px-3 py-0.5",
+        ok ? "text-green-600 border-green-200 bg-green-50" : "text-red-600 border-red-200 bg-red-50",
+      )}
+    >
+      {status}
+    </Badge>
+  );
+}
+
 export default function SmartExecutionDetail() {
   const navigate = useNavigate();
-  const { workspaceId } = useParams();
+  const { workspaceId, caseId } = useParams();
+  const isApiCase = (caseId || "").startsWith("live-oa");
+  const [selectedTrace, setSelectedTrace] = useState<ApiTraceRequest | null>(null);
+  const [traceTab, setTraceTab] = useState<"request" | "response">("request");
   const [searchParams] = useSearchParams();
   const isLiveEntry = searchParams.get("live") === "1";
   const isFailedRun = searchParams.get("result") === "failed";
