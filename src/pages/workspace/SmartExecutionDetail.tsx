@@ -826,7 +826,7 @@ export default function SmartExecutionDetail() {
         <Card className="p-5">
           <h2 className="text-lg font-semibold mb-4">Execution Plan</h2>
           <div className="space-y-4">
-            {executionPlan.map((p) => (
+            {(isApiCase ? oaExecutionPlan : executionPlan).map((p) => (
               <div key={p.step}>
                 <h3 className="font-semibold text-sm mb-1">Step {p.step}</h3>
                 <p className="text-sm text-foreground/80 leading-relaxed">{p.content}</p>
