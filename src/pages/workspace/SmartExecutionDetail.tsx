@@ -876,7 +876,7 @@ export default function SmartExecutionDetail() {
             <div className="flex items-center gap-2">
               <Paperclip className="w-5 h-5 text-muted-foreground" />
               <h2 className="text-lg font-semibold">Artifacts</h2>
-              <span className="text-muted-foreground">({mockArtifacts.length})</span>
+              <span className="text-muted-foreground">({(isApiCase ? oaArtifacts : mockArtifacts).length})</span>
             </div>
             <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
               <button
