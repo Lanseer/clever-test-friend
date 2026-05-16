@@ -996,9 +996,143 @@ export default function SmartExecutionDetail() {
           </Card>
         </div>
       )}
-      {!isLiveLoading && (
+      {!isLiveLoading && isApiCase && (
+        <div className="p-4">
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-muted-foreground" />
+                <h2 className="text-lg font-semibold">API Trace Viewer</h2>
+                <span className="text-muted-foreground text-sm">
+                  ({oaApiTraces.length} 个请求)
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {oaApiTraces.map((req) => (
+                <button
+                  key={req.id}
+                  onClick={() => {
+                    setSelectedTrace(req);
+                    setTraceTab("request");
+                  }}
+                  className="w-full flex items-center gap-4 p-3 rounded-lg border bg-background/50 hover:bg-muted/30 hover:border-primary/40 transition-colors text-left"
+                >
+                  <ApiMethodBadge method={req.method} />
+                  <div className="flex-1 min-w-0 text-sm font-mono break-all line-clamp-2">
+                    {req.url}
+                  </div>
+                  <ApiStatusBadge status={req.status} />
+                  <div className="text-sm text-muted-foreground whitespace-nowrap">
+                    {req.time}
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      <Sheet
+        open={!!selectedTrace}
+        onOpenChange={(open) => !open && setSelectedTrace(null)}
+      >
+        <SheetContent className="w-[640px] sm:max-w-[640px] flex flex-col p-0">
+          {selectedTrace && (
+            <>
+              <SheetHeader className="px-6 pt-6 pb-4 border-b">
+                <SheetTitle>API Request</SheetTitle>
+              </SheetHeader>
+              <div className="px-6 py-4 border-b space-y-3">
+                <div className="text-sm font-mono break-all leading-relaxed">
+                  {selectedTrace.url}
+                </div>
+                <div className="flex items-center gap-2">
+                  <ApiMethodBadge method={selectedTrace.method} />
+                  <ApiStatusBadge status={selectedTrace.status} />
+                  <Badge className="rounded-full bg-primary text-primary-foreground px-3 py-0.5">
+                    complete
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">{selectedTrace.time}</div>
+              </div>
+              <div className="px-6 pt-3 border-b flex items-center gap-6">
+                {(["request", "response"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setTraceTab(tab)}
+                    className={cn(
+                      "pb-3 text-sm font-medium border-b-2 -mb-px transition-colors",
+                      traceTab === tab
+                        ? "border-foreground text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {tab === "request" ? "Request" : "Response"}
+                  </button>
+                ))}
+              </div>
+              <ScrollArea className="flex-1">
+                <div className="px-6 py-4 space-y-4">
+                  {traceTab === "request" ? (
+                    <>
+                      <h3 className="font-semibold text-base">Request Headers</h3>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-1/3">Key</TableHead>
+                            <TableHead>Value</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedTrace.requestHeaders.map((h) => (
+                            <TableRow key={h.key}>
+                              <TableCell className="font-mono text-sm">{h.key}</TableCell>
+                              <TableCell className="font-mono text-sm break-all">
+                                {h.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="font-semibold text-base">Response Headers</h3>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-1/3">Key</TableHead>
+                            <TableHead>Value</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedTrace.responseHeaders.map((h) => (
+                            <TableRow key={h.key}>
+                              <TableCell className="font-mono text-sm">{h.key}</TableCell>
+                              <TableCell className="font-mono text-sm break-all">
+                                {h.value}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      <h3 className="font-semibold text-base mt-4">Response Body</h3>
+                      <pre className="rounded-md border bg-muted/40 p-3 text-xs font-mono leading-relaxed whitespace-pre-wrap text-foreground/90">
+                        {selectedTrace.responseBody}
+                      </pre>
+                    </>
+                  )}
+                </div>
+              </ScrollArea>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {!isLiveLoading && !isApiCase && (
         <>
-      {/* Video Playback */}
       <div className="px-4">
         <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
