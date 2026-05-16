@@ -95,6 +95,97 @@ const mockCases: ExecutionCaseRow[] = [
   },
 ];
 
+const openAccountCases: ExecutionCaseRow[] = [
+  {
+    id: "live-oa-1",
+    name: "OA-001",
+    testData: "客户号:C00001 / 币种:人民币 / 现金",
+    nature: "positive",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:00",
+    endTime: "2026-02-11 09:08",
+  },
+  {
+    id: "live-oa-2",
+    name: "OA-002",
+    testData: "证件号:91110000XXX / 币种:美元 / 转账",
+    nature: "positive",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:08",
+    endTime: "2026-02-11 09:16",
+  },
+  {
+    id: "live-oa-3",
+    name: "OA-003",
+    testData: "客户号:不存在 / 币种:人民币",
+    nature: "negative",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:16",
+    endTime: "2026-02-11 09:22",
+  },
+  {
+    id: "live-oa-4",
+    name: "OA-004",
+    testData: "客户号:C00002 / 本外币一体化 / 转账",
+    nature: "positive",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:22",
+    endTime: "2026-02-11 09:30",
+  },
+  {
+    id: "live-oa-5",
+    name: "OA-005",
+    testData: "客户号:C00003 / 现金 / 联动配款",
+    nature: "positive",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:30",
+    endTime: "2026-02-11 09:38",
+  },
+  {
+    id: "live-oa-6",
+    name: "OA-006",
+    testData: "客户号:C00004 / 对方账户:错误格式",
+    nature: "negative",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:38",
+    endTime: "2026-02-11 09:45",
+  },
+  {
+    id: "live-oa-7",
+    name: "OA-007",
+    testData: "客户号:C00005 / 授权失败场景",
+    nature: "negative",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:45",
+    endTime: "2026-02-11 09:52",
+  },
+  {
+    id: "live-oa-8",
+    name: "OA-008",
+    testData: "客户号:C00006 / 无纸化打印",
+    nature: "positive",
+    status: "completed",
+    testStatus: "passed",
+    environment: "SIT-03",
+    startTime: "2026-02-11 09:52",
+    endTime: "2026-02-11 10:00",
+  },
+];
+
 const natureConfig: Record<ExecutionCaseRow["nature"], { label: string; className: string }> = {
   positive: { label: "正例", className: "bg-green-100 text-green-700 border-green-200" },
   negative: { label: "反例", className: "bg-amber-100 text-amber-700 border-amber-200" },
@@ -116,7 +207,9 @@ const testStatusConfig: Record<ExecutionCaseRow["testStatus"], { label: string; 
 export default function SmartExecutionCases() {
   const navigate = useNavigate();
   const { workspaceId, executionId } = useParams();
-  const [cases] = useState<ExecutionCaseRow[]>(mockCases);
+  const [cases] = useState<ExecutionCaseRow[]>(
+    executionId === "e5" ? openAccountCases : mockCases,
+  );
 
   const handleOpenCase = (caseId: string) => {
     navigate(`/workspace/${workspaceId}/smart-execution/${executionId}/case/${caseId}?live=1`);
