@@ -291,6 +291,23 @@ export default function TestCaseDetail() {
               </Select>
             </div>
 
+            {/* Database */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">数据库</Label>
+              <Select value={database} onValueChange={setDatabase}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择数据库" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableDatabases.map((db) => (
+                    <SelectItem key={db} value={db}>
+                      {db}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Test Data */}
             <div className="space-y-3">
               <Label className="text-base font-medium">测试数据</Label>
