@@ -378,7 +378,7 @@ export default function CaseReviewDetail() {
                   <SelectValue placeholder="选择数据库" />
                 </SelectTrigger>
                 <SelectContent>
-                  {["MySQL-主库", "MySQL-从库", "Oracle-核心库", "PostgreSQL-测试库", "MongoDB-文档库"].map((db) => (
+                  {["开发数据库", "测试数据库", "Oracle测试库"].map((db) => (
                     <SelectItem key={db} value={db}>{db}</SelectItem>
                   ))}
                 </SelectContent>
