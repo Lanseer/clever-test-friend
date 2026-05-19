@@ -254,6 +254,7 @@ interface ApiTraceRequest {
   status: number;
   time: string;
   requestHeaders: { key: string; value: string }[];
+  requestBody?: string;
   responseHeaders: { key: string; value: string }[];
   responseBody: string;
 }
