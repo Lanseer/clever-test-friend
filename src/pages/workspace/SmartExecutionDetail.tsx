@@ -274,6 +274,12 @@ const oaApiTraces: ApiTraceRequest[] = [
       { key: "user-agent", value: "python-httpx/0.28.1" },
       { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
     ],
+    requestBody: `{
+  "channel": "CORP",
+  "custNo": "",
+  "operator": "S1023",
+  "timestamp": "2026-02-11T09:00:00+08:00"
+}`,
     responseHeaders: [
       { key: "content-type", value: "application/json;charset=UTF-8" },
       { key: "content-length", value: "62" },
@@ -301,6 +307,12 @@ const oaApiTraces: ApiTraceRequest[] = [
       { key: "user-agent", value: "python-httpx/0.28.1" },
       { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
     ],
+    requestBody: `{
+  "channel": "CORP",
+  "custNo": "C00001",
+  "operator": "S1023",
+  "timestamp": "2026-02-11T09:01:00+08:00"
+}`,
     responseHeaders: [
       { key: "content-type", value: "application/json;charset=UTF-8" },
       { key: "content-length", value: "286" },
@@ -331,6 +343,14 @@ const oaApiTraces: ApiTraceRequest[] = [
       { key: "content-type", value: "application/json" },
       { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
     ],
+    requestBody: `{
+  "custNo": "C00001",
+  "currency": "CNY",
+  "accountType": "CURRENT",
+  "fundSource": "CASH",
+  "openBranch": "BJ-0001",
+  "operator": "S1023"
+}`,
     responseHeaders: [
       { key: "content-type", value: "application/json;charset=UTF-8" },
       { key: "content-length", value: "94" },
@@ -354,6 +374,15 @@ const oaApiTraces: ApiTraceRequest[] = [
       { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
       { key: "x-idempotency-key", value: "OA-20260211-0001" },
     ],
+    requestBody: `{
+  "custNo": "C00001",
+  "currency": "CNY",
+  "accountType": "CURRENT",
+  "fundSource": "CASH",
+  "initialAmount": "0.00",
+  "checkCode": "VC20260211090201",
+  "operator": "S1023"
+}`,
     responseHeaders: [
       { key: "content-type", value: "application/json;charset=UTF-8" },
       { key: "content-length", value: "212" },
@@ -381,6 +410,12 @@ const oaApiTraces: ApiTraceRequest[] = [
       { key: "content-type", value: "application/json" },
       { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
     ],
+    requestBody: `{
+  "accountNo": "6225880120345678",
+  "approver": "S1023",
+  "action": "APPROVE",
+  "remark": "对公活期开户审批通过"
+}`,
     responseHeaders: [
       { key: "content-type", value: "application/json;charset=UTF-8" },
       { key: "content-length", value: "78" },
@@ -432,6 +467,12 @@ const oaApiTraces: ApiTraceRequest[] = [
       { key: "content-type", value: "application/json" },
       { key: "authorization", value: "Bearer eyJhbGciOiJIUzI1NiIs..." },
     ],
+    requestBody: `{
+  "accountNo": "6225880120345678",
+  "type": "PAPERLESS",
+  "voucherTemplate": "OPEN_ACCOUNT_V3",
+  "operator": "S1023"
+}`,
     responseHeaders: [
       { key: "content-type", value: "application/json;charset=UTF-8" },
       { key: "content-length", value: "108" },
