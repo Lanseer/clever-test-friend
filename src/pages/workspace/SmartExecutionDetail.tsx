@@ -541,7 +541,8 @@ export default function SmartExecutionDetail() {
   const caseIdx = parseInt(searchParams.get("caseIdx") || "0", 10) || 0;
   const failureScenario = getFailureScenario(caseIdx);
 
-  const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry);
+  const isApiCase = (caseId || "").startsWith("live-oa");
+  const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry && !isApiCase);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [searchArtifact, setSearchArtifact] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -552,11 +553,11 @@ export default function SmartExecutionDetail() {
   const [healPhase, setHealPhase] = useState(0);
 
   useEffect(() => {
-    if (!isLiveEntry) return;
+    if (!isLiveEntry || isApiCase) return;
     setIsLiveLoading(true);
     const timer = setTimeout(() => setIsLiveLoading(false), 3000);
     return () => clearTimeout(timer);
-  }, [isLiveEntry]);
+  }, [isLiveEntry, isApiCase]);
 
   useEffect(() => {
     if (!selfHealEnabled || isLiveLoading) return;
