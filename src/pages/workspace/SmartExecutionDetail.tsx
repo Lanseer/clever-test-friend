@@ -541,7 +541,6 @@ export default function SmartExecutionDetail() {
   const caseIdx = parseInt(searchParams.get("caseIdx") || "0", 10) || 0;
   const failureScenario = getFailureScenario(caseIdx);
 
-  const isApiCase = (caseId || "").startsWith("live-oa");
   const [isLiveLoading, setIsLiveLoading] = useState(isLiveEntry && !isApiCase);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [searchArtifact, setSearchArtifact] = useState("");
