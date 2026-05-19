@@ -143,6 +143,7 @@ export default function CaseReviewDetail() {
   const [selectedTags, setSelectedTags] = useState<string[]>(["登录", "核心功能"]);
   const [appUrl, setAppUrl] = useState("https://test.example.com/login");
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
+  const [database, setDatabase] = useState("");
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
   const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
