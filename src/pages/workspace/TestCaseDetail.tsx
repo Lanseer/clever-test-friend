@@ -151,6 +151,7 @@ export default function TestCaseDetail() {
   
   const [selectedTags, setSelectedTags] = useState<string[]>(testCase?.tags || []);
   const [environment, setEnvironment] = useState(testCase?.environment || "");
+  const [database, setDatabase] = useState("");
   const [testData, setTestData] = useState(testCase?.testData || "");
 
   if (!testCase) {
