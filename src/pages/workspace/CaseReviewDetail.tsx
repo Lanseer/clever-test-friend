@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -142,6 +143,7 @@ export default function CaseReviewDetail() {
   const [selectedTags, setSelectedTags] = useState<string[]>(["登录", "核心功能"]);
   const [appUrl, setAppUrl] = useState("https://test.example.com/login");
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
+  const [database, setDatabase] = useState("");
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
   const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
@@ -363,6 +365,24 @@ export default function CaseReviewDetail() {
                 onChange={(e) => setAppUrl(e.target.value)}
                 placeholder="https://..."
               />
+            </div>
+
+            {/* Database */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Database className="w-4 h-4" />
+                数据库
+              </Label>
+              <Select value={database} onValueChange={setDatabase}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择数据库" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["MySQL-主库", "MySQL-从库", "Oracle-核心库", "PostgreSQL-测试库", "MongoDB-文档库"].map((db) => (
+                    <SelectItem key={db} value={db}>{db}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Test Cases (key|value editable rows) */}
