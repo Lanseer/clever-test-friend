@@ -1138,6 +1138,14 @@ export default function SmartExecutionDetail() {
                           ))}
                         </TableBody>
                       </Table>
+                      {selectedTrace.requestBody && (
+                        <>
+                          <h3 className="font-semibold text-base mt-4">Request Body</h3>
+                          <pre className="rounded-md border bg-muted/40 p-3 text-xs font-mono leading-relaxed whitespace-pre-wrap text-foreground/90">
+                            {selectedTrace.requestBody}
+                          </pre>
+                        </>
+                      )}
                     </>
                   ) : (
                     <>
