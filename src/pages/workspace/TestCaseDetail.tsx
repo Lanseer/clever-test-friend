@@ -141,6 +141,7 @@ const mockTestCases: Record<string, {
 
 const availableTags = ["登录", "核心功能", "支付", "关键路径", "注册", "表单验证", "订单", "状态机", "性能", "API", "安全", "UI"];
 const availableEnvironments = ["开发环境", "测试环境", "预发布环境", "生产环境"];
+const availableDatabases = ["MySQL-主库", "MySQL-从库", "Oracle-核心库", "PostgreSQL-测试库", "MongoDB-文档库"];
 
 export default function TestCaseDetail() {
   const { caseId } = useParams<{ caseId: string }>();
