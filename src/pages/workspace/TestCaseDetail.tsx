@@ -141,6 +141,7 @@ const mockTestCases: Record<string, {
 
 const availableTags = ["登录", "核心功能", "支付", "关键路径", "注册", "表单验证", "订单", "状态机", "性能", "API", "安全", "UI"];
 const availableEnvironments = ["开发环境", "测试环境", "预发布环境", "生产环境"];
+const availableDatabases = ["MySQL-主库", "MySQL-从库", "Oracle-核心库", "PostgreSQL-测试库", "MongoDB-文档库"];
 
 export default function TestCaseDetail() {
   const { caseId } = useParams<{ caseId: string }>();
@@ -150,6 +151,7 @@ export default function TestCaseDetail() {
   
   const [selectedTags, setSelectedTags] = useState<string[]>(testCase?.tags || []);
   const [environment, setEnvironment] = useState(testCase?.environment || "");
+  const [database, setDatabase] = useState("");
   const [testData, setTestData] = useState(testCase?.testData || "");
 
   if (!testCase) {
@@ -283,6 +285,23 @@ export default function TestCaseDetail() {
                   {availableEnvironments.map((env) => (
                     <SelectItem key={env} value={env}>
                       {env}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Database */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">数据库</Label>
+              <Select value={database} onValueChange={setDatabase}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择数据库" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableDatabases.map((db) => (
+                    <SelectItem key={db} value={db}>
+                      {db}
                     </SelectItem>
                   ))}
                 </SelectContent>
