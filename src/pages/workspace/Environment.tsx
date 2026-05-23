@@ -69,6 +69,7 @@ const dbTypeLabels: Record<DbType, string> = {
 interface EnvFormState {
   name: string;
   type: EnvType;
+  category: EnvCategory;
   url: string;
   headers: string;
   requestBody: string;
