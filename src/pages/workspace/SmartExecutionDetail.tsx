@@ -894,10 +894,12 @@ export default function SmartExecutionDetail() {
           <h2 className="text-lg font-semibold mb-4">Execution Timeline</h2>
           <div className="space-y-3">
             {(isApiCase ? oaSteps : mockSteps).map((step) => (
-              <div
+              <button
                 key={step.id}
+                type="button"
+                onClick={() => { setSelectedStep(step); setStepTab("details"); }}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg border bg-background/50 transition-colors hover:bg-muted/30",
+                  "w-full text-left flex items-center gap-3 p-3 rounded-lg border bg-background/50 transition-colors hover:bg-muted/40 cursor-pointer",
                   step.highlighted && "border-2 border-green-300 bg-green-50/40"
                 )}
               >
