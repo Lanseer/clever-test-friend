@@ -249,7 +249,7 @@ const useMockDimensions = (): TestDimension[] => {
       id: "dim-3",
       name: `03-${t('mockData.dimensions.businessElement')}`,
       testPoints: [
-        { id: "tp-7", code: "SC-007", name: t('mockData.testPoints.productInfoValidation'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "TSD", caseCount: 14, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+        { id: "tp-7", code: "SC-007", name: t('mockData.testPoints.productInfoValidation'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [] },
         { id: "tp-8", code: "SC-008", name: t('mockData.testPoints.inventoryBoundary'), scenarioCategory: t('caseReview.scenarioCategories.boundary'), source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
       ],
     },

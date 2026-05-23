@@ -262,12 +262,7 @@ export default function CaseReviewDetail() {
                 className="gap-2"
                 onClick={() => {
                   if (isBusinessElement) {
-                    const backUrl = batchId
-                      ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}&dim=${dim ?? ""}`
-                      : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}&dim=${dim ?? ""}`;
-                    navigate(
-                      `/workspace/${workspaceId}/smart-execution/api/${caseId}?caseName=${encodeURIComponent(caseId ?? "")}&editBack=${encodeURIComponent(backUrl)}`
-                    );
+                    navigate(`/workspace/${workspaceId}/smart-execution/e5/cases`);
                     return;
                   }
                   setSelectedLiveCaseIdx("");
@@ -455,17 +450,22 @@ export default function CaseReviewDetail() {
               </>
             )}
 
-            {/* App URL */}
+            {/* Environment - Select */}
             <div className="space-y-3">
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <Globe className="w-4 h-4" />
                 环境
               </Label>
-              <Input
-                value={appUrl}
-                onChange={(e) => setAppUrl(e.target.value)}
-                placeholder="https://..."
-              />
+              <Select value={appUrl} onValueChange={setAppUrl}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择环境" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["SIT-01 测试环境", "SIT-02 测试环境", "SIT-03 测试环境", "UAT-02 预发布环境", "PERF-01 性能环境"].map((env) => (
+                    <SelectItem key={env} value={env}>{env}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Database */}
