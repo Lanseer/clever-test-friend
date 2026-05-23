@@ -27,6 +27,8 @@ const mockData: TestDataItem[] = [
 
 export default function SmartExecutionTestData() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
 
   const filtered = mockData.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
