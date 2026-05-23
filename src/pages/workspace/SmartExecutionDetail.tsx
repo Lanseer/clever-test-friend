@@ -592,7 +592,13 @@ export default function SmartExecutionDetail() {
   const [filterType, setFilterType] = useState("all");
 
   // AI 自愈流程：仅 caseIdx===0（元素定位失败）启用
-  const selfHealEnabled = isFailedRun && caseIdx === 0;
+  const [selectedStep, setSelectedStep] = useState<TimelineStep | null>(null);
+  const [stepTab, setStepTab] = useState<"details" | "artifacts">("details");
+  const [stepArtifactSearch, setStepArtifactSearch] = useState("");
+  const [evidenceOpen, setEvidenceOpen] = useState(true);
+  const [attachmentsOpen, setAttachmentsOpen] = useState(true);
+  const [debugOpen, setDebugOpen] = useState(true);
+
   // phase: 0 idle, 1 detecting, 2 fixing, 3 fixed, 4 retrying, 5 passed
   const [healPhase, setHealPhase] = useState(0);
 
