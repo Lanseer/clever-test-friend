@@ -136,7 +136,9 @@ export default function CaseReviewDetail() {
   const { caseId, workspaceId, recordId, batchId } = useParams<{ caseId: string; workspaceId: string; recordId: string; batchId?: string }>();
   const [searchParams] = useSearchParams();
   const reviewStatus = searchParams.get("status");
+  const dim = searchParams.get("dim");
   const isAdopted = reviewStatus === "adopted" || reviewStatus === "improved";
+  const isBusinessElement = dim === "dim-3";
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
@@ -147,6 +149,22 @@ export default function CaseReviewDetail() {
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
   const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
+  // Business element specific config
+  const [interfaceName, setInterfaceName] = useState("用户登录接口 / api.auth.login");
+  const [selectedTestData, setSelectedTestData] = useState<string[]>(["开户交易测试数据"]);
+  const [testDataPopoverOpen, setTestDataPopoverOpen] = useState(false);
+  const availableTestData = [
+    "开户交易测试数据",
+    "供货期开户数据集",
+    "对公账户开户数据",
+    "个人客户身份验证数据",
+    "跨境汇款测试数据",
+  ];
+  const toggleTestData = (item: string) => {
+    setSelectedTestData((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  };
   const [caseNatures, setCaseNatures] = useState<Record<number, "positive" | "negative">>({
     0: "positive",
     1: "positive",
