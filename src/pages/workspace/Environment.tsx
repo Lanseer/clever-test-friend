@@ -40,10 +40,10 @@ interface DatabaseConfig {
 }
 
 const mockEnvironments: TestEnvironment[] = [
-  { id: "1", name: "开发环境", type: "dev", url: "http://192.168.1.10:8080", headers: '{"Authorization": "Bearer token"}', requestBody: "", status: "active", description: "用于日常开发测试" },
-  { id: "2", name: "测试环境", type: "test", url: "http://192.168.1.20:8080", headers: '{"Content-Type": "application/json"}', requestBody: "", status: "active", description: "用于功能测试" },
-  { id: "3", name: "预发布环境", type: "staging", url: "https://staging.example.com", headers: "", requestBody: "", status: "active", description: "用于上线前验证" },
-  { id: "4", name: "生产环境", type: "prod", url: "https://api.example.com", headers: "", requestBody: "", status: "inactive", description: "生产环境（只读）" },
+  { id: "1", name: "开发环境", type: "dev", category: "api", url: "http://192.168.1.10:8080", headers: '{"Authorization": "Bearer token"}', requestBody: "", status: "active", description: "用于日常开发测试" },
+  { id: "2", name: "测试环境", type: "test", category: "api", url: "http://192.168.1.20:8080", headers: '{"Content-Type": "application/json"}', requestBody: "", status: "active", description: "用于功能测试" },
+  { id: "3", name: "预发布环境", type: "staging", category: "ui", url: "https://staging.example.com", headers: "", requestBody: "", status: "active", description: "用于上线前验证" },
+  { id: "4", name: "生产环境", type: "prod", category: "ui", url: "https://api.example.com", headers: "", requestBody: "", status: "inactive", description: "生产环境（只读）" },
 ];
 
 const mockDatabases: DatabaseConfig[] = [
