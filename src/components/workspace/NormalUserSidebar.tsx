@@ -6,6 +6,7 @@ import {
   Tags as TagsIcon,
   ChevronLeft,
   ArrowLeft,
+  Database,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
