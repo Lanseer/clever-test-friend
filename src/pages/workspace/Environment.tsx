@@ -408,6 +408,18 @@ export default function Environment() {
               </div>
             </div>
             <div className="space-y-2">
+              <Label>分类</Label>
+              <Select value={envForm.category} onValueChange={(v: EnvCategory) => setEnvForm({ ...envForm, category: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ui">UI</SelectItem>
+                  <SelectItem value="api">API</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>环境地址</Label>
               <Input 
                 value={envForm.url} 
@@ -415,26 +427,30 @@ export default function Environment() {
                 placeholder="https://api.example.com"
               />
             </div>
-            <div className="space-y-2">
-              <Label>统一请求头 (JSON格式)</Label>
-              <Textarea 
-                value={envForm.headers} 
-                onChange={(e) => setEnvForm({ ...envForm, headers: e.target.value })}
-                placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
-                className="font-mono text-sm"
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>统一请求体 (JSON格式)</Label>
-              <Textarea 
-                value={envForm.requestBody} 
-                onChange={(e) => setEnvForm({ ...envForm, requestBody: e.target.value })}
-                placeholder='{"key": "value"}'
-                className="font-mono text-sm"
-                rows={3}
-              />
-            </div>
+            {envForm.category === "api" && (
+              <>
+                <div className="space-y-2">
+                  <Label>统一请求头 (JSON格式)</Label>
+                  <Textarea 
+                    value={envForm.headers} 
+                    onChange={(e) => setEnvForm({ ...envForm, headers: e.target.value })}
+                    placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
+                    className="font-mono text-sm"
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>统一请求体 (JSON格式)</Label>
+                  <Textarea 
+                    value={envForm.requestBody} 
+                    onChange={(e) => setEnvForm({ ...envForm, requestBody: e.target.value })}
+                    placeholder='{"key": "value"}'
+                    className="font-mono text-sm"
+                    rows={3}
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label>描述</Label>
               <Input 
