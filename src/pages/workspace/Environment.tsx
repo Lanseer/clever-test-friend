@@ -264,6 +264,11 @@ export default function Environment() {
                     <TableRow key={env.id}>
                       <TableCell className="font-medium">{env.name}</TableCell>
                       <TableCell>
+                        <Badge variant="outline">
+                          {env.category === "ui" ? "UI" : "API"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <Badge variant={env.type === "prod" ? "destructive" : "secondary"}>
                           {envTypeLabels[env.type]}
                         </Badge>
