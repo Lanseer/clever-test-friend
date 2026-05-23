@@ -6,6 +6,7 @@ import {
   Tags as TagsIcon,
   ChevronLeft,
   ArrowLeft,
+  Database,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -34,6 +35,7 @@ interface MenuItem {
 const normalUserMenuItems: MenuItem[] = [
   { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },
   { titleKey: "workspaceMenu.smartExecution", defaultLabel: "智能执行", url: "smart-execution", icon: PlayCircle },
+  { titleKey: "workspaceMenu.testData", defaultLabel: "测试数据", url: "smart-execution/test-data", icon: Database },
   { titleKey: "workspaceMenu.testReport", defaultLabel: "测试报告", url: "test-report", icon: FileBarChart },
   { titleKey: "workspaceMenu.environment", defaultLabel: "测试环境", url: "environment", icon: Server },
   { titleKey: "workspaceMenu.tags", defaultLabel: "标签", url: "tags", icon: TagsIcon },
@@ -89,6 +91,7 @@ export function NormalUserSidebar({ workspaceName = "工作空间" }: NormalUser
                   <SidebarMenuButton asChild className="h-9">
                     <NavLink
                       to={item.url}
+                      end={item.url === "smart-execution"}
                       className={({ isActive }) =>
                         cn(
                           "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
