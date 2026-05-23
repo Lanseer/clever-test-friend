@@ -73,7 +73,10 @@ export default function SmartExecutionTestData() {
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex items-center">
-                <button className="font-medium text-primary hover:text-primary/80 hover:underline text-left transition-colors">
+                <button
+                  onClick={() => navigate(`/workspace/${workspaceId}/smart-execution/test-data/${item.id}`)}
+                  className="font-medium text-primary hover:text-primary/80 hover:underline text-left transition-colors"
+                >
                   {item.name}
                 </button>
               </div>
