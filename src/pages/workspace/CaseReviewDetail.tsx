@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2, PlayCircle } from "lucide-react";
+import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2, PlayCircle, Link as LinkIcon, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
