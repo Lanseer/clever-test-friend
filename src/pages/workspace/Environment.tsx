@@ -251,6 +251,7 @@ export default function Environment() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>环境名称</TableHead>
+                    <TableHead>分类</TableHead>
                     <TableHead>类型</TableHead>
                     <TableHead>环境地址</TableHead>
                     <TableHead>描述</TableHead>
