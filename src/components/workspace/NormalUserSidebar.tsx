@@ -91,6 +91,7 @@ export function NormalUserSidebar({ workspaceName = "工作空间" }: NormalUser
                   <SidebarMenuButton asChild className="h-9">
                     <NavLink
                       to={item.url}
+                      end={item.url === "smart-execution"}
                       className={({ isActive }) =>
                         cn(
                           "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
