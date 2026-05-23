@@ -47,6 +47,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Bug, ChevronDown } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -589,7 +592,14 @@ export default function SmartExecutionDetail() {
   const [filterType, setFilterType] = useState("all");
 
   // AI 自愈流程：仅 caseIdx===0（元素定位失败）启用
+  const [selectedStep, setSelectedStep] = useState<TimelineStep | null>(null);
+  const [stepTab, setStepTab] = useState<"details" | "artifacts">("details");
+  const [stepArtifactSearch, setStepArtifactSearch] = useState("");
+  const [evidenceOpen, setEvidenceOpen] = useState(true);
+  const [attachmentsOpen, setAttachmentsOpen] = useState(true);
+  const [debugOpen, setDebugOpen] = useState(true);
   const selfHealEnabled = isFailedRun && caseIdx === 0;
+
   // phase: 0 idle, 1 detecting, 2 fixing, 3 fixed, 4 retrying, 5 passed
   const [healPhase, setHealPhase] = useState(0);
 
@@ -884,10 +894,12 @@ export default function SmartExecutionDetail() {
           <h2 className="text-lg font-semibold mb-4">Execution Timeline</h2>
           <div className="space-y-3">
             {(isApiCase ? oaSteps : mockSteps).map((step) => (
-              <div
+              <button
                 key={step.id}
+                type="button"
+                onClick={() => { setSelectedStep(step); setStepTab("details"); }}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg border bg-background/50 transition-colors hover:bg-muted/30",
+                  "w-full text-left flex items-center gap-3 p-3 rounded-lg border bg-background/50 transition-colors hover:bg-muted/40 cursor-pointer",
                   step.highlighted && "border-2 border-green-300 bg-green-50/40"
                 )}
               >
@@ -908,7 +920,7 @@ export default function SmartExecutionDetail() {
                   Completed
                 </Badge>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-              </div>
+              </button>
             ))}
           </div>
         </Card>
@@ -1298,6 +1310,219 @@ export default function SmartExecutionDetail() {
       </div>
         </>
       )}
+
+      {/* Step Detail Sidebar */}
+      <Sheet open={!!selectedStep} onOpenChange={(o) => !o && setSelectedStep(null)}>
+        <SheetContent className="w-[640px] sm:max-w-[640px] flex flex-col p-0">
+          {selectedStep && (
+            <>
+              <SheetHeader className="px-6 pt-6 pb-4 border-b">
+                <div className="text-sm text-muted-foreground">测试案例：API测试</div>
+                <SheetTitle className="text-xl mt-2">
+                  步骤 {selectedStep.step}：发送 GET 请求执行常规天气查询场景
+                </SheetTitle>
+                <div className="mt-2">
+                  <Badge variant="outline" className="font-normal rounded-full px-3">
+                    {selectedStep.type}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">开始时间：</span>
+                    <span>2026-05-11 05:41</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">结束时间：</span>
+                    <span>2026-05-11 05:41</span>
+                  </div>
+                </div>
+              </SheetHeader>
+
+              <Tabs value={stepTab} onValueChange={(v) => setStepTab(v as "details" | "artifacts")} className="flex-1 flex flex-col overflow-hidden">
+                <div className="px-6 pt-3 border-b">
+                  <TabsList className="bg-transparent p-0 h-auto gap-6">
+                    <TabsTrigger
+                      value="details"
+                      className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 pb-2"
+                    >
+                      步骤详情
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="artifacts"
+                      className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 pb-2"
+                    >
+                      1 个工件
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <TabsContent value="details" className="flex-1 overflow-hidden m-0">
+                  <ScrollArea className="h-full">
+                    <div className="px-6 py-5 space-y-5 text-sm">
+                      <div>
+                        <h3 className="font-semibold text-base mb-2">上一步</h3>
+                        <p className="text-foreground/80 leading-relaxed">
+                          任务已发起：向高德天气 API 发送 GET 请求，参数为 (key='19767b9ba14a2fd3240388621789d914', city='110101')。
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-base mb-2">上一步状态</h3>
+                        <p className="text-foreground/80">已成功完成</p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-base mb-3">当前输出</h3>
+                        <ul className="space-y-3 list-disc pl-5">
+                          <li>
+                            <div className="font-medium mb-1">接口地址：</div>
+                            <code className="inline-block px-2 py-1 rounded bg-muted text-xs font-mono">
+                              https://restapi.amap.com/v3/weather/weatherInfo
+                            </code>
+                          </li>
+                          <li>
+                            <div className="font-medium mb-1">请求方法：</div>
+                            <code className="inline-block px-2 py-1 rounded bg-muted text-xs font-mono">GET</code>
+                          </li>
+                          <li>
+                            <div className="font-medium mb-1">请求参数：</div>
+                            <div className="flex flex-wrap gap-2">
+                              <code className="inline-block px-2 py-1 rounded bg-muted text-xs font-mono">
+                                key=19767b9ba14a2fd3240388621789d914
+                              </code>
+                              <code className="inline-block px-2 py-1 rounded bg-muted text-xs font-mono">
+                                city=110101
+                              </code>
+                            </div>
+                          </li>
+                          <li>
+                            <div className="font-medium mb-1">状态码：</div>
+                            <span>200</span>
+                          </li>
+                          <li>
+                            <div className="font-medium mb-1">执行耗时：</div>
+                            <span>1.33 秒</span>
+                          </li>
+                          <li>
+                            <div className="font-medium mb-1">完整 JSON 响应：</div>
+                            <pre className="bg-muted p-3 rounded text-xs font-mono overflow-x-auto">{`{
+  "status": "1",
+  "count": "1",
+  "info": "OK",
+  "infocode": "10000",
+  "lives": [
+    {
+      "province": "北京",
+      "city": "东城区",
+      "weather": "晴",
+      "temperature": "23",
+      "winddirection": "南",
+      "windpower": "≤3",
+      "humidity": "32",
+      "reporttime": "2026-05-11 05:40:00"
+    }
+  ]
+}`}</pre>
+                          </li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-base mb-2">校验结果</h3>
+                        <p className="text-foreground/80 leading-relaxed">
+                          接口可达，返回成功的状态码（200）以及业务逻辑码（10000）。
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-base mb-2">任务完成校验</h3>
+                        <p className="text-foreground/80 leading-relaxed">
+                          已按"正常参数查询"场景所需参数成功发送 GET 请求，完整 JSON 响应与状态码均已获取并记录，所有需求均已满足。
+                        </p>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="artifacts" className="flex-1 overflow-hidden m-0">
+                  <ScrollArea className="h-full">
+                    <div className="px-6 py-5 space-y-4">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="搜索工件..."
+                          value={stepArtifactSearch}
+                          onChange={(e) => setStepArtifactSearch(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+
+                      <Collapsible open={evidenceOpen} onOpenChange={setEvidenceOpen}>
+                        <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2.5 rounded-md border bg-blue-50/40 hover:bg-blue-50/70 text-sm font-medium">
+                          <span className="flex items-center gap-2">
+                            <ChevronDown className={cn("w-4 h-4 transition-transform", !evidenceOpen && "-rotate-90")} />
+                            <ImageIcon className="w-4 h-4 text-blue-500" />
+                            证据 <span className="text-muted-foreground font-normal">(0)</span>
+                          </span>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="border border-t-0 rounded-b-md px-4 py-6 text-sm text-muted-foreground text-center">
+                            暂无工件。
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+
+                      <Collapsible open={attachmentsOpen} onOpenChange={setAttachmentsOpen}>
+                        <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2.5 rounded-md border bg-muted/30 hover:bg-muted/50 text-sm font-medium">
+                          <span className="flex items-center gap-2">
+                            <ChevronDown className={cn("w-4 h-4 transition-transform", !attachmentsOpen && "-rotate-90")} />
+                            <Paperclip className="w-4 h-4 text-muted-foreground" />
+                            附件 <span className="text-muted-foreground font-normal">(0)</span>
+                          </span>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="border border-t-0 rounded-b-md px-4 py-6 text-sm text-muted-foreground text-center">
+                            暂无工件。
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+
+                      <Collapsible open={debugOpen} onOpenChange={setDebugOpen}>
+                        <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2.5 rounded-md border border-amber-300 bg-amber-50/40 hover:bg-amber-50/70 text-sm font-medium">
+                          <span className="flex items-center gap-2">
+                            <ChevronDown className={cn("w-4 h-4 transition-transform", !debugOpen && "-rotate-90")} />
+                            <Bug className="w-4 h-4 text-amber-500" />
+                            调试 <span className="text-muted-foreground font-normal">(1)</span>
+                          </span>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="border border-t-0 rounded-b-md px-3 py-3">
+                            <div className="flex items-center justify-between gap-3 px-2 py-2 rounded hover:bg-muted/30">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
+                                <div className="min-w-0">
+                                  <div className="text-sm font-medium truncate">
+                                    log_between_sender-user-rec-chat_manager_202...
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">2026-05-11 05:42</div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
