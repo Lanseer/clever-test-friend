@@ -261,10 +261,6 @@ export default function CaseReviewDetail() {
                 size="sm"
                 className="gap-2"
                 onClick={() => {
-                  if (isBusinessElement) {
-                    navigate(`/workspace/${workspaceId}/smart-execution/e5/cases`);
-                    return;
-                  }
                   setSelectedLiveCaseIdx("");
                   setLiveCaseDialogOpen(true);
                 }}
@@ -785,10 +781,16 @@ export default function CaseReviewDetail() {
                 }
                 setLiveCaseDialogOpen(false);
                 const backUrl = batchId
-                  ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}`
-                  : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}`;
+                  ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}${dim ? `&dim=${dim}` : ""}`
+                  : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}${dim ? `&dim=${dim}` : ""}`;
                 const idxNum = parseInt(selectedLiveCaseIdx, 10) || 0;
                 const runResult = idxNum === 2 ? "passed" : "failed";
+                if (isBusinessElement) {
+                  navigate(
+                    `/workspace/${workspaceId}/smart-execution/e5/case/live-oa-${idxNum + 1}?live=1&editBack=${encodeURIComponent(backUrl)}`
+                  );
+                  return;
+                }
                 navigate(
                   `/workspace/${workspaceId}/smart-execution/live-${caseId}?live=1&caseIdx=${selectedLiveCaseIdx}&result=${runResult}&editBack=${encodeURIComponent(backUrl)}`
                 );
