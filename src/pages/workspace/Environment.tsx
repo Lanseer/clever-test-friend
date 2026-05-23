@@ -251,6 +251,7 @@ export default function Environment() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>环境名称</TableHead>
+                    <TableHead>分类</TableHead>
                     <TableHead>类型</TableHead>
                     <TableHead>环境地址</TableHead>
                     <TableHead>描述</TableHead>
@@ -262,6 +263,11 @@ export default function Environment() {
                   {environments.map((env) => (
                     <TableRow key={env.id}>
                       <TableCell className="font-medium">{env.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {env.category === "ui" ? "UI" : "API"}
+                        </Badge>
+                      </TableCell>
                       <TableCell>
                         <Badge variant={env.type === "prod" ? "destructive" : "secondary"}>
                           {envTypeLabels[env.type]}
