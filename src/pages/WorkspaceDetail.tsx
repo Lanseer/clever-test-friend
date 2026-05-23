@@ -89,6 +89,7 @@ export default function WorkspaceDetail() {
               <Route path="smart-execution" element={<SmartExecution />} />
               <Route path="smart-execution/test-data" element={<SmartExecutionTestData />} />
               <Route path="smart-execution/test-data/:dataId" element={<SmartExecutionTestDataDetail />} />
+              <Route path="smart-execution/api/:caseId" element={<SmartExecutionApiDetail />} />
               <Route path="smart-execution/:executionId/cases" element={<SmartExecutionCases />} />
               <Route path="smart-execution/:executionId/case/:caseId" element={<SmartExecutionDetail />} />
               <Route path="smart-execution/:executionId" element={<SmartExecutionDetail />} />
