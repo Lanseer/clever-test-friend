@@ -138,7 +138,7 @@ export default function CaseReviewDetail() {
   const reviewStatus = searchParams.get("status");
   const dim = searchParams.get("dim");
   const isAdopted = reviewStatus === "adopted" || reviewStatus === "improved";
-  const isBusinessElement = dim === "dim-3";
+  const isBusinessElement = dim === "dim-3" || caseId === "tp-7" || caseId === "tp-8";
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
