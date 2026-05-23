@@ -372,79 +372,78 @@ export default function CaseReviewDetail() {
               </Popover>
             </div>
 
-            {/* Business element: 接口 + 测试数据 */}
+            {/* Business element: 接口 */}
             {isBusinessElement && (
-              <>
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-sm font-medium">
-                    <LinkIcon className="w-4 h-4" />
-                    接口
-                  </Label>
-                  <Input
-                    value={interfaceName}
-                    onChange={(e) => setInterfaceName(e.target.value)}
-                    placeholder="填写接口名称或者编码"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-sm font-medium">
-                    <FileText className="w-4 h-4" />
-                    测试数据
-                  </Label>
-                  <Popover open={testDataPopoverOpen} onOpenChange={setTestDataPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="flex min-h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                      >
-                        <div className="flex flex-wrap gap-1.5 flex-1">
-                          {selectedTestData.length === 0 ? (
-                            <span className="text-muted-foreground">选择测试数据...</span>
-                          ) : (
-                            selectedTestData.map((item) => (
-                              <Badge key={item} variant="secondary" className="gap-1 pr-1">
-                                {item}
-                                <span
-                                  role="button"
-                                  tabIndex={0}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleTestData(item);
-                                  }}
-                                  className="ml-0.5 rounded-sm hover:bg-muted-foreground/20 p-0.5"
-                                >
-                                  <X className="w-3 h-3" />
-                                </span>
-                              </Badge>
-                            ))
-                          )}
-                        </div>
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
-                      <div className="flex flex-col gap-1">
-                        {availableTestData.map((item) => (
-                          <button
-                            key={item}
-                            type="button"
-                            onClick={() => toggleTestData(item)}
-                            className={cn(
-                              "px-3 py-1.5 rounded-md text-left text-xs transition-colors",
-                              selectedTestData.includes(item)
-                                ? "bg-primary/10 text-primary"
-                                : "hover:bg-muted"
-                            )}
-                          >
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </>
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2 text-sm font-medium">
+                  <LinkIcon className="w-4 h-4" />
+                  接口
+                </Label>
+                <Input
+                  value={interfaceName}
+                  onChange={(e) => setInterfaceName(e.target.value)}
+                  placeholder="填写接口名称或者编码"
+                />
+              </div>
             )}
+
+            {/* 测试数据 - available for all dimensions */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <FileText className="w-4 h-4" />
+                测试数据
+              </Label>
+              <Popover open={testDataPopoverOpen} onOpenChange={setTestDataPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex min-h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <div className="flex flex-wrap gap-1.5 flex-1">
+                      {selectedTestData.length === 0 ? (
+                        <span className="text-muted-foreground">选择测试数据...</span>
+                      ) : (
+                        selectedTestData.map((item) => (
+                          <Badge key={item} variant="secondary" className="gap-1 pr-1">
+                            {item}
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTestData(item);
+                              }}
+                              className="ml-0.5 rounded-sm hover:bg-muted-foreground/20 p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </span>
+                          </Badge>
+                        ))
+                      )}
+                    </div>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                  <div className="flex flex-col gap-1">
+                    {availableTestData.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => toggleTestData(item)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-md text-left text-xs transition-colors",
+                          selectedTestData.includes(item)
+                            ? "bg-primary/10 text-primary"
+                            : "hover:bg-muted"
+                        )}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
 
             {/* Environment - Select */}
             <div className="space-y-3">
