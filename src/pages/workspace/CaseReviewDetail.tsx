@@ -261,6 +261,15 @@ export default function CaseReviewDetail() {
                 size="sm"
                 className="gap-2"
                 onClick={() => {
+                  if (isBusinessElement) {
+                    const backUrl = batchId
+                      ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}&dim=${dim ?? ""}`
+                      : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}&dim=${dim ?? ""}`;
+                    navigate(
+                      `/workspace/${workspaceId}/smart-execution/api/${caseId}?caseName=${encodeURIComponent(caseId ?? "")}&editBack=${encodeURIComponent(backUrl)}`
+                    );
+                    return;
+                  }
                   setSelectedLiveCaseIdx("");
                   setLiveCaseDialogOpen(true);
                 }}
