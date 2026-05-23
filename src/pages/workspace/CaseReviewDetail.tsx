@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2, PlayCircle } from "lucide-react";
+import { ArrowLeft, FileCode, Tag, Globe, Database, X, Plus, Trash2, PlayCircle, Link as LinkIcon, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -136,7 +136,9 @@ export default function CaseReviewDetail() {
   const { caseId, workspaceId, recordId, batchId } = useParams<{ caseId: string; workspaceId: string; recordId: string; batchId?: string }>();
   const [searchParams] = useSearchParams();
   const reviewStatus = searchParams.get("status");
+  const dim = searchParams.get("dim");
   const isAdopted = reviewStatus === "adopted" || reviewStatus === "improved";
+  const isBusinessElement = dim === "dim-3";
   const { t } = useTranslation();
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
@@ -147,6 +149,22 @@ export default function CaseReviewDetail() {
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
   const [liveCaseDialogOpen, setLiveCaseDialogOpen] = useState(false);
   const [selectedLiveCaseIdx, setSelectedLiveCaseIdx] = useState<string>("");
+  // Business element specific config
+  const [interfaceName, setInterfaceName] = useState("用户登录接口 / api.auth.login");
+  const [selectedTestData, setSelectedTestData] = useState<string[]>(["开户交易测试数据"]);
+  const [testDataPopoverOpen, setTestDataPopoverOpen] = useState(false);
+  const availableTestData = [
+    "开户交易测试数据",
+    "供货期开户数据集",
+    "对公账户开户数据",
+    "个人客户身份验证数据",
+    "跨境汇款测试数据",
+  ];
+  const toggleTestData = (item: string) => {
+    setSelectedTestData((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  };
   const [caseNatures, setCaseNatures] = useState<Record<number, "positive" | "negative">>({
     0: "positive",
     1: "positive",
@@ -243,6 +261,15 @@ export default function CaseReviewDetail() {
                 size="sm"
                 className="gap-2"
                 onClick={() => {
+                  if (isBusinessElement) {
+                    const backUrl = batchId
+                      ? `/workspace/${workspaceId}/management/ai-cases/${recordId}/batch/${batchId}/review/case/${caseId}?status=${reviewStatus ?? ""}&dim=${dim ?? ""}`
+                      : `/workspace/${workspaceId}/management/ai-cases/${recordId}/case-review/case/${caseId}?status=${reviewStatus ?? ""}&dim=${dim ?? ""}`;
+                    navigate(
+                      `/workspace/${workspaceId}/smart-execution/api/${caseId}?caseName=${encodeURIComponent(caseId ?? "")}&editBack=${encodeURIComponent(backUrl)}`
+                    );
+                    return;
+                  }
                   setSelectedLiveCaseIdx("");
                   setLiveCaseDialogOpen(true);
                 }}
@@ -353,6 +380,80 @@ export default function CaseReviewDetail() {
                 </PopoverContent>
               </Popover>
             </div>
+
+            {/* Business element: 接口 + 测试数据 */}
+            {isBusinessElement && (
+              <>
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
+                    <LinkIcon className="w-4 h-4" />
+                    接口
+                  </Label>
+                  <Input
+                    value={interfaceName}
+                    onChange={(e) => setInterfaceName(e.target.value)}
+                    placeholder="填写接口名称或者编码"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
+                    <FileText className="w-4 h-4" />
+                    测试数据
+                  </Label>
+                  <Popover open={testDataPopoverOpen} onOpenChange={setTestDataPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="flex min-h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <div className="flex flex-wrap gap-1.5 flex-1">
+                          {selectedTestData.length === 0 ? (
+                            <span className="text-muted-foreground">选择测试数据...</span>
+                          ) : (
+                            selectedTestData.map((item) => (
+                              <Badge key={item} variant="secondary" className="gap-1 pr-1">
+                                {item}
+                                <span
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleTestData(item);
+                                  }}
+                                  className="ml-0.5 rounded-sm hover:bg-muted-foreground/20 p-0.5"
+                                >
+                                  <X className="w-3 h-3" />
+                                </span>
+                              </Badge>
+                            ))
+                          )}
+                        </div>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                      <div className="flex flex-col gap-1">
+                        {availableTestData.map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => toggleTestData(item)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-md text-left text-xs transition-colors",
+                              selectedTestData.includes(item)
+                                ? "bg-primary/10 text-primary"
+                                : "hover:bg-muted"
+                            )}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </>
+            )}
 
             {/* App URL */}
             <div className="space-y-3">
