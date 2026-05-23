@@ -95,7 +95,7 @@ export default function Environment() {
   const [envDialogOpen, setEnvDialogOpen] = useState(false);
   const [editingEnv, setEditingEnv] = useState<TestEnvironment | null>(null);
   const [envForm, setEnvForm] = useState<EnvFormState>({ 
-    name: "", type: "dev", url: "", headers: "", requestBody: "", description: "" 
+    name: "", type: "dev", category: "api", url: "", headers: "", requestBody: "", description: "" 
   });
   
   // Database dialog state
@@ -108,7 +108,7 @@ export default function Environment() {
   // Environment handlers
   const handleAddEnv = () => {
     setEditingEnv(null);
-    setEnvForm({ name: "", type: "dev", url: "", headers: "", requestBody: "", description: "" });
+    setEnvForm({ name: "", type: "dev", category: "api", url: "", headers: "", requestBody: "", description: "" });
     setEnvDialogOpen(true);
   };
 
@@ -117,6 +117,7 @@ export default function Environment() {
     setEnvForm({ 
       name: env.name, 
       type: env.type, 
+      category: env.category,
       url: env.url, 
       headers: env.headers, 
       requestBody: env.requestBody, 
@@ -132,9 +133,10 @@ export default function Environment() {
           ...e, 
           name: envForm.name, 
           type: envForm.type, 
+          category: envForm.category,
           url: envForm.url, 
-          headers: envForm.headers, 
-          requestBody: envForm.requestBody, 
+          headers: envForm.category === "ui" ? "" : envForm.headers, 
+          requestBody: envForm.category === "ui" ? "" : envForm.requestBody, 
           description: envForm.description 
         } : e
       ));
@@ -143,9 +145,10 @@ export default function Environment() {
         id: Date.now().toString(),
         name: envForm.name,
         type: envForm.type,
+        category: envForm.category,
         url: envForm.url,
-        headers: envForm.headers,
-        requestBody: envForm.requestBody,
+        headers: envForm.category === "ui" ? "" : envForm.headers,
+        requestBody: envForm.category === "ui" ? "" : envForm.requestBody,
         description: envForm.description,
         status: "active"
       }]);
