@@ -4,21 +4,11 @@ import { ArrowLeft, Plus, Trash2, ChevronRight, Upload, Paperclip } from "lucide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface DataRow {
   id: string;
   key: string;
   value: string;
-  secret: boolean;
   multiline?: boolean;
 }
 
@@ -26,57 +16,56 @@ const mockDataMap: Record<string, { name: string; rows: DataRow[] }> = {
   "1": {
     name: "开户交易测试数据",
     rows: [
-      { id: "r1", key: "username", value: "Qiao", secret: false },
-      { id: "r2", key: "password", value: "123456!", secret: true },
-      { id: "r3", key: "account.nickName", value: "Lanseer", secret: false },
+      { id: "r1", key: "username", value: "Qiao" },
+      { id: "r2", key: "password", value: "123456!" },
+      { id: "r3", key: "account.nickName", value: "Lanseer" },
       {
         id: "r4",
         key: "account.info",
         value: `{\n  "address": "上海市浦东新区",\n  "level": "VIP"\n}`,
-        secret: false,
         multiline: true,
       },
-      { id: "r5", key: "account.idCard", value: "310115199001011234", secret: true },
-      { id: "r6", key: "account.phone", value: "13800138000", secret: false },
+      { id: "r5", key: "account.idCard", value: "310115199001011234" },
+      { id: "r6", key: "account.phone", value: "13800138000" },
     ],
   },
   "2": {
     name: "供货期开户数据集",
     rows: [
-      { id: "r1", key: "supplyPeriod", value: "2024Q2", secret: false },
-      { id: "r2", key: "accountType", value: "Corporate", secret: false },
-      { id: "r3", key: "companyName", value: "上海某某贸易有限公司", secret: false },
-      { id: "r4", key: "creditCode", value: "91310115MA1K3X9Y0Z", secret: false },
-      { id: "r5", key: "legalPerson.name", value: "张伟", secret: false },
-      { id: "r6", key: "legalPerson.idCard", value: "310101198505057890", secret: true },
+      { id: "r1", key: "supplyPeriod", value: "2024Q2" },
+      { id: "r2", key: "accountType", value: "Corporate" },
+      { id: "r3", key: "companyName", value: "上海某某贸易有限公司" },
+      { id: "r4", key: "creditCode", value: "91310115MA1K3X9Y0Z" },
+      { id: "r5", key: "legalPerson.name", value: "张伟" },
+      { id: "r6", key: "legalPerson.idCard", value: "310101198505057890" },
     ],
   },
   "3": {
     name: "对公账户开户数据",
     rows: [
-      { id: "r1", key: "accountName", value: "深圳科技有限公司", secret: false },
-      { id: "r2", key: "accountNo", value: "6225880137820001", secret: true },
-      { id: "r3", key: "bankCode", value: "ICBC-0102", secret: false },
-      { id: "r4", key: "branch", value: "中国工商银行深圳分行", secret: false },
+      { id: "r1", key: "accountName", value: "深圳科技有限公司" },
+      { id: "r2", key: "accountNo", value: "6225880137820001" },
+      { id: "r3", key: "bankCode", value: "ICBC-0102" },
+      { id: "r4", key: "branch", value: "中国工商银行深圳分行" },
     ],
   },
   "4": {
     name: "个人客户身份验证数据",
     rows: [
-      { id: "r1", key: "fullName", value: "李娜", secret: false },
-      { id: "r2", key: "idCard", value: "440301199203051234", secret: true },
-      { id: "r3", key: "mobile", value: "13900139000", secret: false },
-      { id: "r4", key: "verifyCode", value: "888888", secret: true },
+      { id: "r1", key: "fullName", value: "李娜" },
+      { id: "r2", key: "idCard", value: "440301199203051234" },
+      { id: "r3", key: "mobile", value: "13900139000" },
+      { id: "r4", key: "verifyCode", value: "888888" },
     ],
   },
   "5": {
     name: "跨境汇款测试数据",
     rows: [
-      { id: "r1", key: "remitter", value: "John Smith", secret: false },
-      { id: "r2", key: "beneficiary", value: "山田太郎", secret: false },
-      { id: "r3", key: "amount", value: "10000.00", secret: false },
-      { id: "r4", key: "currency", value: "USD", secret: false },
-      { id: "r5", key: "swiftCode", value: "BOTKJPJT", secret: false },
+      { id: "r1", key: "remitter", value: "John Smith" },
+      { id: "r2", key: "beneficiary", value: "山田太郎" },
+      { id: "r3", key: "amount", value: "10000.00" },
+      { id: "r4", key: "currency", value: "USD" },
+      { id: "r5", key: "swiftCode", value: "BOTKJPJT" },
     ],
   },
 };
@@ -88,8 +77,6 @@ export default function SmartExecutionTestDataDetail() {
 
   const [name, setName] = useState(initial.name);
   const [rows, setRows] = useState<DataRow[]>(initial.rows);
-  const [status, setStatus] = useState("draft");
-  const [tags, setTags] = useState<string[]>(["开户", "交易"]);
   const [agentGuidanceOpen, setAgentGuidanceOpen] = useState(false);
   const [agentGuidance, setAgentGuidance] = useState("");
 
@@ -100,7 +87,7 @@ export default function SmartExecutionTestDataDetail() {
   const addRow = () =>
     setRows((prev) => [
       ...prev,
-      { id: `r${Date.now()}`, key: "", value: "", secret: false },
+      { id: `r${Date.now()}`, key: "", value: "" },
     ]);
 
   return (
@@ -127,22 +114,21 @@ export default function SmartExecutionTestDataDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
-        {/* Left: Data Content */}
+        {/* 左侧：数据内容 */}
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="text-base font-semibold mb-4">Data Content</h2>
+          <h2 className="text-base font-semibold mb-4">数据内容</h2>
 
           <div className="rounded-lg border overflow-hidden">
-            <div className="grid grid-cols-[200px_1fr_80px_60px] gap-3 px-4 py-2.5 bg-muted/50 text-xs font-medium text-muted-foreground border-b">
-              <div>Key</div>
-              <div>Value</div>
-              <div className="text-center">Secret</div>
+            <div className="grid grid-cols-[200px_1fr_60px] gap-3 px-4 py-2.5 bg-muted/50 text-xs font-medium text-muted-foreground border-b">
+              <div>键</div>
+              <div>值</div>
               <div></div>
             </div>
             <div className="divide-y">
               {rows.map((row) => (
                 <div
                   key={row.id}
-                  className="grid grid-cols-[200px_1fr_80px_60px] gap-3 px-4 py-3 items-start hover:bg-muted/20"
+                  className="grid grid-cols-[200px_1fr_60px] gap-3 px-4 py-3 items-start hover:bg-muted/20"
                 >
                   <Input
                     value={row.key}
@@ -160,15 +146,8 @@ export default function SmartExecutionTestDataDetail() {
                       value={row.value}
                       onChange={(e) => updateRow(row.id, { value: e.target.value })}
                       className="h-9 font-mono text-sm"
-                      type={row.secret ? "password" : "text"}
                     />
                   )}
-                  <div className="flex items-center justify-center h-9">
-                    <Checkbox
-                      checked={row.secret}
-                      onCheckedChange={(c) => updateRow(row.id, { secret: !!c })}
-                    />
-                  </div>
                   <div className="flex items-center justify-center h-9">
                     <Button
                       variant="ghost"
@@ -186,49 +165,12 @@ export default function SmartExecutionTestDataDetail() {
 
           <Button variant="outline" className="mt-4 gap-2" onClick={addRow}>
             <Plus className="w-4 h-4" />
-            Add new row
+            新增行
           </Button>
         </div>
 
-        {/* Right: Status / Tags / Agent / Attachments */}
+        {/* 右侧：智能体指导 / 附件 */}
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Status <span className="text-destructive">*</span>
-              </label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Tags
-              </label>
-              <div className="border rounded-md min-h-9 px-2 py-1.5 flex flex-wrap gap-1 items-center bg-background">
-                {tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
-                    {tag}
-                    <button
-                      className="ml-1 hover:text-destructive"
-                      onClick={() => setTags(tags.filter((t) => t !== tag))}
-                    >
-                      ×
-                    </button>
-                  </Badge>
-                ))}
-                <span className="text-xs text-muted-foreground px-1">Add tags</span>
-              </div>
-            </div>
-          </div>
-
           <div className="rounded-lg border bg-card">
             <button
               className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-muted/30"
@@ -237,7 +179,7 @@ export default function SmartExecutionTestDataDetail() {
               <ChevronRight
                 className={`w-4 h-4 transition-transform ${agentGuidanceOpen ? "rotate-90" : ""}`}
               />
-              Agent Guidance
+              智能体指导
             </button>
             {agentGuidanceOpen && (
               <div className="px-4 pb-4">
@@ -255,26 +197,24 @@ export default function SmartExecutionTestDataDetail() {
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <div className="flex items-center gap-2 text-sm">
                 <Paperclip className="w-4 h-4 text-muted-foreground" />
-                <span className="font-medium">0 attachments</span>
+                <span className="font-medium">0 个附件</span>
               </div>
-              <Badge variant="outline" className="text-primary border-primary">
-                No attachments
-              </Badge>
+              <span className="text-xs text-muted-foreground border rounded px-2 py-0.5">无附件</span>
             </div>
             <div className="p-4">
               <div className="border-2 border-dashed rounded-lg px-4 py-8 text-center">
                 <Upload className="w-8 h-8 mx-auto text-primary mb-2" />
                 <p className="text-sm font-medium mb-1">
-                  Drag and drop files here, or click to select files
+                  拖拽文件到此处，或点击选择文件
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Supported file types: Documents (.txt, .doc, .docx, .pdf),
-                  Data (.json, .csv, .xls, .xlsx, .xlsm), Images
-                  (.jpg, .jpeg, .png, .bmp), Videos (.mp4, .webm, .avi)
+                  支持的文件类型：文档（.txt, .doc, .docx, .pdf）、
+                  数据（.json, .csv, .xls, .xlsx, .xlsm）、图片
+                  （.jpg, .jpeg, .png, .bmp）、视频（.mp4, .webm, .avi）
                 </p>
               </div>
               <div className="mt-3 border rounded-lg py-6 text-center text-sm text-muted-foreground">
-                No files selected
+                未选择文件
               </div>
             </div>
           </div>
