@@ -84,6 +84,7 @@ export default function WorkspaceDetail() {
               <Route path="management/ai-cases/:recordId/report/test-point/:testPointId/source" element={<TestReportSource />} />
               <Route path="management/my-test-tasks" element={<MyTestTasks />} />
               <Route path="smart-execution" element={<SmartExecution />} />
+              <Route path="smart-execution/test-data" element={<SmartExecutionTestData />} />
               <Route path="smart-execution/:executionId/cases" element={<SmartExecutionCases />} />
               <Route path="smart-execution/:executionId/case/:caseId" element={<SmartExecutionDetail />} />
               <Route path="smart-execution/:executionId" element={<SmartExecutionDetail />} />
