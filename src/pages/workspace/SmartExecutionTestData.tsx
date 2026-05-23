@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Search, Plus, MoreHorizontal, Edit, Copy, Trash2, User, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ const mockData: TestDataItem[] = [
 
 export default function SmartExecutionTestData() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
 
   const filtered = mockData.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -70,7 +73,10 @@ export default function SmartExecutionTestData() {
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex items-center">
-                <button className="font-medium text-primary hover:text-primary/80 hover:underline text-left transition-colors">
+                <button
+                  onClick={() => navigate(`/workspace/${workspaceId}/smart-execution/test-data/${item.id}`)}
+                  className="font-medium text-primary hover:text-primary/80 hover:underline text-left transition-colors"
+                >
                   {item.name}
                 </button>
               </div>

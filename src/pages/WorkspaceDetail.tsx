@@ -36,6 +36,7 @@ import Environment from "./workspace/Environment";
 import SmartExecution from "./workspace/SmartExecution";
 import SmartExecutionCases from "./workspace/SmartExecutionCases";
 import SmartExecutionDetail from "./workspace/SmartExecutionDetail";
+import SmartExecutionTestDataDetail from "./workspace/SmartExecutionTestDataDetail";
 import SmartExecutionTestData from "./workspace/SmartExecutionTestData";
 import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 
@@ -86,6 +87,7 @@ export default function WorkspaceDetail() {
               <Route path="management/my-test-tasks" element={<MyTestTasks />} />
               <Route path="smart-execution" element={<SmartExecution />} />
               <Route path="smart-execution/test-data" element={<SmartExecutionTestData />} />
+              <Route path="smart-execution/test-data/:dataId" element={<SmartExecutionTestDataDetail />} />
               <Route path="smart-execution/:executionId/cases" element={<SmartExecutionCases />} />
               <Route path="smart-execution/:executionId/case/:caseId" element={<SmartExecutionDetail />} />
               <Route path="smart-execution/:executionId" element={<SmartExecutionDetail />} />
