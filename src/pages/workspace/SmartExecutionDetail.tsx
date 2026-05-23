@@ -598,6 +598,7 @@ export default function SmartExecutionDetail() {
   const [evidenceOpen, setEvidenceOpen] = useState(true);
   const [attachmentsOpen, setAttachmentsOpen] = useState(true);
   const [debugOpen, setDebugOpen] = useState(true);
+  const selfHealEnabled = isFailedRun && caseIdx === 0;
 
   // phase: 0 idle, 1 detecting, 2 fixing, 3 fixed, 4 retrying, 5 passed
   const [healPhase, setHealPhase] = useState(0);
