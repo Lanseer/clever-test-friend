@@ -264,9 +264,6 @@ export default function CaseReviewDetail() {
                   setSelectedLiveCaseIdx("");
                   setLiveCaseDialogOpen(true);
                 }}
-                  setSelectedLiveCaseIdx("");
-                  setLiveCaseDialogOpen(true);
-                }}
               >
                 <PlayCircle className="w-4 h-4" />
                 现场测试
