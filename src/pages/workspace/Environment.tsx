@@ -13,12 +13,14 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, Server, Database, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 
 type EnvType = "dev" | "test" | "staging" | "prod";
+type EnvCategory = "ui" | "api";
 type DbType = "mysql" | "postgresql" | "oracle" | "sqlserver";
 
 interface TestEnvironment {
   id: string;
   name: string;
   type: EnvType;
+  category: EnvCategory;
   url: string;
   headers: string;
   requestBody: string;
