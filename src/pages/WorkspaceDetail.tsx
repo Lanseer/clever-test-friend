@@ -36,6 +36,7 @@ import Environment from "./workspace/Environment";
 import SmartExecution from "./workspace/SmartExecution";
 import SmartExecutionCases from "./workspace/SmartExecutionCases";
 import SmartExecutionDetail from "./workspace/SmartExecutionDetail";
+import SmartExecutionTestDataDetail from "./workspace/SmartExecutionTestDataDetail";
 import SmartExecutionTestData from "./workspace/SmartExecutionTestData";
 import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 
