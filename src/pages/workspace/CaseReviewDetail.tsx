@@ -143,7 +143,7 @@ export default function CaseReviewDetail() {
 
   const [bddContent, setBddContent] = useState(getMockBddContent());
   const [selectedTags, setSelectedTags] = useState<string[]>(["登录", "核心功能"]);
-  const [appUrl, setAppUrl] = useState("https://test.example.com/login");
+  const [appUrl, setAppUrl] = useState("SIT-01 测试环境");
   const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
   const [database, setDatabase] = useState("");
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
