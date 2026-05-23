@@ -13,12 +13,14 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, Server, Database, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 
 type EnvType = "dev" | "test" | "staging" | "prod";
+type EnvCategory = "ui" | "api";
 type DbType = "mysql" | "postgresql" | "oracle" | "sqlserver";
 
 interface TestEnvironment {
   id: string;
   name: string;
   type: EnvType;
+  category: EnvCategory;
   url: string;
   headers: string;
   requestBody: string;
@@ -38,10 +40,10 @@ interface DatabaseConfig {
 }
 
 const mockEnvironments: TestEnvironment[] = [
-  { id: "1", name: "开发环境", type: "dev", url: "http://192.168.1.10:8080", headers: '{"Authorization": "Bearer token"}', requestBody: "", status: "active", description: "用于日常开发测试" },
-  { id: "2", name: "测试环境", type: "test", url: "http://192.168.1.20:8080", headers: '{"Content-Type": "application/json"}', requestBody: "", status: "active", description: "用于功能测试" },
-  { id: "3", name: "预发布环境", type: "staging", url: "https://staging.example.com", headers: "", requestBody: "", status: "active", description: "用于上线前验证" },
-  { id: "4", name: "生产环境", type: "prod", url: "https://api.example.com", headers: "", requestBody: "", status: "inactive", description: "生产环境（只读）" },
+  { id: "1", name: "开发环境", type: "dev", category: "api", url: "http://192.168.1.10:8080", headers: '{"Authorization": "Bearer token"}', requestBody: "", status: "active", description: "用于日常开发测试" },
+  { id: "2", name: "测试环境", type: "test", category: "api", url: "http://192.168.1.20:8080", headers: '{"Content-Type": "application/json"}', requestBody: "", status: "active", description: "用于功能测试" },
+  { id: "3", name: "预发布环境", type: "staging", category: "ui", url: "https://staging.example.com", headers: "", requestBody: "", status: "active", description: "用于上线前验证" },
+  { id: "4", name: "生产环境", type: "prod", category: "ui", url: "https://api.example.com", headers: "", requestBody: "", status: "inactive", description: "生产环境（只读）" },
 ];
 
 const mockDatabases: DatabaseConfig[] = [
@@ -67,6 +69,7 @@ const dbTypeLabels: Record<DbType, string> = {
 interface EnvFormState {
   name: string;
   type: EnvType;
+  category: EnvCategory;
   url: string;
   headers: string;
   requestBody: string;
@@ -92,7 +95,7 @@ export default function Environment() {
   const [envDialogOpen, setEnvDialogOpen] = useState(false);
   const [editingEnv, setEditingEnv] = useState<TestEnvironment | null>(null);
   const [envForm, setEnvForm] = useState<EnvFormState>({ 
-    name: "", type: "dev", url: "", headers: "", requestBody: "", description: "" 
+    name: "", type: "dev", category: "api", url: "", headers: "", requestBody: "", description: "" 
   });
   
   // Database dialog state
@@ -105,7 +108,7 @@ export default function Environment() {
   // Environment handlers
   const handleAddEnv = () => {
     setEditingEnv(null);
-    setEnvForm({ name: "", type: "dev", url: "", headers: "", requestBody: "", description: "" });
+    setEnvForm({ name: "", type: "dev", category: "api", url: "", headers: "", requestBody: "", description: "" });
     setEnvDialogOpen(true);
   };
 
@@ -114,6 +117,7 @@ export default function Environment() {
     setEnvForm({ 
       name: env.name, 
       type: env.type, 
+      category: env.category,
       url: env.url, 
       headers: env.headers, 
       requestBody: env.requestBody, 
@@ -129,9 +133,10 @@ export default function Environment() {
           ...e, 
           name: envForm.name, 
           type: envForm.type, 
+          category: envForm.category,
           url: envForm.url, 
-          headers: envForm.headers, 
-          requestBody: envForm.requestBody, 
+          headers: envForm.category === "ui" ? "" : envForm.headers, 
+          requestBody: envForm.category === "ui" ? "" : envForm.requestBody, 
           description: envForm.description 
         } : e
       ));
@@ -140,9 +145,10 @@ export default function Environment() {
         id: Date.now().toString(),
         name: envForm.name,
         type: envForm.type,
+        category: envForm.category,
         url: envForm.url,
-        headers: envForm.headers,
-        requestBody: envForm.requestBody,
+        headers: envForm.category === "ui" ? "" : envForm.headers,
+        requestBody: envForm.category === "ui" ? "" : envForm.requestBody,
         description: envForm.description,
         status: "active"
       }]);
@@ -402,6 +408,18 @@ export default function Environment() {
               </div>
             </div>
             <div className="space-y-2">
+              <Label>分类</Label>
+              <Select value={envForm.category} onValueChange={(v: EnvCategory) => setEnvForm({ ...envForm, category: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ui">UI</SelectItem>
+                  <SelectItem value="api">API</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>环境地址</Label>
               <Input 
                 value={envForm.url} 
@@ -409,26 +427,30 @@ export default function Environment() {
                 placeholder="https://api.example.com"
               />
             </div>
-            <div className="space-y-2">
-              <Label>统一请求头 (JSON格式)</Label>
-              <Textarea 
-                value={envForm.headers} 
-                onChange={(e) => setEnvForm({ ...envForm, headers: e.target.value })}
-                placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
-                className="font-mono text-sm"
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>统一请求体 (JSON格式)</Label>
-              <Textarea 
-                value={envForm.requestBody} 
-                onChange={(e) => setEnvForm({ ...envForm, requestBody: e.target.value })}
-                placeholder='{"key": "value"}'
-                className="font-mono text-sm"
-                rows={3}
-              />
-            </div>
+            {envForm.category === "api" && (
+              <>
+                <div className="space-y-2">
+                  <Label>统一请求头 (JSON格式)</Label>
+                  <Textarea 
+                    value={envForm.headers} 
+                    onChange={(e) => setEnvForm({ ...envForm, headers: e.target.value })}
+                    placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
+                    className="font-mono text-sm"
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>统一请求体 (JSON格式)</Label>
+                  <Textarea 
+                    value={envForm.requestBody} 
+                    onChange={(e) => setEnvForm({ ...envForm, requestBody: e.target.value })}
+                    placeholder='{"key": "value"}'
+                    className="font-mono text-sm"
+                    rows={3}
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label>描述</Label>
               <Input 
