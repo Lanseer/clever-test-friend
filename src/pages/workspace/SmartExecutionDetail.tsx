@@ -920,7 +920,7 @@ export default function SmartExecutionDetail() {
                   Completed
                 </Badge>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-              </div>
+              </button>
             ))}
           </div>
         </Card>
