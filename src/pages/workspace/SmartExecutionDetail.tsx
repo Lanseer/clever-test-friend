@@ -49,7 +49,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Bug, ChevronDown, Image as ImageIcon2 } from "lucide-react";
+import { Bug, ChevronDown } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
