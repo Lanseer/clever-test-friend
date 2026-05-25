@@ -515,12 +515,12 @@ const oaExecutionPlan = [
   { step: 6, content: "调用 /print/voucher 完成无纸化凭证打印。" },
 ];
 
-const oaSteps: TimelineStep[] = [
-  { id: "os1", step: 1, title: "POST /account/customer/query — 客户信息查询", type: "API", status: "completed" },
-  { id: "os2", step: 2, title: "POST /account/open/validate — 开户校验", type: "API", status: "completed" },
-  { id: "os3", step: 3, title: "POST /account/open/create — 创建开户请求", type: "API", status: "completed" },
-  { id: "os4", step: 4, title: "POST /account/auth/approve — 授权审批", type: "API", status: "completed" },
-  { id: "os5", step: 5, title: "GET /account/detail — 账户状态校验", type: "API", status: "completed" },
+const oaSteps: (TimelineStep & { passed?: boolean; assertionPassed?: boolean })[] = [
+  { id: "os1", step: 1, title: "POST /account/customer/query — 客户信息查询", type: "API", status: "completed", passed: true },
+  { id: "os2", step: 2, title: "POST /account/open/validate — 开户校验", type: "API", status: "completed", passed: true },
+  { id: "os3", step: 3, title: "POST /account/open/create — 创建开户请求", type: "API", status: "completed", passed: true },
+  { id: "os4", step: 4, title: "POST /account/auth/approve — 授权审批", type: "API", status: "completed", passed: true },
+  { id: "os5", step: 5, title: "GET /account/detail — 账户状态校验", type: "API", status: "completed", passed: true },
   {
     id: "os6",
     step: 6,
@@ -528,6 +528,8 @@ const oaSteps: TimelineStep[] = [
     type: "API",
     status: "completed",
     highlighted: true,
+    passed: true,
+    assertionPassed: true,
   },
 ];
 
