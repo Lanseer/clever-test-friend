@@ -515,12 +515,12 @@ const oaExecutionPlan = [
   { step: 6, content: "调用 /print/voucher 完成无纸化凭证打印。" },
 ];
 
-const oaSteps: TimelineStep[] = [
-  { id: "os1", step: 1, title: "POST /account/customer/query — 客户信息查询", type: "API", status: "completed" },
-  { id: "os2", step: 2, title: "POST /account/open/validate — 开户校验", type: "API", status: "completed" },
-  { id: "os3", step: 3, title: "POST /account/open/create — 创建开户请求", type: "API", status: "completed" },
-  { id: "os4", step: 4, title: "POST /account/auth/approve — 授权审批", type: "API", status: "completed" },
-  { id: "os5", step: 5, title: "GET /account/detail — 账户状态校验", type: "API", status: "completed" },
+const oaSteps: (TimelineStep & { passed?: boolean; assertionPassed?: boolean })[] = [
+  { id: "os1", step: 1, title: "POST /account/customer/query — 客户信息查询", type: "API", status: "completed", passed: true },
+  { id: "os2", step: 2, title: "POST /account/open/validate — 开户校验", type: "API", status: "completed", passed: true },
+  { id: "os3", step: 3, title: "POST /account/open/create — 创建开户请求", type: "API", status: "completed", passed: true },
+  { id: "os4", step: 4, title: "POST /account/auth/approve — 授权审批", type: "API", status: "completed", passed: true },
+  { id: "os5", step: 5, title: "GET /account/detail — 账户状态校验", type: "API", status: "completed", passed: true },
   {
     id: "os6",
     step: 6,
@@ -528,6 +528,8 @@ const oaSteps: TimelineStep[] = [
     type: "API",
     status: "completed",
     highlighted: true,
+    passed: true,
+    assertionPassed: true,
   },
 ];
 
@@ -893,7 +895,9 @@ export default function SmartExecutionDetail() {
         <Card className="p-5">
           <h2 className="text-lg font-semibold mb-4">Execution Timeline</h2>
           <div className="space-y-3">
-            {(isApiCase ? oaSteps : mockSteps).map((step) => (
+            {(isApiCase ? oaSteps : mockSteps).map((step) => {
+              const s = step as TimelineStep & { passed?: boolean; assertionPassed?: boolean };
+              return (
               <button
                 key={step.id}
                 type="button"
@@ -919,9 +923,38 @@ export default function SmartExecutionDetail() {
                 <Badge variant="outline" className="bg-blue-500 text-white border-blue-500 shrink-0">
                   Completed
                 </Badge>
+                {isApiCase && s.passed !== undefined && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "shrink-0 gap-1",
+                      s.passed
+                        ? "bg-green-500/10 text-green-600 border-green-200"
+                        : "bg-red-500/10 text-red-600 border-red-200"
+                    )}
+                  >
+                    {s.passed ? <CheckCircle2 className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                    {s.passed ? "通过" : "未通过"}
+                  </Badge>
+                )}
+                {isApiCase && s.assertionPassed !== undefined && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "shrink-0 gap-1",
+                      s.assertionPassed
+                        ? "bg-emerald-500/10 text-emerald-700 border-emerald-200"
+                        : "bg-red-500/10 text-red-600 border-red-200"
+                    )}
+                  >
+                    {s.assertionPassed ? <CheckCircle2 className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                    断言{s.assertionPassed ? "成功" : "失败"}
+                  </Badge>
+                )}
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </button>
-            ))}
+              );
+            })}
           </div>
         </Card>
 
