@@ -895,7 +895,9 @@ export default function SmartExecutionDetail() {
         <Card className="p-5">
           <h2 className="text-lg font-semibold mb-4">Execution Timeline</h2>
           <div className="space-y-3">
-            {(isApiCase ? oaSteps : mockSteps).map((step) => (
+            {(isApiCase ? oaSteps : mockSteps).map((step) => {
+              const s = step as TimelineStep & { passed?: boolean; assertionPassed?: boolean };
+              return (
               <button
                 key={step.id}
                 type="button"
@@ -921,9 +923,38 @@ export default function SmartExecutionDetail() {
                 <Badge variant="outline" className="bg-blue-500 text-white border-blue-500 shrink-0">
                   Completed
                 </Badge>
+                {isApiCase && s.passed !== undefined && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "shrink-0 gap-1",
+                      s.passed
+                        ? "bg-green-500/10 text-green-600 border-green-200"
+                        : "bg-red-500/10 text-red-600 border-red-200"
+                    )}
+                  >
+                    {s.passed ? <CheckCircle2 className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                    {s.passed ? "通过" : "未通过"}
+                  </Badge>
+                )}
+                {isApiCase && s.assertionPassed !== undefined && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "shrink-0 gap-1",
+                      s.assertionPassed
+                        ? "bg-emerald-500/10 text-emerald-700 border-emerald-200"
+                        : "bg-red-500/10 text-red-600 border-red-200"
+                    )}
+                  >
+                    {s.assertionPassed ? <CheckCircle2 className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                    断言{s.assertionPassed ? "成功" : "失败"}
+                  </Badge>
+                )}
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </button>
-            ))}
+              );
+            })}
           </div>
         </Card>
 
