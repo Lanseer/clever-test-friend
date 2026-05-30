@@ -362,6 +362,37 @@ export function SmartDesignChat({
               )}
             </div>
           ))}
+
+          {/* Chat Mode Toggle - shown below the assistant greeting */}
+          {messages.length > 0 && messages[0].role === "assistant" && (
+            <div className="flex gap-3 justify-start -mt-2">
+              <div className="w-8 h-8 flex-shrink-0" />
+              <div className="inline-flex items-center rounded-lg border border-border/50 bg-white/80 p-0.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setChatMode("case")}
+                  className={`h-7 px-3 text-xs rounded-md transition-colors ${
+                    chatMode === "case"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t('smartDesign.modeCaseDesign', '案例设计')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChatMode("general")}
+                  className={`h-7 px-3 text-xs rounded-md transition-colors ${
+                    chatMode === "general"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t('smartDesign.modeGeneral', '通用模式')}
+                </button>
+              </div>
+            </div>
+          )}
           
           <div ref={messagesEndRef} />
         </div>
