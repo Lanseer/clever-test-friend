@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download, Lightbulb, Plus, GitCompare, Sparkles } from "lucide-react";
+import { Send, Bot, User, Loader2, FileText, X, Paperclip, Eye, ChevronDown, FolderOpen, Download, Lightbulb, Plus, GitCompare, ClipboardCheck, MessagesSquare } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
