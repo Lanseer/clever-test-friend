@@ -569,7 +569,7 @@ export function SmartDesignChat({
           {isConversationStarted && (
             <div className="px-3 pt-2.5 -mb-1">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-medium border border-primary/20">
-                <Sparkles className="w-3 h-3" />
+                <ActiveModeIcon className="w-3 h-3" />
                 {activeModeLabel}
               </span>
             </div>
