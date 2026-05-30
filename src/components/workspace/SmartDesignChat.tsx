@@ -377,33 +377,42 @@ export function SmartDesignChat({
             </div>
           ))}
 
-          {/* Chat Mode Toggle - shown below the assistant greeting */}
-          {messages.length > 0 && messages[0].role === "assistant" && (
-            <div className="flex gap-3 justify-start -mt-2">
+          {/* Chat Mode Picker - icon style, shown only before conversation starts */}
+          {!isConversationStarted && messages.length > 0 && messages[0].role === "assistant" && (
+            <div className="flex gap-3 justify-start">
               <div className="w-8 h-8 flex-shrink-0" />
-              <div className="inline-flex items-center rounded-lg border border-border/50 bg-white/80 p-0.5 shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setChatMode("case")}
-                  className={`h-7 px-3 text-xs rounded-md transition-colors ${
-                    chatMode === "case"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t('smartDesign.modeCaseDesign', '案例设计')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setChatMode("general")}
-                  className={`h-7 px-3 text-xs rounded-md transition-colors ${
-                    chatMode === "general"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t('smartDesign.modeGeneral', '通用模式')}
-                </button>
+              <div className="flex items-start gap-8 pt-2">
+                {modes.map((mode) => {
+                  const isActive = chatMode === mode.id;
+                  return (
+                    <button
+                      key={mode.id}
+                      type="button"
+                      onClick={() => setChatMode(mode.id)}
+                      className="flex flex-col items-center gap-2 group focus:outline-none"
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                          isActive
+                            ? "bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/30 scale-105"
+                            : "bg-gradient-to-br from-primary/40 to-primary/20 group-hover:from-primary/60 group-hover:to-primary/40"
+                        }`}
+                      >
+                        <Sparkles className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span
+                          className={`text-xs font-medium transition-colors ${
+                            isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                          }`}
+                        >
+                          {mode.label}
+                        </span>
+                        {isActive && <div className="w-4 h-0.5 rounded-full bg-primary" />}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
