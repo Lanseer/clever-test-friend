@@ -537,6 +537,7 @@ export function SmartDesignChat({
               </div>
             </PopoverContent>
           </Popover>
+          </div>
         </div>
 
         <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg overflow-hidden relative">
