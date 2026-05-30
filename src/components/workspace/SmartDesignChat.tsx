@@ -265,7 +265,7 @@ export function SmartDesignChat({
       {/* Chat Messages */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
-          {messages.map((message) => (
+          {messages.map((message, msgIndex) => (
             <div
               key={message.id}
               className={`flex gap-3 ${
@@ -362,6 +362,37 @@ export function SmartDesignChat({
               )}
             </div>
           ))}
+
+          {/* Chat Mode Toggle - shown below the assistant greeting */}
+          {messages.length > 0 && messages[0].role === "assistant" && (
+            <div className="flex gap-3 justify-start -mt-2">
+              <div className="w-8 h-8 flex-shrink-0" />
+              <div className="inline-flex items-center rounded-lg border border-border/50 bg-white/80 p-0.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setChatMode("case")}
+                  className={`h-7 px-3 text-xs rounded-md transition-colors ${
+                    chatMode === "case"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t('smartDesign.modeCaseDesign', '案例设计')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChatMode("general")}
+                  className={`h-7 px-3 text-xs rounded-md transition-colors ${
+                    chatMode === "general"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t('smartDesign.modeGeneral', '通用模式')}
+                </button>
+              </div>
+            </div>
+          )}
           
           <div ref={messagesEndRef} />
         </div>
@@ -369,33 +400,8 @@ export function SmartDesignChat({
 
       {/* Input Area with embedded controls */}
       <div className="p-3 flex-shrink-0">
-        {/* Mode toggle + Prompt Library and Test Cases Buttons */}
-        <div className="flex justify-between items-center gap-2 mb-2">
-          {/* Chat Mode Toggle */}
-          <div className="inline-flex items-center rounded-lg border border-border/50 bg-white/80 p-0.5">
-            <button
-              type="button"
-              onClick={() => setChatMode("case")}
-              className={`h-7 px-3 text-xs rounded-md transition-colors ${
-                chatMode === "case"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t('smartDesign.modeCaseDesign', '案例设计')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setChatMode("general")}
-              className={`h-7 px-3 text-xs rounded-md transition-colors ${
-                chatMode === "general"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t('smartDesign.modeGeneral', '通用模式')}
-            </button>
-          </div>
+        {/* Prompt Library and Test Cases Buttons - positioned right above the chat input */}
+        <div className="flex justify-end gap-2 mb-2">
           <div className="flex items-center gap-2">
           {/* Prompt Library Button */}
           <Popover open={promptPopoverOpen} onOpenChange={setPromptPopoverOpen}>
