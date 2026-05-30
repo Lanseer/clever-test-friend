@@ -110,6 +110,7 @@ export function SmartDesignChat({
   const [isAddingPrompt, setIsAddingPrompt] = useState(false);
   const [newPromptValue, setNewPromptValue] = useState("");
   const [promptPopoverOpen, setPromptPopoverOpen] = useState(false);
+  const [chatMode, setChatMode] = useState<"case" | "general">("case");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
