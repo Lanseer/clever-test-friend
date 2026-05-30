@@ -269,13 +269,6 @@ export function SmartDesignChat({
 
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm relative">
-      {/* Active mode label - only after conversation started */}
-      {isConversationStarted && (
-        <div className="absolute top-3 left-4 z-10 flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium border border-primary/20">
-          <Sparkles className="w-3 h-3" />
-          {activeModeLabel}
-        </div>
-      )}
       {/* Chat Messages */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
@@ -570,6 +563,15 @@ export function SmartDesignChat({
         </div>
 
         <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg overflow-hidden relative">
+          {/* Active mode label - shown inside input after conversation started */}
+          {isConversationStarted && (
+            <div className="px-3 pt-2.5 -mb-1">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-medium border border-primary/20">
+                <Sparkles className="w-3 h-3" />
+                {activeModeLabel}
+              </span>
+            </div>
+          )}
           {/* Uploaded Files - displayed above textarea */}
           {uploadedFiles.length > 0 && (
             <div className="px-3 pt-3 pb-1">
