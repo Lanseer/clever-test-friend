@@ -265,7 +265,7 @@ export function SmartDesignChat({
       {/* Chat Messages */}
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
-          {messages.map((message) => (
+          {messages.map((message, msgIndex) => (
             <div
               key={message.id}
               className={`flex gap-3 ${
