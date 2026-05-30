@@ -262,10 +262,12 @@ export function SmartDesignChat({
 
   const isConversationStarted = messages.length > 1;
   const modes = [
-    { id: "case" as const, label: t('smartDesign.modeCaseDesign', '案例设计') },
-    { id: "general" as const, label: t('smartDesign.modeGeneral', '通用模式') },
+    { id: "case" as const, label: t('smartDesign.modeCaseDesign', '案例设计'), icon: ClipboardCheck },
+    { id: "general" as const, label: t('smartDesign.modeGeneral', '通用模式'), icon: MessagesSquare },
   ];
-  const activeModeLabel = modes.find(m => m.id === chatMode)?.label;
+  const activeMode = modes.find(m => m.id === chatMode);
+  const activeModeLabel = activeMode?.label;
+  const ActiveModeIcon = activeMode?.icon ?? ClipboardCheck;
 
   return (
     <div className="flex flex-col h-full bg-white/30 dark:bg-background/30 backdrop-blur-sm relative">
