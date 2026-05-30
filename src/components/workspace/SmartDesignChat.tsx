@@ -393,7 +393,7 @@ export function SmartDesignChat({
                             : "bg-gradient-to-br from-primary/40 to-primary/20 group-hover:from-primary/60 group-hover:to-primary/40"
                         }`}
                       >
-                        <Sparkles className="w-5 h-5 text-white" />
+                        <mode.icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex flex-col items-center gap-1">
                         <span
