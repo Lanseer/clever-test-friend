@@ -369,8 +369,34 @@ export function SmartDesignChat({
 
       {/* Input Area with embedded controls */}
       <div className="p-3 flex-shrink-0">
-        {/* Prompt Library and Test Cases Buttons - positioned right above the chat input */}
-        <div className="flex justify-end gap-2 mb-2">
+        {/* Mode toggle + Prompt Library and Test Cases Buttons */}
+        <div className="flex justify-between items-center gap-2 mb-2">
+          {/* Chat Mode Toggle */}
+          <div className="inline-flex items-center rounded-lg border border-border/50 bg-white/80 p-0.5">
+            <button
+              type="button"
+              onClick={() => setChatMode("case")}
+              className={`h-7 px-3 text-xs rounded-md transition-colors ${
+                chatMode === "case"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t('smartDesign.modeCaseDesign', '案例设计')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setChatMode("general")}
+              className={`h-7 px-3 text-xs rounded-md transition-colors ${
+                chatMode === "general"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t('smartDesign.modeGeneral', '通用模式')}
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
           {/* Prompt Library Button */}
           <Popover open={promptPopoverOpen} onOpenChange={setPromptPopoverOpen}>
             <PopoverTrigger asChild>
