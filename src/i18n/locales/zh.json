@@ -79,6 +79,7 @@
     "tester": "测试人员"
   },
   "workspaceMenu": {
+    "home": "首页",
     "dashboard": "数据监控",
     "kanban": "看板",
     "testManagement": "测试管理",
