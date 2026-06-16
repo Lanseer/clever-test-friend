@@ -389,6 +389,15 @@ export default function CaseReview() {
   
   // 保存到测试案例弹窗
   const [saveToCasesDialogOpen, setSaveToCasesDialogOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+  
+  // 分组选项
+  const groupOptions = [
+    { value: "user-module", label: "用户模块" },
+    { value: "payment-module", label: "支付模块" },
+    { value: "order-module", label: "订单模块" },
+    { value: "account-module", label: "账户模块" },
+  ];
   
   // Mock task data for display - use translated data
   const mockTasksData = [
@@ -438,21 +447,16 @@ export default function CaseReview() {
   
   // 保存到测试案例
   const handleSaveToCases = () => {
+    setSelectedGroup("");
     setSaveToCasesDialogOpen(true);
   };
   
   const handleConfirmSaveToCases = () => {
+    const group = groupOptions.find(g => g.value === selectedGroup);
     setSaveToCasesDialogOpen(false);
-    toast.success(t('caseReview.saveToCasesSuccess'));
+    setSelectedGroup("");
+    toast.success(`${t('caseReview.saveToCasesSuccess')}：${group?.label || selectedGroup}`);
   };
-  
-  // 统计已采纳和已完善的案例数
-  const adoptedAndImprovedCaseCount = dimensions.reduce((sum, dim) => 
-    sum + dim.testPoints
-      .filter(tp => tp.reviewResult === "adopted" || tp.reviewResult === "improved")
-      .reduce((s, tp) => s + tp.caseCount, 0),
-    0
-  );
 
   // 统计数据计算
   const statistics = {
@@ -1381,14 +1385,34 @@ Scenario: 完善后的场景描述
       <AlertDialog open={saveToCasesDialogOpen} onOpenChange={setSaveToCasesDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('caseReview.saveToTestCases')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('caseReview.saveToCasesConfirm', { count: adoptedAndImprovedCaseCount })}
+              <div className="space-y-4">
+                <p>{t('caseReview.saveToCasesConfirm')}</p>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('caseReview.selectGroup')}</label>
+                  <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('caseReview.selectGroup')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {groupOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmSaveToCases}>
+            <AlertDialogCancel onClick={() => setSelectedGroup("")}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmSaveToCases}
+              disabled={!selectedGroup}
+            >
               {t('common.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
