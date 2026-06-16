@@ -447,12 +447,15 @@ export default function CaseReview() {
   
   // 保存到测试案例
   const handleSaveToCases = () => {
+    setSelectedGroup("");
     setSaveToCasesDialogOpen(true);
   };
   
   const handleConfirmSaveToCases = () => {
+    const group = groupOptions.find(g => g.value === selectedGroup);
     setSaveToCasesDialogOpen(false);
-    toast.success(t('caseReview.saveToCasesSuccess'));
+    setSelectedGroup("");
+    toast.success(`${t('caseReview.saveToCasesSuccess')}：${group?.label || selectedGroup}`);
   };
   
   // 统计已采纳和已完善的案例数
