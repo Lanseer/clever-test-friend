@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   ClipboardList,
   BookOpen,
+  Home,
 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
