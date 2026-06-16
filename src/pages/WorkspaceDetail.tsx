@@ -105,7 +105,6 @@ export default function WorkspaceDetail() {
               <Route path="*" element={<Navigate to="management/ai-cases" replace />} />
             </Routes>
           </main>
-          <TestSpriteButton />
         </div>
       </SidebarProvider>
     );
