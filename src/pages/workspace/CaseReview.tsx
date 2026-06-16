@@ -464,7 +464,7 @@ export default function CaseReview() {
   };
   
   // 保存
-  const handleSave = () => {
+  const handleOpenSaveDialog = () => {
     setSaveTarget(null);
     setSelectedGroup("");
     setSelectedFolder("");
