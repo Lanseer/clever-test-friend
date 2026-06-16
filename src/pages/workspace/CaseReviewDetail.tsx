@@ -786,7 +786,7 @@ export default function CaseReviewDetail() {
                 const runResult = idxNum === 2 ? "passed" : "failed";
                 if (isBusinessElement) {
                   navigate(
-                    `/workspace/${workspaceId}/smart-execution/api/live-oa-${idxNum + 1}?live=1&editBack=${encodeURIComponent(backUrl)}`
+                    `/workspace/${workspaceId}/smart-execution/e5/case/live-oa-${idxNum + 1}?live=1&editBack=${encodeURIComponent(backUrl)}`
                   );
                   return;
                 }
