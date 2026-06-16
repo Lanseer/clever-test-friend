@@ -320,14 +320,66 @@ export default function Home() {
         {activeSession ? (
           <>
             {/* Conversation header */}
-            <div className="px-6 py-3 border-b border-border flex items-center gap-2">
-              <ActiveIcon className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">
-                {activeSession.title}
-              </span>
-              <span className="text-muted-foreground text-xs ml-2">
-                · {activeAgent.name}
-              </span>
+            <div className="px-6 py-3 border-b border-border flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <ActiveIcon className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-sm font-medium text-foreground truncate">
+                  {activeSession.title}
+                </span>
+                <span className="text-muted-foreground text-xs shrink-0">
+                  · {activeAgent.name}
+                </span>
+              </div>
+
+              {activeSession.files.length > 0 && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 gap-1.5 text-primary border-primary/30 hover:bg-primary/10 hover:text-primary shrink-0"
+                    >
+                      <FolderOpen className="w-4 h-4" />
+                      <span className="text-sm">测试案例</span>
+                      <Badge variant="secondary" className="ml-0.5 h-5 px-1.5 text-xs">
+                        {activeSession.files.length}
+                      </Badge>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-80 p-0">
+                    <div className="px-3 py-2 border-b border-border text-xs text-muted-foreground">
+                      测试案例列表
+                    </div>
+                    <div className="max-h-72 overflow-auto p-2 space-y-1">
+                      {activeSession.files.map((f) => {
+                        const isActive = previewFile?.id === f.id;
+                        return (
+                          <button
+                            key={f.id}
+                            onClick={() => setPreviewFile(f)}
+                            className={cn(
+                              "w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-md transition-colors",
+                              isActive
+                                ? "bg-primary/10"
+                                : "hover:bg-muted"
+                            )}
+                          >
+                            <FileText className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-foreground truncate">
+                                {f.name}
+                              </div>
+                              <div className="text-xs text-muted-foreground mt-0.5">
+                                {f.scenarioCount} 场景 · {f.caseCount} 案例
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             {/* Messages */}
