@@ -80,6 +80,12 @@
   },
   "workspaceMenu": {
     "dashboard": "Dashboard",
+    "kanban": "Kanban",
+    "testManagement": "Test Management",
+    "smartDesign": "Smart Design",
+    "testExecution": "Test Execution",
+    "testData": "Test Data",
+    "knowledgeBase": "Knowledge Base",
     "ontology": "Test Ontology",
     "templates": "Case Templates",
     "testReport": "Test Report",
