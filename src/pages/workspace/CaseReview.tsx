@@ -1377,6 +1377,24 @@ Scenario: 完善后的场景描述
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* 保存到测试案例确认对话框 */}
+      <AlertDialog open={saveToCasesDialogOpen} onOpenChange={setSaveToCasesDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('caseReview.saveToCasesConfirm', { count: adoptedAndImprovedCaseCount })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSaveToCases}>
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <CaseDetailSidebar
         open={sidebarOpen}
         onOpenChange={setSidebarOpen}
