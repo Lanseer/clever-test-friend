@@ -52,6 +52,7 @@ const mockTestCases: Record<string, {
     tags: ["登录", "核心功能"],
     environment: "测试环境",
     testData: "使用测试账号 testuser/password123",
+    testType: "UI",
   },
   "2": {
     id: "2",
