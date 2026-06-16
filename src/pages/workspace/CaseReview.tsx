@@ -389,6 +389,15 @@ export default function CaseReview() {
   
   // 保存到测试案例弹窗
   const [saveToCasesDialogOpen, setSaveToCasesDialogOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+  
+  // 分组选项
+  const groupOptions = [
+    { value: "user-module", label: "用户模块" },
+    { value: "payment-module", label: "支付模块" },
+    { value: "order-module", label: "订单模块" },
+    { value: "account-module", label: "账户模块" },
+  ];
   
   // Mock task data for display - use translated data
   const mockTasksData = [
