@@ -156,7 +156,7 @@ export default function TestCases() {
       id: `tc-${Date.now()}`,
       name: newCase.name,
       tags: newCase.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      environment: newCase.environment,
+      environment: "测试环境",
       testType: newCase.testType,
       creator: "当前用户",
       updatedAt: new Date().toISOString().slice(0, 16).replace("T", " "),
@@ -165,7 +165,7 @@ export default function TestCases() {
     setCases((prev) => [created, ...prev]);
     toast.success("案例创建成功");
     setCreateOpen(false);
-    setNewCase({ name: "", testType: "UI", environment: "测试环境", tags: "", description: "" });
+    setNewCase({ name: "", testType: "UI", tags: "" });
   };
 
   const handleCaseClick = (id: string) => navigate(`${id}`);
