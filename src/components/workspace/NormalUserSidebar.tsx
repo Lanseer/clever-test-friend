@@ -45,15 +45,8 @@ const normalUserMenuItems: MenuItem[] = [
   { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },
   { titleKey: "workspaceMenu.testExecution", defaultLabel: "测试执行", url: "smart-execution", icon: PlayCircle },
   { titleKey: "workspaceMenu.testData", defaultLabel: "测试数据", url: "smart-execution/test-data", icon: Database },
-  {
-    titleKey: "workspaceMenu.testReport",
-    defaultLabel: "测试报告",
-    url: "test-report",
-    icon: FileBarChart,
-    children: [
-      { titleKey: "workspaceMenu.knowledgeBase", defaultLabel: "知识库", url: "knowledge", icon: BookOpen },
-    ],
-  },
+  { titleKey: "workspaceMenu.testReport", defaultLabel: "测试报告", url: "test-report", icon: FileBarChart },
+  { titleKey: "workspaceMenu.knowledgeBase", defaultLabel: "知识库", url: "knowledge", icon: BookOpen },
   { titleKey: "workspaceMenu.environment", defaultLabel: "测试环境", url: "environment", icon: Server },
   { titleKey: "workspaceMenu.tags", defaultLabel: "标签", url: "tags", icon: TagsIcon },
 ];
