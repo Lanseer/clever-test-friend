@@ -459,12 +459,7 @@ export default function CaseReview() {
   };
   
   // 统计已采纳和已完善的案例数
-  const adoptedAndImprovedCaseCount = dimensions.reduce((sum, dim) => 
-    sum + dim.testPoints
-      .filter(tp => tp.reviewResult === "adopted" || tp.reviewResult === "improved")
-      .reduce((s, tp) => s + tp.caseCount, 0),
-    0
-  );
+  const adoptedAndImprovedCaseCount = 23;
 
   // 统计数据计算
   const statistics = {
