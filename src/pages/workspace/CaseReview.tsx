@@ -387,6 +387,9 @@ export default function CaseReview() {
   const [saveToTaskDialogOpen, setSaveToTaskDialogOpen] = useState(false);
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   
+  // 保存到测试案例弹窗
+  const [saveToCasesDialogOpen, setSaveToCasesDialogOpen] = useState(false);
+  
   // Mock task data for display - use translated data
   const mockTasksData = [
     { id: "1", name: t('mockData.tasks.userLogin'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
@@ -432,6 +435,24 @@ export default function CaseReview() {
     setCreateTaskDialogOpen(false);
     setSaveToTaskDialogOpen(true);
   };
+  
+  // 保存到测试案例
+  const handleSaveToCases = () => {
+    setSaveToCasesDialogOpen(true);
+  };
+  
+  const handleConfirmSaveToCases = () => {
+    setSaveToCasesDialogOpen(false);
+    toast.success(t('caseReview.saveToCasesSuccess'));
+  };
+  
+  // 统计已采纳和已完善的案例数
+  const adoptedAndImprovedCaseCount = dimensions.reduce((sum, dim) => 
+    sum + dim.testPoints
+      .filter(tp => tp.reviewResult === "adopted" || tp.reviewResult === "improved")
+      .reduce((s, tp) => s + tp.caseCount, 0),
+    0
+  );
 
   // 统计数据计算
   const statistics = {
@@ -907,6 +928,13 @@ export default function CaseReview() {
             </button>
           </div>
         </div>
+        <Button
+          className="ml-auto gap-2"
+          onClick={handleSaveToCases}
+        >
+          <Save className="w-4 h-4" />
+          {t('caseReview.saveToTestCases')}
+        </Button>
       </div>
 
       {/* Statistics Cards */}
@@ -1343,6 +1371,24 @@ Scenario: 完善后的场景描述
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmAiSuggestions}>
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 保存到测试案例确认对话框 */}
+      <AlertDialog open={saveToCasesDialogOpen} onOpenChange={setSaveToCasesDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('caseReview.saveToCasesConfirm', { count: adoptedAndImprovedCaseCount })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSaveToCases}>
               {t('common.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
