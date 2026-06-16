@@ -160,10 +160,13 @@ const initialSessions: Session[] = [
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
   const [sessions, setSessions] = useState<Session[]>(initialSessions);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("general");
+  const [previewFile, setPreviewFile] = useState<GeneratedFile | null>(null);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
   const activeAgent =
@@ -175,27 +178,42 @@ export default function Home() {
   const handleNewSession = () => {
     setActiveSessionId(null);
     setInputValue("");
+    setPreviewFile(null);
   };
 
   const handleSend = () => {
     const text = inputValue.trim();
     if (!text) return;
 
+    const ts = Date.now();
+    const fileName = `${new Date().toISOString().slice(0, 10)}生成案例_V0.${(activeSession?.files.length ?? 0) + 1}`;
+    const scenarioCount = 4 + Math.floor(Math.random() * 4);
+    const caseCount = scenarioCount * 4;
+    const newFile: GeneratedFile = {
+      id: `f-${ts}`,
+      name: fileName,
+      scenarioCount,
+      caseCount,
+      createdAt: "刚刚",
+      recordId: activeSession?.files[0]?.recordId ?? "1",
+    };
+
     if (activeSession) {
-      // append to existing
       setSessions((prev) =>
         prev.map((s) =>
           s.id === activeSession.id
             ? {
                 ...s,
                 updatedAt: "刚刚",
+                files: [...s.files, newFile],
                 messages: [
                   ...s.messages,
-                  { id: `m-${Date.now()}`, role: "user", content: text },
+                  { id: `m-${ts}`, role: "user", content: text },
                   {
-                    id: `m-${Date.now()}-a`,
+                    id: `m-${ts}-a`,
                     role: "assistant",
-                    content: "已收到你的请求，正在为你处理…",
+                    content: `已基于你的需求生成案例文件 ${fileName}，共 ${scenarioCount} 个场景、${caseCount} 条案例。`,
+                    generationData: { scenarioCount, caseCount, fileName },
                   },
                 ],
               }
@@ -203,18 +221,20 @@ export default function Home() {
         )
       );
     } else {
-      const id = `s-${Date.now()}`;
+      const id = `s-${ts}`;
       const newSession: Session = {
         id,
         title: text.length > 16 ? text.slice(0, 16) + "…" : text,
         updatedAt: "刚刚",
         agentId: selectedAgent,
+        files: [newFile],
         messages: [
-          { id: `m-${Date.now()}`, role: "user", content: text },
+          { id: `m-${ts}`, role: "user", content: text },
           {
-            id: `m-${Date.now()}-a`,
+            id: `m-${ts}-a`,
             role: "assistant",
-            content: "已收到你的请求，正在为你处理…",
+            content: `已基于你的需求生成案例文件 ${fileName}，共 ${scenarioCount} 个场景、${caseCount} 条案例。`,
+            generationData: { scenarioCount, caseCount, fileName },
           },
         ],
       };
@@ -223,6 +243,13 @@ export default function Home() {
     }
     setInputValue("");
   };
+
+  const handleReview = (file: GeneratedFile) => {
+    const base = workspaceId ? `/workspace/${workspaceId}` : "..";
+    navigate(`${base}/management/ai-cases/${file.recordId}/case-review`);
+  };
+
+
 
   const handleDeleteSession = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
