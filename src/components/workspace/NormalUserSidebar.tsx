@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   ClipboardList,
   BookOpen,
+  Home,
 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -40,6 +41,7 @@ interface MenuItem {
 }
 
 const normalUserMenuItems: MenuItem[] = [
+  { titleKey: "workspaceMenu.home", defaultLabel: "首页", url: "home", icon: Home },
   { titleKey: "workspaceMenu.kanban", defaultLabel: "看板", url: "dashboard", icon: LayoutDashboard },
   { titleKey: "workspaceMenu.testManagement", defaultLabel: "测试管理", url: "management/my-test-tasks", icon: ClipboardList },
   { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },

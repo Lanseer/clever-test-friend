@@ -5,7 +5,8 @@ import {
   Network,
   FileCode,
   Server,
-  Tags
+  Tags,
+  Home
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -32,6 +33,7 @@ interface MenuItem {
 
 // Admin menu items only
 const adminMenuItems: MenuItem[] = [
+  { titleKey: "workspaceMenu.home", url: "home", icon: Home },
   { titleKey: "workspaceMenu.dashboard", url: "dashboard", icon: LayoutDashboard },
   { titleKey: "workspaceMenu.ontology", url: "ontology", icon: Network },
   { titleKey: "workspaceMenu.templates", url: "templates", icon: FileCode },

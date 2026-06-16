@@ -79,6 +79,7 @@
     "tester": "Tester"
   },
   "workspaceMenu": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "kanban": "Kanban",
     "testManagement": "Test Management",
@@ -92,6 +93,14 @@
     "environment": "Environment",
     "tags": "Tags",
     "testWorkbench": "Test Workbench"
+  },
+  "home": {
+    "agentLabel": "Agent",
+    "inputPlaceholder": "Enter your request, I'll help you complete the task",
+    "send": "Send",
+    "newLine": "New Line",
+    "sessionIsolate": "Session Isolate",
+    "sessionShare": "Session Share"
   },
   "workspaces": {
     "title": "Workspaces",
