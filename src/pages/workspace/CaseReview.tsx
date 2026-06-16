@@ -463,17 +463,26 @@ export default function CaseReview() {
     setSaveToTaskDialogOpen(true);
   };
   
-  // 保存到测试案例
-  const handleSaveToCases = () => {
+  // 保存
+  const handleSave = () => {
+    setSaveTarget(null);
     setSelectedGroup("");
-    setSaveToCasesDialogOpen(true);
+    setSelectedFolder("");
+    setSaveDialogOpen(true);
   };
   
-  const handleConfirmSaveToCases = () => {
-    const group = groupOptions.find(g => g.value === selectedGroup);
-    setSaveToCasesDialogOpen(false);
-    setSelectedGroup("");
-    toast.success(`${t('caseReview.saveToCasesSuccess')}：${group?.label || selectedGroup}`);
+  const handleConfirmSave = () => {
+    setSaveDialogOpen(false);
+    if (saveTarget === "testCases") {
+      const folder = folderOptions.find(f => f.value === selectedFolder);
+      toast.success(`已保存到测试案例：${folder?.label || selectedFolder}`);
+      setSelectedFolder("");
+    } else if (saveTarget === "knowledgeBase") {
+      const group = groupOptions.find(g => g.value === selectedGroup);
+      toast.success(`已保存到知识库：${group?.label || selectedGroup}`);
+      setSelectedGroup("");
+    }
+    setSaveTarget(null);
   };
 
   // 统计数据计算
