@@ -143,6 +143,7 @@ const mockTestCases: Record<string, {
     tags: ["性能", "API"],
     environment: "测试环境",
     testData: "使用性能测试工具 JMeter",
+    testType: "API",
   },
 };
 
