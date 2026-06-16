@@ -39,6 +39,7 @@ import SmartExecutionDetail from "./workspace/SmartExecutionDetail";
 import SmartExecutionTestDataDetail from "./workspace/SmartExecutionTestDataDetail";
 import SmartExecutionTestData from "./workspace/SmartExecutionTestData";
 import SmartExecutionApiDetail from "./workspace/SmartExecutionApiDetail";
+import Home from "./workspace/Home";
 import { TestSpriteButton } from "@/components/workspace/TestSpriteButton";
 
 const mockWorkspaces: Record<string, { name: string; description: string }> = {
