@@ -7,8 +7,11 @@ import {
   ChevronLeft,
   ArrowLeft,
   Database,
+  LayoutDashboard,
+  ClipboardList,
+  BookOpen,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Sidebar,
@@ -18,6 +21,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   SidebarHeader,
   SidebarFooter,
   useSidebar,
@@ -30,13 +36,24 @@ interface MenuItem {
   defaultLabel: string;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
+  children?: MenuItem[];
 }
 
 const normalUserMenuItems: MenuItem[] = [
+  { titleKey: "workspaceMenu.kanban", defaultLabel: "看板", url: "dashboard", icon: LayoutDashboard },
+  { titleKey: "workspaceMenu.testManagement", defaultLabel: "测试管理", url: "management/my-test-tasks", icon: ClipboardList },
   { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },
-  { titleKey: "workspaceMenu.smartExecution", defaultLabel: "智能执行", url: "smart-execution", icon: PlayCircle },
+  { titleKey: "workspaceMenu.testExecution", defaultLabel: "测试执行", url: "smart-execution", icon: PlayCircle },
   { titleKey: "workspaceMenu.testData", defaultLabel: "测试数据", url: "smart-execution/test-data", icon: Database },
-  { titleKey: "workspaceMenu.testReport", defaultLabel: "测试报告", url: "test-report", icon: FileBarChart },
+  {
+    titleKey: "workspaceMenu.testReport",
+    defaultLabel: "测试报告",
+    url: "test-report",
+    icon: FileBarChart,
+    children: [
+      { titleKey: "workspaceMenu.knowledgeBase", defaultLabel: "知识库", url: "knowledge", icon: BookOpen },
+    ],
+  },
   { titleKey: "workspaceMenu.environment", defaultLabel: "测试环境", url: "environment", icon: Server },
   { titleKey: "workspaceMenu.tags", defaultLabel: "标签", url: "tags", icon: TagsIcon },
 ];
@@ -50,6 +67,16 @@ export function NormalUserSidebar({ workspaceName = "工作空间" }: NormalUser
   const isCollapsed = state === "collapsed";
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { pathname } = useLocation();
+
+  const isPathActive = (url: string) => {
+    const normalizedUrl = url.replace(/^\/+|\/+$/g, "");
+    const urlParts = normalizedUrl.split("/");
+    const pathParts = pathname.split("/").filter(Boolean);
+    if (pathParts.length < urlParts.length) return false;
+    const endParts = pathParts.slice(-urlParts.length);
+    return endParts.join("/") === normalizedUrl;
+  };
 
   return (
     <Sidebar
@@ -86,31 +113,52 @@ export function NormalUserSidebar({ workspaceName = "工作空间" }: NormalUser
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {normalUserMenuItems.map((item) => (
-                <SidebarMenuItem key={item.titleKey}>
-                  <SidebarMenuButton asChild className="h-9">
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "smart-execution"}
-                      className={({ isActive }) =>
-                        cn(
-                          "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
-                          "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
-                          isActive &&
-                            "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md"
-                        )
-                      }
-                    >
-                      <item.icon className="w-4 h-4 flex-shrink-0" />
-                      {!isCollapsed && (
-                        <span className="text-sm font-medium">
-                          {t(item.titleKey, { defaultValue: item.defaultLabel })}
-                        </span>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {normalUserMenuItems.map((item) => {
+                const isParentActive = item.children?.some((child) => isPathActive(child.url)) ?? false;
+                return (
+                  <SidebarMenuItem key={item.titleKey}>
+                    <SidebarMenuButton asChild className="h-9">
+                      <NavLink
+                        to={item.url}
+                        end={item.url === "smart-execution"}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all duration-200",
+                            "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                            (isActive || isParentActive) &&
+                              "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground shadow-md"
+                          )
+                        }
+                      >
+                        <item.icon className="w-4 h-4 flex-shrink-0" />
+                        {!isCollapsed && (
+                          <span className="text-sm font-medium">
+                            {t(item.titleKey, { defaultValue: item.defaultLabel })}
+                          </span>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                    {item.children && (
+                      <SidebarMenuSub>
+                        {item.children.map((child) => (
+                          <SidebarMenuSubItem key={child.titleKey}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={isPathActive(child.url)}
+                              size="sm"
+                            >
+                              <NavLink to={child.url}>
+                                <child.icon className="w-4 h-4" />
+                                <span>{t(child.titleKey, { defaultValue: child.defaultLabel })}</span>
+                              </NavLink>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

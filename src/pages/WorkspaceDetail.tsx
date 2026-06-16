@@ -61,7 +61,9 @@ export default function WorkspaceDetail() {
           <NormalUserSidebar workspaceName={workspace?.name} />
           <main className="flex-1 p-6 overflow-auto">
             <Routes>
-              <Route index element={<Navigate to="management/ai-cases" replace />} />
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="knowledge" element={<Knowledge />} />
               <Route path="management/ai-cases" element={<AIGeneratedCases />} />
               <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
               <Route path="management/ai-cases/:recordId/case-review" element={<CaseReview />} />

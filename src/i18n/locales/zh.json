@@ -80,6 +80,12 @@
   },
   "workspaceMenu": {
     "dashboard": "数据监控",
+    "kanban": "看板",
+    "testManagement": "测试管理",
+    "smartDesign": "智能设计",
+    "testExecution": "测试执行",
+    "testData": "测试数据",
+    "knowledgeBase": "知识库",
     "ontology": "测试本体",
     "templates": "案例模板",
     "testReport": "测试报告",
