@@ -435,6 +435,24 @@ export default function CaseReview() {
     setCreateTaskDialogOpen(false);
     setSaveToTaskDialogOpen(true);
   };
+  
+  // 保存到测试案例
+  const handleSaveToCases = () => {
+    setSaveToCasesDialogOpen(true);
+  };
+  
+  const handleConfirmSaveToCases = () => {
+    setSaveToCasesDialogOpen(false);
+    toast.success(t('caseReview.saveToCasesSuccess'));
+  };
+  
+  // 统计已采纳和已完善的案例数
+  const adoptedAndImprovedCaseCount = dimensions.reduce((sum, dim) => 
+    sum + dim.testPoints
+      .filter(tp => tp.reviewResult === "adopted" || tp.reviewResult === "improved")
+      .reduce((s, tp) => s + tp.caseCount, 0),
+    0
+  );
 
   // 统计数据计算
   const statistics = {
