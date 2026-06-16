@@ -116,7 +116,8 @@ export default function WorkspaceDetail() {
         <WorkspaceSidebar workspaceName={workspace?.name || "工作空间"} />
         <main className="flex-1 p-6 overflow-auto">
           <Routes>
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route index element={<Navigate to="home" replace />} />
+            <Route path="home" element={<Home />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="knowledge" element={<Knowledge />} />
             <Route path="management/cases" element={<TestCases />} />
