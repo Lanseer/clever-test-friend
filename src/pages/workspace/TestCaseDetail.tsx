@@ -210,7 +210,7 @@ export default function TestCaseDetail() {
   const handleTest = () => {
     toast.success("开始执行测试");
     if (testCase.testType === "API") {
-      navigate(`/workspace/${workspaceId}/smart-execution/api/${caseId}`);
+      navigate(`/workspace/${workspaceId}/smart-execution/e5/case/live-oa-${caseId}`);
     } else {
       navigate(`/workspace/${workspaceId}/smart-execution/exec-001/case/${caseId}`);
     }
