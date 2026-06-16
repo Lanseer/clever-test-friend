@@ -209,7 +209,17 @@ export default function TestCaseDetail() {
 
   const handleTest = () => {
     toast.success("开始执行测试");
-    // Here you would typically trigger test execution
+    if (testCase.testType === "API") {
+      navigate(`/workspace/${workspaceId}/smart-execution/api/${caseId}`);
+    } else {
+      navigate(`/workspace/${workspaceId}/smart-execution/exec-001/case/${caseId}`);
+    }
+  };
+
+  const toggleTestData = (item: string) => {
+    setSelectedTestData(prev =>
+      prev.includes(item) ? prev.filter(t => t !== item) : [...prev, item]
+    );
   };
 
   return (
