@@ -121,6 +121,7 @@ const mockTestCases: Record<string, {
     tags: ["订单", "状态机"],
     environment: "开发环境",
     testData: "使用模拟订单数据",
+    testType: "UI",
   },
   "5": {
     id: "5",
