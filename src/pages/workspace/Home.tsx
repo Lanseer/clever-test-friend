@@ -327,6 +327,59 @@ export default function Home() {
               </span>
             </div>
 
+            {/* Generated case files list (above conversation) */}
+            {activeSession.files.length > 0 && (
+              <div className="px-6 py-3 border-b border-border bg-muted/20">
+                <div className="max-w-3xl mx-auto space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>本次会话生成的案例文件 ({activeSession.files.length})</span>
+                  </div>
+                  {activeSession.files.map((f) => {
+                    const isActive = previewFile?.id === f.id;
+                    return (
+                      <div
+                        key={f.id}
+                        className={cn(
+                          "group flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors cursor-pointer",
+                          isActive
+                            ? "border-primary/40 bg-primary/5"
+                            : "border-border bg-card hover:border-primary/30 hover:bg-accent/40"
+                        )}
+                        onClick={() => setPreviewFile(f)}
+                      >
+                        <FileText className="w-4 h-4 text-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-foreground truncate">
+                            {f.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                            <span>{f.scenarioCount} 个场景</span>
+                            <span>·</span>
+                            <span>{f.caseCount} 条案例</span>
+                            <span>·</span>
+                            <span>{f.createdAt}</span>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewFile(f);
+                          }}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          预览
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Messages */}
             <ScrollArea className="flex-1">
               <div className="max-w-3xl mx-auto px-6 py-6 space-y-6">
@@ -355,69 +408,6 @@ export default function Home() {
             {/* Composer */}
             <div className="border-t border-border p-4">
               <div className="max-w-3xl mx-auto">
-                {/* Generated case files list (above input) */}
-                {activeSession.files.length > 0 && (
-                  <div className="mb-3 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>本次会话生成的案例文件 ({activeSession.files.length})</span>
-                    </div>
-                    {activeSession.files.map((f) => {
-                      const isActive = previewFile?.id === f.id;
-                      return (
-                        <div
-                          key={f.id}
-                          className={cn(
-                            "group flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors cursor-pointer",
-                            isActive
-                              ? "border-primary/40 bg-primary/5"
-                              : "border-border bg-card hover:border-primary/30 hover:bg-accent/40"
-                          )}
-                          onClick={() => setPreviewFile(f)}
-                        >
-                          <FileText className="w-4 h-4 text-primary shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-foreground truncate">
-                              {f.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
-                              <span>{f.scenarioCount} 个场景</span>
-                              <span>·</span>
-                              <span>{f.caseCount} 条案例</span>
-                              <span>·</span>
-                              <span>{f.createdAt}</span>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPreviewFile(f);
-                            }}
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            预览
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 px-2.5 text-xs gap-1 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleReview(f);
-                            }}
-                          >
-                            <ClipboardCheck className="w-3.5 h-3.5" />
-                            审查
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
                 <div className="bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
                   <Textarea
                     value={inputValue}
@@ -446,6 +436,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
 
           </>
         ) : (
@@ -609,15 +600,6 @@ export default function Home() {
               </div>
             </div>
             <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs gap-1 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
-              onClick={() => handleReview(previewFile)}
-            >
-              <ClipboardCheck className="w-3.5 h-3.5" />
-              审查
-            </Button>
-            <Button
               variant="ghost"
               size="icon"
               className="h-7 w-7"
@@ -655,7 +637,17 @@ export default function Home() {
               })}
             </div>
           </ScrollArea>
+          <div className="border-t border-border p-3 bg-card">
+            <Button
+              className="w-full gap-2 bg-primary/90 hover:bg-primary text-primary-foreground"
+              onClick={() => handleReview(previewFile)}
+            >
+              <ClipboardCheck className="w-4 h-4" />
+              开始审查
+            </Button>
+          </div>
         </aside>
+
       )}
     </div>
   );
