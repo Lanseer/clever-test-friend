@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle, Folder, BookOpen } from "lucide-react";
 import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
 import { GenerationRecordItem } from "@/components/workspace/GenerationRecordsPanel";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -387,16 +395,26 @@ export default function CaseReview() {
   const [saveToTaskDialogOpen, setSaveToTaskDialogOpen] = useState(false);
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   
-  // 保存到测试案例弹窗
-  const [saveToCasesDialogOpen, setSaveToCasesDialogOpen] = useState(false);
+  // 保存弹窗
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveTarget, setSaveTarget] = useState<"testCases" | "knowledgeBase" | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string>("");
+  const [selectedFolder, setSelectedFolder] = useState<string>("");
   
-  // 分组选项
+  // 分组选项（知识库）
   const groupOptions = [
     { value: "user-module", label: "用户模块" },
     { value: "payment-module", label: "支付模块" },
     { value: "order-module", label: "订单模块" },
     { value: "account-module", label: "账户模块" },
+  ];
+  
+  // 文件夹选项（测试案例）
+  const folderOptions = [
+    { value: "folder-login", label: "登录模块" },
+    { value: "folder-payment", label: "支付流程" },
+    { value: "folder-order", label: "订单管理" },
+    { value: "folder-account", label: "账户中心" },
   ];
   
   // Mock task data for display - use translated data
@@ -445,17 +463,26 @@ export default function CaseReview() {
     setSaveToTaskDialogOpen(true);
   };
   
-  // 保存到测试案例
-  const handleSaveToCases = () => {
+  // 保存
+  const handleOpenSaveDialog = () => {
+    setSaveTarget(null);
     setSelectedGroup("");
-    setSaveToCasesDialogOpen(true);
+    setSelectedFolder("");
+    setSaveDialogOpen(true);
   };
   
-  const handleConfirmSaveToCases = () => {
-    const group = groupOptions.find(g => g.value === selectedGroup);
-    setSaveToCasesDialogOpen(false);
-    setSelectedGroup("");
-    toast.success(`${t('caseReview.saveToCasesSuccess')}：${group?.label || selectedGroup}`);
+  const handleConfirmSave = () => {
+    setSaveDialogOpen(false);
+    if (saveTarget === "testCases") {
+      const folder = folderOptions.find(f => f.value === selectedFolder);
+      toast.success(`已保存到测试案例：${folder?.label || selectedFolder}`);
+      setSelectedFolder("");
+    } else if (saveTarget === "knowledgeBase") {
+      const group = groupOptions.find(g => g.value === selectedGroup);
+      toast.success(`已保存到知识库：${group?.label || selectedGroup}`);
+      setSelectedGroup("");
+    }
+    setSaveTarget(null);
   };
 
   // 统计数据计算
@@ -934,10 +961,10 @@ export default function CaseReview() {
         </div>
         <Button
           className="ml-auto gap-2"
-          onClick={handleSaveToCases}
+          onClick={handleOpenSaveDialog}
         >
           <Save className="w-4 h-4" />
-          {t('caseReview.saveToTestCases')}
+          {t('common.save')}
         </Button>
       </div>
 
@@ -1381,43 +1408,99 @@ Scenario: 完善后的场景描述
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 保存到测试案例确认对话框 */}
-      <AlertDialog open={saveToCasesDialogOpen} onOpenChange={setSaveToCasesDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('caseReview.saveToTestCases')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              <div className="space-y-4">
-                <p>{t('caseReview.saveToCasesConfirm')}</p>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t('caseReview.selectGroup')}</label>
-                  <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={t('caseReview.selectGroup')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {groupOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+      {/* 保存对话框 */}
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>保存</DialogTitle>
+            <DialogDescription>请选择保存目标位置</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setSaveTarget("testCases")}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-4 rounded-lg border transition-colors text-center",
+                  saveTarget === "testCases"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border hover:bg-muted"
+                )}
+              >
+                <Folder className="w-6 h-6" />
+                <span className="text-sm font-medium">保存到测试案例</span>
+              </button>
+              <button
+                onClick={() => setSaveTarget("knowledgeBase")}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-4 rounded-lg border transition-colors text-center",
+                  saveTarget === "knowledgeBase"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border hover:bg-muted"
+                )}
+              >
+                <BookOpen className="w-6 h-6" />
+                <span className="text-sm font-medium">保存到知识库</span>
+              </button>
+            </div>
+
+            {saveTarget === "testCases" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">选择保存到的文件夹</label>
+                <Select value={selectedFolder} onValueChange={setSelectedFolder}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="选择文件夹" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {folderOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setSelectedGroup("")}>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmSaveToCases}
-              disabled={!selectedGroup}
+            )}
+
+            {saveTarget === "knowledgeBase" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">选择保存到的分组</label>
+                <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="选择分组" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {groupOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setSaveDialogOpen(false);
+              setSaveTarget(null);
+              setSelectedGroup("");
+              setSelectedFolder("");
+            }}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={handleConfirmSave}
+              disabled={
+                !saveTarget ||
+                (saveTarget === "testCases" && !selectedFolder) ||
+                (saveTarget === "knowledgeBase" && !selectedGroup)
+              }
             >
               {t('common.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <CaseDetailSidebar
         open={sidebarOpen}
