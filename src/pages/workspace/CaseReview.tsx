@@ -395,16 +395,26 @@ export default function CaseReview() {
   const [saveToTaskDialogOpen, setSaveToTaskDialogOpen] = useState(false);
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   
-  // 保存到测试案例弹窗
-  const [saveToCasesDialogOpen, setSaveToCasesDialogOpen] = useState(false);
+  // 保存弹窗
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveTarget, setSaveTarget] = useState<"testCases" | "knowledgeBase" | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string>("");
+  const [selectedFolder, setSelectedFolder] = useState<string>("");
   
-  // 分组选项
+  // 分组选项（知识库）
   const groupOptions = [
     { value: "user-module", label: "用户模块" },
     { value: "payment-module", label: "支付模块" },
     { value: "order-module", label: "订单模块" },
     { value: "account-module", label: "账户模块" },
+  ];
+  
+  // 文件夹选项（测试案例）
+  const folderOptions = [
+    { value: "folder-login", label: "登录模块" },
+    { value: "folder-payment", label: "支付流程" },
+    { value: "folder-order", label: "订单管理" },
+    { value: "folder-account", label: "账户中心" },
   ];
   
   // Mock task data for display - use translated data
