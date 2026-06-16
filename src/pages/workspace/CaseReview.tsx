@@ -1390,14 +1390,34 @@ Scenario: 完善后的场景描述
       <AlertDialog open={saveToCasesDialogOpen} onOpenChange={setSaveToCasesDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('caseReview.saveToTestCases')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('caseReview.saveToCasesConfirm', { count: adoptedAndImprovedCaseCount })}
+              <div className="space-y-4">
+                <p>{t('caseReview.saveToCasesConfirm', { count: adoptedAndImprovedCaseCount })}</p>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('caseReview.selectGroup')}</label>
+                  <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('caseReview.selectGroup')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {groupOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmSaveToCases}>
+            <AlertDialogCancel onClick={() => setSelectedGroup("")}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmSaveToCases}
+              disabled={!selectedGroup}
+            >
               {t('common.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
