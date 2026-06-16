@@ -77,6 +77,7 @@ const mockTestCases: Record<string, {
     tags: ["支付", "关键路径"],
     environment: "预发布环境",
     testData: "使用测试信用卡 4111111111111111",
+    testType: "UI",
   },
   "3": {
     id: "3",
