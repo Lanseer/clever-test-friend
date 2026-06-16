@@ -249,7 +249,7 @@ export default function TestCases() {
               </Button>
               <Button variant="outline" className="gap-2" onClick={handleBatchTest} disabled={selectedIds.size === 0}>
                 <PlayCircle className="w-4 h-4" />
-                批量测试
+                触发测试
               </Button>
             </div>
           </div>

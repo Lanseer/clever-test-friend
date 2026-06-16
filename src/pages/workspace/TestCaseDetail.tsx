@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play } from "lucide-react";
+import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play, ChevronsUpDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+
 
 // Mock test case data
 const mockTestCases: Record<string, {
@@ -24,6 +26,7 @@ const mockTestCases: Record<string, {
   tags: string[];
   environment: string;
   testData: string;
+  testType: "UI" | "API";
 }> = {
   "1": {
     id: "1",
@@ -49,6 +52,7 @@ const mockTestCases: Record<string, {
     tags: ["登录", "核心功能"],
     environment: "测试环境",
     testData: "使用测试账号 testuser/password123",
+    testType: "UI",
   },
   "2": {
     id: "2",
@@ -73,6 +77,7 @@ const mockTestCases: Record<string, {
     tags: ["支付", "关键路径"],
     environment: "预发布环境",
     testData: "使用测试信用卡 4111111111111111",
+    testType: "UI",
   },
   "3": {
     id: "3",
@@ -96,6 +101,7 @@ const mockTestCases: Record<string, {
     tags: ["注册", "表单验证"],
     environment: "测试环境",
     testData: "使用随机生成的测试邮箱",
+    testType: "UI",
   },
   "4": {
     id: "4",
@@ -115,6 +121,7 @@ const mockTestCases: Record<string, {
     tags: ["订单", "状态机"],
     environment: "开发环境",
     testData: "使用模拟订单数据",
+    testType: "UI",
   },
   "5": {
     id: "5",
@@ -136,6 +143,7 @@ const mockTestCases: Record<string, {
     tags: ["性能", "API"],
     environment: "测试环境",
     testData: "使用性能测试工具 JMeter",
+    testType: "API",
   },
 };
 
@@ -143,8 +151,17 @@ const availableTags = ["登录", "核心功能", "支付", "关键路径", "注�
 const availableEnvironments = ["开发环境", "测试环境", "预发布环境", "生产环境"];
 const availableDatabases = ["MySQL-主库", "MySQL-从库", "Oracle-核心库", "PostgreSQL-测试库", "MongoDB-文档库"];
 
+const availableTestData = [
+  "登录测试数据集",
+  "支付测试数据集",
+  "用户注册数据集",
+  "订单模拟数据集",
+  "性能压测数据集",
+  "API接口Mock数据",
+];
+
 export default function TestCaseDetail() {
-  const { caseId } = useParams<{ caseId: string }>();
+  const { workspaceId, caseId } = useParams<{ workspaceId: string; caseId: string }>();
   const navigate = useNavigate();
   
   const testCase = caseId ? mockTestCases[caseId] : null;
@@ -152,7 +169,11 @@ export default function TestCaseDetail() {
   const [selectedTags, setSelectedTags] = useState<string[]>(testCase?.tags || []);
   const [environment, setEnvironment] = useState(testCase?.environment || "");
   const [database, setDatabase] = useState("");
-  const [testData, setTestData] = useState(testCase?.testData || "");
+  const [selectedTestData, setSelectedTestData] = useState<string[]>(
+    testCase?.testData ? [availableTestData[0]] : []
+  );
+  const [testDataOpen, setTestDataOpen] = useState(false);
+
 
   if (!testCase) {
     return (
@@ -188,7 +209,17 @@ export default function TestCaseDetail() {
 
   const handleTest = () => {
     toast.success("开始执行测试");
-    // Here you would typically trigger test execution
+    if (testCase.testType === "API") {
+      navigate(`/workspace/${workspaceId}/smart-execution/api/${caseId}`);
+    } else {
+      navigate(`/workspace/${workspaceId}/smart-execution/exec-001/case/${caseId}`);
+    }
+  };
+
+  const toggleTestData = (item: string) => {
+    setSelectedTestData(prev =>
+      prev.includes(item) ? prev.filter(t => t !== item) : [...prev, item]
+    );
   };
 
   return (
@@ -311,12 +342,41 @@ export default function TestCaseDetail() {
             {/* Test Data */}
             <div className="space-y-3">
               <Label className="text-base font-medium">测试数据</Label>
-              <Textarea
-                value={testData}
-                onChange={(e) => setTestData(e.target.value)}
-                placeholder="输入测试数据说明..."
-                className="min-h-[120px] resize-none"
-              />
+              <Popover open={testDataOpen} onOpenChange={setTestDataOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    <span className={cn("truncate", selectedTestData.length === 0 && "text-muted-foreground")}>
+                      {selectedTestData.length > 0
+                        ? selectedTestData.join("、")
+                        : "选择测试数据"}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-1" align="start">
+                  <div className="max-h-64 overflow-y-auto">
+                    {availableTestData.map((item) => {
+                      const checked = selectedTestData.includes(item);
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => toggleTestData(item)}
+                          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent text-left"
+                        >
+                          <Checkbox checked={checked} className="pointer-events-none" />
+                          <span className="flex-1">{item}</span>
+                          {checked && <Check className="h-4 w-4 text-primary" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
