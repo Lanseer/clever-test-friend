@@ -26,6 +26,7 @@ const mockTestCases: Record<string, {
   tags: string[];
   environment: string;
   testData: string;
+  testType: "UI" | "API";
 }> = {
   "1": {
     id: "1",
