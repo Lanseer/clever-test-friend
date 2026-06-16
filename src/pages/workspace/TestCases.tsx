@@ -369,35 +369,14 @@ export default function TestCases() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>环境</Label>
-                <Select value={newCase.environment} onValueChange={(v) => setNewCase({ ...newCase, environment: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="开发环境">开发环境</SelectItem>
-                    <SelectItem value="测试环境">测试环境</SelectItem>
-                    <SelectItem value="预发布环境">预发布环境</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="tags">标签（逗号分隔）</Label>
+                <Input
+                  id="tags"
+                  placeholder="如：登录, 核心功能"
+                  value={newCase.tags}
+                  onChange={(e) => setNewCase({ ...newCase, tags: e.target.value })}
+                />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tags">标签（逗号分隔）</Label>
-              <Input
-                id="tags"
-                placeholder="如：登录, 核心功能"
-                value={newCase.tags}
-                onChange={(e) => setNewCase({ ...newCase, tags: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="desc">描述</Label>
-              <Textarea
-                id="desc"
-                placeholder="案例描述（可选）"
-                value={newCase.description}
-                onChange={(e) => setNewCase({ ...newCase, description: e.target.value })}
-                rows={3}
-              />
             </div>
           </div>
           <DialogFooter>
