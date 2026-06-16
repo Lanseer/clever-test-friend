@@ -101,6 +101,7 @@ const mockTestCases: Record<string, {
     tags: ["注册", "表单验证"],
     environment: "测试环境",
     testData: "使用随机生成的测试邮箱",
+    testType: "UI",
   },
   "4": {
     id: "4",
