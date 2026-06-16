@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import {
   Bot,
   Send,
@@ -21,6 +23,10 @@ import {
   Plus,
   MessageSquare,
   Trash2,
+  FileText,
+  Eye,
+  ClipboardCheck,
+  X,
 } from "lucide-react";
 
 interface AgentCard {
@@ -43,10 +49,24 @@ const quickTools = [
   { id: "skill", icon: Wand2, label: "技能" },
 ];
 
+interface GeneratedFile {
+  id: string;
+  name: string;
+  scenarioCount: number;
+  caseCount: number;
+  createdAt: string;
+  recordId: string;
+}
+
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
+  generationData?: {
+    scenarioCount: number;
+    caseCount: number;
+    fileName: string;
+  };
 }
 
 interface Session {
@@ -55,46 +75,98 @@ interface Session {
   updatedAt: string;
   agentId: string;
   messages: ChatMessage[];
+  files: GeneratedFile[];
 }
 
 const initialSessions: Session[] = [
   {
     id: "s1",
-    title: "用户登录接口测试",
+    title: "用户登录模块案例设计",
     updatedAt: "今天 10:24",
-    agentId: "api",
+    agentId: "general",
+    files: [
+      {
+        id: "f1",
+        name: "2024-06-16生成案例_V0.1",
+        scenarioCount: 6,
+        caseCount: 24,
+        createdAt: "今天 10:24",
+        recordId: "1",
+      },
+    ],
     messages: [
-      { id: "m1", role: "user", content: "帮我生成用户登录接口的测试用例" },
+      {
+        id: "m1",
+        role: "user",
+        content: "基于登录模块 PRD 文档，生成完整的测试案例，覆盖正向和负向场景",
+      },
       {
         id: "m2",
         role: "assistant",
         content:
-          "好的，我已根据 /api/login 接口生成了 6 条测试用例，覆盖正常登录、密码错误、账号锁定、参数缺失、SQL 注入与限流场景。",
+          "已为你解析《登录模块PRD V1.2》，提取出 6 个测试场景，并生成 24 条 BDD 格式测试案例，涵盖账号密码登录、SSO登录、验证码登录、密码错误、账号锁定、限流等场景。",
+        generationData: {
+          scenarioCount: 6,
+          caseCount: 24,
+          fileName: "2024-06-16生成案例_V0.1",
+        },
       },
     ],
   },
   {
     id: "s2",
-    title: "订单字段映射梳理",
+    title: "支付流程端到端案例",
     updatedAt: "昨天 18:02",
-    agentId: "migration",
+    agentId: "general",
+    files: [
+      {
+        id: "f2",
+        name: "2024-06-15生成案例_V0.1",
+        scenarioCount: 8,
+        caseCount: 32,
+        createdAt: "昨天 18:02",
+        recordId: "2",
+      },
+      {
+        id: "f3",
+        name: "2024-06-15生成案例_V0.2",
+        scenarioCount: 4,
+        caseCount: 12,
+        createdAt: "昨天 19:10",
+        recordId: "2",
+      },
+    ],
     messages: [
-      { id: "m1", role: "user", content: "把旧订单表字段映射到新订单表" },
+      { id: "m1", role: "user", content: "为支付下单到回调的端到端流程生成测试案例" },
       {
         id: "m2",
         role: "assistant",
-        content: "已完成字段映射，共匹配 24 个字段，3 个字段需要人工确认。",
+        content:
+          "已生成首版案例，覆盖 8 个支付场景、共 32 条案例，包含创建订单、调起支付、支付成功回调、超时、重复支付、退款等。",
+        generationData: { scenarioCount: 8, caseCount: 32, fileName: "2024-06-15生成案例_V0.1" },
+      },
+      { id: "m3", role: "user", content: "补充异常处理和退款相关的案例" },
+      {
+        id: "m4",
+        role: "assistant",
+        content: "已补充 4 个异常场景，共 12 条案例，包含支付超时、网络异常、部分退款、全额退款等。",
+        generationData: { scenarioCount: 4, caseCount: 12, fileName: "2024-06-15生成案例_V0.2" },
       },
     ],
   },
 ];
 
+
+
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { workspaceId } = useParams();
   const [sessions, setSessions] = useState<Session[]>(initialSessions);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("general");
+  const [previewFile, setPreviewFile] = useState<GeneratedFile | null>(null);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
   const activeAgent =
@@ -106,27 +178,42 @@ export default function Home() {
   const handleNewSession = () => {
     setActiveSessionId(null);
     setInputValue("");
+    setPreviewFile(null);
   };
 
   const handleSend = () => {
     const text = inputValue.trim();
     if (!text) return;
 
+    const ts = Date.now();
+    const fileName = `${new Date().toISOString().slice(0, 10)}生成案例_V0.${(activeSession?.files.length ?? 0) + 1}`;
+    const scenarioCount = 4 + Math.floor(Math.random() * 4);
+    const caseCount = scenarioCount * 4;
+    const newFile: GeneratedFile = {
+      id: `f-${ts}`,
+      name: fileName,
+      scenarioCount,
+      caseCount,
+      createdAt: "刚刚",
+      recordId: activeSession?.files[0]?.recordId ?? "1",
+    };
+
     if (activeSession) {
-      // append to existing
       setSessions((prev) =>
         prev.map((s) =>
           s.id === activeSession.id
             ? {
                 ...s,
                 updatedAt: "刚刚",
+                files: [...s.files, newFile],
                 messages: [
                   ...s.messages,
-                  { id: `m-${Date.now()}`, role: "user", content: text },
+                  { id: `m-${ts}`, role: "user", content: text },
                   {
-                    id: `m-${Date.now()}-a`,
+                    id: `m-${ts}-a`,
                     role: "assistant",
-                    content: "已收到你的请求，正在为你处理…",
+                    content: `已基于你的需求生成案例文件 ${fileName}，共 ${scenarioCount} 个场景、${caseCount} 条案例。`,
+                    generationData: { scenarioCount, caseCount, fileName },
                   },
                 ],
               }
@@ -134,18 +221,20 @@ export default function Home() {
         )
       );
     } else {
-      const id = `s-${Date.now()}`;
+      const id = `s-${ts}`;
       const newSession: Session = {
         id,
         title: text.length > 16 ? text.slice(0, 16) + "…" : text,
         updatedAt: "刚刚",
         agentId: selectedAgent,
+        files: [newFile],
         messages: [
-          { id: `m-${Date.now()}`, role: "user", content: text },
+          { id: `m-${ts}`, role: "user", content: text },
           {
-            id: `m-${Date.now()}-a`,
+            id: `m-${ts}-a`,
             role: "assistant",
-            content: "已收到你的请求，正在为你处理…",
+            content: `已基于你的需求生成案例文件 ${fileName}，共 ${scenarioCount} 个场景、${caseCount} 条案例。`,
+            generationData: { scenarioCount, caseCount, fileName },
           },
         ],
       };
@@ -154,6 +243,13 @@ export default function Home() {
     }
     setInputValue("");
   };
+
+  const handleReview = (file: GeneratedFile) => {
+    const base = workspaceId ? `/workspace/${workspaceId}` : "..";
+    navigate(`${base}/management/ai-cases/${file.recordId}/case-review`);
+  };
+
+
 
   const handleDeleteSession = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -258,33 +354,99 @@ export default function Home() {
 
             {/* Composer */}
             <div className="border-t border-border p-4">
-              <div className="max-w-3xl mx-auto bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
-                <Textarea
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  placeholder={t(
-                    "home.inputPlaceholder",
-                    "输入你的需求，我来帮你完成任务"
-                  )}
-                  className="min-h-[60px] resize-none border-0 bg-transparent text-sm focus-visible:ring-0 focus-visible:ring-offset-0 p-0 shadow-none"
-                />
-                <div className="flex justify-end pt-2">
-                  <Button
-                    size="icon"
-                    onClick={handleSend}
-                    className="h-9 w-9 rounded-lg bg-primary/90 hover:bg-primary text-primary-foreground"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+              <div className="max-w-3xl mx-auto">
+                {/* Generated case files list (above input) */}
+                {activeSession.files.length > 0 && (
+                  <div className="mb-3 space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>本次会话生成的案例文件 ({activeSession.files.length})</span>
+                    </div>
+                    {activeSession.files.map((f) => {
+                      const isActive = previewFile?.id === f.id;
+                      return (
+                        <div
+                          key={f.id}
+                          className={cn(
+                            "group flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors cursor-pointer",
+                            isActive
+                              ? "border-primary/40 bg-primary/5"
+                              : "border-border bg-card hover:border-primary/30 hover:bg-accent/40"
+                          )}
+                          onClick={() => setPreviewFile(f)}
+                        >
+                          <FileText className="w-4 h-4 text-primary shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-foreground truncate">
+                              {f.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                              <span>{f.scenarioCount} 个场景</span>
+                              <span>·</span>
+                              <span>{f.caseCount} 条案例</span>
+                              <span>·</span>
+                              <span>{f.createdAt}</span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewFile(f);
+                            }}
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            预览
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2.5 text-xs gap-1 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleReview(f);
+                            }}
+                          >
+                            <ClipboardCheck className="w-3.5 h-3.5" />
+                            审查
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
+                  <Textarea
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    placeholder={t(
+                      "home.inputPlaceholder",
+                      "输入你的需求，我来帮你完成任务"
+                    )}
+                    className="min-h-[60px] resize-none border-0 bg-transparent text-sm focus-visible:ring-0 focus-visible:ring-offset-0 p-0 shadow-none"
+                  />
+                  <div className="flex justify-end pt-2">
+                    <Button
+                      size="icon"
+                      onClick={handleSend}
+                      className="h-9 w-9 rounded-lg bg-primary/90 hover:bg-primary text-primary-foreground"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
+
           </>
         ) : (
           <ScrollArea className="flex-1">
@@ -432,6 +594,69 @@ export default function Home() {
           </ScrollArea>
         )}
       </div>
+
+      {/* Right: file preview panel */}
+      {activeSession && previewFile && (
+        <aside className="w-[420px] shrink-0 border-l border-border bg-card flex flex-col">
+          <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-foreground truncate">
+                {previewFile.name}
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {previewFile.scenarioCount} 个场景 · {previewFile.caseCount} 条案例
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-xs gap-1 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() => handleReview(previewFile)}
+            >
+              <ClipboardCheck className="w-3.5 h-3.5" />
+              审查
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setPreviewFile(null)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-3">
+              {Array.from({ length: previewFile.scenarioCount }).map((_, sIdx) => {
+                const perScenario = Math.ceil(previewFile.caseCount / previewFile.scenarioCount);
+                return (
+                  <div key={sIdx} className="border border-border rounded-lg overflow-hidden">
+                    <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        场景 {sIdx + 1}：测试场景示例
+                      </span>
+                      <Badge variant="secondary" className="text-xs">
+                        {perScenario} 条
+                      </Badge>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {Array.from({ length: perScenario }).map((__, cIdx) => (
+                        <div key={cIdx} className="px-3 py-2 text-xs text-muted-foreground">
+                          <span className="text-foreground font-medium">
+                            TC-{sIdx + 1}.{cIdx + 1}
+                          </span>{" "}
+                          案例示例：当用户执行操作 {cIdx + 1} 时，系统应返回预期结果。
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </aside>
+      )}
     </div>
   );
 }
