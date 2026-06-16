@@ -342,12 +342,41 @@ export default function TestCaseDetail() {
             {/* Test Data */}
             <div className="space-y-3">
               <Label className="text-base font-medium">测试数据</Label>
-              <Textarea
-                value={testData}
-                onChange={(e) => setTestData(e.target.value)}
-                placeholder="输入测试数据说明..."
-                className="min-h-[120px] resize-none"
-              />
+              <Popover open={testDataOpen} onOpenChange={setTestDataOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between font-normal"
+                  >
+                    <span className={cn("truncate", selectedTestData.length === 0 && "text-muted-foreground")}>
+                      {selectedTestData.length > 0
+                        ? selectedTestData.join("、")
+                        : "选择测试数据"}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-1" align="start">
+                  <div className="max-h-64 overflow-y-auto">
+                    {availableTestData.map((item) => {
+                      const checked = selectedTestData.includes(item);
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => toggleTestData(item)}
+                          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-accent text-left"
+                        >
+                          <Checkbox checked={checked} className="pointer-events-none" />
+                          <span className="flex-1">{item}</span>
+                          {checked && <Check className="h-4 w-4 text-primary" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
