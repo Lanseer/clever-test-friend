@@ -961,10 +961,10 @@ export default function CaseReview() {
         </div>
         <Button
           className="ml-auto gap-2"
-          onClick={handleSaveToCases}
+          onClick={handleOpenSaveDialog}
         >
           <Save className="w-4 h-4" />
-          {t('caseReview.saveToTestCases')}
+          {t('common.save')}
         </Button>
       </div>
 
