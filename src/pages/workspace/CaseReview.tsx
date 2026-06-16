@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle, Folder, BookOpen } from "lucide-react";
 import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
 import { GenerationRecordItem } from "@/components/workspace/GenerationRecordsPanel";
 import { Input } from "@/components/ui/input";
