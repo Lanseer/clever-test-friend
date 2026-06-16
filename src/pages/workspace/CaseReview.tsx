@@ -1396,7 +1396,7 @@ Scenario: 完善后的场景描述
             <AlertDialogTitle>{t('caseReview.saveToTestCases')}</AlertDialogTitle>
             <AlertDialogDescription>
               <div className="space-y-4">
-                <p>{t('caseReview.saveToCasesConfirm', { count: adoptedAndImprovedCaseCount })}</p>
+                <p>{t('caseReview.saveToCasesConfirm')}</p>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t('caseReview.selectGroup')}</label>
                   <Select value={selectedGroup} onValueChange={setSelectedGroup}>
