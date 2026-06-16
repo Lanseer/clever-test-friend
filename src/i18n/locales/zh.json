@@ -94,6 +94,14 @@
     "tags": "标签",
     "testWorkbench": "测试工作台"
   },
+  "home": {
+    "agentLabel": "智能体",
+    "inputPlaceholder": "输入你的需求，我来帮你完成任务",
+    "send": "发送",
+    "newLine": "换行",
+    "sessionIsolate": "会话隔离",
+    "sessionShare": "会话共享"
+  },
   "workspaces": {
     "title": "工作空间",
     "subtitle": "管理您的测试项目空间",
