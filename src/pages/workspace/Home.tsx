@@ -600,15 +600,6 @@ export default function Home() {
               </div>
             </div>
             <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs gap-1 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
-              onClick={() => handleReview(previewFile)}
-            >
-              <ClipboardCheck className="w-3.5 h-3.5" />
-              审查
-            </Button>
-            <Button
               variant="ghost"
               size="icon"
               className="h-7 w-7"
@@ -646,7 +637,17 @@ export default function Home() {
               })}
             </div>
           </ScrollArea>
+          <div className="border-t border-border p-3 bg-card">
+            <Button
+              className="w-full gap-2 bg-primary/90 hover:bg-primary text-primary-foreground"
+              onClick={() => handleReview(previewFile)}
+            >
+              <ClipboardCheck className="w-4 h-4" />
+              开始审查
+            </Button>
+          </div>
         </aside>
+
       )}
     </div>
   );
