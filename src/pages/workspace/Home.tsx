@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import {
   Bot,
   Send,
@@ -21,6 +23,10 @@ import {
   Plus,
   MessageSquare,
   Trash2,
+  FileText,
+  Eye,
+  ClipboardCheck,
+  X,
 } from "lucide-react";
 
 interface AgentCard {
@@ -43,10 +49,24 @@ const quickTools = [
   { id: "skill", icon: Wand2, label: "技能" },
 ];
 
+interface GeneratedFile {
+  id: string;
+  name: string;
+  scenarioCount: number;
+  caseCount: number;
+  createdAt: string;
+  recordId: string;
+}
+
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
+  generationData?: {
+    scenarioCount: number;
+    caseCount: number;
+    fileName: string;
+  };
 }
 
 interface Session {
@@ -55,39 +75,88 @@ interface Session {
   updatedAt: string;
   agentId: string;
   messages: ChatMessage[];
+  files: GeneratedFile[];
 }
 
 const initialSessions: Session[] = [
   {
     id: "s1",
-    title: "用户登录接口测试",
+    title: "用户登录模块案例设计",
     updatedAt: "今天 10:24",
-    agentId: "api",
+    agentId: "general",
+    files: [
+      {
+        id: "f1",
+        name: "2024-06-16生成案例_V0.1",
+        scenarioCount: 6,
+        caseCount: 24,
+        createdAt: "今天 10:24",
+        recordId: "1",
+      },
+    ],
     messages: [
-      { id: "m1", role: "user", content: "帮我生成用户登录接口的测试用例" },
+      {
+        id: "m1",
+        role: "user",
+        content: "基于登录模块 PRD 文档，生成完整的测试案例，覆盖正向和负向场景",
+      },
       {
         id: "m2",
         role: "assistant",
         content:
-          "好的，我已根据 /api/login 接口生成了 6 条测试用例，覆盖正常登录、密码错误、账号锁定、参数缺失、SQL 注入与限流场景。",
+          "已为你解析《登录模块PRD V1.2》，提取出 6 个测试场景，并生成 24 条 BDD 格式测试案例，涵盖账号密码登录、SSO登录、验证码登录、密码错误、账号锁定、限流等场景。",
+        generationData: {
+          scenarioCount: 6,
+          caseCount: 24,
+          fileName: "2024-06-16生成案例_V0.1",
+        },
       },
     ],
   },
   {
     id: "s2",
-    title: "订单字段映射梳理",
+    title: "支付流程端到端案例",
     updatedAt: "昨天 18:02",
-    agentId: "migration",
+    agentId: "general",
+    files: [
+      {
+        id: "f2",
+        name: "2024-06-15生成案例_V0.1",
+        scenarioCount: 8,
+        caseCount: 32,
+        createdAt: "昨天 18:02",
+        recordId: "2",
+      },
+      {
+        id: "f3",
+        name: "2024-06-15生成案例_V0.2",
+        scenarioCount: 4,
+        caseCount: 12,
+        createdAt: "昨天 19:10",
+        recordId: "2",
+      },
+    ],
     messages: [
-      { id: "m1", role: "user", content: "把旧订单表字段映射到新订单表" },
+      { id: "m1", role: "user", content: "为支付下单到回调的端到端流程生成测试案例" },
       {
         id: "m2",
         role: "assistant",
-        content: "已完成字段映射，共匹配 24 个字段，3 个字段需要人工确认。",
+        content:
+          "已生成首版案例，覆盖 8 个支付场景、共 32 条案例，包含创建订单、调起支付、支付成功回调、超时、重复支付、退款等。",
+        generationData: { scenarioCount: 8, caseCount: 32, fileName: "2024-06-15生成案例_V0.1" },
+      },
+      { id: "m3", role: "user", content: "补充异常处理和退款相关的案例" },
+      {
+        id: "m4",
+        role: "assistant",
+        content: "已补充 4 个异常场景，共 12 条案例，包含支付超时、网络异常、部分退款、全额退款等。",
+        generationData: { scenarioCount: 4, caseCount: 12, fileName: "2024-06-15生成案例_V0.2" },
       },
     ],
   },
 ];
+
+
 
 export default function Home() {
   const { t } = useTranslation();
