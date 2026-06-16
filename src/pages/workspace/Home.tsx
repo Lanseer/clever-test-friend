@@ -594,6 +594,69 @@ export default function Home() {
           </ScrollArea>
         )}
       </div>
+
+      {/* Right: file preview panel */}
+      {activeSession && previewFile && (
+        <aside className="w-[420px] shrink-0 border-l border-border bg-card flex flex-col">
+          <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-foreground truncate">
+                {previewFile.name}
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {previewFile.scenarioCount} 个场景 · {previewFile.caseCount} 条案例
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-xs gap-1 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() => handleReview(previewFile)}
+            >
+              <ClipboardCheck className="w-3.5 h-3.5" />
+              审查
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setPreviewFile(null)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-3">
+              {Array.from({ length: previewFile.scenarioCount }).map((_, sIdx) => {
+                const perScenario = Math.ceil(previewFile.caseCount / previewFile.scenarioCount);
+                return (
+                  <div key={sIdx} className="border border-border rounded-lg overflow-hidden">
+                    <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        场景 {sIdx + 1}：测试场景示例
+                      </span>
+                      <Badge variant="secondary" className="text-xs">
+                        {perScenario} 条
+                      </Badge>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {Array.from({ length: perScenario }).map((__, cIdx) => (
+                        <div key={cIdx} className="px-3 py-2 text-xs text-muted-foreground">
+                          <span className="text-foreground font-medium">
+                            TC-{sIdx + 1}.{cIdx + 1}
+                          </span>{" "}
+                          案例示例：当用户执行操作 {cIdx + 1} 时，系统应返回预期结果。
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </aside>
+      )}
     </div>
   );
 }
