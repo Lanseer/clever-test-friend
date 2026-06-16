@@ -457,9 +457,6 @@ export default function CaseReview() {
     setSelectedGroup("");
     toast.success(`${t('caseReview.saveToCasesSuccess')}：${group?.label || selectedGroup}`);
   };
-  
-  // 统计已采纳和已完善的案例数
-  const adoptedAndImprovedCaseCount = 23;
 
   // 统计数据计算
   const statistics = {
