@@ -41,6 +41,7 @@ interface MenuItem {
 }
 
 const normalUserMenuItems: MenuItem[] = [
+  { titleKey: "workspaceMenu.home", defaultLabel: "首页", url: "home", icon: Home },
   { titleKey: "workspaceMenu.kanban", defaultLabel: "看板", url: "dashboard", icon: LayoutDashboard },
   { titleKey: "workspaceMenu.testManagement", defaultLabel: "测试管理", url: "management/my-test-tasks", icon: ClipboardList },
   { titleKey: "workspaceMenu.smartDesign", defaultLabel: "智能设计", url: "management/ai-cases", icon: Sparkles },
