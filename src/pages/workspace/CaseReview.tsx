@@ -928,6 +928,13 @@ export default function CaseReview() {
             </button>
           </div>
         </div>
+        <Button
+          className="ml-auto gap-2"
+          onClick={handleSaveToCases}
+        >
+          <Save className="w-4 h-4" />
+          {t('caseReview.saveToTestCases')}
+        </Button>
       </div>
 
       {/* Statistics Cards */}
