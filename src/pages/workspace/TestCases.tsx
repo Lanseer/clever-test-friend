@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+
 import { cn } from "@/lib/utils";
 import { CaseGroupSidebar, CaseGroup } from "@/components/workspace/CaseGroupSidebar";
 import { toast } from "sonner";
