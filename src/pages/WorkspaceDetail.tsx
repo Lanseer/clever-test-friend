@@ -157,7 +157,7 @@ export default function WorkspaceDetail() {
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </main>
-        <TestSpriteButton />
+        
       </div>
     </SidebarProvider>
   );
