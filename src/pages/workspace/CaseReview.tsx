@@ -387,6 +387,9 @@ export default function CaseReview() {
   const [saveToTaskDialogOpen, setSaveToTaskDialogOpen] = useState(false);
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   
+  // 保存到测试案例弹窗
+  const [saveToCasesDialogOpen, setSaveToCasesDialogOpen] = useState(false);
+  
   // Mock task data for display - use translated data
   const mockTasksData = [
     { id: "1", name: t('mockData.tasks.userLogin'), testPhase: t('myTasks.testPhase.sit'), testCategory: t('myTasks.testCategory.functional') },
