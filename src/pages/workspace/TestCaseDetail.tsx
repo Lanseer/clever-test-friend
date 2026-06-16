@@ -101,7 +101,7 @@ const mockTestCases: Record<string, {
     tags: ["注册", "表单验证"],
     environment: "测试环境",
     testData: "使用随机生成的测试邮箱",
-    testType: "UI",
+    testType: "API",
   },
   "4": {
     id: "4",
@@ -121,7 +121,7 @@ const mockTestCases: Record<string, {
     tags: ["订单", "状态机"],
     environment: "开发环境",
     testData: "使用模拟订单数据",
-    testType: "UI",
+    testType: "API",
   },
   "5": {
     id: "5",
