@@ -72,9 +72,7 @@ export default function TestCases() {
   const [newCase, setNewCase] = useState({
     name: "",
     testType: "UI" as TestType,
-    environment: "测试环境",
     tags: "",
-    description: "",
   });
   const navigate = useNavigate();
   const { workspaceId } = useParams();
