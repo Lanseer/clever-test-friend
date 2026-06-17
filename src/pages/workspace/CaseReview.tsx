@@ -1482,7 +1482,7 @@ Scenario: 完善后的场景描述
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setSaveDialogOpen(false);
-              setSaveTarget(null);
+              setSaveTarget("testCases");
               setSelectedGroup("");
               setSelectedFolder("");
             }}>
@@ -1491,9 +1491,8 @@ Scenario: 完善后的场景描述
             <Button
               onClick={handleConfirmSave}
               disabled={
-                !saveTarget ||
-                (saveTarget === "testCases" && !selectedFolder) ||
-                (saveTarget === "knowledgeBase" && !selectedGroup)
+                (saveTarget === "testCases" && !selectedGroup) ||
+                (saveTarget === "knowledgeBase" && !selectedFolder)
               }
             >
               {t('common.confirm')}
