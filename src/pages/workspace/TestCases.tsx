@@ -390,6 +390,51 @@ export default function TestCases() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Import Dialog */}
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>导入测试案例</DialogTitle>
+            <DialogDescription>选择导入途径</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <button
+              onClick={() => {
+                toast.info("请选择本地文件");
+                setImportOpen(false);
+              }}
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <FileText className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium text-foreground">本地文件</div>
+                <div className="text-xs text-muted-foreground mt-1">从本地导入Excel/CSV文件</div>
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                toast.info("请选择知识库文件");
+                setImportOpen(false);
+              }}
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Database className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium text-foreground">知识库</div>
+                <div className="text-xs text-muted-foreground mt-1">从知识库选择已有文档</div>
+              </div>
+            </button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setImportOpen(false)}>取消</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
