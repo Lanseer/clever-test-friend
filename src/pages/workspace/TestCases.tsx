@@ -71,6 +71,7 @@ export default function TestCases() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [createOpen, setCreateOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [importSource, setImportSource] = useState<"knowledge" | "local">("knowledge");
   const [newCase, setNewCase] = useState({
     name: "",
     testType: "UI" as TestType,
