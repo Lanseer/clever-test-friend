@@ -35,6 +35,7 @@ export interface CreateExecutionData {
   environment: string;
   testCases?: string[];
   tags?: string[];
+  group?: string;
 }
 
 interface CreateExecutionDialogProps {
@@ -69,6 +70,14 @@ const availableTags = [
   "集成",
 ];
 
+const availableGroups = [
+  "登录模块",
+  "支付模块",
+  "订单模块",
+  "用户中心",
+  "商品管理",
+];
+
 const environments = ["SIT-01", "SIT-02", "UAT-01", "UAT-02", "PERF-01"];
 
 export function CreateExecutionDialog({
@@ -81,6 +90,7 @@ export function CreateExecutionDialog({
   const [environment, setEnvironment] = useState("");
   const [selectedCase, setSelectedCase] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   useEffect(() => {
@@ -90,6 +100,7 @@ export function CreateExecutionDialog({
       setEnvironment("");
       setSelectedCase("");
       setSelectedTags([]);
+      setSelectedGroup("");
     }
   }, [open]);
 
@@ -102,7 +113,9 @@ export function CreateExecutionDialog({
   const isValid =
     name.trim() &&
     environment &&
-    (mode === "single" ? !!selectedCase : selectedTags.length > 0);
+    (mode === "single"
+      ? !!selectedCase
+      : !!selectedGroup && selectedTags.length > 0);
 
   const handleConfirm = () => {
     onConfirm({
@@ -111,6 +124,7 @@ export function CreateExecutionDialog({
       environment,
       testCases: mode === "single" && selectedCase ? [selectedCase] : undefined,
       tags: mode === "batch" ? selectedTags : undefined,
+      group: mode === "batch" ? selectedGroup : undefined,
     });
     onOpenChange(false);
   };
@@ -163,16 +177,37 @@ export function CreateExecutionDialog({
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
-                测试 <span className="text-destructive">*</span>
+                测试案例 <span className="text-destructive">*</span>
               </Label>
               <Select value={selectedCase} onValueChange={setSelectedCase}>
                 <SelectTrigger>
-                  <SelectValue placeholder="请选择测试场景" />
+                  <SelectValue placeholder="请选择测试案例" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTestCases.map((tc) => (
                     <SelectItem key={tc.id} value={tc.id}>
                       {tc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Batch: Group */}
+          {mode === "batch" && (
+            <div className="space-y-2">
+              <Label>
+                分组 <span className="text-destructive">*</span>
+              </Label>
+              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                <SelectTrigger>
+                  <SelectValue placeholder="请选择分组" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableGroups.map((g) => (
+                    <SelectItem key={g} value={g}>
+                      {g}
                     </SelectItem>
                   ))}
                 </SelectContent>
