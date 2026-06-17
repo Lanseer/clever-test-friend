@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, Plus, Sparkles, Trash2, PlayCircle, Tag, Clock, User, Globe, Code2 } from "lucide-react";
+import { Search, Plus, Sparkles, Trash2, PlayCircle, Tag, Clock, User, Globe, Code2, Upload, FileText, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
