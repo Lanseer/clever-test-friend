@@ -25,6 +25,15 @@ import {
   RefreshCw,
   Play,
   MessageSquare,
+  Folder,
+  ChevronRight,
+  ChevronDown,
+  Star,
+  Minimize2,
+  FolderPlus,
+  Upload,
+  FileSpreadsheet,
+  FileType2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
