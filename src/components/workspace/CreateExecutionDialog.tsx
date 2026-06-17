@@ -70,6 +70,14 @@ const availableTags = [
   "集成",
 ];
 
+const availableGroups = [
+  "登录模块",
+  "支付模块",
+  "订单模块",
+  "用户中心",
+  "商品管理",
+];
+
 const environments = ["SIT-01", "SIT-02", "UAT-01", "UAT-02", "PERF-01"];
 
 export function CreateExecutionDialog({
