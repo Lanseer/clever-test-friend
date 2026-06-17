@@ -221,7 +221,7 @@ export default function SmartExecution() {
             <TableBody>
               {filteredExecutions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
                   </TableCell>
                 </TableRow>
@@ -240,17 +240,6 @@ export default function SmartExecution() {
                         </button>
                       </TableCell>
                       <TableCell>
-                        <button
-                          onClick={() => {
-                            setActiveScenarioId(exec.scenarioId);
-                            setScenarioOpen(true);
-                          }}
-                          className="font-mono text-sm text-primary hover:underline"
-                        >
-                          {exec.scenarioId}
-                        </button>
-                      </TableCell>
-                      <TableCell>
                         <Badge variant="outline" className={cn("font-normal", status.className)}>
                           {status.label}
                         </Badge>
@@ -263,12 +252,6 @@ export default function SmartExecution() {
                             {testStatus.label}
                           </Badge>
                         )}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        <span className="font-mono text-sm">
-                          <span className="text-green-600 font-semibold">{exec.completedCases}</span>
-                          <span className="text-muted-foreground">/{exec.totalCases}</span>
-                        </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
@@ -304,11 +287,6 @@ export default function SmartExecution() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         onConfirm={handleConfirmCreate}
-      />
-      <ScenarioDetailDialog
-        open={scenarioOpen}
-        onOpenChange={setScenarioOpen}
-        scenarioId={activeScenarioId}
       />
     </div>
   );
