@@ -244,6 +244,10 @@ export default function TestCases() {
                 <Plus className="w-4 h-4" />
                 新增案例
               </Button>
+              <Button variant="outline" className="gap-2" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4" />
+                导入
+              </Button>
               <Button variant="outline" className="gap-2" onClick={handleBatchDelete} disabled={selectedIds.size === 0}>
                 <Trash2 className="w-4 h-4" />
                 批量删除
