@@ -35,6 +35,7 @@ export interface CreateExecutionData {
   environment: string;
   testCases?: string[];
   tags?: string[];
+  group?: string;
 }
 
 interface CreateExecutionDialogProps {
