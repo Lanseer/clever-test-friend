@@ -465,7 +465,7 @@ export default function CaseReview() {
   
   // 保存
   const handleOpenSaveDialog = () => {
-    setSaveTarget(null);
+    setSaveTarget("testCases");
     setSelectedGroup("");
     setSelectedFolder("");
     setSaveDialogOpen(true);
@@ -474,15 +474,15 @@ export default function CaseReview() {
   const handleConfirmSave = () => {
     setSaveDialogOpen(false);
     if (saveTarget === "testCases") {
-      const folder = folderOptions.find(f => f.value === selectedFolder);
-      toast.success(`已保存到测试案例：${folder?.label || selectedFolder}`);
-      setSelectedFolder("");
-    } else if (saveTarget === "knowledgeBase") {
       const group = groupOptions.find(g => g.value === selectedGroup);
-      toast.success(`已保存到知识库：${group?.label || selectedGroup}`);
+      toast.success(`已保存到测试案例：${group?.label || selectedGroup}`);
       setSelectedGroup("");
+    } else if (saveTarget === "knowledgeBase") {
+      const folder = folderOptions.find(f => f.value === selectedFolder);
+      toast.success(`已保存到知识库：${folder?.label || selectedFolder}`);
+      setSelectedFolder("");
     }
-    setSaveTarget(null);
+    setSaveTarget("testCases");
   };
 
   // 统计数据计算
