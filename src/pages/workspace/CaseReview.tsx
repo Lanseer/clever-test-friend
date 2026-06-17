@@ -1445,13 +1445,13 @@ Scenario: 完善后的场景描述
 
             {saveTarget === "testCases" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">选择保存到的文件夹</label>
-                <Select value={selectedFolder} onValueChange={setSelectedFolder}>
+                <label className="text-sm font-medium">选择保存到的分组</label>
+                <Select value={selectedGroup} onValueChange={setSelectedGroup}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="选择文件夹" />
+                    <SelectValue placeholder="选择分组" />
                   </SelectTrigger>
                   <SelectContent>
-                    {folderOptions.map((option) => (
+                    {groupOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
                       </SelectItem>
@@ -1463,13 +1463,13 @@ Scenario: 完善后的场景描述
 
             {saveTarget === "knowledgeBase" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">选择保存到的分组</label>
-                <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                <label className="text-sm font-medium">选择保存位置</label>
+                <Select value={selectedFolder} onValueChange={setSelectedFolder}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="选择分组" />
+                    <SelectValue placeholder="选择保存位置" />
                   </SelectTrigger>
                   <SelectContent>
-                    {groupOptions.map((option) => (
+                    {folderOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
                       </SelectItem>
