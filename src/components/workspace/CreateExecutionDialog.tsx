@@ -90,6 +90,7 @@ export function CreateExecutionDialog({
   const [environment, setEnvironment] = useState("");
   const [selectedCase, setSelectedCase] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export function CreateExecutionDialog({
       setEnvironment("");
       setSelectedCase("");
       setSelectedTags([]);
+      setSelectedGroup("");
     }
   }, [open]);
 
