@@ -397,11 +397,11 @@ export default function CaseReview() {
   
   // 保存弹窗
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const [saveTarget, setSaveTarget] = useState<"testCases" | "knowledgeBase" | null>(null);
+  const [saveTarget, setSaveTarget] = useState<"testCases" | "knowledgeBase">("testCases");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [selectedFolder, setSelectedFolder] = useState<string>("");
   
-  // 分组选项（知识库）
+  // 分组选项（测试案例）
   const groupOptions = [
     { value: "user-module", label: "用户模块" },
     { value: "payment-module", label: "支付模块" },
@@ -409,7 +409,7 @@ export default function CaseReview() {
     { value: "account-module", label: "账户模块" },
   ];
   
-  // 文件夹选项（测试案例）
+  // 文件夹选项（知识库）
   const folderOptions = [
     { value: "folder-login", label: "登录模块" },
     { value: "folder-payment", label: "支付流程" },
@@ -465,7 +465,7 @@ export default function CaseReview() {
   
   // 保存
   const handleOpenSaveDialog = () => {
-    setSaveTarget(null);
+    setSaveTarget("testCases");
     setSelectedGroup("");
     setSelectedFolder("");
     setSaveDialogOpen(true);
@@ -474,15 +474,15 @@ export default function CaseReview() {
   const handleConfirmSave = () => {
     setSaveDialogOpen(false);
     if (saveTarget === "testCases") {
-      const folder = folderOptions.find(f => f.value === selectedFolder);
-      toast.success(`已保存到测试案例：${folder?.label || selectedFolder}`);
-      setSelectedFolder("");
-    } else if (saveTarget === "knowledgeBase") {
       const group = groupOptions.find(g => g.value === selectedGroup);
-      toast.success(`已保存到知识库：${group?.label || selectedGroup}`);
+      toast.success(`已保存到测试案例：${group?.label || selectedGroup}`);
       setSelectedGroup("");
+    } else if (saveTarget === "knowledgeBase") {
+      const folder = folderOptions.find(f => f.value === selectedFolder);
+      toast.success(`已保存到知识库：${folder?.label || selectedFolder}`);
+      setSelectedFolder("");
     }
-    setSaveTarget(null);
+    setSaveTarget("testCases");
   };
 
   // 统计数据计算
@@ -1445,24 +1445,6 @@ Scenario: 完善后的场景描述
 
             {saveTarget === "testCases" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">选择保存到的文件夹</label>
-                <Select value={selectedFolder} onValueChange={setSelectedFolder}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="选择文件夹" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {folderOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {saveTarget === "knowledgeBase" && (
-              <div className="space-y-2">
                 <label className="text-sm font-medium">选择保存到的分组</label>
                 <Select value={selectedGroup} onValueChange={setSelectedGroup}>
                   <SelectTrigger className="w-full">
@@ -1478,11 +1460,29 @@ Scenario: 完善后的场景描述
                 </Select>
               </div>
             )}
+
+            {saveTarget === "knowledgeBase" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">选择保存位置</label>
+                <Select value={selectedFolder} onValueChange={setSelectedFolder}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="选择保存位置" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {folderOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setSaveDialogOpen(false);
-              setSaveTarget(null);
+              setSaveTarget("testCases");
               setSelectedGroup("");
               setSelectedFolder("");
             }}>
@@ -1491,9 +1491,8 @@ Scenario: 完善后的场景描述
             <Button
               onClick={handleConfirmSave}
               disabled={
-                !saveTarget ||
-                (saveTarget === "testCases" && !selectedFolder) ||
-                (saveTarget === "knowledgeBase" && !selectedGroup)
+                (saveTarget === "testCases" && !selectedGroup) ||
+                (saveTarget === "knowledgeBase" && !selectedFolder)
               }
             >
               {t('common.confirm')}
