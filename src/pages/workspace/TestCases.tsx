@@ -69,6 +69,7 @@ export default function TestCases() {
   const [cases, setCases] = useState<TestCase[]>(mockTestCases);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [createOpen, setCreateOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [newCase, setNewCase] = useState({
     name: "",
     testType: "UI" as TestType,
