@@ -177,16 +177,37 @@ export function CreateExecutionDialog({
           {mode === "single" && (
             <div className="space-y-2">
               <Label>
-                测试 <span className="text-destructive">*</span>
+                测试案例 <span className="text-destructive">*</span>
               </Label>
               <Select value={selectedCase} onValueChange={setSelectedCase}>
                 <SelectTrigger>
-                  <SelectValue placeholder="请选择测试场景" />
+                  <SelectValue placeholder="请选择测试案例" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTestCases.map((tc) => (
                     <SelectItem key={tc.id} value={tc.id}>
                       {tc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Batch: Group */}
+          {mode === "batch" && (
+            <div className="space-y-2">
+              <Label>
+                分组 <span className="text-destructive">*</span>
+              </Label>
+              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                <SelectTrigger>
+                  <SelectValue placeholder="请选择分组" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableGroups.map((g) => (
+                    <SelectItem key={g} value={g}>
+                      {g}
                     </SelectItem>
                   ))}
                 </SelectContent>
