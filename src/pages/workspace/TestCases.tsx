@@ -394,44 +394,62 @@ export default function TestCases() {
       </Dialog>
 
       {/* Import Dialog */}
-      <Dialog open={importOpen} onOpenChange={setImportOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog open={importOpen} onOpenChange={(open) => { setImportOpen(open); if (!open) setImportSource("knowledge"); }}>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>导入测试案例</DialogTitle>
             <DialogDescription>选择导入途径</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <button
-              onClick={() => {
-                toast.info("请选择本地文件");
-                setImportOpen(false);
-              }}
-              className="flex flex-col items-center gap-3 p-6 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-center"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-primary" />
+          <Tabs value={importSource} onValueChange={(v) => setImportSource(v as "knowledge" | "local")} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="knowledge" className="gap-2">
+                <Database className="w-4 h-4" />
+                知识库
+              </TabsTrigger>
+              <TabsTrigger value="local" className="gap-2">
+                <FileText className="w-4 h-4" />
+                本地文件
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="knowledge" className="mt-4 space-y-3">
+              <div className="text-sm font-medium text-foreground">选择知识库文件</div>
+              <div className="rounded-lg border divide-y max-h-64 overflow-auto">
+                {[
+                  { id: "kb1", name: "NCBS功能需求文档.xlsx", type: "Excel", size: "2.4 MB", date: "2024-06-10" },
+                  { id: "kb2", name: "交易接口总览.xls", type: "Excel", size: "1.8 MB", date: "2024-06-08" },
+                  { id: "kb3", name: "接口测试用例模板.xlsx", type: "Excel", size: "890 KB", date: "2024-06-05" },
+                  { id: "kb4", name: "业务流程梳理文档.xlsx", type: "Excel", size: "3.1 MB", date: "2024-06-01" },
+                ].map((file) => (
+                  <div key={file.id} className="flex items-center justify-between px-3 py-2.5 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-green-600" />
+                      <div>
+                        <div className="text-sm font-medium text-foreground">{file.name}</div>
+                        <div className="text-xs text-muted-foreground">{file.type} · {file.size} · {file.date}</div>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => { toast.success(`已选择知识库文件：${file.name}`); setImportOpen(false); }}>
+                      选择
+                    </Button>
+                  </div>
+                ))}
               </div>
-              <div>
-                <div className="font-medium text-foreground">本地文件</div>
-                <div className="text-xs text-muted-foreground mt-1">从本地导入Excel/CSV文件</div>
+            </TabsContent>
+            <TabsContent value="local" className="mt-4">
+              <div className="flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Upload className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-center">
+                  <div className="font-medium text-foreground">上传文件</div>
+                  <div className="text-xs text-muted-foreground mt-1">支持 Excel / CSV 格式，单个文件不超过 50MB</div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => { toast.info("请选择本地文件"); }}>
+                  选择文件
+                </Button>
               </div>
-            </button>
-            <button
-              onClick={() => {
-                toast.info("请选择知识库文件");
-                setImportOpen(false);
-              }}
-              className="flex flex-col items-center gap-3 p-6 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-center"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Database className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <div className="font-medium text-foreground">知识库</div>
-                <div className="text-xs text-muted-foreground mt-1">从知识库选择已有文档</div>
-              </div>
-            </button>
-          </div>
+            </TabsContent>
+          </Tabs>
           <DialogFooter>
             <Button variant="outline" onClick={() => setImportOpen(false)}>取消</Button>
           </DialogFooter>
