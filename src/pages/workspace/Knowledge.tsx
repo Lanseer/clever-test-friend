@@ -501,6 +501,63 @@ function AutoTasksView() {
   );
 }
 
+interface KnowledgeFile {
+  id: string;
+  name: string;
+  ext: "xlsx" | "xls" | "txt" | "doc" | "pdf";
+  size: string;
+  createdAt: string;
+  creator: string;
+}
+
+interface KnowledgeFolder {
+  id: string;
+  name: string;
+  createdAt: string;
+  creator: string;
+  children: KnowledgeFile[];
+}
+
+const mockFolders: KnowledgeFolder[] = [
+  {
+    id: "f1",
+    name: "NCBS",
+    createdAt: "2026/06/17 10:42",
+    creator: "liuyan",
+    children: [
+      { id: "f1-1", name: "326000_BaseAccountopening.xlsx", ext: "xlsx", size: "10 KB", createdAt: "2026/06/17 10:42", creator: "liuyan" },
+      { id: "f1-2", name: "344101_openIndividualCustomer.xlsx", ext: "xlsx", size: "6 KB", createdAt: "2026/06/17 10:42", creator: "liuyan" },
+      { id: "f1-3", name: "NCBS-Param.txt", ext: "txt", size: "7 KB", createdAt: "2026/06/17 10:42", creator: "liuyan" },
+    ],
+  },
+];
+
+const mockRootFiles: KnowledgeFile[] = [
+  { id: "r1", name: "交易接口总览.xls", ext: "xls", size: "485 KB", createdAt: "2026/06/16 15:46", creator: "liyafeng" },
+];
+
+function FileExtIcon({ ext }: { ext: KnowledgeFile["ext"] }) {
+  if (ext === "xlsx" || ext === "xls") {
+    return (
+      <div className="w-6 h-6 rounded bg-green-500/10 flex items-center justify-center shrink-0">
+        <FileSpreadsheet className="w-4 h-4 text-green-600" />
+      </div>
+    );
+  }
+  if (ext === "txt") {
+    return (
+      <div className="w-6 h-6 rounded bg-orange-500/10 flex items-center justify-center shrink-0">
+        <FileType2 className="w-4 h-4 text-orange-500" />
+      </div>
+    );
+  }
+  return (
+    <div className="w-6 h-6 rounded bg-muted flex items-center justify-center shrink-0">
+      <FileText className="w-4 h-4 text-muted-foreground" />
+    </div>
+  );
+}
+
 function KnowledgeView({
   searchQuery,
   setSearchQuery,
@@ -518,6 +575,12 @@ function KnowledgeView({
   handleOpenDiffDialog: (doc: KnowledgeDocument) => void;
   setCreateDialogOpen: (v: boolean) => void;
 }) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({ f1: true });
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+
+  const toggleFolder = (id: string) =>
+    setExpanded((p) => ({ ...p, [id]: !p[id] }));
+
   return (
     <div className="h-full">
       <header className="sticky top-0 z-10 glass border-b">
@@ -526,143 +589,184 @@ function KnowledgeView({
             <div>
               <h1 className="text-2xl font-bold text-foreground">知识</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                项目文档中心 · FSD / PRD / API接口文档
+                项目文档中心 · 文件与文件夹管理
               </p>
             </div>
-            <Button
-              className="gradient-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
-              onClick={() => setCreateDialogOpen(true)}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              新建文档
-            </Button>
           </div>
         </div>
       </header>
 
-      <div className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="p-6 space-y-4">
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <Select value={selectedType} onValueChange={setSelectedType}>
+            <SelectTrigger className="w-28">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="全部">全部</SelectItem>
+              <SelectItem value="xlsx">Excel</SelectItem>
+              <SelectItem value="txt">文本</SelectItem>
+              <SelectItem value="pdf">PDF</SelectItem>
+            </SelectContent>
+          </Select>
+
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="搜索文档名称或描述..."
+              placeholder="输入文件名,按回车触发搜索"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-card border-border"
+              className="pl-10"
             />
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {documentTypes.map((type) => (
-              <Button
-                key={type}
-                variant={selectedType === type ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedType(type)}
-                className={cn(
-                  "transition-all",
-                  selectedType === type && "gradient-primary text-primary-foreground"
-                )}
-              >
-                {type === "全部"
-                  ? type
-                  : typeConfig[type as keyof typeof typeConfig]?.label || type}
-              </Button>
-            ))}
+
+          <div className="flex items-center border rounded-md overflow-hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn("h-9 w-9 rounded-none", viewMode === "grid" && "bg-primary/10 text-primary")}
+              onClick={() => setViewMode("grid")}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn("h-9 w-9 rounded-none", viewMode === "list" && "bg-primary/10 text-primary")}
+              onClick={() => setViewMode("list")}
+            >
+              <TableIcon className="w-4 h-4" />
+            </Button>
           </div>
+
+          <Button variant="outline" size="sm" className="gap-2">
+            <Minimize2 className="w-4 h-4" />
+            收起
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2">
+            批量操作
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Download className="w-4 h-4" />
+            全量下载
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2">
+            <FolderPlus className="w-4 h-4" />
+            新增文件夹
+          </Button>
+          <Button size="sm" className="gradient-primary text-primary-foreground gap-2">
+            <Upload className="w-4 h-4" />
+            上传
+          </Button>
         </div>
 
+        {/* File list */}
         <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
           <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
-            <div className="col-span-5">文档名称</div>
+            <div className="col-span-5">文件</div>
+            <div className="col-span-1">大小</div>
             <div className="col-span-1">类型</div>
-            <div className="col-span-2">版本</div>
-            <div className="col-span-2">更新时间</div>
-            <div className="col-span-1">作者</div>
-            <div className="col-span-1">操作</div>
+            <div className="col-span-2">创建时间</div>
+            <div className="col-span-2">创建者</div>
+            <div className="col-span-1 text-right">操作</div>
           </div>
 
           <div className="divide-y divide-border">
-            {filteredDocs.map((doc, index) => {
-              const typeInfo = typeConfig[doc.type];
-              const TypeIcon = typeInfo.icon;
+            {mockFolders.map((folder) => {
+              const isOpen = !!expanded[folder.id];
               return (
-                <div
-                  key={doc.id}
-                  className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-muted/30 transition-colors animate-fade-in cursor-pointer"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="col-span-5 flex items-center gap-3">
-                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", typeInfo.color.split(" ")[0])}>
-                      <TypeIcon className={cn("w-5 h-5", typeInfo.color.split(" ")[1])} />
+                <div key={folder.id}>
+                  <div
+                    className="grid grid-cols-12 gap-4 px-6 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
+                    onClick={() => toggleFolder(folder.id)}
+                  >
+                    <div className="col-span-5 flex items-center gap-2">
+                      {isOpen ? (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      <Folder className="w-5 h-5 text-blue-500" />
+                      <span className="text-sm font-medium text-foreground">{folder.name}</span>
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground truncate">{doc.name}</p>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">{doc.description}</p>
+                    <div className="col-span-1 flex items-center text-sm text-muted-foreground">
+                      {folder.children.length} 个文件
+                    </div>
+                    <div className="col-span-1 flex items-center text-sm text-muted-foreground">---</div>
+                    <div className="col-span-2 flex items-center text-sm text-muted-foreground">{folder.createdAt}</div>
+                    <div className="col-span-2 flex items-center text-sm text-muted-foreground">{folder.creator}</div>
+                    <div className="col-span-1 flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Star className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Download className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <MoreHorizontal className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="col-span-1 flex items-center">
-                    <Badge variant="outline" className={cn("text-xs", typeInfo.color)}>
-                      {typeInfo.label}
-                    </Badge>
-                  </div>
-                  <div className="col-span-2 flex items-center">
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {doc.version}
-                    </Badge>
-                  </div>
-                  <div className="col-span-2 flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="w-3.5 h-3.5" />
-                    {doc.updatedAt}
-                  </div>
-                  <div className="col-span-1 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="w-3 h-3 text-primary" />
-                    </div>
-                    <span className="text-sm text-foreground truncate">{doc.author}</span>
-                  </div>
-                  <div className="col-span-1 flex items-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          查看详情
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <History className="w-4 h-4 mr-2" />
-                          版本历史
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenDiffDialog(doc)}>
-                          <GitCompare className="w-4 h-4 mr-2" />
-                          查看版本差异
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <FilePlus className="w-4 h-4 mr-2" />
-                          新增版本
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Download className="w-4 h-4 mr-2" />
-                          下载文档
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                  {isOpen &&
+                    folder.children.map((file) => (
+                      <div
+                        key={file.id}
+                        className="grid grid-cols-12 gap-4 px-6 py-3 hover:bg-muted/30 transition-colors border-t border-border/50"
+                      >
+                        <div className="col-span-5 flex items-center gap-2 pl-10">
+                          <FileExtIcon ext={file.ext} />
+                          <span className="text-sm text-foreground truncate">{file.name}</span>
+                        </div>
+                        <div className="col-span-1 flex items-center text-sm text-muted-foreground">{file.size}</div>
+                        <div className="col-span-1 flex items-center text-sm text-muted-foreground">.{file.ext}</div>
+                        <div className="col-span-2 flex items-center text-sm text-muted-foreground">{file.createdAt}</div>
+                        <div className="col-span-2 flex items-center text-sm text-muted-foreground">{file.creator}</div>
+                        <div className="col-span-1 flex items-center justify-end gap-1">
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <Star className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <Download className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <MoreHorizontal className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               );
             })}
+
+            {mockRootFiles.map((file) => (
+              <div
+                key={file.id}
+                className="grid grid-cols-12 gap-4 px-6 py-3 hover:bg-muted/30 transition-colors"
+              >
+                <div className="col-span-5 flex items-center gap-2">
+                  <FileExtIcon ext={file.ext} />
+                  <span className="text-sm text-foreground truncate">{file.name}</span>
+                </div>
+                <div className="col-span-1 flex items-center text-sm text-muted-foreground">{file.size}</div>
+                <div className="col-span-1 flex items-center text-sm text-muted-foreground">.{file.ext}</div>
+                <div className="col-span-2 flex items-center text-sm text-muted-foreground">{file.createdAt}</div>
+                <div className="col-span-2 flex items-center text-sm text-muted-foreground">{file.creator}</div>
+                <div className="col-span-1 flex items-center justify-end gap-1">
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Star className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Download className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <MoreHorizontal className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-
-        {filteredDocs.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">暂无匹配的文档</p>
-          </div>
-        )}
       </div>
     </div>
   );
