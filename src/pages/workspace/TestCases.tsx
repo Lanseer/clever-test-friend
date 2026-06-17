@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, Plus, Sparkles, Trash2, PlayCircle, Tag, Clock, User, Globe, Code2 } from "lucide-react";
+import { Search, Plus, Sparkles, Trash2, PlayCircle, Tag, Clock, User, Globe, Code2, Upload, FileText, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +69,7 @@ export default function TestCases() {
   const [cases, setCases] = useState<TestCase[]>(mockTestCases);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [createOpen, setCreateOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [newCase, setNewCase] = useState({
     name: "",
     testType: "UI" as TestType,
@@ -243,6 +244,10 @@ export default function TestCases() {
                 <Plus className="w-4 h-4" />
                 新增案例
               </Button>
+              <Button variant="outline" className="gap-2" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4" />
+                导入
+              </Button>
               <Button variant="outline" className="gap-2" onClick={handleBatchDelete} disabled={selectedIds.size === 0}>
                 <Trash2 className="w-4 h-4" />
                 批量删除
@@ -382,6 +387,51 @@ export default function TestCases() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>取消</Button>
             <Button onClick={handleCreate}>创建</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Dialog */}
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>导入测试案例</DialogTitle>
+            <DialogDescription>选择导入途径</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <button
+              onClick={() => {
+                toast.info("请选择本地文件");
+                setImportOpen(false);
+              }}
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <FileText className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium text-foreground">本地文件</div>
+                <div className="text-xs text-muted-foreground mt-1">从本地导入Excel/CSV文件</div>
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                toast.info("请选择知识库文件");
+                setImportOpen(false);
+              }}
+              className="flex flex-col items-center gap-3 p-6 rounded-xl border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Database className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium text-foreground">知识库</div>
+                <div className="text-xs text-muted-foreground mt-1">从知识库选择已有文档</div>
+              </div>
+            </button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setImportOpen(false)}>取消</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
