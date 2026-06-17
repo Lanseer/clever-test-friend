@@ -113,7 +113,9 @@ export function CreateExecutionDialog({
   const isValid =
     name.trim() &&
     environment &&
-    (mode === "single" ? !!selectedCase : selectedTags.length > 0);
+    (mode === "single"
+      ? !!selectedCase
+      : !!selectedGroup && selectedTags.length > 0);
 
   const handleConfirm = () => {
     onConfirm({
@@ -122,6 +124,7 @@ export function CreateExecutionDialog({
       environment,
       testCases: mode === "single" && selectedCase ? [selectedCase] : undefined,
       tags: mode === "batch" ? selectedTags : undefined,
+      group: mode === "batch" ? selectedGroup : undefined,
     });
     onOpenChange(false);
   };
