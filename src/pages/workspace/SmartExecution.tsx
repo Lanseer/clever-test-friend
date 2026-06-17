@@ -26,7 +26,7 @@ import {
   CreateExecutionDialog,
   type CreateExecutionData,
 } from "@/components/workspace/CreateExecutionDialog";
-import { ScenarioDetailDialog } from "@/components/workspace/ScenarioDetailDialog";
+
 
 interface ExecutionRecord {
   id: string;
@@ -149,8 +149,6 @@ export default function SmartExecution() {
   const handleCreate = () => {
     setCreateOpen(true);
   };
-  const [scenarioOpen, setScenarioOpen] = useState(false);
-  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
   const handleConfirmCreate = (data: CreateExecutionData) => {
     const count =
       data.mode === "single"
@@ -162,7 +160,7 @@ export default function SmartExecution() {
   };
 
   const handleOpenDetail = (id: string) => {
-    navigate(`/workspace/${workspaceId}/smart-execution/${id}/cases`);
+    navigate(`/workspace/${workspaceId}/smart-execution/${id}`);
   };
 
   return (
@@ -211,10 +209,8 @@ export default function SmartExecution() {
             <TableHeader>
               <TableRow className="bg-muted/40">
                 <TableHead className="min-w-[180px]">名称</TableHead>
-                <TableHead>场景编号</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>测试状态</TableHead>
-                <TableHead>执行案例</TableHead>
                 <TableHead>标签</TableHead>
                 <TableHead>环境</TableHead>
                 <TableHead>创建人</TableHead>
@@ -225,7 +221,7 @@ export default function SmartExecution() {
             <TableBody>
               {filteredExecutions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
                     暂无执行记录
                   </TableCell>
                 </TableRow>
@@ -244,17 +240,6 @@ export default function SmartExecution() {
                         </button>
                       </TableCell>
                       <TableCell>
-                        <button
-                          onClick={() => {
-                            setActiveScenarioId(exec.scenarioId);
-                            setScenarioOpen(true);
-                          }}
-                          className="font-mono text-sm text-primary hover:underline"
-                        >
-                          {exec.scenarioId}
-                        </button>
-                      </TableCell>
-                      <TableCell>
                         <Badge variant="outline" className={cn("font-normal", status.className)}>
                           {status.label}
                         </Badge>
@@ -267,12 +252,6 @@ export default function SmartExecution() {
                             {testStatus.label}
                           </Badge>
                         )}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        <span className="font-mono text-sm">
-                          <span className="text-green-600 font-semibold">{exec.completedCases}</span>
-                          <span className="text-muted-foreground">/{exec.totalCases}</span>
-                        </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
@@ -308,11 +287,6 @@ export default function SmartExecution() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         onConfirm={handleConfirmCreate}
-      />
-      <ScenarioDetailDialog
-        open={scenarioOpen}
-        onOpenChange={setScenarioOpen}
-        scenarioId={activeScenarioId}
       />
     </div>
   );
