@@ -397,11 +397,11 @@ export default function CaseReview() {
   
   // 保存弹窗
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const [saveTarget, setSaveTarget] = useState<"testCases" | "knowledgeBase" | null>(null);
+  const [saveTarget, setSaveTarget] = useState<"testCases" | "knowledgeBase">("testCases");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [selectedFolder, setSelectedFolder] = useState<string>("");
   
-  // 分组选项（知识库）
+  // 分组选项（测试案例）
   const groupOptions = [
     { value: "user-module", label: "用户模块" },
     { value: "payment-module", label: "支付模块" },
@@ -409,7 +409,7 @@ export default function CaseReview() {
     { value: "account-module", label: "账户模块" },
   ];
   
-  // 文件夹选项（测试案例）
+  // 文件夹选项（知识库）
   const folderOptions = [
     { value: "folder-login", label: "登录模块" },
     { value: "folder-payment", label: "支付流程" },
