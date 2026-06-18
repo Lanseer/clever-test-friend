@@ -188,7 +188,7 @@ export default function Knowledge() {
   };
 
   const subMenuItems: { key: SubMenu; label: string; icon: typeof ListTodo }[] = [
-    { key: "tasks", label: "任务", icon: ListTodo },
+    { key: "tasks", label: "加工", icon: ListTodo },
     { key: "knowledge", label: "知识", icon: BookOpen },
   ];
 
