@@ -42,7 +42,7 @@ interface MenuItem {
 
 const normalUserMenuItems: MenuItem[] = [
   { titleKey: "workspaceMenu.home", defaultLabel: "首页", url: "home", icon: Home },
-  { titleKey: "workspaceMenu.kanban", defaultLabel: "看板", url: "dashboard", icon: LayoutDashboard },
+  { titleKey: "workspaceMenu.kanban", defaultLabel: "仪表盘", url: "dashboard", icon: LayoutDashboard },
   { titleKey: "workspaceMenu.testCases", defaultLabel: "测试案例", url: "management/cases", icon: ClipboardList },
   
   { titleKey: "workspaceMenu.testExecution", defaultLabel: "测试执行", url: "smart-execution", icon: PlayCircle },
