@@ -4,10 +4,9 @@ import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
+
 
 const getMockBddContent = () => `Feature: 用户登录功能
 
