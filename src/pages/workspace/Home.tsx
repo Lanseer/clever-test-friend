@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { FolderOpen, Paperclip, ChevronDown, Folder, FileSpreadsheet } from "lucide-react";
+import { FolderOpen, Library, ChevronDown, Folder, FileSpreadsheet } from "lucide-react";
 
 import {
   Bot,
@@ -213,7 +213,7 @@ function ResourcePopover({ className }: { className?: string }) {
           className={cn("h-8 w-8 text-muted-foreground hover:text-foreground", className)}
           title="资源"
         >
-          <Paperclip className="w-4 h-4" />
+          <Library className="w-4 h-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">
@@ -515,7 +515,7 @@ export default function Home() {
             <div className="border-t border-border p-4">
               <div className="max-w-3xl mx-auto">
                 <div className="relative bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
-                  <div className="absolute top-2 right-2 z-10">
+                  <div className="absolute -top-2 -right-2 z-10">
                     <ResourcePopover />
                   </div>
                   <Textarea
