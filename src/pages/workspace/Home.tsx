@@ -159,6 +159,110 @@ const initialSessions: Session[] = [
   },
 ];
 
+interface ResourceSection {
+  key: string;
+  label: string;
+  count: number;
+  items: { id: string; name: string; icon: React.ComponentType<{ className?: string }>; iconClass?: string; isFolder?: boolean }[];
+}
+
+const resourceSections: ResourceSection[] = [
+  {
+    key: "attachments",
+    label: "会话附件",
+    count: 1,
+    items: [
+      { id: "a1", name: "JN-需求FSD-个人活期开户.docx", icon: FileText, iconClass: "text-blue-600" },
+    ],
+  },
+  {
+    key: "knowledge",
+    label: "项目知识库",
+    count: 28,
+    items: [
+      { id: "k1", name: "case-generation-202606", icon: Folder, iconClass: "text-amber-500", isFolder: true },
+      { id: "k2", name: "需求文档汇总", icon: Folder, iconClass: "text-amber-500", isFolder: true },
+      { id: "k3", name: "接口规范说明.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
+    ],
+  },
+  {
+    key: "cases",
+    label: "测试案例文件",
+    count: 12,
+    items: [
+      { id: "c1", name: "登录模块测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
+      { id: "c2", name: "支付流程测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
+      { id: "c3", name: "订单管理测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
+    ],
+  },
+];
+
+function ResourcePopover({ className }: { className?: string }) {
+  const [open, setOpen] = useState<Record<string, boolean>>({
+    attachments: true,
+    knowledge: true,
+    cases: true,
+  });
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn("h-8 w-8 text-muted-foreground hover:text-foreground", className)}
+          title="资源"
+        >
+          <Paperclip className="w-4 h-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 p-0">
+        <div className="max-h-96 overflow-auto py-2">
+          {resourceSections.map((section) => {
+            const isOpen = open[section.key];
+            return (
+              <div key={section.key} className="px-2 py-1.5">
+                <button
+                  type="button"
+                  onClick={() => setOpen((p) => ({ ...p, [section.key]: !p[section.key] }))}
+                  className="w-full flex items-center gap-1 px-1.5 py-1 text-left hover:bg-muted/50 rounded"
+                >
+                  <ChevronDown
+                    className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", !isOpen && "-rotate-90")}
+                  />
+                  <span className="text-sm font-semibold text-foreground">{section.label}</span>
+                  <span className="text-xs text-muted-foreground ml-1">
+                    （{section.count}个文件）
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="mt-1 space-y-0.5">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
+                        >
+                          {item.isFolder && <ChevronDown className="w-3 h-3 text-muted-foreground -rotate-90" />}
+                          <Icon className={cn("w-4 h-4 shrink-0", item.iconClass)} />
+                          <span className="text-sm text-foreground truncate">{item.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+
+
 
 
 export default function Home() {
