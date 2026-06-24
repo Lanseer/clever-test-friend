@@ -647,6 +647,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </div>
 
               <p className="text-xs text-muted-foreground mt-3 self-end max-w-4xl w-full text-right">
                 ↵ {t("home.send", "发送")}，⇧ + ↵ {t("home.newLine", "换行")}
