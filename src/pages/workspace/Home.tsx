@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { FolderOpen } from "lucide-react";
+import { FolderOpen, Paperclip, ChevronDown, Folder, FileSpreadsheet } from "lucide-react";
 
 import {
   Bot,
