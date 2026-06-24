@@ -558,94 +558,92 @@ export default function Home() {
               </h1>
 
               {/* Chat Input Box */}
-              <div className="w-full max-w-4xl relative">
-                <div className="absolute -top-9 right-0 z-10">
-                  <ResourcePopover />
-                </div>
-                <div className="bg-card border border-border rounded-2xl shadow-sm p-4 md:p-5 transition-all duration-200 focus-within:ring-1 focus-within:ring-ring">
+              <div className="w-full max-w-4xl flex flex-col items-end mx-auto">
+                <ResourcePopover />
+                <div className="w-full bg-card border border-border rounded-2xl shadow-sm p-4 md:p-5 transition-all duration-200 focus-within:ring-1 focus-within:ring-ring">
                   <div className="flex items-center gap-2 mb-3">
-                  <Bot className="w-5 h-5 text-foreground" />
-                  <span className="text-sm font-medium text-foreground">
-                    {t("home.agentLabel", "智能体")}
-                  </span>
-                  <span className="text-muted-foreground">|</span>
-                  <span className="text-sm font-medium text-primary flex items-center gap-1">
-                    <ActiveIcon className="w-4 h-4" />
-                    {activeAgent.name}
-                  </span>
-                </div>
+                    <Bot className="w-5 h-5 text-foreground" />
+                    <span className="text-sm font-medium text-foreground">
+                      {t("home.agentLabel", "智能体")}
+                    </span>
+                    <span className="text-muted-foreground">|</span>
+                    <span className="text-sm font-medium text-primary flex items-center gap-1">
+                      <ActiveIcon className="w-4 h-4" />
+                      {activeAgent.name}
+                    </span>
+                  </div>
 
-                <Textarea
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  placeholder={t(
-                    "home.inputPlaceholder",
-                    "输入你的需求，我来帮你完成任务"
-                  )}
-                  className="min-h-[120px] resize-none border-0 bg-transparent text-base placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 shadow-none"
-                />
+                  <Textarea
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    placeholder={t(
+                      "home.inputPlaceholder",
+                      "输入你的需求，我来帮你完成任务"
+                    )}
+                    className="min-h-[120px] resize-none border-0 bg-transparent text-base placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 shadow-none"
+                  />
 
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                  <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                    {quickTools.map((tool) => (
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                    <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                      {quickTools.map((tool) => (
+                        <Button
+                          key={tool.id}
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-muted"
+                        >
+                          <tool.icon className="w-4 h-4 mr-1.5" />
+                          <span className="text-sm">{tool.label}</span>
+                        </Button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                       <Button
-                        key={tool.id}
                         variant="ghost"
                         size="sm"
                         className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-muted"
                       >
-                        <tool.icon className="w-4 h-4 mr-1.5" />
-                        <span className="text-sm">{tool.label}</span>
+                        <BrainCircuit className="w-4 h-4 mr-1.5" />
+                        <span className="text-sm">GLM-5.2</span>
                       </Button>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-muted"
-                    >
-                      <BrainCircuit className="w-4 h-4 mr-1.5" />
-                      <span className="text-sm">GLM-5.2</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 px-2 text-primary bg-primary/10 hover:bg-primary/15 hover:text-primary"
-                    >
-                      <Shield className="w-4 h-4 mr-1.5" />
-                      <span className="text-sm">
-                        {t("home.sessionIsolate", "会话隔离")}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-muted"
-                    >
-                      <Users className="w-4 h-4 mr-1.5" />
-                      <span className="text-sm">
-                        {t("home.sessionShare", "会话共享")}
-                      </span>
-                    </Button>
-                    <Button
-                      size="icon"
-                      onClick={handleSend}
-                      className="h-9 w-9 rounded-lg bg-primary/90 hover:bg-primary text-primary-foreground"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-primary bg-primary/10 hover:bg-primary/15 hover:text-primary"
+                      >
+                        <Shield className="w-4 h-4 mr-1.5" />
+                        <span className="text-sm">
+                          {t("home.sessionIsolate", "会话隔离")}
+                        </span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      >
+                        <Users className="w-4 h-4 mr-1.5" />
+                        <span className="text-sm">
+                          {t("home.sessionShare", "会话共享")}
+                        </span>
+                      </Button>
+                      <Button
+                        size="icon"
+                        onClick={handleSend}
+                        className="h-9 w-9 rounded-lg bg-primary/90 hover:bg-primary text-primary-foreground"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
               <p className="text-xs text-muted-foreground mt-3 self-end max-w-4xl w-full text-right">
                 ↵ {t("home.send", "发送")}，⇧ + ↵ {t("home.newLine", "换行")}
