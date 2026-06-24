@@ -185,19 +185,9 @@ const resourceSections: ResourceSection[] = [
       { id: "k3", name: "接口规范说明.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
     ],
   },
-  {
-    key: "cases",
-    label: "测试案例文件",
-    count: 12,
-    items: [
-      { id: "c1", name: "登录模块测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
-      { id: "c2", name: "支付流程测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
-      { id: "c3", name: "订单管理测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
-    ],
-  },
 ];
 
-function ResourcePopover({ className }: { className?: string }) {
+function ResourcePopover({ className, files }: { className?: string; files?: GeneratedFile[] }) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     attachments: true,
     knowledge: true,
@@ -255,6 +245,41 @@ function ResourcePopover({ className }: { className?: string }) {
               </div>
             );
           })}
+          {files && files.length > 0 && (
+            <div className="px-2 py-1.5">
+              <button
+                type="button"
+                onClick={() => setOpen((p) => ({ ...p, cases: !p.cases }))}
+                className="w-full flex items-center gap-1 px-1.5 py-1 text-left hover:bg-muted/50 rounded"
+              >
+                <ChevronDown
+                  className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", !open.cases && "-rotate-90")}
+                />
+                <span className="text-sm font-semibold text-foreground">测试案例</span>
+                <span className="text-xs text-muted-foreground ml-1">
+                  （{files.length}个文件）
+                </span>
+              </button>
+              {open.cases && (
+                <div className="mt-1 space-y-0.5">
+                  {files.map((f) => (
+                    <div
+                      key={f.id}
+                      className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4 shrink-0 text-primary" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-foreground truncate">{f.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {f.scenarioCount} 场景 · {f.caseCount} 案例
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </PopoverContent>
     </Popover>
@@ -435,55 +460,6 @@ export default function Home() {
                 </span>
               </div>
 
-              {activeSession.files.length > 0 && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-9 gap-1.5 text-primary border-primary/30 hover:bg-primary/10 hover:text-primary shrink-0"
-                    >
-                      <FolderOpen className="w-4 h-4" />
-                      <span className="text-sm">测试案例</span>
-                      <Badge variant="secondary" className="ml-0.5 h-5 px-1.5 text-xs">
-                        {activeSession.files.length}
-                      </Badge>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-80 p-0">
-                    <div className="px-3 py-2 border-b border-border text-xs text-muted-foreground">
-                      测试案例列表
-                    </div>
-                    <div className="max-h-72 overflow-auto p-2 space-y-1">
-                      {activeSession.files.map((f) => {
-                        const isActive = previewFile?.id === f.id;
-                        return (
-                          <button
-                            key={f.id}
-                            onClick={() => setPreviewFile(f)}
-                            className={cn(
-                              "w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-md transition-colors",
-                              isActive
-                                ? "bg-primary/10"
-                                : "hover:bg-muted"
-                            )}
-                          >
-                            <FileText className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-foreground truncate">
-                                {f.name}
-                              </div>
-                              <div className="text-xs text-muted-foreground mt-0.5">
-                                {f.scenarioCount} 场景 · {f.caseCount} 案例
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              )}
             </div>
 
             {/* Messages */}
@@ -559,7 +535,7 @@ export default function Home() {
 
               {/* Chat Input Box */}
               <div className="w-full max-w-4xl flex flex-col items-end mx-auto">
-                <ResourcePopover />
+                <ResourcePopover files={activeSession.files} />
                 <div className="w-full bg-card border border-border rounded-2xl shadow-sm p-4 md:p-5 transition-all duration-200 focus-within:ring-1 focus-within:ring-ring">
                   <div className="flex items-center gap-2 mb-3">
                     <Bot className="w-5 h-5 text-foreground" />
