@@ -571,6 +571,9 @@ export default function Home() {
                     <ActiveIcon className="w-4 h-4" />
                     {activeAgent.name}
                   </span>
+                  <div className="ml-auto">
+                    <ResourcePopover />
+                  </div>
                 </div>
 
                 <Textarea
