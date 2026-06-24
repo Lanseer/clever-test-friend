@@ -185,16 +185,6 @@ const resourceSections: ResourceSection[] = [
       { id: "k3", name: "接口规范说明.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
     ],
   },
-  {
-    key: "cases",
-    label: "测试案例文件",
-    count: 12,
-    items: [
-      { id: "c1", name: "登录模块测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
-      { id: "c2", name: "支付流程测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
-      { id: "c3", name: "订单管理测试案例.xlsx", icon: FileSpreadsheet, iconClass: "text-green-600" },
-    ],
-  },
 ];
 
 function ResourcePopover({ className }: { className?: string }) {
