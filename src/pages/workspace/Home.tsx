@@ -210,10 +210,10 @@ function ResourcePopover({ className }: { className?: string }) {
           type="button"
           variant="ghost"
           size="icon"
-          className={cn("h-8 w-8 text-muted-foreground hover:text-foreground", className)}
+          className={cn("h-9 w-9 rounded-md bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary", className)}
           title="资源"
         >
-          <Folder className="w-4 h-4" />
+          <Folder className="w-5 h-5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">
