@@ -513,11 +513,11 @@ export default function Home() {
 
             {/* Composer */}
             <div className="border-t border-border p-4">
-              <div className="max-w-3xl mx-auto">
-                <div className="relative bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
-                  <div className="absolute -top-2 -right-2 z-10">
-                    <ResourcePopover />
-                  </div>
+              <div className="max-w-3xl mx-auto relative">
+                <div className="absolute -top-9 right-0 z-10">
+                  <ResourcePopover />
+                </div>
+                <div className="bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
                   <Textarea
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
