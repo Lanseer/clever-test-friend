@@ -560,11 +560,12 @@ export default function Home() {
               </h1>
 
               {/* Chat Input Box */}
-              <div className="w-full max-w-4xl relative bg-card border border-border rounded-2xl shadow-sm p-4 md:p-5 transition-all duration-200 focus-within:ring-1 focus-within:ring-ring">
-                <div className="absolute -top-2 -right-2 z-10">
+              <div className="w-full max-w-4xl relative">
+                <div className="absolute -top-9 right-0 z-10">
                   <ResourcePopover />
                 </div>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="bg-card border border-border rounded-2xl shadow-sm p-4 md:p-5 transition-all duration-200 focus-within:ring-1 focus-within:ring-ring">
+                  <div className="flex items-center gap-2 mb-3">
                   <Bot className="w-5 h-5 text-foreground" />
                   <span className="text-sm font-medium text-foreground">
                     {t("home.agentLabel", "智能体")}
