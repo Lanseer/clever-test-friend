@@ -213,7 +213,7 @@ function ResourcePopover({ className }: { className?: string }) {
           className={cn("h-8 w-8 text-muted-foreground hover:text-foreground", className)}
           title="资源"
         >
-          <Library className="w-4 h-4" />
+          <Folder className="w-4 h-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">
