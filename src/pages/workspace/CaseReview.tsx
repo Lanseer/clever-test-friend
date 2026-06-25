@@ -597,17 +597,17 @@ export default function CaseReview() {
         id: "dim-1",
         name: `01-${t('mockData.dimensions.businessFlow')}`,
         testPoints: [
-          { id: `tp-${fileId}-1`, code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 10 + base, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-          { id: `tp-${fileId}-2`, code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 15 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
-          { id: `tp-${fileId}-3`, code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 6 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+          { id: `tp-${fileId}-1`, code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), transaction: "贷款还款", source: "UserStory, FSD", caseCount: 10 + base, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+          { id: `tp-${fileId}-2`, code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), transaction: "贷款还款", source: "FSD", caseCount: 15 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+          { id: `tp-${fileId}-3`, code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), transaction: "贷款还款", source: "TSD, PRD", caseCount: 6 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
         ],
       },
       {
         id: "dim-2",
         name: `02-${t('mockData.dimensions.businessFunction')}`,
         testPoints: [
-          { id: `tp-${fileId}-4`, code: "SC-004", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 20 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
-          { id: `tp-${fileId}-5`, code: "SC-005", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 12 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+          { id: `tp-${fileId}-4`, code: "SC-004", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), transaction: "贷款还款", source: "UserStory", caseCount: 20 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+          { id: `tp-${fileId}-5`, code: "SC-005", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), transaction: "贷款还款", source: "FSD", caseCount: 12 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
         ],
       },
     ];
