@@ -209,7 +209,7 @@
     "scenarioName": "Scenario Description",
     "scenarioCategory": "Scenario Category",
     "source": "Source",
-    "caseCount": "Case Count",
+    "caseCount": "Test Points",
     "comparison": "Comparison",
     "comparisonStatus": "Comparison Status",
     "reviewResult": "Review Result",
