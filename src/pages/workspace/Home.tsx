@@ -189,7 +189,17 @@ const resourceSections: ResourceSection[] = [
   },
 ];
 
-function ResourcePopover({ className, files, onFileClick }: { className?: string; files?: GeneratedFile[]; onFileClick?: (f: GeneratedFile) => void }) {
+type CaseFileKind = "outline" | "cases";
+
+function ResourcePopover({
+  className,
+  files,
+  onFileClick,
+}: {
+  className?: string;
+  files?: GeneratedFile[];
+  onFileClick?: (f: GeneratedFile, kind: CaseFileKind) => void;
+}) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     attachments: true,
     knowledge: true,
@@ -259,22 +269,35 @@ function ResourcePopover({ className, files, onFileClick }: { className?: string
                 />
                 <span className="text-sm font-semibold text-foreground">测试案例</span>
                 <span className="text-xs text-muted-foreground ml-1">
-                  （{files.length}个文件）
+                  （{files.length * 2}个文件）
                 </span>
               </button>
               {open.cases && (
                 <div className="mt-1 space-y-0.5">
                   {files.map((f) => (
-                    <div
-                      key={f.id}
-                      onClick={() => onFileClick?.(f)}
-                      className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
-                    >
-                      <FileText className="w-4 h-4 shrink-0 text-primary" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-foreground truncate">{f.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {f.scenarioCount} 场景 · {f.caseCount} 案例
+                    <div key={f.id} className="space-y-0.5">
+                      <div
+                        onClick={() => onFileClick?.(f, "outline")}
+                        className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
+                      >
+                        <FileText className="w-4 h-4 shrink-0 text-blue-600" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-foreground truncate">{f.name}_测试大纲</div>
+                          <div className="text-xs text-muted-foreground">
+                            {f.scenarioCount} 场景 · {f.caseCount} 个测试要点
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => onFileClick?.(f, "cases")}
+                        className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
+                      >
+                        <FileSpreadsheet className="w-4 h-4 shrink-0 text-green-600" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-foreground truncate">{f.name}_案例文件</div>
+                          <div className="text-xs text-muted-foreground">
+                            {f.caseCount} 条案例
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -385,6 +408,82 @@ function PreviewDimensions({ file }: { file: GeneratedFile }) {
   );
 }
 
+interface CaseRow {
+  testPoint: string;
+  title: string;
+  precondition: string;
+  steps: string;
+  expected: string;
+}
+
+function buildCaseRows(file: GeneratedFile): CaseRow[] {
+  const samples: CaseRow[] = [
+    {
+      testPoint: "贷款还款：\"正常还款-还款金额小于未偿账单-账单优先顺序分配\"的场景",
+      title: "验证：\"缴款金额\"小于\"总已出账未偿账单\"时，按\"还款优先类别A（账单优先）\"从最早到期日到最晚到期日的顺序分配还款，最早到期优先清偿",
+      precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*N期逾期账单(O)且每期均含INT和PRI，缴款金额<总已出账未偿账单。",
+      steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<步骤1返回的SCB主账号cust_acct_num>，amount=<步骤1返回的放款金额disb_amt>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<步骤1返回的SCB主账号>，effectDate=<系统当前日期>。",
+      expected: "1、检查LoanAcctOpening接口返回的状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回的statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查系统按还款优先类别A(账单优先)从最早到期日到最晚到期日顺序分配还款，最早到期优先清偿。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况：本金+利息的余额更新。",
+    },
+    {
+      testPoint: "贷款还款：\"正常还款-还款金额小于未偿账单-余额别名顺序分配\"的场景",
+      title: "验证：还款按\"缴存层级COMN的Seq1\"执行时，按\"余额别名列表顺序\"依次分配还款，\"S*\"优先于\"FIS\"，\"FIS\"优先于\"INT\"，\"INT\"优先于\"PRI\"",
+      precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*单期逾期账单(O)含多个余额别名(S*、FIS、INT、PRI)，缴款金额覆盖部分余额别名。",
+      steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<步骤1返回的SCB主账号>，amount=<放款金额>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<SCB主账号>，effectDate=<系统当前日期>。",
+      expected: "1、检查LoanAcctOpening接口返回状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查系统按Seq1配置的余额别名列表顺序依次分配还款，S*优先于FIS，FIS优先于INT，INT优先于PRI。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况：本金+利息的余额更新。",
+    },
+    {
+      testPoint: "贷款还款：\"正常还款-还款金额小于未偿账单-部分偿还保留标记\"的场景",
+      title: "验证：\"某期到期\"仅部分偿还时，\"INT\"全额清偿并标记\"结算顺序号\"，\"PRI\"部分清偿并标记\"结算顺序号\"，剩余未偿本金保留在该期到期中",
+      precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*单期逾期账单(O)含INT和PRI，缴款金额<单期账单总额但>INT金额。",
+      steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<SCB主账号>，amount=<放款金额>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<SCB主账号>，effectDate=<系统当前日期>。",
+      expected: "1、检查LoanAcctOpening接口返回状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查INT全额清偿并标记结算顺序号，PRI部分清偿并标记结算顺序号，剩余未偿本金保留在该期到期中。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况：本金+利息的余额更新。",
+    },
+  ];
+  const rows: CaseRow[] = [];
+  for (let i = 0; i < file.caseCount; i++) {
+    rows.push(samples[i % samples.length]);
+  }
+  return rows;
+}
+
+function CasesListPreview({ file }: { file: GeneratedFile }) {
+  const rows = buildCaseRows(file);
+  return (
+    <ScrollArea className="flex-1 min-h-0">
+      <div className="p-3">
+        <div className="text-xs text-muted-foreground mb-2">共 {rows.length} 条案例</div>
+        <div className="overflow-x-auto border border-border rounded-lg">
+          <table className="text-xs min-w-[1200px]">
+            <thead className="bg-emerald-50 dark:bg-emerald-950/30">
+              <tr>
+                <th className="px-3 py-2 text-left font-semibold text-foreground border-b border-r border-border w-[180px]">测试点</th>
+                <th className="px-3 py-2 text-left font-semibold text-foreground border-b border-r border-border w-[240px]">标题</th>
+                <th className="px-3 py-2 text-left font-semibold text-foreground border-b border-r border-border w-[260px]">前置条件</th>
+                <th className="px-3 py-2 text-left font-semibold text-foreground border-b border-r border-border w-[300px]">步骤</th>
+                <th className="px-3 py-2 text-left font-semibold text-foreground border-b border-border w-[280px]">预期</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr key={idx} className="border-b border-border last:border-b-0 align-top">
+                  <td className="px-3 py-2 border-r border-border text-foreground whitespace-pre-wrap">{r.testPoint}</td>
+                  <td className="px-3 py-2 border-r border-border text-foreground whitespace-pre-wrap">{r.title}</td>
+                  <td className="px-3 py-2 border-r border-border text-muted-foreground whitespace-pre-wrap">{r.precondition}</td>
+                  <td className="px-3 py-2 border-r border-border text-muted-foreground whitespace-pre-wrap">{r.steps}</td>
+                  <td className="px-3 py-2 text-muted-foreground whitespace-pre-wrap">{r.expected}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
+
+
 
 
 
@@ -397,6 +496,7 @@ export default function Home() {
   const [inputValue, setInputValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("general");
   const [previewFile, setPreviewFile] = useState<GeneratedFile | null>(null);
+  const [previewKind, setPreviewKind] = useState<CaseFileKind>("outline");
 
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
   const activeAgent =
@@ -409,6 +509,11 @@ export default function Home() {
     setActiveSessionId(null);
     setInputValue("");
     setPreviewFile(null);
+  };
+
+  const handleOpenPreview = (f: GeneratedFile, kind: CaseFileKind) => {
+    setPreviewFile(f);
+    setPreviewKind(kind);
   };
 
   const handleSend = () => {
@@ -588,7 +693,7 @@ export default function Home() {
             {/* Composer */}
             <div className="border-t border-border p-4">
               <div className="max-w-3xl mx-auto flex flex-col items-end">
-                <ResourcePopover files={activeSession.files} onFileClick={setPreviewFile} />
+                <ResourcePopover files={activeSession.files} onFileClick={handleOpenPreview} />
                 <div className="w-full bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
                   <Textarea
                     value={inputValue}
@@ -773,15 +878,21 @@ export default function Home() {
 
       {/* Right: file preview panel */}
       {activeSession && previewFile && (
-        <aside className="w-[420px] shrink-0 border-l border-border bg-card flex flex-col">
+        <aside className={cn("shrink-0 border-l border-border bg-card flex flex-col", previewKind === "cases" ? "w-[720px]" : "w-[420px]")}>
           <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-            <FileText className="w-4 h-4 text-primary" />
+            {previewKind === "cases" ? (
+              <FileSpreadsheet className="w-4 h-4 text-green-600" />
+            ) : (
+              <FileText className="w-4 h-4 text-blue-600" />
+            )}
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-foreground truncate">
-                {previewFile.name}
+                {previewFile.name}_{previewKind === "cases" ? "案例文件" : "测试大纲"}
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                {previewFile.scenarioCount} 个场景 · {previewFile.caseCount} 条案例
+                {previewKind === "cases"
+                  ? `${previewFile.caseCount} 条案例`
+                  : `${previewFile.scenarioCount} 个场景 · ${previewFile.caseCount} 个测试要点`}
               </div>
             </div>
             <Button
@@ -793,7 +904,11 @@ export default function Home() {
               <X className="w-4 h-4" />
             </Button>
           </div>
-          <PreviewDimensions file={previewFile} />
+          {previewKind === "cases" ? (
+            <CasesListPreview file={previewFile} />
+          ) : (
+            <PreviewDimensions file={previewFile} />
+          )}
 
           <div className="border-t border-border p-3 bg-card">
             <Button
