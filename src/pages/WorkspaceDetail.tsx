@@ -6,6 +6,7 @@ import { useRole } from "@/contexts/RoleContext";
 import Knowledge from "./workspace/Knowledge";
 import TestCases from "./workspace/TestCases";
 import TestCaseDetail from "./workspace/TestCaseDetail";
+import TestCaseRecords from "./workspace/TestCaseRecords";
 import AIGeneratedCases from "./workspace/AIGeneratedCases";
 import AIGeneratedCaseDetail from "./workspace/AIGeneratedCaseDetail";
 import CaseReview from "./workspace/CaseReview";
