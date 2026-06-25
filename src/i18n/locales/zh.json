@@ -228,7 +228,7 @@
     "deleted": "删除",
     "unchanged": "-",
     "totalScenarios": "总场景",
-    "totalCases": "总案例",
+    "totalCases": "总测试点",
     "confirmAiSuggestions": "确认要采纳智能意见吗？",
     "confirmAiSuggestionsDesc": "系统将自动应用AI的审查建议到案例中",
     "applyAndConfirm": "应用并确认",
