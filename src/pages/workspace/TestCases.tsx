@@ -254,10 +254,6 @@ export default function TestCases() {
                 <Trash2 className="w-4 h-4" />
                 批量删除
               </Button>
-              <Button variant="outline" className="gap-2" onClick={handleBatchTest} disabled={selectedIds.size === 0}>
-                <PlayCircle className="w-4 h-4" />
-                触发测试
-              </Button>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play, ChevronsUpDown, Check } from "lucide-react";
+import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play, ChevronsUpDown, Check, History } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -248,6 +248,10 @@ export default function TestCaseDetail() {
           <Button variant="outline" onClick={handleDelete} className="gap-2 text-destructive hover:text-destructive">
             <Trash2 className="w-4 h-4" />
             删除
+          </Button>
+          <Button variant="outline" onClick={() => navigate(`/workspace/${workspaceId}/management/cases/${caseId}/records`)} className="gap-2">
+            <History className="w-4 h-4" />
+            测试记录
           </Button>
           <Button onClick={handleTest} className="gap-2">
             <Play className="w-4 h-4" />
