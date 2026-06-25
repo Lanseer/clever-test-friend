@@ -977,26 +977,6 @@ export default function CaseReview() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            className="gap-2"
-            onClick={handleSmartReview}
-            disabled={isSmartReviewing}
-          >
-            {isSmartReviewing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t('caseReview.smartReview')}...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                {t('caseReview.smartReview')}
-              </>
-            )}
-          </Button>
-        </div>
       </div>
 
       {/* Dimension Tables */}
