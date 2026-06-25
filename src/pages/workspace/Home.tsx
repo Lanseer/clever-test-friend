@@ -187,7 +187,7 @@ const resourceSections: ResourceSection[] = [
   },
 ];
 
-function ResourcePopover({ className, files }: { className?: string; files?: GeneratedFile[] }) {
+function ResourcePopover({ className, files, onFileClick }: { className?: string; files?: GeneratedFile[]; onFileClick?: (f: GeneratedFile) => void }) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     attachments: true,
     knowledge: true,
