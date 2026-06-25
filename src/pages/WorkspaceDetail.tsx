@@ -125,6 +125,7 @@ export default function WorkspaceDetail() {
             <Route path="knowledge" element={<Knowledge />} />
             <Route path="management/cases" element={<TestCases />} />
             <Route path="management/cases/:caseId" element={<TestCaseDetail />} />
+            <Route path="management/cases/:caseId/records" element={<TestCaseRecords />} />
             <Route path="management/ai-cases" element={<AIGeneratedCases />} />
             <Route path="management/ai-cases/:recordId" element={<CaseReview />} />
             <Route path="management/ai-cases/:recordId/case-review" element={<CaseReview />} />
