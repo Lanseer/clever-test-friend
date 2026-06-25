@@ -1057,30 +1057,14 @@ export default function CaseReview() {
                           <span className={cn("text-xs whitespace-normal", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         </div>
                       </div>
+                      {/* 交易 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        <span className="text-xs text-foreground">{tp.transaction || "-"}</span>
+                      </div>
                       {/* 场景分类 */}
                       <div className="col-span-1 px-2 py-1 border-r border-border flex items-center justify-center">
                         <span className="text-xs text-muted-foreground">
                           {tp.scenarioCategory || "-"}
-                        </span>
-                      </div>
-                      {/* 场景来源 - 纯文字显示，支持多个类型 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        <span className="text-[10px]">
-                          {tp.source.split(",").map((s, idx, arr) => {
-                            const source = s.trim();
-                            const colorClass = 
-                              source === "UserStory" ? "text-amber-600" :
-                              source === "FSD" ? "text-blue-600" :
-                              source === "TSD" ? "text-emerald-600" :
-                              source === "PRD" ? "text-purple-600" :
-                              "text-foreground";
-                            return (
-                              <span key={idx}>
-                                <span className={colorClass}>{source}</span>
-                                {idx < arr.length - 1 && <span className="text-muted-foreground">, </span>}
-                              </span>
-                            );
-                          })}
                         </span>
                       </div>
                       {/* 对应案例数 - 可点击打开侧边栏 */}
