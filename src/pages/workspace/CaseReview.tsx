@@ -1067,7 +1067,7 @@ export default function CaseReview() {
                     <div
                       key={tp.id}
                       className="grid text-sm hover:bg-muted/30 transition-colors cursor-pointer"
-                      style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}
+                      style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}
                       onClick={() => handleOpenSidebar(dimension.id, tp)}
                     >
                       {/* 编号 */}
