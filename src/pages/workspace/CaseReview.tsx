@@ -334,7 +334,8 @@ interface TestPoint {
   code: string;
   name: string;
   scenarioCategory?: string;
-  source: string;
+  source?: string;
+  transaction?: string;
   caseCount: number;
   reviewResult: ReviewResult;
   aiSuggestion?: ReviewResult; // 智能审查建议结果
