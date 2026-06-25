@@ -187,7 +187,7 @@ const resourceSections: ResourceSection[] = [
   },
 ];
 
-function ResourcePopover({ className, files }: { className?: string; files?: GeneratedFile[] }) {
+function ResourcePopover({ className, files, onFileClick }: { className?: string; files?: GeneratedFile[]; onFileClick?: (f: GeneratedFile) => void }) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     attachments: true,
     knowledge: true,
@@ -265,6 +265,7 @@ function ResourcePopover({ className, files }: { className?: string; files?: Gen
                   {files.map((f) => (
                     <div
                       key={f.id}
+                      onClick={() => onFileClick?.(f)}
                       className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
                     >
                       <FileText className="w-4 h-4 shrink-0 text-primary" />
@@ -490,7 +491,7 @@ export default function Home() {
             {/* Composer */}
             <div className="border-t border-border p-4">
               <div className="max-w-3xl mx-auto flex flex-col items-end">
-                <ResourcePopover files={activeSession.files} />
+                <ResourcePopover files={activeSession.files} onFileClick={setPreviewFile} />
                 <div className="w-full bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
                   <Textarea
                     value={inputValue}
