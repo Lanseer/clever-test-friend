@@ -265,6 +265,7 @@ function ResourcePopover({ className, files, onFileClick }: { className?: string
                   {files.map((f) => (
                     <div
                       key={f.id}
+                      onClick={() => onFileClick?.(f)}
                       className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
                     >
                       <FileText className="w-4 h-4 shrink-0 text-primary" />
