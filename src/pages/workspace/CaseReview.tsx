@@ -234,32 +234,61 @@ const useScenarioCategoryOptions = () => {
 // Mock dimensions with i18n
 const useMockDimensions = (): TestDimension[] => {
   const { t } = useTranslation();
+  const categoryA = "正常还款金额小于总已出账未偿账单";
+  const categoryB = "正常还款金额大于总未还账单但不足以偿还下一期分期";
+  const pointsA = [
+    "【账单优先顺序分配】",
+    "【余额别名顺序分配】",
+    "【部分偿还保留标记】",
+    "【FED不计入账单】",
+    "【未偿账单后续生成】",
+    "【未生成账单不分期】",
+    "【已计提费用纳入账单】",
+  ];
+  const pointsB = [
+    "【超额部分提前还款】",
+    "【提前还款层级Seq2】",
+    "【提前还款别名顺序】",
+    "【部分提前还款出账】",
+    "【FED提前还款状态】",
+    "【提前还款后账单生成】",
+    "【提前还款后剩余出账】",
+  ];
+  const results: ReviewResult[] = ["adopted", "pending", "improved", "focusReview", "needsImprovement", "adopted", "pending"];
+  const statuses: ComparisonStatus[] = ["unchanged", "new", "updated", "unchanged", "new", "updated", "unchanged"];
+
+  const makeTp = (idx: number, category: string, pointName: string): TestPoint => ({
+    id: `tp-${idx + 1}`,
+    code: `SC-${String(idx + 1).padStart(3, '0')}`,
+    name: "正常还款",
+    scenarioCategory: category,
+    transaction: "贷款还款",
+    caseCount: 1,
+    reviewResult: results[idx % results.length],
+    comparisonStatus: statuses[idx % statuses.length],
+    reviewHistory: [],
+  });
+
+  const allPoints: TestPoint[] = [
+    ...pointsA.map((p, i) => makeTp(i, categoryA, p)),
+    ...pointsB.map((p, i) => makeTp(i + pointsA.length, categoryB, p)),
+  ];
+
   return [
     {
       id: "dim-1",
       name: `01-${t('mockData.dimensions.businessFlow')}`,
-      testPoints: [
-        { id: "tp-1", code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-2", code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 18, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
-        { id: "tp-3", code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 8, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
-        { id: "tp-4", code: "SC-004", name: t('mockData.testPoints.multiFactorAuth'), scenarioCategory: t('caseReview.scenarioCategories.security'), source: "PRD", caseCount: 5, reviewResult: "pending", comparisonStatus: "deleted", reviewHistory: [] },
-      ],
+      testPoints: allPoints.slice(0, 5),
     },
     {
       id: "dim-2",
       name: `02-${t('mockData.dimensions.businessFunction')}`,
-      testPoints: [
-        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
-      ],
+      testPoints: allPoints.slice(5, 10),
     },
     {
       id: "dim-3",
       name: `03-${t('mockData.dimensions.businessElement')}`,
-      testPoints: [
-        { id: "tp-7", code: "SC-007", name: t('mockData.testPoints.productInfoValidation'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [] },
-        { id: "tp-8", code: "SC-008", name: t('mockData.testPoints.inventoryBoundary'), scenarioCategory: t('caseReview.scenarioCategories.boundary'), source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-      ],
+      testPoints: allPoints.slice(10, 14),
     },
   ];
 };
