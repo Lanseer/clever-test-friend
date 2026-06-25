@@ -45,7 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+
 import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { ReviewHistorySidebar, ReviewHistoryData } from "@/components/workspace/ReviewHistorySidebar";
 import { ReferenceMaterialsSidebar, ReferenceMaterial } from "@/components/workspace/ReferenceMaterialsSidebar";
