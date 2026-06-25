@@ -292,30 +292,30 @@ function ResourcePopover({ className, files, onFileClick }: { className?: string
 
 interface DimensionScenario {
   name: string;
-  cases: string[];
+  testPoints: string[];
 }
 
 function buildDimensionData(file: GeneratedFile): Record<"process" | "function" | "element", DimensionScenario[]> {
   const total = file.caseCount;
-  const make = (labels: string[], caseTemplates: (s: string, i: number) => string): DimensionScenario[] => {
+  const make = (labels: string[], pointTemplates: (s: string, i: number) => string): DimensionScenario[] => {
     const perScenario = Math.max(1, Math.ceil(total / labels.length));
     return labels.map((name) => ({
       name,
-      cases: Array.from({ length: perScenario }).map((_, i) => caseTemplates(name, i)),
+      testPoints: Array.from({ length: perScenario }).map((_, i) => pointTemplates(name, i)),
     }));
   };
   return {
     process: make(
       ["发起请求", "身份校验", "业务处理", "结果回调", "异常处理"],
-      (s, i) => `在「${s}」环节，验证步骤 ${i + 1} 的流转与状态正确`,
+      (s, i) => `【${s}环节测试要点 ${i + 1}】`,
     ),
     function: make(
       ["账户开立", "信息维护", "权限控制", "查询统计", "报表导出"],
-      (s, i) => `「${s}」功能项 ${i + 1}：核心路径与边界条件校验`,
+      (s, i) => `【${s}功能测试要点 ${i + 1}】`,
     ),
     element: make(
       ["客户信息", "证件资料", "金额与币种", "渠道标识", "时间字段"],
-      (s, i) => `要素「${s}」校验 ${i + 1}：必填、格式、取值范围与依赖关系`,
+      (s, i) => `【${s}要素测试要点 ${i + 1}】`,
     ),
   };
 }
@@ -340,36 +340,42 @@ function PreviewDimensions({ file }: { file: GeneratedFile }) {
       </div>
       {tabs.map((t) => {
         const scenarios = data[t.key];
-        const totalCases = scenarios.reduce((sum, s) => sum + s.cases.length, 0);
+        const totalPoints = scenarios.reduce((sum, s) => sum + s.testPoints.length, 0);
         return (
           <TabsContent key={t.key} value={t.key} className="flex-1 min-h-0 mt-2">
             <ScrollArea className="h-full">
               <div className="p-4 pt-2 space-y-3">
                 <div className="text-xs text-muted-foreground">
-                  共 {scenarios.length} 个场景 · {totalCases} 条案例
+                  共 {scenarios.length} 个场景 · {totalPoints} 个测试要点
                 </div>
-                {scenarios.map((s, sIdx) => (
-                  <div key={sIdx} className="border border-border rounded-lg overflow-hidden">
-                    <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">
-                        场景 {sIdx + 1}：{s.name}
-                      </span>
-                      <Badge variant="secondary" className="text-xs">
-                        {s.cases.length} 条
-                      </Badge>
-                    </div>
-                    <div className="divide-y divide-border">
-                      {s.cases.map((c, cIdx) => (
-                        <div key={cIdx} className="px-3 py-2 text-xs text-muted-foreground">
-                          <span className="text-foreground font-medium">
-                            TC-{sIdx + 1}.{cIdx + 1}
-                          </span>{" "}
-                          {c}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <table className="w-full border border-border rounded-lg overflow-hidden text-sm">
+                  <thead>
+                    <tr className="bg-muted/40 border-b border-border">
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-foreground border-r border-border w-[140px]">
+                        分类场景
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-foreground">
+                        测试要点
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scenarios.map((s, sIdx) => (
+                      s.testPoints.map((p, pIdx) => (
+                        <tr key={`${sIdx}-${pIdx}`} className="border-b border-border last:border-b-0">
+                          {pIdx === 0 && (
+                            <td rowSpan={s.testPoints.length} className="px-3 py-2 text-xs text-foreground border-r border-border align-middle">
+                              {s.name}
+                            </td>
+                          )}
+                          <td className="px-3 py-2 text-xs text-muted-foreground">
+                            {p}
+                          </td>
+                        </tr>
+                      ))
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </ScrollArea>
           </TabsContent>
