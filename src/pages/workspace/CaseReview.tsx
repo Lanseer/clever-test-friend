@@ -234,32 +234,62 @@ const useScenarioCategoryOptions = () => {
 // Mock dimensions with i18n
 const useMockDimensions = (): TestDimension[] => {
   const { t } = useTranslation();
+  const categoryA = "正常还款金额小于总已出账未偿账单";
+  const categoryB = "正常还款金额大于总未还账单但不足以偿还下一期分期";
+  const pointsA = [
+    "【账单优先顺序分配】",
+    "【余额别名顺序分配】",
+    "【部分偿还保留标记】",
+    "【FED不计入账单】",
+    "【未偿账单后续生成】",
+    "【未生成账单不分期】",
+    "【已计提费用纳入账单】",
+  ];
+  const pointsB = [
+    "【超额部分提前还款】",
+    "【提前还款层级Seq2】",
+    "【提前还款别名顺序】",
+    "【部分提前还款出账】",
+    "【FED提前还款状态】",
+    "【提前还款后账单生成】",
+    "【提前还款后剩余出账】",
+  ];
+  const results: ReviewResult[] = ["adopted", "pending", "improved", "focusReview", "needsImprovement", "adopted", "pending"];
+  const statuses: ComparisonStatus[] = ["unchanged", "new", "updated", "unchanged", "new", "updated", "unchanged"];
+
+  const makeTp = (idx: number, category: string, pointName: string): TestPoint => ({
+    id: `tp-${idx + 1}`,
+    code: `SC-${String(idx + 1).padStart(3, '0')}`,
+    name: "正常还款",
+    scenarioCategory: category,
+    transaction: "贷款还款",
+    testPointName: pointName,
+    caseCount: 1,
+    reviewResult: results[idx % results.length],
+    comparisonStatus: statuses[idx % statuses.length],
+    reviewHistory: [],
+  });
+
+  const allPoints: TestPoint[] = [
+    ...pointsA.map((p, i) => makeTp(i, categoryA, p)),
+    ...pointsB.map((p, i) => makeTp(i + pointsA.length, categoryB, p)),
+  ];
+
   return [
     {
       id: "dim-1",
       name: `01-${t('mockData.dimensions.businessFlow')}`,
-      testPoints: [
-        { id: "tp-1", code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 12, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-2", code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 18, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
-        { id: "tp-3", code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 8, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
-        { id: "tp-4", code: "SC-004", name: t('mockData.testPoints.multiFactorAuth'), scenarioCategory: t('caseReview.scenarioCategories.security'), source: "PRD", caseCount: 5, reviewResult: "pending", comparisonStatus: "deleted", reviewHistory: [] },
-      ],
+      testPoints: allPoints.slice(0, 5),
     },
     {
       id: "dim-2",
       name: `02-${t('mockData.dimensions.businessFunction')}`,
-      testPoints: [
-        { id: "tp-5", code: "SC-005", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 22, reviewResult: "adopted", comparisonStatus: "unchanged", reviewHistory: [] },
-        { id: "tp-6", code: "SC-006", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 15, reviewResult: "improved", comparisonStatus: "new", reviewHistory: [] },
-      ],
+      testPoints: allPoints.slice(5, 10),
     },
     {
       id: "dim-3",
       name: `03-${t('mockData.dimensions.businessElement')}`,
-      testPoints: [
-        { id: "tp-7", code: "SC-007", name: t('mockData.testPoints.productInfoValidation'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "TSD", caseCount: 14, reviewResult: "adopted", comparisonStatus: "updated", reviewHistory: [] },
-        { id: "tp-8", code: "SC-008", name: t('mockData.testPoints.inventoryBoundary'), scenarioCategory: t('caseReview.scenarioCategories.boundary'), source: "PRD", caseCount: 10, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-      ],
+      testPoints: allPoints.slice(10, 14),
     },
   ];
 };
@@ -334,7 +364,9 @@ interface TestPoint {
   code: string;
   name: string;
   scenarioCategory?: string;
-  source: string;
+  source?: string;
+  transaction?: string;
+  testPointName?: string;
   caseCount: number;
   reviewResult: ReviewResult;
   aiSuggestion?: ReviewResult; // 智能审查建议结果
@@ -567,17 +599,17 @@ export default function CaseReview() {
         id: "dim-1",
         name: `01-${t('mockData.dimensions.businessFlow')}`,
         testPoints: [
-          { id: `tp-${fileId}-1`, code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory, FSD", caseCount: 10 + base, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
-          { id: `tp-${fileId}-2`, code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "FSD", caseCount: 15 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
-          { id: `tp-${fileId}-3`, code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "TSD, PRD", caseCount: 6 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+          { id: `tp-${fileId}-1`, code: "SC-001", name: t('mockData.testPoints.userLoginSuccess'), scenarioCategory: t('caseReview.scenarioCategories.functional'), transaction: "贷款还款", source: "UserStory, FSD", caseCount: 10 + base, reviewResult: "pending", comparisonStatus: "unchanged", reviewHistory: [] },
+          { id: `tp-${fileId}-2`, code: "SC-002", name: t('mockData.testPoints.userRegisterFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), transaction: "贷款还款", source: "FSD", caseCount: 15 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+          { id: `tp-${fileId}-3`, code: "SC-003", name: t('mockData.testPoints.passwordResetException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), transaction: "贷款还款", source: "TSD, PRD", caseCount: 6 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
         ],
       },
       {
         id: "dim-2",
         name: `02-${t('mockData.dimensions.businessFunction')}`,
         testPoints: [
-          { id: `tp-${fileId}-4`, code: "SC-004", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), source: "UserStory", caseCount: 20 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
-          { id: `tp-${fileId}-5`, code: "SC-005", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), source: "FSD", caseCount: 12 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
+          { id: `tp-${fileId}-4`, code: "SC-004", name: t('mockData.testPoints.orderCreateFlow'), scenarioCategory: t('caseReview.scenarioCategories.functional'), transaction: "贷款还款", source: "UserStory", caseCount: 20 + base, reviewResult: "pending", comparisonStatus: "new", reviewHistory: [] },
+          { id: `tp-${fileId}-5`, code: "SC-005", name: t('mockData.testPoints.orderPaymentException'), scenarioCategory: t('caseReview.scenarioCategories.exception'), transaction: "贷款还款", source: "FSD", caseCount: 12 + base, reviewResult: "pending", comparisonStatus: "updated", reviewHistory: [] },
         ],
       },
     ];
@@ -1018,9 +1050,9 @@ export default function CaseReview() {
                 {/* Second row - column headers */}
                 <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.code')}</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.transaction')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioName')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioCategory')}</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.source')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.caseCount')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.reviewResult')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.problemCategory')}</div>
@@ -1049,7 +1081,11 @@ export default function CaseReview() {
                            tp.reviewResult === "focusReview" && "text-amber-600 font-semibold"
                          )}>{tp.code}</span>
                       </div>
-                      {/* 场景描述 - hover显示完整内容，根据对比状态显示颜色 */}
+                      {/* 交易 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        <span className="text-xs text-foreground">{tp.transaction || "-"}</span>
+                      </div>
+                      {/* 场景 */}
                       <div className="col-span-2 px-3 py-3 border-r border-border flex items-center group relative">
                         <span className={cn("truncate text-xs", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-2 min-w-[200px] max-w-[300px]">
@@ -1060,26 +1096,6 @@ export default function CaseReview() {
                       <div className="col-span-1 px-2 py-1 border-r border-border flex items-center justify-center">
                         <span className="text-xs text-muted-foreground">
                           {tp.scenarioCategory || "-"}
-                        </span>
-                      </div>
-                      {/* 场景来源 - 纯文字显示，支持多个类型 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        <span className="text-[10px]">
-                          {tp.source.split(",").map((s, idx, arr) => {
-                            const source = s.trim();
-                            const colorClass = 
-                              source === "UserStory" ? "text-amber-600" :
-                              source === "FSD" ? "text-blue-600" :
-                              source === "TSD" ? "text-emerald-600" :
-                              source === "PRD" ? "text-purple-600" :
-                              "text-foreground";
-                            return (
-                              <span key={idx}>
-                                <span className={colorClass}>{source}</span>
-                                {idx < arr.length - 1 && <span className="text-muted-foreground">, </span>}
-                              </span>
-                            );
-                          })}
                         </span>
                       </div>
                       {/* 对应案例数 - 可点击打开侧边栏 */}
