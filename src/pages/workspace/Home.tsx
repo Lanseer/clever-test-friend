@@ -490,7 +490,7 @@ export default function Home() {
             {/* Composer */}
             <div className="border-t border-border p-4">
               <div className="max-w-3xl mx-auto flex flex-col items-end">
-                <ResourcePopover />
+                <ResourcePopover files={activeSession.files} />
                 <div className="w-full bg-card border border-border rounded-2xl p-3 focus-within:ring-1 focus-within:ring-ring">
                   <Textarea
                     value={inputValue}
