@@ -1019,9 +1019,9 @@ export default function CaseReview() {
                 {/* Second row - column headers */}
                 <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.code')}</div>
+                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.transaction')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioName')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioCategory')}</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.source')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.caseCount')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.reviewResult')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.problemCategory')}</div>
