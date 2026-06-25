@@ -2,7 +2,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 
 const mockTestPoints = [
@@ -58,17 +58,9 @@ export default function CaseReviewDetail() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-mono text-xs">
-                {caseId}
-              </Badge>
-              <h1 className="text-xl font-bold text-foreground">
-                {t('caseDetail.title')}
-              </h1>
-            </div>
-            <p className="text-muted-foreground text-sm mt-1">
-              {t('caseDetail.bddContent')} & {t('caseDetail.caseSource')}
-            </p>
+            <h1 className="text-xl font-bold text-foreground">
+              {t('caseDetail.title')}
+            </h1>
           </div>
         </div>
       </div>
