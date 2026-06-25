@@ -278,7 +278,7 @@
     }
   },
   "caseDetail": {
-    "title": "Case Details",
+    "title": "Details",
     "bddContent": "Case Details (BDD)",
     "reviewResult": "Review Result",
     "caseCount": "Related Case Count",

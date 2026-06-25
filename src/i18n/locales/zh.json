@@ -278,7 +278,7 @@
     }
   },
   "caseDetail": {
-    "title": "案例详情",
+    "title": "详情",
     "bddContent": "案例详情 (BDD)",
     "reviewResult": "审查结果",
     "caseCount": "对应案例数",
