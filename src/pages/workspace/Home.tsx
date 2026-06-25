@@ -696,35 +696,8 @@ export default function Home() {
               <X className="w-4 h-4" />
             </Button>
           </div>
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-3">
-              {Array.from({ length: previewFile.scenarioCount }).map((_, sIdx) => {
-                const perScenario = Math.ceil(previewFile.caseCount / previewFile.scenarioCount);
-                return (
-                  <div key={sIdx} className="border border-border rounded-lg overflow-hidden">
-                    <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">
-                        场景 {sIdx + 1}：测试场景示例
-                      </span>
-                      <Badge variant="secondary" className="text-xs">
-                        {perScenario} 条
-                      </Badge>
-                    </div>
-                    <div className="divide-y divide-border">
-                      {Array.from({ length: perScenario }).map((__, cIdx) => (
-                        <div key={cIdx} className="px-3 py-2 text-xs text-muted-foreground">
-                          <span className="text-foreground font-medium">
-                            TC-{sIdx + 1}.{cIdx + 1}
-                          </span>{" "}
-                          案例示例：当用户执行操作 {cIdx + 1} 时，系统应返回预期结果。
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
+          <PreviewDimensions file={previewFile} />
+
           <div className="border-t border-border p-3 bg-card">
             <Button
               className="w-full gap-2 bg-primary/90 hover:bg-primary text-primary-foreground"
