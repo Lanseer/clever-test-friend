@@ -49,12 +49,11 @@ export default function TestCaseRecords() {
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[1.4fr_1fr_1fr_100px_120px_100px_100px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
+        <div className="grid grid-cols-[1.4fr_1fr_1fr_100px_100px_100px] gap-2 px-6 py-3 bg-muted/50 text-sm font-medium text-muted-foreground border-b">
           <div>执行时间</div>
           <div>执行人</div>
           <div>环境</div>
           <div>耗时</div>
-          <div>触发方式</div>
           <div>状态</div>
           <div className="text-right">操作</div>
         </div>
@@ -64,15 +63,12 @@ export default function TestCaseRecords() {
           return (
             <div
               key={r.id}
-              className="grid grid-cols-[1.4fr_1fr_1fr_100px_120px_100px_100px] gap-2 px-6 py-3 border-b last:border-b-0 items-center text-sm hover:bg-muted/30"
+              className="grid grid-cols-[1.4fr_1fr_1fr_100px_100px_100px] gap-2 px-6 py-3 border-b last:border-b-0 items-center text-sm hover:bg-muted/30"
             >
               <div className="text-foreground">{r.executedAt}</div>
               <div className="text-foreground">{r.executor}</div>
               <div className="text-muted-foreground">{r.environment}</div>
               <div className="text-muted-foreground">{r.duration}</div>
-              <div>
-                <Badge variant="secondary" className="text-xs">{r.trigger}</Badge>
-              </div>
               <div>
                 <Badge variant="outline" className={`gap-1 ${cfg.className}`}>
                   <StatusIcon className="w-3 h-3" />
