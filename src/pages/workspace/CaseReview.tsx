@@ -365,6 +365,7 @@ interface TestPoint {
   scenarioCategory?: string;
   source?: string;
   transaction?: string;
+  testPointName?: string;
   caseCount: number;
   reviewResult: ReviewResult;
   aiSuggestion?: ReviewResult; // 智能审查建议结果
