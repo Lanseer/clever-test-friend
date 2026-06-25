@@ -1090,16 +1090,6 @@ export default function CaseReview() {
                           {tp.scenarioCategory || "-"}
                         </span>
                       </div>
-                      {/* 对比状态 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        {tp.comparisonStatus && tp.comparisonStatus !== "unchanged" ? (
-                          <Badge variant="outline" className={cn("text-[10px] px-1.5", comparisonConfig.className)}>
-                            {comparisonConfig.label}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )}
-                      </div>
                       {/* 场景来源 - 纯文字显示，支持多个类型 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
                         <span className="text-[10px]">
