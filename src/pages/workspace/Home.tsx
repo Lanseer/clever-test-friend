@@ -348,31 +348,34 @@ function PreviewDimensions({ file }: { file: GeneratedFile }) {
                 <div className="text-xs text-muted-foreground">
                   共 {scenarios.length} 个场景 · {totalPoints} 个测试要点
                 </div>
-                <div className="border border-border rounded-lg overflow-hidden">
-                  <div className="grid grid-cols-[140px_1fr] bg-muted/40 border-b border-border">
-                    <div className="px-3 py-2 text-xs font-semibold text-foreground border-r border-border">
-                      分类场景
-                    </div>
-                    <div className="px-3 py-2 text-xs font-semibold text-foreground">
-                      测试要点
-                    </div>
-                  </div>
-                  {scenarios.map((s, sIdx) => (
-                    <div key={sIdx} className="grid grid-cols-[140px_1fr] border-b border-border last:border-b-0">
-                      <div className="px-3 py-2 text-xs text-foreground border-r border-border flex items-center"
-                           style={{ gridRow: `span ${s.testPoints.length}` }}>
-                        {s.name}
-                      </div>
-                      <div className="divide-y divide-border">
-                        {s.testPoints.map((p, pIdx) => (
-                          <div key={pIdx} className="px-3 py-2 text-xs text-muted-foreground">
+                <table className="w-full border border-border rounded-lg overflow-hidden text-sm">
+                  <thead>
+                    <tr className="bg-muted/40 border-b border-border">
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-foreground border-r border-border w-[140px]">
+                        分类场景
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-foreground">
+                        测试要点
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scenarios.map((s, sIdx) => (
+                      s.testPoints.map((p, pIdx) => (
+                        <tr key={`${sIdx}-${pIdx}`} className="border-b border-border last:border-b-0">
+                          {pIdx === 0 && (
+                            <td rowSpan={s.testPoints.length} className="px-3 py-2 text-xs text-foreground border-r border-border align-middle">
+                              {s.name}
+                            </td>
+                          )}
+                          <td className="px-3 py-2 text-xs text-muted-foreground">
                             {p}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                          </td>
+                        </tr>
+                      ))
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </ScrollArea>
           </TabsContent>
