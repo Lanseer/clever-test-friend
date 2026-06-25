@@ -420,6 +420,7 @@ export default function Home() {
   const [inputValue, setInputValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("general");
   const [previewFile, setPreviewFile] = useState<GeneratedFile | null>(null);
+  const [previewKind, setPreviewKind] = useState<CaseFileKind>("outline");
 
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
   const activeAgent =
@@ -432,6 +433,11 @@ export default function Home() {
     setActiveSessionId(null);
     setInputValue("");
     setPreviewFile(null);
+  };
+
+  const handleOpenPreview = (f: GeneratedFile, kind: CaseFileKind) => {
+    setPreviewFile(f);
+    setPreviewKind(kind);
   };
 
   const handleSend = () => {
