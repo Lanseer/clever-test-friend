@@ -290,6 +290,95 @@ function ResourcePopover({ className, files, onFileClick }: { className?: string
 }
 
 
+interface DimensionScenario {
+  name: string;
+  cases: string[];
+}
+
+function buildDimensionData(file: GeneratedFile): Record<"process" | "function" | "element", DimensionScenario[]> {
+  const total = file.caseCount;
+  const make = (labels: string[], caseTemplates: (s: string, i: number) => string): DimensionScenario[] => {
+    const perScenario = Math.max(1, Math.ceil(total / labels.length));
+    return labels.map((name) => ({
+      name,
+      cases: Array.from({ length: perScenario }).map((_, i) => caseTemplates(name, i)),
+    }));
+  };
+  return {
+    process: make(
+      ["发起请求", "身份校验", "业务处理", "结果回调", "异常处理"],
+      (s, i) => `在「${s}」环节，验证步骤 ${i + 1} 的流转与状态正确`,
+    ),
+    function: make(
+      ["账户开立", "信息维护", "权限控制", "查询统计", "报表导出"],
+      (s, i) => `「${s}」功能项 ${i + 1}：核心路径与边界条件校验`,
+    ),
+    element: make(
+      ["客户信息", "证件资料", "金额与币种", "渠道标识", "时间字段"],
+      (s, i) => `要素「${s}」校验 ${i + 1}：必填、格式、取值范围与依赖关系`,
+    ),
+  };
+}
+
+function PreviewDimensions({ file }: { file: GeneratedFile }) {
+  const data = buildDimensionData(file);
+  const tabs: { key: "process" | "function" | "element"; label: string }[] = [
+    { key: "process", label: "业务流程" },
+    { key: "function", label: "业务功能" },
+    { key: "element", label: "业务要素" },
+  ];
+  return (
+    <Tabs defaultValue="process" className="flex-1 flex flex-col min-h-0">
+      <div className="px-4 pt-3">
+        <TabsList className="grid w-full grid-cols-3">
+          {tabs.map((t) => (
+            <TabsTrigger key={t.key} value={t.key} className="text-xs">
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      {tabs.map((t) => {
+        const scenarios = data[t.key];
+        const totalCases = scenarios.reduce((sum, s) => sum + s.cases.length, 0);
+        return (
+          <TabsContent key={t.key} value={t.key} className="flex-1 min-h-0 mt-2">
+            <ScrollArea className="h-full">
+              <div className="p-4 pt-2 space-y-3">
+                <div className="text-xs text-muted-foreground">
+                  共 {scenarios.length} 个场景 · {totalCases} 条案例
+                </div>
+                {scenarios.map((s, sIdx) => (
+                  <div key={sIdx} className="border border-border rounded-lg overflow-hidden">
+                    <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        场景 {sIdx + 1}：{s.name}
+                      </span>
+                      <Badge variant="secondary" className="text-xs">
+                        {s.cases.length} 条
+                      </Badge>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {s.cases.map((c, cIdx) => (
+                        <div key={cIdx} className="px-3 py-2 text-xs text-muted-foreground">
+                          <span className="text-foreground font-medium">
+                            TC-{sIdx + 1}.{cIdx + 1}
+                          </span>{" "}
+                          {c}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+        );
+      })}
+    </Tabs>
+  );
+}
+
 
 
 
