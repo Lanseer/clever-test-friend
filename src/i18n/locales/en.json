@@ -228,7 +228,7 @@
     "deleted": "Deleted",
     "unchanged": "-",
     "totalScenarios": "Total Scenarios",
-    "totalCases": "Total Cases",
+    "totalCases": "Total Test Points",
     "confirmAiSuggestions": "Confirm applying AI suggestions?",
     "confirmAiSuggestionsDesc": "The system will automatically apply AI review suggestions to the cases",
     "applyAndConfirm": "Apply & Confirm",
