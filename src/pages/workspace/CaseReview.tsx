@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Plus, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle, Folder, BookOpen } from "lucide-react";
+import { ArrowLeft, Search, Sparkles, Loader2, ChevronDown, Check, Info, ChevronRight, Save, FileText, ChevronUp, MessageCircle, Shield, AlertTriangle, Folder, BookOpen } from "lucide-react";
 import { SmartDesignChat, Message } from "@/components/workspace/SmartDesignChat";
 import { GenerationRecordItem } from "@/components/workspace/GenerationRecordsPanel";
 import { Input } from "@/components/ui/input";
@@ -622,34 +622,6 @@ export default function CaseReview() {
     });
   };
 
-  // 新增场景
-  const handleAddScenario = (dimId: string) => {
-    const now = new Date();
-    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
-    const dim = dimensions.find(d => d.id === dimId);
-    if (!dim) return;
-    
-    const newCode = `SC-${String(dim.testPoints.length + 1).padStart(3, '0')}`;
-    const newTestPoint: TestPoint = {
-      id: `tp-${Date.now()}`,
-      code: newCode,
-      name: "新场景",
-      source: "UserStory",
-      caseCount: 0,
-      reviewResult: "pending",
-      reviewHistory: [{ timestamp, action: "新增场景" }],
-    };
-    
-    setDimensions(prev => prev.map(d => {
-      if (d.id === dimId) {
-        return { ...d, testPoints: [...d.testPoints, newTestPoint] };
-      }
-      return d;
-    }));
-    toast.success("已新增场景");
-  };
-
   // 过滤维度和测试点
   const filteredDimensions = dimensions
     .map((dim) => ({
@@ -1268,14 +1240,6 @@ Scenario: 完善后的场景描述
                   </div>
                 )}
                 
-                {/* 新增场景按钮 */}
-                <div 
-                  className="px-4 py-2 border-t border-dashed border-border hover:bg-muted/30 cursor-pointer transition-colors flex items-center justify-center gap-2 text-muted-foreground hover:text-primary"
-                  onClick={() => handleAddScenario(dimension.id)}
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="text-sm">{t('caseReview.addScenario')}</span>
-                </div>
               </div>
             </div>
               </CollapsibleContent>
