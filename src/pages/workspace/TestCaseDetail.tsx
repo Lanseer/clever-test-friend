@@ -249,6 +249,10 @@ export default function TestCaseDetail() {
             <Trash2 className="w-4 h-4" />
             删除
           </Button>
+          <Button variant="outline" onClick={() => navigate(`/workspace/${workspaceId}/management/cases/${caseId}/records`)} className="gap-2">
+            <History className="w-4 h-4" />
+            测试记录
+          </Button>
           <Button onClick={handleTest} className="gap-2">
             <Play className="w-4 h-4" />
             测试
