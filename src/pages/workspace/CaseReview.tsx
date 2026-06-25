@@ -1081,16 +1081,16 @@ export default function CaseReview() {
                            tp.reviewResult === "focusReview" && "text-amber-600 font-semibold"
                          )}>{tp.code}</span>
                       </div>
-                      {/* 场景描述 - hover显示完整内容，根据对比状态显示颜色 */}
+                      {/* 交易 */}
+                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
+                        <span className="text-xs text-foreground">{tp.transaction || "-"}</span>
+                      </div>
+                      {/* 场景 */}
                       <div className="col-span-2 px-3 py-3 border-r border-border flex items-center group relative">
                         <span className={cn("truncate text-xs", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         <div className="absolute left-0 top-full z-50 hidden group-hover:block bg-popover border rounded-lg shadow-lg p-2 min-w-[200px] max-w-[300px]">
                           <span className={cn("text-xs whitespace-normal", comparisonConfig.scenarioClassName)}>{tp.name}</span>
                         </div>
-                      </div>
-                      {/* 交易 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        <span className="text-xs text-foreground">{tp.transaction || "-"}</span>
                       </div>
                       {/* 场景分类 */}
                       <div className="col-span-1 px-2 py-1 border-r border-border flex items-center justify-center">
