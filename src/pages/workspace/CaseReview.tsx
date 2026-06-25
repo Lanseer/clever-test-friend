@@ -263,6 +263,7 @@ const useMockDimensions = (): TestDimension[] => {
     name: "正常还款",
     scenarioCategory: category,
     transaction: "贷款还款",
+    testPointName: pointName,
     caseCount: 1,
     reviewResult: results[idx % results.length],
     comparisonStatus: statuses[idx % statuses.length],
