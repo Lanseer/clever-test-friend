@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play, ChevronsUpDown, Check } from "lucide-react";
+import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play, ChevronsUpDown, Check, History } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
