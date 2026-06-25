@@ -878,15 +878,21 @@ export default function Home() {
 
       {/* Right: file preview panel */}
       {activeSession && previewFile && (
-        <aside className="w-[420px] shrink-0 border-l border-border bg-card flex flex-col">
+        <aside className={cn("shrink-0 border-l border-border bg-card flex flex-col", previewKind === "cases" ? "w-[720px]" : "w-[420px]")}>
           <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-            <FileText className="w-4 h-4 text-primary" />
+            {previewKind === "cases" ? (
+              <FileSpreadsheet className="w-4 h-4 text-green-600" />
+            ) : (
+              <FileText className="w-4 h-4 text-blue-600" />
+            )}
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-foreground truncate">
-                {previewFile.name}
+                {previewFile.name}_{previewKind === "cases" ? "案例文件" : "测试大纲"}
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                {previewFile.scenarioCount} 个场景 · {previewFile.caseCount} 条案例
+                {previewKind === "cases"
+                  ? `${previewFile.caseCount} 条案例`
+                  : `${previewFile.scenarioCount} 个场景 · ${previewFile.caseCount} 个测试要点`}
               </div>
             </div>
             <Button
@@ -898,7 +904,11 @@ export default function Home() {
               <X className="w-4 h-4" />
             </Button>
           </div>
-          <PreviewDimensions file={previewFile} />
+          {previewKind === "cases" ? (
+            <CasesListPreview file={previewFile} />
+          ) : (
+            <PreviewDimensions file={previewFile} />
+          )}
 
           <div className="border-t border-border p-3 bg-card">
             <Button
