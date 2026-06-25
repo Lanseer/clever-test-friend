@@ -189,7 +189,17 @@ const resourceSections: ResourceSection[] = [
   },
 ];
 
-function ResourcePopover({ className, files, onFileClick }: { className?: string; files?: GeneratedFile[]; onFileClick?: (f: GeneratedFile) => void }) {
+type CaseFileKind = "outline" | "cases";
+
+function ResourcePopover({
+  className,
+  files,
+  onFileClick,
+}: {
+  className?: string;
+  files?: GeneratedFile[];
+  onFileClick?: (f: GeneratedFile, kind: CaseFileKind) => void;
+}) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     attachments: true,
     knowledge: true,
@@ -259,22 +269,35 @@ function ResourcePopover({ className, files, onFileClick }: { className?: string
                 />
                 <span className="text-sm font-semibold text-foreground">测试案例</span>
                 <span className="text-xs text-muted-foreground ml-1">
-                  （{files.length}个文件）
+                  （{files.length * 2}个文件）
                 </span>
               </button>
               {open.cases && (
                 <div className="mt-1 space-y-0.5">
                   {files.map((f) => (
-                    <div
-                      key={f.id}
-                      onClick={() => onFileClick?.(f)}
-                      className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
-                    >
-                      <FileText className="w-4 h-4 shrink-0 text-primary" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-foreground truncate">{f.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {f.scenarioCount} 场景 · {f.caseCount} 案例
+                    <div key={f.id} className="space-y-0.5">
+                      <div
+                        onClick={() => onFileClick?.(f, "outline")}
+                        className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
+                      >
+                        <FileText className="w-4 h-4 shrink-0 text-blue-600" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-foreground truncate">{f.name}_测试大纲</div>
+                          <div className="text-xs text-muted-foreground">
+                            {f.scenarioCount} 场景 · {f.caseCount} 个测试要点
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => onFileClick?.(f, "cases")}
+                        className="flex items-center gap-2 px-2 py-1.5 ml-4 rounded hover:bg-muted/50 cursor-pointer"
+                      >
+                        <FileSpreadsheet className="w-4 h-4 shrink-0 text-green-600" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-foreground truncate">{f.name}_案例文件</div>
+                          <div className="text-xs text-muted-foreground">
+                            {f.caseCount} 条案例
+                          </div>
                         </div>
                       </div>
                     </div>
