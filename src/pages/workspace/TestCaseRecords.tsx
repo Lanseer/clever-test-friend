@@ -10,15 +10,14 @@ interface RunRecord {
   environment: string;
   duration: string;
   status: "passed" | "failed" | "running";
-  trigger: "手动" | "定时" | "CI";
 }
 
 const mockRecords: RunRecord[] = [
-  { id: "r-001", executedAt: "2026-06-25 09:42:18", executor: "张伟", environment: "测试环境", duration: "12s", status: "passed", trigger: "手动" },
-  { id: "r-002", executedAt: "2026-06-24 18:05:32", executor: "CI Pipeline", environment: "预发布环境", duration: "15s", status: "failed", trigger: "CI" },
-  { id: "r-003", executedAt: "2026-06-24 10:21:07", executor: "李娜", environment: "测试环境", duration: "11s", status: "passed", trigger: "手动" },
-  { id: "r-004", executedAt: "2026-06-23 22:00:00", executor: "定时任务", environment: "测试环境", duration: "13s", status: "passed", trigger: "定时" },
-  { id: "r-005", executedAt: "2026-06-23 14:33:46", executor: "王芳", environment: "开发环境", duration: "10s", status: "failed", trigger: "手动" },
+  { id: "r-001", executedAt: "2026-06-25 09:42:18", executor: "张伟", environment: "测试环境", duration: "12s", status: "passed" },
+  { id: "r-002", executedAt: "2026-06-24 18:05:32", executor: "CI Pipeline", environment: "预发布环境", duration: "15s", status: "failed" },
+  { id: "r-003", executedAt: "2026-06-24 10:21:07", executor: "李娜", environment: "测试环境", duration: "11s", status: "passed" },
+  { id: "r-004", executedAt: "2026-06-23 22:00:00", executor: "定时任务", environment: "测试环境", duration: "13s", status: "passed" },
+  { id: "r-005", executedAt: "2026-06-23 14:33:46", executor: "王芳", environment: "开发环境", duration: "10s", status: "failed" },
 ];
 
 const statusConfig = {
