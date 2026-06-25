@@ -1,35 +1,40 @@
-import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { CaseSourceInfo } from "@/components/workspace/CaseSourceInfo";
 
-
-const getMockBddContent = () => `Feature: 用户登录功能
-
-  Scenario: 用户使用有效的用户名和密码登录系统
-    Given 用户已经注册并拥有有效的账户
-    And 用户位于登录页面
-    When 用户输入正确的用户名 "testuser"
-    And 用户输入正确的密码 "Password123"
-    And 用户点击登录按钮
-    Then 系统应该验证用户凭证
-    And 用户应该被重定向到主页
-    And 系统应该显示欢迎消息
-
-  Cases:
-    | 编号    | 用户名      | 密码         | 预期结果           |
-    | TC-001  | testuser    | Password123  | 登录成功           |
-    | TC-002  | admin       | Admin@456    | 登录成功           |
-    | TC-003  | user01      | User#789     | 登录成功           |
-    | TC-004  | guest       | Guest@2026   | 登录成功并跳转首页 |
-    | TC-005  | dev_user    | Dev$Pass01   | 登录成功           |
-    | TC-006  | qa.tester   | Qa!Test2026  | 登录成功           |
-    | TC-007  | manager01   | Mgr#Pwd2026  | 登录成功           |
-    | TC-008  | finance     | Fin@2026Sec  | 登录成功并显示财务模块 |`;
+const mockTestPoints = [
+  {
+    keyPoint: "【账单优先顺序分配】",
+    verification: "当缴款金额小于总已出账未偿账单时，那么系统应按还款优先类别A(账单优先)从最早到期日到最晚到期日的顺序分配还款",
+  },
+  {
+    keyPoint: "【余额别名顺序分配】",
+    verification: "若还款按缴存层级COMN的Seq1执行，则每期到期内应按余额别名列表顺序(S*,FIS,F*,AS1,AT1,A11,AIS,AOT,INT,ALI,ALO,ALT,PIS,POT,PRI)依次分配还款",
+  },
+  {
+    keyPoint: "【部分偿还保留标记】",
+    verification: "若某期到期仅部分偿还，则剩余未偿本金应保留在该期到期中，且已偿还部分按结算顺序号标记",
+  },
+  {
+    keyPoint: "【FED不计入账单】",
+    verification: "若付款方式配置为B，则代收费用(FED)不计入账单，还款时不优先偿还FED",
+  },
+  {
+    keyPoint: "【未偿账单后续生成】",
+    verification: "当还款后仍有未偿账单时，则在账单日系统应正常生成下一期账单，并按缴存层级分配至所有未还余额",
+  },
+  {
+    keyPoint: "【未生成账单不分期】",
+    verification: "若当前到期(C)尚未生成账单，则还款时不对其分配还款金额，仅在账单日生成账单",
+  },
+  {
+    keyPoint: "【已计提费用纳入账单】",
+    verification: "当账单日生成账单时，系统应将已计提的利息(INT)和利息罚息(ALT)纳入账单金额",
+  },
+];
 
 export default function CaseReviewDetail() {
   const navigate = useNavigate();
@@ -38,8 +43,6 @@ export default function CaseReviewDetail() {
   const reviewStatus = searchParams.get("status");
   const dim = searchParams.get("dim");
   const { t } = useTranslation();
-
-  const [bddContent, setBddContent] = useState(getMockBddContent());
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -75,13 +78,34 @@ export default function CaseReviewDetail() {
         <div className="p-6 space-y-6">
           <div>
             <h2 className="font-semibold text-foreground text-sm mb-3">
-              测试场景
+              测试要点
             </h2>
-            <Textarea
-              className="min-h-[320px] font-mono text-xs resize-none bg-muted/30"
-              value={bddContent}
-              onChange={(e) => setBddContent(e.target.value)}
-            />
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b">
+                    <th className="px-4 py-3 text-center font-semibold text-foreground w-[200px]">
+                      测试要点
+                    </th>
+                    <th className="px-4 py-3 text-center font-semibold text-foreground">
+                      具体验证点
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockTestPoints.map((item, index) => (
+                    <tr key={index} className="border-b last:border-b-0">
+                      <td className="px-4 py-3 align-top font-medium whitespace-nowrap">
+                        {item.keyPoint}
+                      </td>
+                      <td className="px-4 py-3 align-top text-muted-foreground">
+                        {item.verification}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div>
