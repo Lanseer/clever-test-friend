@@ -45,7 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+
 import { CaseDetailSidebar, CaseDetailData } from "@/components/workspace/CaseDetailSidebar";
 import { ReviewHistorySidebar, ReviewHistoryData } from "@/components/workspace/ReviewHistorySidebar";
 import { ReferenceMaterialsSidebar, ReferenceMaterial } from "@/components/workspace/ReferenceMaterialsSidebar";
@@ -891,73 +891,6 @@ export default function CaseReview() {
             )}
           </h1>
           
-          {/* Reference Materials & Coverage & Smart Review */}
-          <div className="flex items-center gap-4 mt-1 flex-wrap">
-            {/* Document Coverage Rate */}
-            <Popover>
-              <PopoverTrigger className="flex items-center gap-1.5 text-sm cursor-pointer hover:opacity-80 transition-opacity">
-                <FileText className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">文档覆盖率</span>
-                <span className="font-semibold text-primary text-base">{avgCoverage}%</span>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-[420px] p-4">
-                <h4 className="font-medium text-sm mb-3">文档覆盖率明细</h4>
-                <div className="space-y-3">
-                  {documentCoverageRates.map((doc, idx) => {
-                    const matchedMaterial = mockReferenceMaterials.find(m => m.name === doc.name);
-                    return (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex items-center justify-between text-sm">
-                          <span 
-                            className={cn(
-                              "truncate flex-1 mr-2",
-                              matchedMaterial ? "text-primary cursor-pointer hover:underline" : "text-foreground"
-                            )}
-                            onClick={() => {
-                              if (matchedMaterial) {
-                                handleOpenMaterial(matchedMaterial);
-                              }
-                            }}
-                          >
-                            {doc.name}
-                          </span>
-                          <span className={cn(
-                            "font-semibold",
-                            doc.coverage >= 90 ? "text-green-600" : doc.coverage >= 80 ? "text-amber-600" : "text-red-600"
-                          )}>{doc.coverage}%</span>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-1.5">
-                          <div 
-                            className={cn(
-                              "h-1.5 rounded-full transition-all",
-                              doc.coverage >= 90 ? "bg-green-500" : doc.coverage >= 80 ? "bg-amber-500" : "bg-red-500"
-                            )}
-                            style={{ width: `${doc.coverage}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-3 pt-3 border-t flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">汇总覆盖率（主文档平均）</span>
-                  <span className="font-bold text-primary">{avgCoverage}%</span>
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <span className="text-muted-foreground">|</span>
-
-            {/* Multi-dimension Smart Review */}
-            <button
-              className="flex items-center gap-1.5 text-sm cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => setMultiDimensionReviewOpen(true)}
-            >
-              <Shield className="w-4 h-4 text-primary" />
-              <span className="text-muted-foreground">多维度智能覆盖率评估</span>
-              <span className="font-semibold text-destructive">{riskItemCount} 个风险项</span>
-            </button>
-          </div>
         </div>
         <Button
           className="ml-auto gap-2"
@@ -1044,26 +977,6 @@ export default function CaseReview() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            className="gap-2"
-            onClick={handleSmartReview}
-            disabled={isSmartReviewing}
-          >
-            {isSmartReviewing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t('caseReview.smartReview')}...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4" />
-                {t('caseReview.smartReview')}
-              </>
-            )}
-          </Button>
-        </div>
       </div>
 
       {/* Dimension Tables */}
@@ -1122,8 +1035,8 @@ export default function CaseReview() {
               {/* Table Header */}
               <div className="bg-[hsl(200,70%,50%)] text-white min-w-[1200px]">
                 {/* First row - group headers */}
-                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
-                  <div className="col-span-7 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
+                  <div className="col-span-6 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     {t('caseReview.scenarioBasicInfo')}
                   </div>
                   <div className="col-span-7 px-3 py-2 text-center font-medium">
@@ -1131,11 +1044,10 @@ export default function CaseReview() {
                   </div>
                 </div>
                 {/* Second row - column headers */}
-                <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
+                <div className="grid text-sm bg-[hsl(200,65%,55%)]" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.code')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioName')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.scenarioCategory')}</div>
-                  <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.comparisonStatus')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.source')}</div>
                   <div className="col-span-1 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.caseCount')}</div>
                   <div className="col-span-2 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center">{t('caseReview.reviewResult')}</div>
@@ -1155,7 +1067,7 @@ export default function CaseReview() {
                     <div
                       key={tp.id}
                       className="grid text-sm hover:bg-muted/30 transition-colors cursor-pointer"
-                      style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}
+                      style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}
                       onClick={() => handleOpenSidebar(dimension.id, tp)}
                     >
                       {/* 编号 */}
@@ -1177,16 +1089,6 @@ export default function CaseReview() {
                         <span className="text-xs text-muted-foreground">
                           {tp.scenarioCategory || "-"}
                         </span>
-                      </div>
-                      {/* 对比状态 */}
-                      <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
-                        {tp.comparisonStatus && tp.comparisonStatus !== "unchanged" ? (
-                          <Badge variant="outline" className={cn("text-[10px] px-1.5", comparisonConfig.className)}>
-                            {comparisonConfig.label}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )}
                       </div>
                       {/* 场景来源 - 纯文字显示，支持多个类型 */}
                       <div className="col-span-1 px-3 py-3 border-r border-border flex items-center justify-center">
