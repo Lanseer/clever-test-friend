@@ -1035,8 +1035,8 @@ export default function CaseReview() {
               {/* Table Header */}
               <div className="bg-[hsl(200,70%,50%)] text-white min-w-[1200px]">
                 {/* First row - group headers */}
-                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(14, minmax(0, 1fr))' }}>
-                  <div className="col-span-7 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
+                <div className="grid text-sm" style={{ gridTemplateColumns: 'repeat(13, minmax(0, 1fr))' }}>
+                  <div className="col-span-6 px-3 py-2 border-r border-[hsl(200,70%,60%)] text-center font-medium">
                     {t('caseReview.scenarioBasicInfo')}
                   </div>
                   <div className="col-span-7 px-3 py-2 text-center font-medium">
