@@ -218,6 +218,10 @@ export default function TestCaseDetail() {
             <History className="w-4 h-4" />
             测试记录
           </Button>
+          <Button variant="outline" onClick={() => toast.success("用例已保存")} className="gap-2">
+            <Save className="w-4 h-4" />
+            保存
+          </Button>
           <Button onClick={handleTest} className="gap-2">
             <Play className="w-4 h-4" />
             测试
