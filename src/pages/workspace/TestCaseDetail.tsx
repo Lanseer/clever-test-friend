@@ -236,23 +236,23 @@ export default function TestCaseDetail() {
           <div className="p-6 space-y-5">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">测试点</Label>
-              <div className="text-sm text-foreground">{testCase.testPoint}</div>
+              <Input value={testPoint} onChange={(e) => setTestPoint(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">用例标题</Label>
-              <div className="text-sm text-foreground font-medium">{testCase.title}</div>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">前置条件</Label>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.precondition}</div>
+              <Textarea value={precondition} onChange={(e) => setPrecondition(e.target.value)} rows={4} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">步骤</Label>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.steps}</div>
+              <Textarea value={steps} onChange={(e) => setSteps(e.target.value)} rows={6} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">预期</Label>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.expected}</div>
+              <Textarea value={expected} onChange={(e) => setExpected(e.target.value)} rows={6} />
             </div>
           </div>
         </div>
