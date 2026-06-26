@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Tag, Settings, TestTube, Copy, Trash2, Play, ChevronsUpDown, Check, History } from "lucide-react";
+import { ArrowLeft, Tag, Settings, FileText, Copy, Trash2, Play, ChevronsUpDown, Check, History } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,11 @@ const mockTestCases: Record<string, {
   id: string;
   code: string;
   name: string;
-  bddContent: string;
+  testPoint: string;
+  title: string;
+  precondition: string;
+  steps: string;
+  expected: string;
   tags: string[];
   environment: string;
   testData: string;
@@ -31,118 +35,71 @@ const mockTestCases: Record<string, {
   "1": {
     id: "1",
     code: "TC-001",
-    name: "用户登录功能测试",
-    bddContent: `Feature: 用户登录功能
-
-  Scenario: 使用有效凭证登录
-    Given 用户在登录页面
-    When 用户输入有效的用户名 "testuser"
-    And 用户输入有效的密码 "password123"
-    And 用户点击登录按钮
-    Then 用户应该成功登录
-    And 用户应该被重定向到首页
-
-  Scenario: 使用无效凭证登录
-    Given 用户在登录页面
-    When 用户输入无效的用户名 "wronguser"
-    And 用户输入错误的密码 "wrongpass"
-    And 用户点击登录按钮
-    Then 用户应该看到错误提示 "用户名或密码错误"
-    And 用户应该仍在登录页面`,
-    tags: ["登录", "核心功能"],
+    name: "贷款还款-账单优先顺序分配",
+    testPoint: "贷款还款：\"正常还款-还款金额小于未偿账单-账单优先顺序分配\"的场景",
+    title: "验证：\"缴款金额\"小于\"总已出账未偿账单\"时，按\"还款优先类别A（账单优先）\"从最早到期日到最晚到期日的顺序分配还款，最早到期优先清偿",
+    precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*N期逾期账单(O)且每期均含INT和PRI，缴款金额<总已出账未偿账单。",
+    steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<步骤1返回的SCB主账号cust_acct_num>，amount=<步骤1返回的放款金额disb_amt>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<步骤1返回的SCB主账号>，effectDate=<系统当前日期>。",
+    expected: "1、检查LoanAcctOpening接口返回的状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回的statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查系统按还款优先类别A(账单优先)从最早到期日到最晚到期日顺序分配还款，最早到期优先清偿。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况：本金+利息的余额更新。",
+    tags: ["贷款", "还款"],
     environment: "测试环境",
-    testData: "使用测试账号 testuser/password123",
-    testType: "UI",
+    testData: "使用贷款测试数据集",
+    testType: "API",
   },
   "2": {
     id: "2",
     code: "TC-002",
-    name: "支付流程完整性测试",
-    bddContent: `Feature: 支付流程
-
-  Scenario: 完成正常支付流程
-    Given 用户已登录并在购物车页面
-    And 购物车中有商品
-    When 用户点击结算按钮
-    And 用户选择支付方式 "信用卡"
-    And 用户确认支付
-    Then 支付应该成功完成
-    And 用户应该收到支付成功通知
-
-  Scenario: 支付失败处理
-    Given 用户已登录并在支付页面
-    When 支付过程中发生网络错误
-    Then 系统应该显示支付失败提示
-    And 用户可以选择重试或取消`,
-    tags: ["支付", "关键路径"],
-    environment: "预发布环境",
-    testData: "使用测试信用卡 4111111111111111",
-    testType: "UI",
+    name: "贷款还款-余额别名顺序分配",
+    testPoint: "贷款还款：\"正常还款-还款金额小于未偿账单-余额别名顺序分配\"的场景",
+    title: "验证：还款按\"缴存层级COMN的Seq1\"执行时，按\"余额别名列表顺序\"依次分配还款，\"S*\"优先于\"FIS\"，\"FIS\"优先于\"INT\"，\"INT\"优先于\"PRI\"",
+    precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*单期逾期账单(O)含多个余额别名(S*、FIS、INT、PRI)，缴款金额覆盖部分余额别名。",
+    steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<SCB主账号>，amount=<放款金额>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<SCB主账号>，effectDate=<系统当前日期>。",
+    expected: "1、检查LoanAcctOpening接口返回状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查系统按Seq1配置的余额别名列表顺序依次分配还款，S*优先于FIS，FIS优先于INT，INT优先于PRI。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况：本金+利息的余额更新。",
+    tags: ["贷款", "还款"],
+    environment: "测试环境",
+    testData: "使用贷款测试数据集",
+    testType: "API",
   },
   "3": {
     id: "3",
     code: "TC-003",
-    name: "用户注册表单验证",
-    bddContent: `Feature: 用户注册表单验证
-
-  Scenario: 验证必填字段
-    Given 用户在注册页面
-    When 用户未填写任何字段
-    And 用户点击注册按钮
-    Then 系统应该显示 "请填写用户名" 错误
-    And 系统应该显示 "请填写密码" 错误
-    And 系统应该显示 "请填写邮箱" 错误
-
-  Scenario: 验证邮箱格式
-    Given 用户在注册页面
-    When 用户输入无效邮箱 "invalidemail"
-    And 用户点击注册按钮
-    Then 系统应该显示 "请输入有效的邮箱地址" 错误`,
-    tags: ["注册", "表单验证"],
+    name: "贷款还款-部分偿还保留标记",
+    testPoint: "贷款还款：\"正常还款-还款金额小于未偿账单-部分偿还保留标记\"的场景",
+    title: "验证：\"某期到期\"仅部分偿还时，\"INT\"全额清偿并标记\"结算顺序号\"，\"PRI\"部分清偿并标记\"结算顺序号\"，剩余未偿本金保留在该期到期中",
+    precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*单期逾期账单(O)含INT和PRI，缴款金额<单期账单总额但>INT金额。",
+    steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<SCB主账号>，amount=<放款金额>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<SCB主账号>，effectDate=<系统当前日期>。",
+    expected: "1、检查LoanAcctOpening接口返回状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查INT全额清偿并标记结算顺序号，PRI部分清偿并标记结算顺序号，剩余未偿本金保留在该期到期中。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况：本金+利息的余额更新。",
+    tags: ["贷款", "还款"],
     environment: "测试环境",
-    testData: "使用随机生成的测试邮箱",
+    testData: "使用贷款测试数据集",
     testType: "API",
   },
   "4": {
     id: "4",
     code: "TC-004",
-    name: "订单状态流转测试",
-    bddContent: `Feature: 订单状态流转
-
-  Scenario: 订单从创建到完成的正常流程
-    Given 用户创建了一个新订单
-    Then 订单状态应该是 "待支付"
-    When 用户完成支付
-    Then 订单状态应该变为 "待发货"
-    When 商家发货
-    Then 订单状态应该变为 "已发货"
-    When 用户确认收货
-    Then 订单状态应该变为 "已完成"`,
-    tags: ["订单", "状态机"],
-    environment: "开发环境",
-    testData: "使用模拟订单数据",
+    name: "贷款还款-FED不计入账单",
+    testPoint: "贷款还款：\"正常还款-FED不计入账单\"的场景",
+    title: "验证：若付款方式配置为B，则代收费用(FED)不计入账单，还款时不优先偿还FED",
+    precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*付款方式配置为B，账单含FED。",
+    steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<SCB主账号>，amount=<放款金额>，effectDate=<T>，发送。\n3、*【T+N日】调用LoanDataPmt_RegularRepayment，输入loanAccountNumber=<SCB主账号>，effectDate=<系统当前日期>。",
+    expected: "1、检查LoanAcctOpening接口返回状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回statusCode=<200>，贷款放款成功。\n3、*还款检查：\n（1）调用LoanDataPmt_RegularRepayment接口，检查返回statusCode=<0>，贷款还款成功。\n（2）检查FED不计入账单，还款时不优先偿还FED。\n（3）调用LoanDataInq_AcctDetailInq接口，检查还款成功后账户余额情况。",
+    tags: ["贷款", "还款"],
+    environment: "测试环境",
+    testData: "使用贷款测试数据集",
     testType: "API",
   },
   "5": {
     id: "5",
     code: "TC-005",
-    name: "API接口响应时间测试",
-    bddContent: `Feature: API接口响应时间
-
-  Scenario: 验证登录接口响应时间
-    Given API服务正常运行
-    When 发送登录请求到 "/api/login"
-    Then 响应时间应该小于 200ms
-    And 响应状态码应该是 200
-
-  Scenario: 验证查询接口响应时间
-    Given API服务正常运行
-    When 发送查询请求到 "/api/users"
-    Then 响应时间应该小于 500ms
-    And 响应应该包含用户列表数据`,
-    tags: ["性能", "API"],
+    name: "贷款还款-已计提费用纳入账单",
+    testPoint: "贷款还款：\"正常还款-已计提费用纳入账单\"的场景",
+    title: "验证：当账单日生成账单时，系统应将已计提的利息(INT)和利息罚息(ALT)纳入账单金额",
+    precondition: "1、手工数据：准备1个法人客户，用于开户\n2、手工数据：准备1个贷款产品，用于开户\n3、手工数据：准备1个存款人账号，用于开户和还款\n4、过程数据：使用\"贷款开户\"返回的\"SCB主账号\"、\"放款金额\"、\"放款日期\"，用于放款\n5、*账单日已计提INT和ALT。",
+    steps: "1、调用LoanAcctOpening接口，输入cplComm.cust_acct_num=<已准备的法人客户>，cplComm.prod_cate_code=<496>，cplComm.prod_code=<COMN>，发送。\n2、【T日】调用LoanAcctDisburse_Disbursement接口，输入accountID=<SCB主账号>，amount=<放款金额>，effectDate=<T>，发送。\n3、*【账单日】检查账单生成情况。",
+    expected: "1、检查LoanAcctOpening接口返回状态码=<成功>，贷款开户成功。\n2、检查LoanAcctDisburse_Disbursement接口返回statusCode=<200>，贷款放款成功。\n3、*账单检查：\n（1）检查账单日生成账单时，已计提的利息(INT)和利息罚息(ALT)已纳入账单金额。\n（2）调用LoanDataInq_AcctDetailInq接口，检查账单金额正确。",
+    tags: ["贷款", "还款"],
     environment: "测试环境",
-    testData: "使用性能测试工具 JMeter",
+    testData: "使用贷款测试数据集",
     testType: "API",
   },
 };
