@@ -133,6 +133,12 @@ export default function TestCaseDetail() {
   );
   const [testDataOpen, setTestDataOpen] = useState(false);
 
+  const [testPoint, setTestPoint] = useState(testCase?.testPoint || "");
+  const [title, setTitle] = useState(testCase?.title || "");
+  const [precondition, setPrecondition] = useState(testCase?.precondition || "");
+  const [steps, setSteps] = useState(testCase?.steps || "");
+  const [expected, setExpected] = useState(testCase?.expected || "");
+
 
   if (!testCase) {
     return (
