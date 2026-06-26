@@ -910,15 +910,17 @@ export default function Home() {
             <PreviewDimensions file={previewFile} />
           )}
 
-          <div className="border-t border-border p-3 bg-card">
-            <Button
-              className="w-full gap-2 bg-primary/90 hover:bg-primary text-primary-foreground"
-              onClick={() => handleReview(previewFile)}
-            >
-              <ClipboardCheck className="w-4 h-4" />
-              开始审查
-            </Button>
-          </div>
+          {previewKind === "outline" && (
+            <div className="border-t border-border p-3 bg-card">
+              <Button
+                className="w-full gap-2 bg-primary/90 hover:bg-primary text-primary-foreground"
+                onClick={() => handleReview(previewFile)}
+              >
+                <ClipboardCheck className="w-4 h-4" />
+                开始审查
+              </Button>
+            </div>
+          )}
         </aside>
 
       )}
