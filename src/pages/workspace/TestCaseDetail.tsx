@@ -219,15 +219,32 @@ export default function TestCaseDetail() {
 
       {/* Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: BDD Content */}
+        {/* Left: Case Detail */}
         <div className="rounded-xl border bg-card overflow-hidden">
           <div className="px-6 py-4 border-b bg-muted/30 flex items-center gap-2">
-            <TestTube className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold text-foreground">测试功能</h2>
+            <FileText className="w-5 h-5 text-primary" />
+            <h2 className="font-semibold text-foreground">用例详情</h2>
           </div>
-          <div className="p-6">
-            <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap leading-relaxed">
-              {testCase.bddContent}
+          <div className="p-6 space-y-5">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">测试点</Label>
+              <div className="text-sm text-foreground">{testCase.testPoint}</div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">用例标题</Label>
+              <div className="text-sm text-foreground font-medium">{testCase.title}</div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">前置条件</Label>
+              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.precondition}</div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">步骤</Label>
+              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.steps}</div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">预期</Label>
+              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.expected}</div>
             </div>
           </div>
         </div>
