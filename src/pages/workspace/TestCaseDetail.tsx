@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Tag, Settings, FileText, Copy, Trash2, Play, ChevronsUpDown, Check, History } from "lucide-react";
+import { ArrowLeft, Tag, Settings, FileText, Copy, Trash2, Play, ChevronsUpDown, Check, History, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -131,6 +133,12 @@ export default function TestCaseDetail() {
   );
   const [testDataOpen, setTestDataOpen] = useState(false);
 
+  const [testPoint, setTestPoint] = useState(testCase?.testPoint || "");
+  const [title, setTitle] = useState(testCase?.title || "");
+  const [precondition, setPrecondition] = useState(testCase?.precondition || "");
+  const [steps, setSteps] = useState(testCase?.steps || "");
+  const [expected, setExpected] = useState(testCase?.expected || "");
+
 
   if (!testCase) {
     return (
@@ -210,6 +218,10 @@ export default function TestCaseDetail() {
             <History className="w-4 h-4" />
             测试记录
           </Button>
+          <Button variant="outline" onClick={() => toast.success("用例已保存")} className="gap-2">
+            <Save className="w-4 h-4" />
+            保存
+          </Button>
           <Button onClick={handleTest} className="gap-2">
             <Play className="w-4 h-4" />
             测试
@@ -228,23 +240,23 @@ export default function TestCaseDetail() {
           <div className="p-6 space-y-5">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">测试点</Label>
-              <div className="text-sm text-foreground">{testCase.testPoint}</div>
+              <Input value={testPoint} onChange={(e) => setTestPoint(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">用例标题</Label>
-              <div className="text-sm text-foreground font-medium">{testCase.title}</div>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">前置条件</Label>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.precondition}</div>
+              <Textarea value={precondition} onChange={(e) => setPrecondition(e.target.value)} rows={4} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">步骤</Label>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.steps}</div>
+              <Textarea value={steps} onChange={(e) => setSteps(e.target.value)} rows={6} />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">预期</Label>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{testCase.expected}</div>
+              <Textarea value={expected} onChange={(e) => setExpected(e.target.value)} rows={6} />
             </div>
           </div>
         </div>
