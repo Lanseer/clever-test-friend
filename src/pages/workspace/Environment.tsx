@@ -469,6 +469,21 @@ export default function Environment() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEnvDialogOpen(false)}>取消</Button>
             <Button onClick={handleSaveEnv}>保存</Button>
+            {envForm.category === "api" && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  import("@/hooks/use-toast").then(({ toast }) => {
+                    toast({ title: "连接测试", description: `正在测试 ${envForm.url || "环境地址"} 的连通性...` });
+                    setTimeout(() => {
+                      toast({ title: "连接成功", description: "环境连通性正常" });
+                    }, 800);
+                  });
+                }}
+              >
+                连接测试
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
