@@ -467,8 +467,6 @@ export default function Environment() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEnvDialogOpen(false)}>取消</Button>
-            <Button onClick={handleSaveEnv}>保存</Button>
             {envForm.category === "api" && (
               <Button
                 variant="secondary"
@@ -484,6 +482,8 @@ export default function Environment() {
                 连接测试
               </Button>
             )}
+            <Button variant="outline" onClick={() => setEnvDialogOpen(false)}>取消</Button>
+            <Button onClick={handleSaveEnv}>保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
